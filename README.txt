@@ -1,15 +1,22 @@
 EJSApp 1.0
 
 This is the first release of the ejsapp plugin.
-This plugin lets you add any Java applet created with Easy Java Simulations (EJS) to your Moodle course.
-The Java applets should be compiled with version 4.37 or older of EJS to properly work.
+This plugin lets you add any Java applet created with Easy Java Simulations (EJS) to your 
+Moodle course.
+The Java applets should be compiled with version 4.37 (build 20120715 or later) of EJS to 
+properly work.
 
-This is a module plugin for Moodle so you should place the ejsapp folder in your /mod folder, inside you Moodle installation.
+This is a module plugin for Moodle so you should place the ejsappbooking folder in your /mod
+folder,inside you Moodle installation.
+This module has been tested in Moodle versions 2.0, 2.1, 2.2 and 2.3.
 
-This module enhances its functionality when used along with the ejsapp_file_browser and the ejsapp_collab_session blocks.
-You can find and download both of them at the plugins section in the Moodle.org webpage.
+This module enhances its functionality when used along with the ejsappbooking module and/or
+the ejsapp_file_browser and the ejsapp_collab_session blocks.
+You can find and download them at the plugins section in the Moodle.org webpage or at
+https://github.com/UNEDLabs.
 
-An explanation of EJSApp is included in the folder "doc". You will also find a txt file with relevant links.
+An explanation of EJSApp is included in the folder "doc". There, you will also find a txt 
+file with relevant links.
 
 #####################################
 
