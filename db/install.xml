@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="ejsapp" COMMENT="Virtual-Remote Laboratory">
+    <TABLE NAME="ejsapp" COMMENT="Easy Java Simulations Applications">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Course ejsapp activity belongs to" PREVIOUS="id" NEXT="name"/>
@@ -17,9 +17,10 @@
         <FIELD NAME="class_file" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="applet main class file (e.g., heatflow.heatflowMoodle.heatflowMoodleApplet.class)" PREVIOUS="applet_name" NEXT="codebase"/>
         <FIELD NAME="codebase" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Path of the .jar that embeds the applet (e.g., /remote_laboratories_applets/gyroscopeMoodle/)" PREVIOUS="class_file" NEXT="mainframe"/>
         <FIELD NAME="mainframe" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the EJS mainframe (by default MainFrame)" PREVIOUS="codebase" NEXT="is_collaborative"/>
-        <FIELD NAME="is_collaborative" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" COMMENT="Does the lab supports collaborative sessions? (1=yes, 0=not)" PREVIOUS="mainframe" NEXT="preserve_applet_size"/>
-        <FIELD NAME="preserve_applet_size" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" PREVIOUS="is_collaborative" NEXT="height"/>
-        <FIELD NAME="height" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="preserve_applet_size" NEXT="width"/>
+        <FIELD NAME="is_collaborative" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" COMMENT="Does the lab supports collaborative sessions? (1=yes, 0=not)" PREVIOUS="mainframe" NEXT="preserve_applet_size"/>
+        <FIELD NAME="preserve_applet_size" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="is_collaborative" NEXT="is_rem_lab"/>
+        <FIELD NAME="is_rem_lab" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="preserve_applet_size" NEXT="height"/>
+        <FIELD NAME="height" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="is_rem_lab" NEXT="width"/>
         <FIELD NAME="width" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="height"/>
       </FIELDS>
       <KEYS>

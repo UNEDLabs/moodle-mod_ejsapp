@@ -58,8 +58,10 @@ $string['appletfile'] = 'Easy Java Simulation';
 $string['appletfile_required'] = 'A .jar file must be selected';
 $string['appletfile_help'] = 'Select the .jar file that encapsulates the Easy Java Simulation (EJS) application. The official website of EJS is http://fem.um.es/Ejs/';
 
-$string['preserve_applet_size_help'] = 'If this option is selected, the size of the applet layout is set by EJS. Otherwise, the size is set by moodle';
 $string['preserve_applet_size'] = 'Preserve the size of the applet layout';
+$string['preserve_applet_size_help'] = 'If this option is selected, the size of the applet layout is set by EJS. Otherwise, the size is set by moodle';
+$string['is_rem_lab'] = 'Remote experimental system?';
+$string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources, select "yes". Otherwise, select "no".';
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";

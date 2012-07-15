@@ -8,6 +8,6 @@ ejsapp Moodle tracker: http://tracker.moodle.org/browse/CONTRIB-3733
 
 EJS webpage: http://www.um.es/fem/EjsWiki/
 
-UNEDLabs github repository: https://github.com/UNEDLabs
+UNEDLabs github repository: https://github.com/organizations/UNEDLabs
 
 UNEDLabs webpage: http://unedlabs.dia.uned.es/

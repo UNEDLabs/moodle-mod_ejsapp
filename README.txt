@@ -1,6 +1,5 @@
-EJSApp 1.0
+EJSApp 1.1
 
-This is the first release of the ejsapp plugin.
 This plugin lets you add any Java applet created with Easy Java Simulations (EJS) to your 
 Moodle course.
 The Java applets should be compiled with version 4.37 (build 20120715 or later) of EJS to 

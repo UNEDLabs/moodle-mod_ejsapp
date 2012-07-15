@@ -57,8 +57,10 @@ $string['appletfile'] = 'Easy Java Simulation';
 $string['appletfile_required'] = 'Se debe seleccionar un archivo .jar';
 $string['appletfile_help'] = 'Selecione el archivo .jar que encapsula el laboratorio EJS (Easy Java Simulation). La pagina oficial de EJS es http://fem.um.es/Ejs/';
 
-$string['preserve_applet_size_help'] = 'Si selecciona esta opci&oacute;n, el applet se visualizar&aacute; con el tama&ntilde;o especificado con EJS. En caso contraro, moodle recalcular&aacute; el tama&ntilde;o';
 $string['preserve_applet_size'] = 'Preservar el tama&ntilde;o del applet';
+$string['preserve_applet_size_help'] = 'Si selecciona esta opci&oacute;n, el applet se visualizar&aacute; con el tama&ntilde;o especificado con EJS. En caso contraro, moodle recalcular&aacute; el tama&ntilde;o';
+$string['is_rem_lab'] = '¿Sistema experimental remoto?';
+$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota, selecciona "sí". En caso contrario, selecciona "no".';
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";

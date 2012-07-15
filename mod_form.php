@@ -97,6 +97,9 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 
     	  $mform->addElement('selectyesno', 'preserve_applet_size', get_string('preserve_applet_size', 'ejsapp'));
     	  $mform->addHelpButton('preserve_applet_size', 'preserve_applet_size', 'ejsapp');      
+    	  
+    	  $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
+    	  $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');  
 
 		// -------------------------------------------------------------------------------
         // Add standard elements, common to all modules

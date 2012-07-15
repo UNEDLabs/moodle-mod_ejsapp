@@ -28,28 +28,15 @@ function xmldb_ejsapp_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
-
-    if ($oldversion < 2012060602) {
-    	/// Define field course to be added to ejsapp
-    	$table = new xmldb_table('ejsapp');
-
-    	$field = new xmldb_field('preserve_applet_size', XMLDB_TYPE_TEXT);
-    	/// Conditionally launch add field preserve_applet_size
+    
+    if ($oldversion < 2012071507) {
+    /// Define field course to be added to ejsapp
+    $table = new xmldb_table('ejsapp');
+    
+    $field = new xmldb_field('is_rem_lab', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, true, 0, null, 'preserve_applet_size');
+    	/// Conditionally launch add field is_rem_lab
     	if (!$dbman->field_exists($table, $field)) {
-    		$dbman->add_field($table, $field);
-    	}
-
-    	$field = new xmldb_field('height', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, 'preserve_applet_size');
-    	// Conditionally launch add field height
-    	if (!$dbman->field_exists($table, $field)) {
-    		$dbman->add_field($table, $field);
-    	}
-
-    	$field = new xmldb_field('width', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, 'height');
-
-    	// Conditionally launch add field width
-    	if (!$dbman->field_exists($table, $field)) {
-    		$dbman->add_field($table, $field);
+    	  $dbman->add_field($table, $field, 0);  
     	}
     }
 
