@@ -7,7 +7,7 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// EJSApp is distributed in the hope that it will be useful,
+// EJSApp booking system is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -22,37 +22,18 @@
 //  (UNED), Madrid, Spain
 
 /**
- * Capability definitions for the ejsappbooking module
- *
- * The variable name for the capability definitions array is $capabilities
+ * @see uninstall_plugin()
  *
  * @package    mod
- * @subpackage ejsapp
- * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @subpackage ejsapp 
+ * @copyright  2012 Luis de la Torre and Ruben Heradio  <ldelatorre@gmail.com rheradio@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$capabilities = array(
-    'mod/ejsapp:view' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'guest' => CAP_ALLOW,
-            'user' => CAP_ALLOW,
-        )
-    ),
-
-    'mod/ejsapp:addinstance' => array(
-        'riskbitmask' => RISK_XSS,
-
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ),
-        'clonepermissionsfrom' => 'moodle/course:manageactivities'
-    ),
-    );
+/**
+ * Custom uninstallation procedure
+ */
+ 
+function xmldb_ejsapp_uninstall() {
+    return true;
+}

@@ -21,6 +21,17 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
+/**
+ * Capability definitions for the ejsappbooking module
+ *
+ * The variable name for the capability definitions array is $capabilities
+ *
+ * @package    mod
+ * @subpackage ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_ejsapp_upgrade($oldversion) {
@@ -30,14 +41,32 @@ function xmldb_ejsapp_upgrade($oldversion) {
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
     
     if ($oldversion < 2012071507) {
-    /// Define field course to be added to ejsapp
-    $table = new xmldb_table('ejsapp');
-    
-    $field = new xmldb_field('is_rem_lab', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, true, 0, null, 'preserve_applet_size');
+      /// Define field course to be added to ejsapp
+      $table = new xmldb_table('ejsapp');
+      $field = new xmldb_field('is_rem_lab', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, true, 0, null, 'preserve_applet_size');
+      
     	/// Conditionally launch add field is_rem_lab
-    	if (!$dbman->field_exists($table, $field)) {
-    	  $dbman->add_field($table, $field, 0);  
-    	}
+   	  $dbman->add_field($table, $field, 0);  
+    }
+    
+    if ($oldversion < 2012071510) {
+      /// Set the table name to be added  (ejsapp_remlab_conf) and add its fields
+      $table = new xmldb_table('ejsapp_remlab_conf');
+      
+      $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
+      $table->add_field('ejsappid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null);                 
+      $table->add_field('ip', XMLDB_TYPE_CHAR, '255', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null);
+      $table->add_field('port', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null);
+      $table->add_field('totalslots', XMLDB_TYPE_INTEGER, '5', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null);
+      $table->add_field('weeklyslots', XMLDB_TYPE_INTEGER, '3', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null); 
+      $table->add_field('dailyslots', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null);  
+
+      /// Set the table's key and index
+      $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'), null, null);
+      $table->add_index('ejsappid', XMLDB_INDEX_NOTUNIQUE, array('ejsappid'));
+    
+    	/// Create the new table
+    	$dbman->create_table($table);  
     }
 
     return true;

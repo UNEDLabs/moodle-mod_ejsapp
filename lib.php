@@ -234,13 +234,3 @@ function ejsapp_scale_used_anywhere($scaleid) {
         return false;
     }
 }
-
-/**
- * Execute post-uninstall custom actions for the module
- * This function was added in 1.9
- *
- * @return boolean true if success, false on error
- */
-function ejsapp_uninstall() {
-    return true;
-}

@@ -21,6 +21,17 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
+/**
+ * Capability definitions for the ejsappbooking module
+ *
+ * The variable name for the capability definitions array is $capabilities
+ *
+ * @package    mod
+ * @subpackage ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $DB;

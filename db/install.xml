@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="ejsapp" COMMENT="Easy Java Simulations Applications">
+    <TABLE NAME="ejsapp" COMMENT="Defines the Easy Java Simulations Applications instances in Moodle" NEXT="ejsapp_remlab_conf">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Course ejsapp activity belongs to" PREVIOUS="id" NEXT="name"/>
@@ -28,6 +28,23 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="ejsapp_remlab_conf" COMMENT="Contains all the configuration parameters a remote EJSApp needs" PREVIOUS="ejsapp">
+      <FIELDS>
+      	<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
+      	<FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The EJSApp id" PREVIOUS="id" NEXT="ip"/>
+        <FIELD NAME="ip" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="IP direction of the computer that controls the remote equipment" PREVIOUS="ejsappid" NEXT="port"/>
+        <FIELD NAME="port" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ip" NEXT="totalslots"/>
+        <FIELD NAME="totalslots" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="port" NEXT="weeklyslots"/>
+        <FIELD NAME="weeklyslots" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="totalslots" NEXT="dailyslots"/>
+        <FIELD NAME="dailyslots" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="weeklyslots"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

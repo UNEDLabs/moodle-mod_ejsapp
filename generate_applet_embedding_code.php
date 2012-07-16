@@ -135,7 +135,7 @@ function generate_applet_embedding_code($ejsapp,
 
   if ($state_file) {
     //<to read the applet state, javascript must wait until the applet has been totally downloaded>
-    //$state_load_msg = get_string('state_load_msg', 'ejsapp');
+    $state_load_msg = get_string('state_load_msg', 'ejsapp');
     $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
     $load_state_code = <<<EOC
     var applet = document.getElementById('{$ejsapp->applet_name}');
@@ -184,6 +184,8 @@ switch ($caller) {
 		break;
 
 	case 'ejsapp_file_browser':
+	  $state_file_id = required_param('state_file_id', PARAM_INT);
+	  $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
 		$ejsapp = $DB->get_record('ejsapp', array('id' => $_GET['ejsapp_id']));
 
 	  $course = $DB->get_record('course', array('id' => $ejsapp->course), '*', MUST_EXIST);
@@ -194,29 +196,27 @@ switch ($caller) {
 	  $PAGE->set_heading($course->fullname);
 
 		// get state_file and store it into the folder '/mod/ejsapp/tmp_state_files/'
-		store_tmp_state_file($_GET['state_file_id']);
+		store_tmp_state_file($state_file_id);
 
-		//$PAGE->set_url('/mod/ejsapp/generate_applet_embedding_code.php', array('caller' => 'ejsapp_file_browser', 'ejsapp_id' => $ejsapp->id, 'context_id' => $context->id, 'state_file_id' => $_GET['state_file_id']));
 		$context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
-		$PAGE->set_context($context);
+		$PAGE->set_url('/mod/ejsapp/generate_applet_embedding_code.php', array('caller' => $caller, 'ejsapp_id' => $ejsapp->id, 'context_id' => $context->id, 'state_file_id' => $state_file_id));
     $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'ejsapp')));
 		$PAGE->set_pagelayout('incourse'); 
-    $PAGE->navbar->add($ejsapp->name);
 		echo $OUTPUT->header();
 		
 		$tmp_state_files_path = $CFG->wwwroot . '/mod/ejsapp/tmp_state_files/';
-		$state_file_tmp_name = $tmp_state_files_path . $_GET['state_file_id'] . '.xml';
+		$state_file_tmp_name = $tmp_state_files_path . $state_file_id . '.xml';
 		echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $state_file_tmp_name, null, null));
 		
 		echo $OUTPUT->footer();
 		break;
 
 	case 'ejsapp_collab_session':
-		$PAGE->set_url('/mod/ejsapp/generate_applet_embedding_code.php');
 		require("{$CFG->dirroot}/blocks/ejsapp_collab_session/init_page.php");
 		$session = required_param('session', PARAM_INT);
 		$courseid = required_param('courseid', PARAM_INT);
 		$contextid = required_param('contextid', PARAM_INT);
+		$PAGE->set_url('/mod/ejsapp/generate_applet_embedding_code.php', array('caller' => $caller, 'session' => $session, 'courseid' => $courseid, 'contextid' => $contextid));
 
 		$ejsapp = get_ejsapp_object($session);
 

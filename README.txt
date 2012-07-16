@@ -5,7 +5,10 @@ Moodle course.
 The Java applets should be compiled with version 4.37 (build 20120715 or later) of EJS to 
 properly work.
 
-This is a module plugin for Moodle so you should place the ejsappbooking folder in your /mod
+If you downloaded this plugin from github, you will need to change the folder's name to
+ejsapp. If you downloaded it from Moodle.org, then you are fine.
+
+This is a module plugin for Moodle so you should place the ejsapp folder in your /mod
 folder,inside you Moodle installation.
 This module has been tested in Moodle versions 2.0, 2.1, 2.2 and 2.3.
 
