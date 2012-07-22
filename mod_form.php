@@ -71,7 +71,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Adding the standard "intro" and "introformat" fields
         $this->add_intro_editor();
         // -------------------------------------------------------------------------------   
-        // Adding the rest of ejsapp settings, adding more fieldsets
+        // Adding the rest of ejsapp settings by adding more fieldsets
         $mform->addElement('header', 'conf_parameters', get_string('jar_file', 'ejsapp'));
 
         $mform->addElement('hidden', 'class_file', null); // automatic sesskey protection
@@ -101,7 +101,39 @@ class mod_ejsapp_mod_form extends moodleform_mod {
     	  $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
     	  $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');  
 
-		// -------------------------------------------------------------------------------
+		    // -------------------------------------------------------------------------------
+		    // Adding elements to configure the remote lab if is_rem_lab element is set to true
+		    $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
+		    
+		    $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'),array('size'=>'15'));
+        $mform->setType('ip_lab', PARAM_TEXT);
+        $mform->addRule('ip_lab', get_string('maximumchars', '', 15), 'maxlength', 15, 'client');
+        $mform->setDefault('ip_lab', '127.0.0.1');
+        //if is_rem_lab == true
+          $mform->addRule('ip_lab', get_string('ip_lab_required', 'ejsapp'), 'required');
+        //
+        $mform->addHelpButton('ip_lab', 'ip_lab', 'ejsapp');
+		    
+        $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'),array('size'=>'5'));
+        $mform->setType('totalslots', PARAM_INT);
+        $mform->setDefault('totalslots', '10');
+        $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
+        $mform->addHelpButton('totalslots', 'totalslots', 'ejsapp');
+        
+        $mform->addElement('text', 'weeklyslots', get_string('weeklyslots', 'ejsapp'),array('size'=>'3'));
+        $mform->setType('weeklyslots', PARAM_INT);
+        $mform->setDefault('weeklyslots', '8');
+        $mform->addRule('weeklyslots', get_string('maximumchars', '', 3), 'maxlength', 3, 'client');
+        $mform->addHelpButton('weeklyslots', 'weeklyslots', 'ejsapp');
+        
+        $mform->addElement('text', 'dailyslots', get_string('dailyslots', 'ejsapp'),array('size'=>'2'));
+        $mform->setType('dailyslots', PARAM_INT);
+        $mform->setDefault('dailyslots', '4');
+        $mform->addRule('dailyslots', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
+        $mform->addHelpButton('dailyslots', 'dailyslots', 'ejsapp');
+        
+        $mform->setAdvanced('rem_lab');
+		    // -------------------------------------------------------------------------------
         // Add standard elements, common to all modules
         $this->standard_coursemodule_elements();
         // -------------------------------------------------------------------------------

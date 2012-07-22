@@ -60,13 +60,25 @@ function ejsapp_supports($feature) {
  */
 function ejsapp_add_instance($ejsapp) {
     global $DB, $CFG;
-
+        
     $ejsapp->timecreated = time();
     $ejsapp->id = $DB->insert_record('ejsapp', $ejsapp);
     
     $cmid = $ejsapp->coursemodule;
     $context = get_context_instance(CONTEXT_MODULE, $cmid);
     update_db($ejsapp, $context->id);
+    
+    // Remote labs
+    if ($ejsapp->is_rem_lab == 1) {
+      $ejsapp_rem_lab = new stdClass();
+      $ejsapp_rem_lab->ejsappid = $ejsapp->id;
+      $ejsapp_rem_lab->port = '0';
+      $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+      $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
+      $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
+      $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+      $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+    }
     
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     delete_recursively($path . 'temp');
@@ -84,7 +96,7 @@ function ejsapp_add_instance($ejsapp) {
  */
 function ejsapp_update_instance($ejsapp) {
     global $DB, $CFG;
-
+    
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
       
@@ -92,6 +104,28 @@ function ejsapp_update_instance($ejsapp) {
     $context = get_context_instance(CONTEXT_MODULE, $cmid); 
     $DB->delete_records('files', array('contextid' => $context->id, 'component' => 'mod_ejsapp', 'filearea' => 'jarfile', 'itemid' => '0'));  
     update_db($ejsapp, $context->id);
+    
+    // Remote labs
+    if ($ejsapp->is_rem_lab == 1) {
+      $ejsapp_rem_lab = new stdClass();
+      $ejsapp_rem_lab->ejsappid = $ejsapp->id;
+      $ejsapp_rem_lab->port = '0';
+      $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+      $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
+      $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
+      $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;      
+      $rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
+      if ($rem_labs != null) {
+        foreach ($rem_labs as $rem_lab) {
+          $ejsapp_rem_lab->id = $rem_lab->id;
+          $DB->update_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+        }
+      } else {
+        $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+      }        
+    } elseif ($rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id)) != null) {
+      $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id)); 
+    }
                   
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     delete_recursively($path . 'temp');
