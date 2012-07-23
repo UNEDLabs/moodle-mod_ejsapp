@@ -62,5 +62,16 @@ $string['preserve_applet_size_help'] = 'Si selecciona esta opci&oacute;n, el app
 $string['is_rem_lab'] = '¿Sistema experimental remoto?';
 $string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota, selecciona "sí". En caso contrario, selecciona "no".';
 
+$string['rem_lab_conf'] = 'Configuracion del laboratorio remoto';
+$string['ip_lab'] = 'IP direction';
+$string['ip_lab_help'] = 'Esperimental system IP direction.';
+$string['ip_lab_required'] = 'Debe proporcionar una direccion IP valida.';
+$string['totalslots'] = 'Horas de trabajo totales';
+$string['totalslots_help'] = 'Cantidad total de horas máximas que se le permitirá usar a cada alumno para trabajar con este laboratorio.';
+$string['weeklyslots'] = 'Horas de trabajo semanales';
+$string['weeklyslots_help'] = 'Cantidad semanal de horas máximas que se le permitirá usar a cada alumno para trabajar con este laboratorio.';
+$string['dailyslots'] = 'Horas de trabajo diarias';
+$string['dailyslots_help'] = 'Cantidad diaria de horas máximas que se le permitirá usar a cada alumno para trabajar con este laboratorio.';
+
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";

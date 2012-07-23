@@ -63,5 +63,16 @@ $string['preserve_applet_size_help'] = 'If this option is selected, the size of 
 $string['is_rem_lab'] = 'Remote experimental system?';
 $string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources, select "yes". Otherwise, select "no".';
 
+$string['rem_lab_conf'] = 'Remote Lab Configuration';
+$string['ip_lab'] = 'IP direction';
+$string['ip_lab_help'] = 'Esperimental system IP direction.';
+$string['ip_lab_required'] = 'You need to provide a valid IP direction.';
+$string['totalslots'] = 'Total hours of work';
+$string['totalslots_help'] = 'Total amount of maximum hours each student will be allowed to work with this lab.';
+$string['weeklyslots'] = 'Weekly hours of work';
+$string['weeklyslots_help'] = 'Weekly amount of maximum hours each student will be allowed to work with this lab.';
+$string['dailyslots'] = 'Daily hours of work';
+$string['dailyslots_help'] = 'Daily amount of maximum hours each student will be allowed to work with this lab.';
+
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
