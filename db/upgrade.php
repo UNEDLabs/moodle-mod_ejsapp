@@ -40,10 +40,10 @@ function xmldb_ejsapp_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
     
-    if ($oldversion < 2012071507) {
+    /*if ($oldversion < 2012071507) {
       /// Define field course to be added to ejsapp
       $table = new xmldb_table('ejsapp');
-      $field = new xmldb_field('is_rem_lab', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, true, 0, null, 'preserve_applet_size');
+      $field = new xmldb_field('is_rem_lab', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, false, null, 0, 'preserve_applet_size');
       
     	/// Conditionally launch add field is_rem_lab
    	  $dbman->add_field($table, $field, 0);  
@@ -68,6 +68,17 @@ function xmldb_ejsapp_upgrade($oldversion) {
     	/// Create the new table
     	$dbman->create_table($table);  
     }
+    
+    if ($oldversion < 2012072301) {
+      $table = new xmldb_table('ejsapp');
+      
+      $field1 = new xmldb_field('appwording', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'introformat');
+      $field2 = new xmldb_field('appwordingformat', XMLDB_TYPE_INT, '4', XMLDB_UNSIGNED, false, null, 0, 'appwording');
+      
+    	/// Conditionally launch add field
+   	  $dbman->add_field($table, $field1, 0);  
+   	  $dbman->add_field($table, $field2, 0);  
+    }*/
 
     return true;
     

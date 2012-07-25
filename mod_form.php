@@ -21,13 +21,6 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-// EJS manifest pareameters:
-// 	- Applet-Width
-// 	- Applet-Height
-//  - Main-Frame
-//  - Main-Class 
-//  - Is-Collaborative
-
 
 /**
  * The main ejsapp configuration form
@@ -74,19 +67,19 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Adding the rest of ejsapp settings by adding more fieldsets
         $mform->addElement('header', 'conf_parameters', get_string('jar_file', 'ejsapp'));
 
-        $mform->addElement('hidden', 'class_file', null); // automatic sesskey protection
+        $mform->addElement('hidden', 'class_file', null);
         $mform->setType('class_file', PARAM_TEXT);
         $mform->setDefault('class_file', 'null');
 
-        $mform->addElement('hidden', 'codebase', null); // automatic sesskey protection
+        $mform->addElement('hidden', 'codebase', null);
         $mform->setType('codebase', PARAM_TEXT);
         $mform->setDefault('codebase', 'null');
 
-        $mform->addElement('hidden', 'mainframe', null); // automatic sesskey protection
+        $mform->addElement('hidden', 'mainframe', null);
         $mform->setType('mainframe', PARAM_TEXT);
         $mform->setDefault('mainframe', 'null');
 
-        $mform->addElement('hidden', 'is_collaborative', null); // automatic sesskey protection
+        $mform->addElement('hidden', 'is_collaborative', null);
         $mform->setType('is_collaborative', PARAM_TEXT);
         $mform->setDefault('is_collaborative', 0);
 
@@ -95,9 +88,27 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 		    $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
-    	  $mform->addElement('selectyesno', 'preserve_applet_size', get_string('preserve_applet_size', 'ejsapp'));
-    	  $mform->addHelpButton('preserve_applet_size', 'preserve_applet_size', 'ejsapp');      
-
+        $select = &$mform->addElement('select', 'applet_size_conf', get_string('applet_size_conf','ejsapp'), array(get_string('preserve_applet_size','ejsapp'), get_string('moodle_resize','ejsapp'), get_string('user_resize','ejsapp')));
+        $mform->addHelpButton('applet_size_conf', 'applet_size_conf', 'ejsapp');
+        
+        $mform->addElement('selectyesno', 'preserve_aspect_ratio', get_string('preserve_aspect_ratio', 'ejsapp'));
+    	  $mform->addHelpButton('preserve_aspect_ratio', 'preserve_aspect_ratio', 'ejsapp');
+    	  $mform->disabledIf('preserve_aspect_ratio', 'applet_size_conf', 'eq', 0);
+    	  $mform->disabledIf('preserve_aspect_ratio', 'applet_size_conf', 'eq', 1);
+        
+        $mform->addElement('text', 'custom_width', get_string('custom_width', 'ejsapp'),array('size'=>'3'));
+        $mform->setType('custom_width', PARAM_INT);
+        $mform->disabledIf('custom_width', 'applet_size_conf', 'eq', 0);
+        //$mform->disabledIf('custom_width', 'applet_size_conf', 'eq', 1);
+        
+        $mform->addElement('text', 'custom_height', get_string('custom_height', 'ejsapp'),array('size'=>'3'));
+        $mform->setType('custom_height', PARAM_INT);
+    	  $mform->disabledIf('custom_height', 'applet_size_conf', 'eq', 0);
+    	  $mform->disabledIf('custom_height', 'applet_size_conf', 'eq', 1);
+    	  $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
+    	  
+    	  $mform->addElement('editor', 'ejsapp', get_string('appwording', 'ejsapp'), null, array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$this->context, 'noclean'=>1, 'trusttext'=>0));
+        $mform->setType('ejsapp', PARAM_RAW);
 		    // -------------------------------------------------------------------------------
 		    // Adding elements to configure the remote lab, if that's the case 
 		    $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
@@ -105,24 +116,21 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 		    $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
     	  $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp'); 
 		    
-		    $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'),array('size'=>'15'));
+		    $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'),array('size'=>'12'));
         $mform->setType('ip_lab', PARAM_TEXT);
         $mform->addRule('ip_lab', get_string('maximumchars', '', 15), 'maxlength', 15, 'client');
         $mform->setDefault('ip_lab', '127.0.0.1');
-        //if is_rem_lab == true
-        //$mform->addRule('ip_lab', get_string('ip_lab_required', 'ejsapp'), 'required');
-        //
         $mform->addHelpButton('ip_lab', 'ip_lab', 'ejsapp');
         $mform->disabledIf('ip_lab', 'is_rem_lab', 'eq', 0);
 		    
-        $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'),array('size'=>'5'));
+        $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'),array('size'=>'2'));
         $mform->setType('totalslots', PARAM_INT);
         $mform->setDefault('totalslots', '10');
         $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
         $mform->addHelpButton('totalslots', 'totalslots', 'ejsapp');
         $mform->disabledIf('totalslots', 'is_rem_lab', 'eq', 0);
         
-        $mform->addElement('text', 'weeklyslots', get_string('weeklyslots', 'ejsapp'),array('size'=>'3'));
+        $mform->addElement('text', 'weeklyslots', get_string('weeklyslots', 'ejsapp'),array('size'=>'2'));
         $mform->setType('weeklyslots', PARAM_INT);
         $mform->setDefault('weeklyslots', '8');
         $mform->addRule('weeklyslots', get_string('maximumchars', '', 3), 'maxlength', 3, 'client');
@@ -142,7 +150,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements();
         // -------------------------------------------------------------------------------
         // Add standard buttons, common to all modules
-        $this->add_action_buttons();
+        $this->add_action_buttons(); 
     } //function definition
 
 
@@ -159,7 +167,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
     	}
 
       $content = $this->get_file_content('appletfile');
-      
+              
       if ($content) {
         $form_data = $this->get_data();
         
@@ -180,7 +188,8 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Store the .jar file in the proper folder
         $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $form_data->course . '/' . $name . '/';
         $filename = $path . $applet_name;
-        //$mform->save_file('appletfile', $path, true); 
+        //$this->save_file('appletfile', $path, true);
+        //$mform->save_stored_file('appletfile', $newcontextid, $newcomponent, $newfilearea, $newitemid, $newfilepath='/', $newfilename=null, $overwrite=false, $newuserid=null);
         $fh = fopen($filename, 'w+') or die(get_string('file_error', 'ejsapp'));
         fwrite($fh, $content);
         fclose($fh);
@@ -199,16 +208,44 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->setType('applet_name', PARAM_TEXT);
         $mform->setDefault('applet_name', $applet_name);
         $default_values['applet_name'] = $applet_name;
+           
+        //Check the data provided by the user
+        if ($form_data->applet_size_conf == 2) {
+          //$mform->addRule('custom_width', get_string('custom_width_required', 'ejsapp'), 'required');
+          if ($form_data->custom_width == null) {
+            //$form_data->applet_size_conf = 0;
+            //$form_data->custom_width = 600;
+            echo get_string('custom_width_required', 'ejsapp');
+          }
+          if ($form_data->preserve_aspect_ratio == 0) {  
+            //$mform->addRule('custom_height', get_string('custom_height_required', 'ejsapp'), 'required');
+            if ($form_data->custom_width == null) {
+              //$form_data->applet_size_conf = 0;
+              //$form_data->custom_height = 400;
+              echo get_string('custom_height_required', 'ejsapp');
+            }
+          }
+        }
+        if ($form_data->is_rem_lab == 1) {
+          //$mform->addRule('ip_lab', get_string('ip_lab_required', 'ejsapp'), 'required');
+          if ($form_data->ip_lab == null) {
+            //$form_data->ip_lab = "127.0.0.1"; 
+            echo get_string('ip_lab_required', 'ejsapp');
+          }
+        }  
       } //if ($content)
+      
+      if ($this->current->instance) {
+        $draftitemid = file_get_submitted_draft_itemid('ejsapp');
+        $default_values['ejsapp']['format'] = $default_values['appwordingformat'];
+        $default_values['ejsapp']['text'] = file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$this->context, 'noclean'=>1, 'trusttext'=>0), $default_values['appwording']);
+        $default_values['ejsapp']['itemid'] = $draftitemid;
+      }           
     } //data_preprocessing
     
     
-    /*function validation($data) {
-    //Setting rules for remote labs configuration 
-      if ($data->is_rem_lab == 1) {
-        $mform->addRule('ip_lab', get_string('ip_lab_required', 'ejsapp'), 'required');
-      }
-      return "ok";
+    /*function validation($data, $files) {     
+      
     }*/
 
 } //class mod_ejsapp_mod_form

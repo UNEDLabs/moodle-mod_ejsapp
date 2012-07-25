@@ -57,15 +57,29 @@ $string['appletfile'] = 'Easy Java Simulation';
 $string['appletfile_required'] = 'Se debe seleccionar un archivo .jar';
 $string['appletfile_help'] = 'Selecione el archivo .jar que encapsula el laboratorio EJS (Easy Java Simulation). La pagina oficial de EJS es http://fem.um.es/Ejs/';
 
-$string['preserve_applet_size'] = 'Preservar el tama&ntilde;o del applet';
-$string['preserve_applet_size_help'] = 'Si selecciona esta opci&oacute;n, el applet se visualizar&aacute; con el tama&ntilde;o especificado con EJS. En caso contraro, moodle recalcular&aacute; el tama&ntilde;o';
-$string['is_rem_lab'] = '¿Sistema experimental remoto?';
-$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota, selecciona "sí". En caso contrario, selecciona "no".';
+$string['applet_size_conf'] = 'Reescalado del applet';
+$string['applet_size_conf_help'] = 'Tres opciones: 1) "Mantener tamaño original" mantendrá el tamaño original del applet en EJS, 2) "Permitir que Moodle fije el tamaño" redimensionará el applet para que ocupe todo el espacio posible a la par que respeta la relación de tamaño original, 3) "Permitir que el usuario fije el tamaño" permitirá al usuario establecer el tamaño del applet y seleccionar si desea mantener, o no, su relación de tamaño original.';
+$string['preserve_applet_size'] = 'Mantener tamaño original';
+$string['moodle_resize'] = 'Permitir que Moodle fije el tamaño';
+$string['user_resize'] = 'Permitir que el usuario fije el tamaño';
+
+$string['preserve_aspect_ratio'] = 'Mantener relación de tamaño';
+$string['preserve_aspect_ratio_help'] = 'Si selecciona esta opci&oacute;n, se respetará la relación de tamaño original del applet. En ese caso, el usuario podrá modificar la anchura del applet y el sistema ajustará automáticamente el valor para su altura. Si no se selecciona, el usuario podrá fijar tanto su anchura como su altura.';
+
+$string['custom_width'] = 'Anchura del applet (px)';
+$string['custom_width_required'] = 'ATENCION: La anchura del applet no fue fijada. Debes proporcionar un valor distinto.';
+
+$string['custom_height'] = 'Altura del applet (px)';
+$string['custom_height_required'] = 'ATENCION: La altura del applet no fue fijada. Debes proporcionar un valor distinto.';
+
+$string['appwording'] = 'Enunciado';
 
 $string['rem_lab_conf'] = 'Configuracion del laboratorio remoto';
+$string['is_rem_lab'] = '¿Sistema experimental remoto?';
+$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota, selecciona "sí". En caso contrario, selecciona "no".';
 $string['ip_lab'] = 'IP direction';
 $string['ip_lab_help'] = 'Esperimental system IP direction.';
-$string['ip_lab_required'] = 'Debe proporcionar una direccion IP valida.';
+$string['ip_lab_required'] = 'ATENCION: Debe proporcionar una direccion IP valida.';
 $string['totalslots'] = 'Horas de trabajo totales';
 $string['totalslots_help'] = 'Cantidad total de horas máximas que se le permitirá usar a cada alumno para trabajar con este laboratorio.';
 $string['weeklyslots'] = 'Horas de trabajo semanales';

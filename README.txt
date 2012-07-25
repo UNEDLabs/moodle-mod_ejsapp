@@ -20,6 +20,9 @@ https://github.com/UNEDLabs.
 An explanation of EJSApp is included in the folder "doc". There, you will also find a txt 
 file with relevant links.
 
+WARNING! If you are using Mac OS, Linux or Unix, you need to set permissions of the ejsapp
+folder to 777.
+
 #####################################
 
 CONFIGURING THE EJSAPP PLUGIN:

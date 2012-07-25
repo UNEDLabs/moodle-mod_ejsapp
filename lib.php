@@ -58,11 +58,16 @@ function ejsapp_supports($feature) {
  * @param object $ejsapp An object from the form in mod_form.php
  * @return int The id of the newly inserted ejsapp record
  */
-function ejsapp_add_instance($ejsapp) {
+function ejsapp_add_instance($ejsapp, $mform = null) {
     global $DB, $CFG;
         
     $ejsapp->timecreated = time();
     $ejsapp->id = $DB->insert_record('ejsapp', $ejsapp);
+    
+    if ($mform) {
+        $ejsapp->appwording       = $ejsapp->ejsapp['text'];
+        $ejsapp->appwordingformat = $ejsapp->ejsapp['format'];
+    }
     
     $cmid = $ejsapp->coursemodule;
     $context = get_context_instance(CONTEXT_MODULE, $cmid);
@@ -83,6 +88,12 @@ function ejsapp_add_instance($ejsapp) {
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     delete_recursively($path . 'temp');
     
+    if ($mform and !empty($ejsapp->ejsapp['itemid'])) {
+      $draftitemid = $ejsapp->ejsapp['itemid'];
+      $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$context, 'noclean'=>1, 'trusttext'=>0), $ejsapp->appwording);
+      $DB->update_record('ejsapp', $ejsapp);
+    }
+    
     return $ejsapp->id;
 }
                                 
@@ -94,11 +105,14 @@ function ejsapp_add_instance($ejsapp) {
  * @param object $ejsapp An object from the form in mod_form.php
  * @return boolean Success/Fail
  */
-function ejsapp_update_instance($ejsapp) {
+function ejsapp_update_instance($ejsapp, $mform) {
     global $DB, $CFG;
     
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
+    
+    $ejsapp->appwording       = $ejsapp->ejsapp['text'];
+    $ejsapp->appwordingformat = $ejsapp->ejsapp['format'];
       
     $cmid = $ejsapp->coursemodule;
     $context = get_context_instance(CONTEXT_MODULE, $cmid); 
@@ -129,6 +143,12 @@ function ejsapp_update_instance($ejsapp) {
                   
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     delete_recursively($path . 'temp');
+    
+    $draftitemid = $ejsapp->ejsapp['itemid'];
+    if ($draftitemid) {
+      $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$context, 'noclean'=>1, 'trusttext'=>0), $ejsapp->appwording);
+      $DB->update_record('ejsapp', $ejsapp);
+    }
 
     return $ejsapp->id;
 }

@@ -11,22 +11,19 @@
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="intro"/>
         <FIELD NAME="intro" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the ejsapp activity" PREVIOUS="name" NEXT="introformat"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="intro" NEXT="appwording"/>
-        <FIELD NAME="appwording" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Wording associated to the EJS applet" PREVIOUS="introformat" NEXT="appwordingformat"/>
-        <FIELD NAME="appwordingformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the appwording field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="appwording" NEXT="timecreated"/>
+        <FIELD NAME="appwording" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" COMMENT="Wording associated to the EJS applet" PREVIOUS="introformat" NEXT="appwordingformat"/>
+        <FIELD NAME="appwordingformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="Format of the appwording field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="appwording" NEXT="timecreated"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="appwordingformat" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="applet_name"/>
         <FIELD NAME="applet_name" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the applet that implements the Lab (e.g., heatflowMoodle)" PREVIOUS="timemodified" NEXT="class_file"/>
         <FIELD NAME="class_file" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="applet main class file (e.g., heatflow.heatflowMoodle.heatflowMoodleApplet.class)" PREVIOUS="applet_name" NEXT="codebase"/>
         <FIELD NAME="codebase" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Path of the .jar that embeds the applet (e.g., /remote_laboratories_applets/gyroscopeMoodle/)" PREVIOUS="class_file" NEXT="mainframe"/>
         <FIELD NAME="mainframe" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the EJS mainframe (by default MainFrame)" PREVIOUS="codebase" NEXT="is_collaborative"/>
-        <FIELD NAME="is_collaborative" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="Does the lab supports collaborative sessions? (1=yes, 0=not)" PREVIOUS="mainframe" NEXT="applet_size_conf"/>
-        <FIELD NAME="applet_size_conf" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="is_collaborative" NEXT="preserve_aspect_ratio"/>
-        <FIELD NAME="preserve_aspect_ratio" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="applet_size_conf" NEXT="custom_width"/>
-        <FIELD NAME="custom_width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="preserve_aspect_ratio" NEXT="custom_height"/>
-        <FIELD NAME="custom_height" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="custom_width" NEXT="is_rem_lab"/>
-        <FIELD NAME="is_rem_lab" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="custom_height" NEXT="height"/>
-        <FIELD NAME="height" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="is_rem_lab" NEXT="width"/>
-        <FIELD NAME="width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="height"/>
+        <FIELD NAME="is_collaborative" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" COMMENT="Does the lab supports collaborative sessions? (1=yes, 0=not)" PREVIOUS="mainframe" NEXT="preserve_applet_size"/>
+        <FIELD NAME="preserve_applet_size" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="is_collaborative" NEXT="is_rem_lab"/>
+        <FIELD NAME="is_rem_lab" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="preserve_applet_size" NEXT="height"/>
+        <FIELD NAME="height" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="is_rem_lab" NEXT="width"/>
+        <FIELD NAME="width" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="height"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -33,7 +33,6 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_login();
 require_once(dirname(__FILE__).'/lib.php');
 require_once('generate_applet_embedding_code.php');
 require_once('locallib.php');
@@ -58,17 +57,35 @@ $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
 add_to_log($course->id, 'ejsapp', 'view', "view.php?id=$cm->id", $ejsapp->name, $cm->id);
 
+// Update 'viewed' state if required by completion system
+//require_once($CFG->libdir . '/completionlib.php');
+//$completion = new completion_info($course);
+//$completion->set_module_viewed($cm);
+
 // Print the page header
 $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $cm->id));
 $PAGE->set_title($ejsapp->name);
-$PAGE->set_heading($course->fullname);
+$PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'ejsapp')));
 
 // Output starts here
 echo $OUTPUT->header();
 
+if ($ejsapp->intro) { // If some text was written, show the intro
+  echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
+}
+
 echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, null, null, null));
+
+if ($ejsapp->appwording) { // If some text was written, show it
+  $formatoptions = new stdClass;
+  $formatoptions->noclean = true;
+  $formatoptions->overflowdiv = true;
+  $formatoptions->context = $context;
+  $content = format_text($ejsapp->appwording, $ejsapp->appwordingformat, $formatoptions);
+  echo $OUTPUT->box($content, 'generalbox center clearfix');
+}
 
 // Finish the page
 echo $OUTPUT->footer();

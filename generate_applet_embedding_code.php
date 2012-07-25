@@ -61,15 +61,17 @@ function generate_applet_embedding_code($ejsapp,
 	)
 {
 
-  global $USER, $APPLET_WIDTH, $COLUMNS_WIDTH, $CFG;
+  global $USER, $APPLET_WIDTH, $COLUMNS_WIDTH, $CFG, $DB;
 
   $code = '';
   $code .= '<script "text/javascript">';
 
 	// <set the applet size on the screen>
-	if ($ejsapp->preserve_applet_size == 1) {
-		$code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
-	} else {
+	switch ($ejsapp->applet_size_conf) {
+	  case 0:
+		  $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
+		  break;
+	  case 1:
 		  $code .= "var w = 630, h = 460;
 		  if (window.innerWidth)
       w = window.innerWidth;
@@ -86,7 +88,16 @@ function generate_applet_embedding_code($ejsapp,
       w = document.documentElement.clientWidth;
       w = w - $COLUMNS_WIDTH;
       if (w < $APPLET_WIDTH) w = $APPLET_WIDTH;
-      h = 1.15*screen.availHeight*(w/screen.availWidth);";
+      h = w*{$ejsapp->height}/{$ejsapp->width};";
+      //h = screen.availHeight*(w/screen.availWidth);";
+      break;
+    case 2:
+      if($ejsapp->preserve_aspect_ratio == 0) {
+        $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
+      } else {
+        $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
+      }
+      break;
 	}
 	// <\set the applet size on the screen>
 
@@ -99,9 +110,9 @@ function generate_applet_embedding_code($ejsapp,
   }
   $context = get_context_instance(CONTEXT_USER, $USER->id);
   $language = current_language();
-  $user_name = get_user_name($USER->id); //For collab
+  $user_name = fullname($USER);            //For collab
   /*$username = new stdClass();
-  username = $USER->name;               //For checking Moodle connection*/
+  username = $USER->name;                  //For checking Moodle connection*/
 	$code .= "document.write('codebase=\"{$ejsapp->codebase}\"');
   document.write('archive=\"{$ejsapp->applet_name}.jar\"');
   document.write('name=\"{$ejsapp->applet_name}\"');

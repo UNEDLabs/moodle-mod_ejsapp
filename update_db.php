@@ -35,6 +35,7 @@ require_once('locallib.php');
 
 function update_db($ejsapp, $contextid)
 {
+
     global $CFG, $DB, $USER;
 
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' .
@@ -61,9 +62,11 @@ function update_db($ejsapp, $contextid)
  		$pattern = '/Main-Class\s*:\s*(.+)\s*/';
  		preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
  		$sub_str = $matches[1][0];
- 		$pattern = '/^\s(.+)\s*/m';
- 		if (preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
- 		  $sub_str = $sub_str . $matches[1][0];
+ 		if (strlen($matches[1][0]) == 59) { 
+ 		  $pattern = '/^\s(.+)\s*/m';
+ 		  if ((preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0)) {   
+ 		    $sub_str = $sub_str . $matches[1][0];
+      }
  	  }
  		$class_file = $sub_str . 'Applet.class';
  		$class_file = preg_replace('/\s+/', "", $class_file); // delete all white-spaces and the first newline 
@@ -142,6 +145,7 @@ function update_db($ejsapp, $contextid)
     $ejsapp->height = $height;
     $ejsapp->width = $width;
     $DB->update_record('ejsapp', $ejsapp);
+    
 } //update_db
 
 ?>
