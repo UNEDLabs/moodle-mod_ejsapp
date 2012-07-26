@@ -93,18 +93,15 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         
         $mform->addElement('selectyesno', 'preserve_aspect_ratio', get_string('preserve_aspect_ratio', 'ejsapp'));
     	  $mform->addHelpButton('preserve_aspect_ratio', 'preserve_aspect_ratio', 'ejsapp');
-    	  $mform->disabledIf('preserve_aspect_ratio', 'applet_size_conf', 'eq', 0);
-    	  $mform->disabledIf('preserve_aspect_ratio', 'applet_size_conf', 'eq', 1);
+    	  $mform->disabledIf('preserve_aspect_ratio', 'applet_size_conf', 'neq', 2);
         
         $mform->addElement('text', 'custom_width', get_string('custom_width', 'ejsapp'),array('size'=>'3'));
         $mform->setType('custom_width', PARAM_INT);
-        $mform->disabledIf('custom_width', 'applet_size_conf', 'eq', 0);
-        //$mform->disabledIf('custom_width', 'applet_size_conf', 'eq', 1);
+        $mform->disabledIf('custom_width', 'applet_size_conf', 'neq', 2);
         
         $mform->addElement('text', 'custom_height', get_string('custom_height', 'ejsapp'),array('size'=>'3'));
         $mform->setType('custom_height', PARAM_INT);
-    	  $mform->disabledIf('custom_height', 'applet_size_conf', 'eq', 0);
-    	  $mform->disabledIf('custom_height', 'applet_size_conf', 'eq', 1);
+    	  $mform->disabledIf('custom_height', 'applet_size_conf', 'neq', 2);
     	  $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
     	  
     	  $mform->addElement('editor', 'ejsapp', get_string('appwording', 'ejsapp'), null, array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$this->context, 'noclean'=>1, 'trusttext'=>0));
