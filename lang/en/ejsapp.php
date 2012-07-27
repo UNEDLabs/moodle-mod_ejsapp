@@ -78,6 +78,9 @@ $string['appwording'] = 'Wording';
 $string['rem_lab_conf'] = 'Remote Lab Configuration';
 $string['is_rem_lab'] = 'Remote experimental system?';
 $string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources, select "yes". Otherwise, select "no".';
+$string['port'] = 'Port';
+$string['port_help'] = 'The port used to establish the communication.';
+$string['port_required'] = 'WARNING: You need to provide a valid port.';
 $string['ip_lab'] = 'IP direction';
 $string['ip_lab_help'] = 'Esperimental system IP direction.';
 $string['ip_lab_required'] = 'WARNING: You need to provide a valid IP direction.';
@@ -90,3 +93,11 @@ $string['dailyslots_help'] = 'Daily amount of maximum hours each student will be
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
+
+//Settings
+$string['columns_width'] = "Columns width";
+$string['columns_width_description'] = "Total width (px) occupied by the columns in your Moodle visual theme";
+$string['collaborative_port'] = "Port for collaborative sessions";
+$string['collaborative_port_description'] = "Port used to establish communication for the collaborative sessions (requires the EJSApp collab sessions block)";
+$string['sarlab'] = "Using Sarlab?";
+$string['sarlab_description'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";

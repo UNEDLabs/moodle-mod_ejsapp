@@ -77,12 +77,27 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
     if ($ejsapp->is_rem_lab == 1) {
       $ejsapp_rem_lab = new stdClass();
       $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-      $ejsapp_rem_lab->port = '0';
       $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+      $ejsapp_rem_lab->port = $ejsapp->port;
       $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
       $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
       $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+      
+      $ejsapp_expsyst2pract = new stdClass();
+      $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+      //Obtain the url of the activity
+      $ejsapp_expsyst2pract->urlgoto = $CFG->wwwroot . "/mod/ejsapp/view.php?n=" . $ejsapp->id;
+      //Receive parameters from Sarlab's config tool (if it is used)
+      if ($CFG->sarlab == 1) {
+        //$ejsapp_expsyst2pract->practiceid = 1;
+        //$ejsapp_expsyst2pract->practiceintro = "Not available";
+      } else {
+        $ejsapp_expsyst2pract->practiceid = 1;
+        $ejsapp_expsyst2pract->practiceintro = "Not available";
+      } 
+      
       $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+      $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
     }
     
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $ejsapp->id . '/';
@@ -121,24 +136,45 @@ function ejsapp_update_instance($ejsapp, $mform) {
     
     // Remote labs
     if ($ejsapp->is_rem_lab == 1) {
+    
       $ejsapp_rem_lab = new stdClass();
       $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-      $ejsapp_rem_lab->port = '0';
       $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+      $ejsapp_rem_lab->port = $ejsapp->port;
       $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
       $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
       $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;      
+
+      $ejsapp_expsyst2pract = new stdClass();
+      $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+      //Obtain the url of the activity
+      $ejsapp_expsyst2pract->urlgoto = $CFG->wwwroot . "/mod/ejsapp/view.php?n=" . $ejsapp->id;
+      //Receive parameters from Sarlab's config tool (if it is used)
+      if ($CFG->sarlab == 1) {
+        //$ejsapp_expsyst2pract->practiceid = 1;
+        //$ejsapp_expsyst2pract->practiceintro = "Not available";
+      } else {
+        $ejsapp_expsyst2pract->practiceid = 1;
+        $ejsapp_expsyst2pract->practiceintro = "Not available";
+      } 
+      
       $rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
+      
       if ($rem_labs != null) {
         foreach ($rem_labs as $rem_lab) {
           $ejsapp_rem_lab->id = $rem_lab->id;
+          $ejsapp_expsyst2pract->id = $rem_lab->id;
           $DB->update_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+          $DB->update_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
         }
       } else {
         $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
-      }        
+        $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
+      }   
+           
     } elseif ($rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id)) != null) {
       $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id)); 
+      $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id)); 
     }
                   
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $ejsapp->id . '/';
@@ -173,6 +209,11 @@ function ejsapp_delete_instance($id) {
 	  
 	  $DB->delete_records('files', array('contextid' => $context->id, 'component' => 'mod_ejsapp', 'filearea' => 'jarfile', 'itemid' => '0'));
     $DB->delete_records('ejsapp', array('id' => $ejsapp->id));
+    
+    if ($ejsapp->is_rem_lab == 1) {
+      $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
+      $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
+    }
     
     $path = $CFG->dirroot . '/mod/ejsapp/jarfile/' . $ejsapp->course . '/' . $id;
     delete_recursively($path);

@@ -1,4 +1,4 @@
-EJSApp 1.1
+EJSApp 1.2
 
 This plugin lets you add any Java applet created with Easy Java Simulations (EJS) to your 
 Moodle course.
@@ -27,25 +27,21 @@ folder to 777.
 
 CONFIGURING THE EJSAPP PLUGIN:
 
-Edit the configuration.php file form the ejsapp folder. You will find three variables:
+When installing ejsapp for the first time, you will need to set three variables:
 
-   COLUMNS_WIDTH: This is the total width occupied by your columns (in pixels) in your Moodle
+   columns_width: This is the total width occupied by your columns (in pixels) in your Moodle
                   visual theme. This variable is used to resize the applet size when embedded
 		  in Moodle and the "Preserve original applet layout" options is set to no.
 		  Default configuration works well with the default theme and with many others
                   based on the two columns format. However, other themes may require changes 
                   in this variable.
 
-   APPLET_WIDTH:  This is the minimum width you want for your applet (in pixels). This 
-		  variable is used to resize the applet size when embedded in Moodle and the 
-		  "Preserve original applet layout" options is set to no.
-		  Default configuration works well with the default theme and with many others
-                  based on the two columns format. However, other themes may require changes 
-                  in this variable.
-
-   COLLABORATIVE_PORT: When the "EJSApp Collaborative Sessions" block is also installed, this
+   collaborative_port: When the "EJSApp Collaborative Sessions" block is also installed, this
 		       variable sets the port used for establishing TCP connections in the 
                        collaborative sessions.
+
+   sarlab:	  This variable defines whether the SARLAB system is used for managing the 
+		  access to the remote laboratories (requires SARLAB), or not.
 
 #####################################
                                                       

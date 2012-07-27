@@ -89,3 +89,11 @@ $string['dailyslots_help'] = 'Cantidad diaria de horas máximas que se le permiti
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
+
+//Settings
+$string['columns_width'] = "Ancho de columnas";
+$string['columns_width_description'] = "Ancho total ocupado (en px) por las columnas en tu tema visual de Moodle";
+$string['collaborative_port'] = "Puerto para sesiones colaborativas";
+$string['collaborative_port_description'] = "Puerto usado para establecer la comunicacion en las sesiones colaborativas (requiere el bloque EJSApp collab sessions)";
+$string['sarlab'] = "Usar Sarlab?";
+$string['sarlab_description'] = "Seleccionar 'si' unicamente si se esta usando Sarlab; un system que gestiona las conexiones a recursos de laboratorios remotos";

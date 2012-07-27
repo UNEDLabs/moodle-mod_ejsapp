@@ -33,13 +33,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$COLUMNS_WIDTH = 480;       //Total width occupied by your columns (in pixels)
-                            //in your Moodle visual theme
-$APPLET_WIDTH = 800-$COLUMNS_WIDTH; //Minimum width (in pixels) used by the main
-                                    //frame (where the applet is embeded) in
-                                    //your Moodle theme
-$COLLABORATIVE_PORT = 50000; //Port used for establishing TCP connections in the
-                             //collaborative sessions (requires the EJSApp 
-                             //Collab Sessions block)
+defined('MOODLE_INTERNAL') || die;
 
+//columns_width,      Total width occupied by the column(s) (in pixels) in your Moodle visual theme
+//collaborative_port, Port used for establishing TCP connections in the collaborative sessions (requires the EJSApp Collab Sessions block)
+//sarlab,             Whether SARLAB system is used for accessing the remote laboratories (requires SARLAB), or not.  
+
+if ($ADMIN->fulltree) {
+  $settings->add(new admin_setting_configtext('columns_width', get_string('columns_width','ejsapp'), get_string('columns_width_description','ejsapp'), 480, PARAM_INT, '2'));
+  $settings->add(new admin_setting_configtext('collaborative_port', get_string('collaborative_port','ejsapp'), get_string('collaborative_port_description','ejsapp'), 50000, PARAM_INT, '2'));
+  $settings->add(new admin_setting_configselect('sarlab', get_string('sarlab','ejsapp'), get_string('sarlab_description','ejsapp'), 0, array(0=>'No', 1=>'Yes')));                      
+}
 ?>

@@ -38,17 +38,16 @@
 require_once ('../../config.php');
 require_login();
 require_once('manage_tmp_state_files.php');
-require_once('configuration.php');
 
 
 if (is_block_installed('ejsapp_collab_session')) {
 	require_once($CFG->dirroot . '/blocks/ejsapp_collab_session/manage_collaborative_db.php' );
 }
 
-global $DB, $USER, $APPLET_WIDTH, $COLUMNS_WIDTH, $CFG, $COURSE;
+global $DB, $USER, $CFG, $COURSE;
 
 function is_block_installed($block_name){
-		global $DB, $USER,$CFG;
+		global $DB, $CFG;
 		$sql = "select * from {$CFG->prefix}block where name='{$block_name}'";
 		$records = $DB->get_records_sql($sql);
 		return (count($records) > 0);
@@ -61,7 +60,7 @@ function generate_applet_embedding_code($ejsapp,
 	)
 {
 
-  global $USER, $APPLET_WIDTH, $COLUMNS_WIDTH, $CFG, $DB;
+  global $USER, $CFG, $DB;
 
   $code = '';
   $code .= '<script "text/javascript">';
@@ -86,8 +85,7 @@ function generate_applet_embedding_code($ejsapp,
       else if (document.documentElement &&
       document.documentElement.clientWidth)
       w = document.documentElement.clientWidth;
-      w = w - $COLUMNS_WIDTH;
-      if (w < $APPLET_WIDTH) w = $APPLET_WIDTH;
+      w = w - $CFG->columns_width;
       h = w*{$ejsapp->height}/{$ejsapp->width};";
       //h = screen.availHeight*(w/screen.availWidth);";
       break;

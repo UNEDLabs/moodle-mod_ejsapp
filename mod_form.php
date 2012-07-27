@@ -115,10 +115,17 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 		    
 		    $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'),array('size'=>'12'));
         $mform->setType('ip_lab', PARAM_TEXT);
-        $mform->addRule('ip_lab', get_string('maximumchars', '', 15), 'maxlength', 15, 'client');
+        $mform->addRule('ip_lab', get_string('maximumchars', '', 12), 'maxlength', 12, 'client');
         $mform->setDefault('ip_lab', '127.0.0.1');
         $mform->addHelpButton('ip_lab', 'ip_lab', 'ejsapp');
         $mform->disabledIf('ip_lab', 'is_rem_lab', 'eq', 0);
+        
+        $mform->addElement('text', 'port', get_string('port', 'ejsapp'),array('size'=>'2'));
+        $mform->setType('port', PARAM_INT);
+        $mform->addRule('port', get_string('maximumchars', '', 6), 'maxlength', 6, 'client');
+        $mform->setDefault('port', '443');
+        $mform->addHelpButton('port', 'port', 'ejsapp');
+        $mform->disabledIf('port', 'is_rem_lab', 'eq', 0);
 		    
         $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'),array('size'=>'2'));
         $mform->setType('totalslots', PARAM_INT);
@@ -228,6 +235,10 @@ class mod_ejsapp_mod_form extends moodleform_mod {
           if ($form_data->ip_lab == null) {
             //$form_data->ip_lab = "127.0.0.1"; 
             echo get_string('ip_lab_required', 'ejsapp');
+          }
+          if ($form_data->port == null) {
+            //$form_data->port = "443"; 
+            echo get_string('port_required', 'ejsapp');
           }
         }  
       } //if ($content)
