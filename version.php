@@ -38,4 +38,4 @@ $module->requires = 2010112400;
 $module->cron     = 0;           // Period for cron to check this module (secs)
 $module->component = 'mod_ejsapp'; // To check on upgrade, that module sits in correct place
 $module->maturity = MATURITY_STABLE;
-$module->release = '1.1 (Build: 2012072700)';
+$module->release = '1.2 (Build: 2012072700)';

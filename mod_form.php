@@ -46,7 +46,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 
     function definition()
     {
-        global $COURSE, $CFG;
+        global $COURSE, $CFG, $DB;
         $mform = &$this->_form;
         // -------------------------------------------------------------------------------
         // Adding the "general" fieldset, where all the common settings are showed
@@ -115,38 +115,59 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 		    
 		    $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'),array('size'=>'12'));
         $mform->setType('ip_lab', PARAM_TEXT);
-        $mform->addRule('ip_lab', get_string('maximumchars', '', 12), 'maxlength', 12, 'client');
-        $mform->setDefault('ip_lab', '127.0.0.1');
+        $mform->addRule('ip_lab', get_string('maximumchars', '', 12), 'maxlength', 12, 'client'); 
         $mform->addHelpButton('ip_lab', 'ip_lab', 'ejsapp');
         $mform->disabledIf('ip_lab', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance) {
+          $rem_lab_data = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$this->current->instance));
+          if ($rem_lab_data) {
+            $mform->setDefault('ip_lab', $rem_lab_data->ip);
+          }
+        }
         
         $mform->addElement('text', 'port', get_string('port', 'ejsapp'),array('size'=>'2'));
         $mform->setType('port', PARAM_INT);
         $mform->addRule('port', get_string('maximumchars', '', 6), 'maxlength', 6, 'client');
-        $mform->setDefault('port', '443');
         $mform->addHelpButton('port', 'port', 'ejsapp');
         $mform->disabledIf('port', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance) {
+          if ($rem_lab_data) {
+            $mform->setDefault('port', $rem_lab_data->port);
+          }
+        }
 		    
         $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'),array('size'=>'2'));
         $mform->setType('totalslots', PARAM_INT);
-        $mform->setDefault('totalslots', '10');
         $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
         $mform->addHelpButton('totalslots', 'totalslots', 'ejsapp');
         $mform->disabledIf('totalslots', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance) {
+          if ($rem_lab_data) {
+            $mform->setDefault('totalslots', $rem_lab_data->totalslots);
+          }
+        }
         
         $mform->addElement('text', 'weeklyslots', get_string('weeklyslots', 'ejsapp'),array('size'=>'2'));
         $mform->setType('weeklyslots', PARAM_INT);
-        $mform->setDefault('weeklyslots', '8');
         $mform->addRule('weeklyslots', get_string('maximumchars', '', 3), 'maxlength', 3, 'client');
         $mform->addHelpButton('weeklyslots', 'weeklyslots', 'ejsapp');
         $mform->disabledIf('weeklyslots', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance) {
+          if ($rem_lab_data) {
+            $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
+          }
+        }
         
         $mform->addElement('text', 'dailyslots', get_string('dailyslots', 'ejsapp'),array('size'=>'2'));
         $mform->setType('dailyslots', PARAM_INT);
-        $mform->setDefault('dailyslots', '4');
         $mform->addRule('dailyslots', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
         $mform->addHelpButton('dailyslots', 'dailyslots', 'ejsapp');
         $mform->disabledIf('dailyslots', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance) {
+          if ($rem_lab_data) {
+            $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
+          }
+        }
         
         $mform->setAdvanced('rem_lab');
 		    // -------------------------------------------------------------------------------
@@ -211,36 +232,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'applet_name', null);
         $mform->setType('applet_name', PARAM_TEXT);
         $mform->setDefault('applet_name', $applet_name);
-        $default_values['applet_name'] = $applet_name;
-           
-        //Check the data provided by the user
-        if ($form_data->applet_size_conf == 2) {
-          //$mform->addRule('custom_width', get_string('custom_width_required', 'ejsapp'), 'required');
-          if ($form_data->custom_width == null) {
-            //$form_data->applet_size_conf = 0;
-            //$form_data->custom_width = 600;
-            echo get_string('custom_width_required', 'ejsapp');
-          }
-          if ($form_data->preserve_aspect_ratio == 0) {  
-            //$mform->addRule('custom_height', get_string('custom_height_required', 'ejsapp'), 'required');
-            if ($form_data->custom_width == null) {
-              //$form_data->applet_size_conf = 0;
-              //$form_data->custom_height = 400;
-              echo get_string('custom_height_required', 'ejsapp');
-            }
-          }
-        }
-        if ($form_data->is_rem_lab == 1) {
-          //$mform->addRule('ip_lab', get_string('ip_lab_required', 'ejsapp'), 'required');
-          if ($form_data->ip_lab == null) {
-            //$form_data->ip_lab = "127.0.0.1"; 
-            echo get_string('ip_lab_required', 'ejsapp');
-          }
-          if ($form_data->port == null) {
-            //$form_data->port = "443"; 
-            echo get_string('port_required', 'ejsapp');
-          }
-        }  
+        $default_values['applet_name'] = $applet_name; 
       } //if ($content)
       
       if ($this->current->instance) {
@@ -252,8 +244,31 @@ class mod_ejsapp_mod_form extends moodleform_mod {
     } //data_preprocessing
     
     
-    /*function validation($data, $files) {     
+    function validation($data, $files) {
+      //Check the data provided by the user     
+      $errors = parent::validation($data, $files);
+
+      if ($data['applet_size_conf'] == 2) {
+        if (empty($data['custom_width'])) {                                            
+          $errors['custom_width'] = get_string('custom_width_required','ejsapp');
+        }
+        if ($data['preserve_aspect_ratio'] == 0) {
+          if (empty($data['custom_height'])) {                                            
+            $errors['custom_height'] = get_string('custom_height_required','ejsapp');
+          }
+        }
+      }
+
+      if ($data['is_rem_lab'] == 1) {
+        if (empty($data['ip_lab'])) {                                            
+          $errors['ip_lab'] = get_string('ip_lab_required','ejsapp');
+        }
+        if (empty($data['port'])) {                                            
+          $errors['port'] = get_string('port_required','ejsapp');
+        }
+      }
       
-    }*/
+      return $errors;
+    }
 
 } //class mod_ejsapp_mod_form
