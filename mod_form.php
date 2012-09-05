@@ -64,7 +64,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Adding the standard "intro" and "introformat" fields
         $this->add_intro_editor();
         // -------------------------------------------------------------------------------   
-        // Adding the rest of ejsapp settings by adding more fieldsets
+        // Adding other ejsapp settings by adding more fieldsets
         $mform->addElement('header', 'conf_parameters', get_string('jar_file', 'ejsapp'));
 
         $mform->addElement('hidden', 'class_file', null);
@@ -103,6 +103,10 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->setType('custom_height', PARAM_INT);
     	  $mform->disabledIf('custom_height', 'applet_size_conf', 'neq', 2);
     	  $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
+    	  
+    	  // ------------------------------------------------------------------------------- 
+    	  //More optional text to be shown after the applet
+    	  $mform->addElement('header', 'more_text', get_string('more_text', 'ejsapp'));
     	  
     	  $mform->addElement('editor', 'ejsapp', get_string('appwording', 'ejsapp'), null, array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$this->context, 'noclean'=>1, 'trusttext'=>0));
         $mform->setType('ejsapp', PARAM_RAW);

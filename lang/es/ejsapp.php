@@ -51,6 +51,8 @@ $string['pluginname'] = 'EJSApp';
 $string['state_load_msg'] = 'Se va a actualizar el estado del laboratorio';
 $string['state_fail_msg'] = 'Fallo al cargar el estado';
 
+$string['more_text'] = 'Texto optional tras el applet';
+
 $string['jar_file'] = 'Archivo .jar que encapsula el laboratorio EJS';
 
 $string['appletfile'] = 'Easy Java Simulation';
