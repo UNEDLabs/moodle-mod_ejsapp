@@ -24,42 +24,29 @@
 
 /**
  * This file is used to receive any .xml, text or image file saved by an EJS
- * applet. 
+ * applet.
  *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 require_once('../../config.php'); // getting $CFG
 require_login();
 require_once("$CFG->libdir/formslib.php");
 require_once("$CFG->libdir/dml/moodle_database.php");
 require_once("$CFG->libdir/blocklib.php");
-require_once('manage_tmp_state_files.php');
-
-function get_file_id($filename,$source,$userid){
-	global $CFG;
-	mysql_connect($CFG->dbhost, $CFG->dbuser, $CFG->dbpass) or die(mysql_error());
-	mysql_select_db($CFG->dbname) or die(mysql_error());
-	$sql = "select * from {$CFG->prefix}files where filename='$filename' and source='$source' and userid='$userid'";
-	$result = mysql_query($sql);
-	while ($row = mysql_fetch_assoc($result)) {
-		$file_id = $row['id'];
-	}
-	mysql_free_result($result);
-	return $file_id;
-} //get_file_id
 
 // user_file has the following format:
-//		filename_context_id_879_ejsapp_id_87.extension
+// filename_context_id_879_ejsapp_id_87.extension
 
 // To avoid problems with the file names
 $safe_file = $_FILES['user_file']['name'];
-$aux_array = explode('\\',$safe_file);
-$aux_array = explode('/',$safe_file);
-$safe_file = $aux_array[count($aux_array)-1];
+$aux_array = explode('\\', $safe_file);
+$aux_array = explode('/', $safe_file);
+$safe_file = $aux_array[count($aux_array) - 1];
+$safe_file = str_replace(" ", "_", $safe_file);
 $safe_file = str_replace("#", "", $safe_file);
 $safe_file = str_replace("$", "Dollar", $safe_file);
 $safe_file = str_replace("%", "Percent", $safe_file);
@@ -83,62 +70,71 @@ $file_extension = $match[1];
 // <upload the file to a temporal folder>
 $upload_dir = $CFG->dataroot . "/tmp/";
 if (!file_exists($upload_dir)) {
-	mkdir($upload_dir, 0777);
+    mkdir($upload_dir, 0777);
 }
 
 $path = $upload_dir . $file_name . '.' . $file_extension;
 
-if ($_FILES['user_file'] != null){ // as long as a file was selected...
+if ($_FILES['user_file'] != null) { // as long as a file was selected...
 
-	if(copy($_FILES['user_file']['tmp_name'], $path)){
-	// if the file has been successfully copied do nothing
-	} else {
-		// print and error message
-		$theFileName = $_FILES['user_file']['name'];
-		echo "File $theFileName could not be uploaded";
-	}
+    if (copy($_FILES['user_file']['tmp_name'], $path)) {
+        // if the file has been successfully copied do nothing
+    } else {
+        // print and error message
+        $theFileName = $_FILES['user_file']['name'];
+        echo "File $theFileName could not be uploaded";
+    }
 
 }
-
 // </upload the file to a temporal folder>
 
-$browser = get_file_browser();
+// <store the file into the user repository>
+// <prepare the file info data>
 $fs = get_file_storage();
 // Prepare file record object
 $fileinfo = array(
-    'contextid' => $context_id,  // ID of context
-    'component' => 'user',     	   // usually = table name
-    'filearea' => 'private',          // usually = table name
-    'itemid' => 0,                      // usually = ID of row in table
-    'source' => "ejsapp=$ejsapp_id",
+    'contextid' => $context_id, // ID of context
+    'component' => 'user', // usually = table name
+    'filearea' => 'private', // usually = table name
+    'itemid' => 0, // usually = ID of row in table
+    'source' => "ejsappid=$ejsapp_id",
     'userid' => $user_id,
     'filepath' => '/',
     'filename' => $file_name . '.' . $file_extension);
+// </prepare the file info data>
 
-// <if is there an old file in the repository with the same name, then delete it>
+// <if is there an old file in the user repository with the same name, then delete it>
 $old_file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
 if ($old_file) {
-	// < code to avoid refreshing problems with block ejsapp_file_browser >
-	// < i.e., old_file link is not missed from ejsapp_file_browser >
-	$old_file_id = get_file_id("$file_name.$file_extension", "ejsapp=$ejsapp_id", $user_id);
-	store_tmp_state_file($old_file_id);
-	// </ code to avoid refreshing problems with block ejsapp_file_browser >
-	$old_file->delete();
+    $old_file->delete();
 }
-// </if is there an old file in the repository with the same name, then delete it>
+// </if is there an old file in the user repository with the same name, then delete it>
 
-// <store the file into the repository>
-$uploaded_file = fopen($path, 'r');
-$uploaded_file_code = fread($uploaded_file, filesize($path));
+$fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
+// </store the file into the user repository>
 
-$fs->create_file_from_string($fileinfo, $uploaded_file_code);
-fclose($uploaded_file);
-// <store the file into the repository>
+// <store the file into the mod_ejsapp repository>
+if (strcmp($file_extension, 'xml') == 0) {
+    $fileinfo = array(
+        'contextid' => $context_id,
+        'component' => 'mod_ejsapp',
+        'filearea' => 'private',
+        'itemid' => 0,
+        'source' => "ejsappid=$ejsapp_id",
+        'userid' => $user_id,
+        'filepath' => '/',
+        'filename' => $file_name . '.' . $file_extension);
+    // <if is there an old file in the mod_ejsapp repository with the same name, then delete it>
+    $old_file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
+    if ($old_file) {
+        $old_file->delete();
+    }
+    // </if is there an old file in the mod_ejsapp repository with the same name, then delete it>
+    $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
+}
+// </store the file into the mod_ejsapp repository>
 
-// remove the temporal file
+// remove the temporal file from the temporal folder
 unlink("$path");
 
 ?>
-
-
-

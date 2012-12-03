@@ -24,35 +24,23 @@
 
 /**
  *
- * This file is used to manage the .xml state files saved by the EJS applets and
- * that can be loaded by them. 
+ * Prints a particular instance of ejsapp
  *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
+//Check conditions in order to allow or restrict the access to the applet.   
+
 require_once ('../../config.php');
-require_once($CFG->libdir.'/filelib.php');
-require_login();
 
-function store_tmp_state_file($state_file_id){
-	global $CFG;
-	$fs = get_file_storage();
-	$file = $fs->get_file_by_id($state_file_id);
+global $DB;
 
-	if ($file) {
-		$tmp_state_files_path = $CFG->dirroot . '/mod/ejsapp/tmp_state_files/';
-		if (!file_exists($tmp_state_files_path)) {
-			mkdir($tmp_state_files_path, 0777);
-		}
-		$state_file_tmp_name =  $tmp_state_files_path . $state_file_id . '.xml';
-		$tmp_file = fopen($state_file_tmp_name, 'w+');
-		fwrite($tmp_file, $file->get_content());
-		fclose($tmp_file);
-	}
+$key = $_GET["key"];
+echo "key=$key\n";
 
-} //store_tmp_state_file
-
-?>
+if ($DB->record_exists('sarlab_keys', array('sarlabpass' => $key))) {
+    echo "access=true\n";
+} else echo "access=false\n";

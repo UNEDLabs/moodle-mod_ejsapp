@@ -22,9 +22,7 @@
 //  (UNED), Madrid, Spain
 
 /**
- * Capability definitions for the ejsappbooking module
- *
- * The variable name for the capability definitions array is $capabilities
+ * Log file for the ejsapp module
  *
  * @package    mod
  * @subpackage ejsapp
@@ -37,8 +35,8 @@ defined('MOODLE_INTERNAL') || die();
 global $DB;
 
 $logs = array(
-    array('module'=>'ejsapp', 'action'=>'add', 'mtable'=>'ejsapp', 'field'=>'name'),
-    array('module'=>'ejsapp', 'action'=>'update', 'mtable'=>'ejsapp', 'field'=>'name'),
-    array('module'=>'ejsapp', 'action'=>'view', 'mtable'=>'ejsapp', 'field'=>'name'),
-    array('module'=>'ejsapp', 'action'=>'view all', 'mtable'=>'ejsapp', 'field'=>'name')
+    array('module' => 'ejsapp', 'action' => 'add', 'mtable' => 'ejsapp', 'field' => 'name'),
+    array('module' => 'ejsapp', 'action' => 'update', 'mtable' => 'ejsapp', 'field' => 'name'),
+    array('module' => 'ejsapp', 'action' => 'view', 'mtable' => 'ejsapp', 'field' => 'name'),
+    array('module' => 'ejsapp', 'action' => 'view all', 'mtable' => 'ejsapp', 'field' => 'name')
 );

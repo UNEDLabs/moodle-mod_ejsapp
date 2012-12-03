@@ -21,38 +21,61 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
+/**
+ * Tasks file to perform the EJSApp backup
+ *
+ * @package    mod
+ * @subpackage ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/ejsapp/backup/moodle2/backup_ejsapp_stepslib.php');
-class backup_ejsapp_activity_task extends backup_activity_task {
 
-    protected function define_my_settings() {
+/**
+ * EJSApp backup task that provides all the settings and steps to perform one
+ * complete backup of the activity
+ */
+class backup_ejsapp_activity_task extends backup_activity_task
+{
+    /**
+     * Define particular settings for this activity
+     */
+    protected function define_my_settings()
+    {
         // No particular settings for this activity
     }
 
-    protected function define_my_steps() {
+    /**
+     * Caller to define_structure->define_structure
+     */
+    protected function define_my_steps()
+    {
         $this->add_step(new backup_ejsapp_activity_structure_step('ejsapp_structure', 'ejsapp.xml'));
     }
 
-    static public function encode_content_links($content) {
+    /**
+     * Code the transformations to perform in the activity in
+     *  order to get transportable (encoded) links
+     *
+     * @param string $content
+     */
+    static public function encode_content_links($content)
+    {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/ejsapp','#');
+        $base = preg_quote($CFG->wwwroot . '/mod/ejsapp', '#');
 
         //Access a list of all links in a course
-        $pattern = '#('.$base.'/index\.php\?id=)([0-9]+)#';
-        $replacement = '$@VRLABINDEX*$2@$';
+        $pattern = '#(' . $base . '/index\.php\?id=)([0-9]+)#';
+        $replacement = '$@EJSAPPINDEX*$2@$';
         $content = preg_replace($pattern, $replacement, $content);
 
         //Access the link supplying a course module id
-        $pattern = '#('.$base.'/view\.php\?id=)([0-9]+)#';
-        $replacement = '$@VRLABVIEWBYID*$2@$';
-        $content = preg_replace($pattern, $replacement, $content);
-
-        //Access the link supplying an instance id
-        $pattern = '#('.$base.'/view\.php\?u=)([0-9]+)#';
-        $replacement = '$@VRLABVIEWBYU*$2@$';
+        $pattern = '#(' . $base . '/view\.php\?id=)([0-9]+)#';
+        $replacement = '$@EJSAPPVIEWBYID*$2@$';
         $content = preg_replace($pattern, $replacement, $content);
 
         return $content;

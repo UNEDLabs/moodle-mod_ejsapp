@@ -78,14 +78,25 @@ $string['custom_height_required'] = 'WARNING: Applet height was not set. You mus
 $string['appwording'] = 'Wording';
 
 $string['rem_lab_conf'] = 'Remote Lab Configuration';
+
 $string['is_rem_lab'] = 'Remote experimental system?';
 $string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources, select "yes". Otherwise, select "no".';
-$string['port'] = 'Port';
-$string['port_help'] = 'The port used to establish the communication.';
-$string['port_required'] = 'WARNING: You need to provide a valid port.';
+
+$string['sarlab'] = "Using Sarlab?";
+$string['sarlab_help'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
+
+$string['sarlab_instance'] = "Sarlab server for this lab";
+$string['sarlab_instance_help'] = "The order corresponds to the one used for the values in the sarlab_IP and sarlab_port variables configured at the ejsapp settings page";
+
 $string['ip_lab'] = 'IP direction';
-$string['ip_lab_help'] = 'Esperimental system IP direction.';
+$string['ip_lab_help'] = 'Esperimental system IP direction. If you are using Sarlab, you dont have to worry about this parameter.';
 $string['ip_lab_required'] = 'WARNING: You need to provide a valid IP direction.';
+$string['port'] = 'Port';
+$string['port_help'] = 'The port used to establish the communication. If you are using Sarlab, you dont have to worry about this parameter.';
+$string['port_required'] = 'WARNING: You need to provide a valid port.';
+$string['practiceintro'] = 'Practice identifier in Sarlab';
+$string['practiceintro_help'] = 'Practices (separated by semicolons) configured in Sarlab for this experimental system.';
+$string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
 $string['totalslots'] = 'Total hours of work';
 $string['totalslots_help'] = 'Total amount of maximum hours each student will be allowed to work with this lab.';
 $string['weeklyslots'] = 'Weekly hours of work';
@@ -96,10 +107,18 @@ $string['dailyslots_help'] = 'Daily amount of maximum hours each student will be
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
 
+$string['no_booking'] = 'You do not have an active booking for this lab.';
+$string['check_bookings'] = 'Check your active bookings with the booking system.';
+
 //Settings
+$string['default_display_set'] = "Default display settings";
+$string['default_communication_set'] = "Default communication settings";
 $string['columns_width'] = "Columns width";
 $string['columns_width_description'] = "Total width (px) occupied by the columns in your Moodle visual theme";
+//$string['sarlab_description'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
 $string['collaborative_port'] = "Port for collaborative sessions";
 $string['collaborative_port_description'] = "Port used to establish communication for the collaborative sessions (requires the EJSApp collab sessions block)";
-$string['sarlab'] = "Using Sarlab?";
-$string['sarlab_description'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
+$string['sarlab_IP'] = "IP direction of the Sarlab server";
+$string['sarlab_IP_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide the IP direction of the server that runs the Sarlab system you want to use. Otherwise, this value will not be used, so you can leave the default value. If you have more than one sarlab server (for example, one at 127.0.0.1 and a second one at 127.0.0.2), insert the IPs direction separated by semicolons: 127.0.0.1;127.0.0.2";
+$string['sarlab_port'] = "Sarlab communication port";
+$string['sarlab_port_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide a valid port for establishing the communications with the Sarlab server. Otherwise, this value will not be used, so you can leave the default value. If you have more than one sarlab server (for example, one using port 443 and a second one also using port 443), insert the values separated by semicolons: 443;443";

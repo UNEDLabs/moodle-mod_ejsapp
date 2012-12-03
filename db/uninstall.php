@@ -22,10 +22,10 @@
 //  (UNED), Madrid, Spain
 
 /**
- * @see uninstall_plugin()
+ * Uninstall file for the ejsapp module
  *
  * @package    mod
- * @subpackage ejsapp 
+ * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio  <ldelatorre@gmail.com rheradio@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@
 /**
  * Custom uninstallation procedure
  */
- 
-function xmldb_ejsapp_uninstall() {
+function xmldb_ejsapp_uninstall()
+{
     return true;
 }

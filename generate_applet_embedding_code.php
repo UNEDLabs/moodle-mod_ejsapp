@@ -21,132 +21,166 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-
 /**
  *
- * This file is generates the code that embeds the EJS applet into Moodle. It is
+ * This file generates the code that embeds the EJS applet into Moodle. It is
  * used for three different cases: 1) when only the EJSApp activity is being
  * used, 2) when the EJSApp File Browser is used to load a state file, and
  * 3) when the EJSApp Collab Session is used.
- *  
+ *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ('../../config.php');
-require_login();
-require_once('manage_tmp_state_files.php');
+defined('MOODLE_INTERNAL') || die();
 
-
-if (is_block_installed('ejsapp_collab_session')) {
-	require_once($CFG->dirroot . '/blocks/ejsapp_collab_session/manage_collaborative_db.php' );
+if ($DB->record_exists('block', array('name' => 'ejsapp_collab_session'))) {
+    require_once($CFG->dirroot . '/blocks/ejsapp_collab_session/manage_collaborative_db.php');
 }
 
-global $DB, $USER, $CFG, $COURSE;
-
-function is_block_installed($block_name){
-		global $DB, $CFG;
-		$sql = "select * from {$CFG->prefix}block where name='{$block_name}'";
-		$records = $DB->get_records_sql($sql);
-		return (count($records) > 0);
-}
-
-
-function generate_applet_embedding_code($ejsapp,
-	$state_file, // caller = ejsapp_file_browser
-	$master_user, $col_session // caller = ejsapp_collab_session
-	)
+/**
+ * Returns the code that embeds an EJS applet into Moodle
+ *
+ * This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
+ * It is used for three different cases:
+ *      1) when only the EJSApp activity is being used
+ *      2) when the EJSApp File Browser is used to load a state file
+ *      3) when the EJSApp Collab Session is used
+ *
+ * @param stdClass $ejsapp record from table ejsapp
+ * @param int|null $sarlabinstance sarlab id (null if sarlab is not used)
+ * @param int|null $practiceid practice id (null if sarlab is not used)
+ * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser it is the name of the xml file that stores the state of an EJS applet, elsewhere it is null
+ * @param int|null $col_session if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the session id, elsewhere it is null
+ * @param string|null $col_ip if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the IP of the collaborative session master user, elsewhere it is null
+ * @param int|null $col_port if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the port of the collaborative session master user, elsewhere it is null
+ * @param int|null $session_director if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the id of the collaborative session master user, elsewhere it is null
+ * @return string code that embeds an EJS applet into Moodle
+ */
+function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $state_file, $col_session, $col_ip, $col_port, $session_director)
 {
+    global $DB, $USER, $CFG;
 
-  global $USER, $CFG, $DB;
+    if ($practiceid) { // Sarlab is used to access this remote lab
+        $time = time();
+        $year = date("Y", $time);
+        $month = date("n", $time);
+        $day = date("j", $time);
+        $hour = date("G", $time);
+        $min = date("i", $time);
+        $seg = date("s", $time);
+        $time = mktime($hour, $min, $seg, $month, $day, $year);
+        $DB->delete_records('sarlab_keys', array('user' => $USER->username, 'creationtime' => $time - 5));
+        mt_srand(time());
+        $random = mt_rand(0, 1000000);
+        $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $practiceid . fullname($USER) . $USER->username . $random);
 
-  $code = '';
-  $code .= '<script "text/javascript">';
+        $new_sarlab_key = new stdClass();
+        $new_sarlab_key->user = $USER->username;
+        $new_sarlab_key->sarlabpass = $sarlab_key;
+        $new_sarlab_key->creationtime = $time;
+        $DB->insert_record('sarlab_keys', $new_sarlab_key);
 
-	// <set the applet size on the screen>
-	switch ($ejsapp->applet_size_conf) {
-	  case 0:
-		  $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
-		  break;
-	  case 1:
-		  $code .= "var w = 630, h = 460;
-		  if (window.innerWidth)
-      w = window.innerWidth;
-      else if (document.body && document.body.offsetWidth)
-      w = document.body.offsetWidth;
-      if (document.body && document.body.clientWidth)
-      w= document.body.clientWidth;
-      else if (document.compatMode=='CSS1Compat' &&
-      document.documentElement &&
-      document.documentElement.offsetWidth )
-      w = document.documentElement.offsetWidth;
-      else if (document.documentElement &&
-      document.documentElement.clientWidth)
-      w = document.documentElement.clientWidth;
-      w = w - $CFG->columns_width;
-      h = w*{$ejsapp->height}/{$ejsapp->width};";
-      //h = screen.availHeight*(w/screen.availWidth);";
-      break;
-    case 2:
-      if($ejsapp->preserve_aspect_ratio == 0) {
-        $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
-      } else {
-        $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
-      }
-      break;
-	}
-	// <\set the applet size on the screen>
+        $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+        $list_sarlab_ports = explode(";", $CFG->sarlab_port);
+        $sarlab_IP = $list_sarlab_IPs[$sarlabinstance];
+        $sarlab_port = $list_sarlab_ports[$sarlabinstance];
+    }
 
-  if ($col_session && !am_i_master_user()) {
-   	$class_file = $ejsapp->class_file;
-   	$class_file = str_replace(".class", "Student.class", $class_file);
-   	$code .= "document.write('<applet code=\"$class_file\"');";
-  } else {
-   	$code .= "document.write('<applet code=\"{$ejsapp->class_file}\"');";
-  }
-  $context = get_context_instance(CONTEXT_USER, $USER->id);
-  $language = current_language();
-  $user_name = fullname($USER);            //For collab
-  /*$username = new stdClass();
-  username = $USER->name;                  //For checking Moodle connection*/
-	$code .= "document.write('codebase=\"{$ejsapp->codebase}\"');
-  document.write('archive=\"{$ejsapp->applet_name}.jar\"');
-  document.write('name=\"{$ejsapp->applet_name}\"');
-  document.write('id=\"{$ejsapp->applet_name}\"');
-  document.write('width=\"'+w+'\"');
-  document.write('height=\"'+h+'\">');
-  document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
+    $code = '<script "text/javascript">';
+
+    // <set the applet size on the screen>
+    switch ($ejsapp->applet_size_conf) {
+        case 0:
+            $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
+            break;
+        case 1:
+            $code .= "var w = 630, h = 460;
+		        if (window.innerWidth)
+                    w = window.innerWidth;
+                else if (document.body && document.body.offsetWidth)
+                    w = document.body.offsetWidth;
+                if (document.body && document.body.clientWidth)
+                    w= document.body.clientWidth;
+                else if (document.compatMode=='CSS1Compat' &&
+                         document.documentElement &&
+                         document.documentElement.offsetWidth )
+                    w = document.documentElement.offsetWidth;
+                else if (document.documentElement &&
+                        document.documentElement.clientWidth)
+                    w = document.documentElement.clientWidth;
+                w = w - $CFG->columns_width;
+                h = w*{$ejsapp->height}/{$ejsapp->width};";
+            break;
+        case 2:
+            if ($ejsapp->preserve_aspect_ratio == 0) {
+                $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
+            } else {
+                $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
+            }
+            break;
+    }
+    // <\set the applet size on the screen>
+
+    if ($col_session && !$session_director) {
+        $class_file = $ejsapp->class_file;
+        $class_file = str_replace(".class", "Student.class", $class_file);
+        $code .= "document.write('<applet code=\"$class_file\"');";
+    } else {
+        $code .= "document.write('<applet code=\"{$ejsapp->class_file}\"');";
+    }
+
+    $context = get_context_instance(CONTEXT_USER, $USER->id);
+    $language = current_language();
+    $username = fullname($USER); //For collab
+    $user_name = $USER->username; //For checking Moodle connection*/
+    $code .= "document.write('codebase=\"{$ejsapp->codebase}\"');
+    document.write('archive=\"{$ejsapp->applet_name}.jar\"');
+    document.write('name=\"{$ejsapp->applet_name}\"');
+    document.write('id=\"{$ejsapp->applet_name}\"');
+    document.write('width=\"'+w+'\"');
+    document.write('height=\"'+h+'\">');
+    document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
 	document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
 	document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
 	document.write('<param name=\"language\" value=\"$language\"/>');
-	document.write('<param name=\"username\" value=\"$user_name\"/>');
+	document.write('<param name=\"username\" value=\"$username\"/>');
+	document.write('<param name=\"user_name\" value=\"$user_name\"/>');
 	document.write('<param name=\"password\" value=\"{$USER->password}\"/>');
 	document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
-	
-  if ($col_session) {
-  	$port = get_port($master_user->collaborative_session_where_user_participates);
-		$code .= "document.write('<param name=\"is_collaborative\" value=\"true\"/>');
-		document.write('<param name=\"Port_Teacher\" value=\"$port\"/>');";
-		if (am_i_master_user()) {
-			$code .= "document.write('<param name=\"directorname\" value=\"$user_name\"/>');";
-		}else{
-			insert_collaborative_user($USER->id, null, $col_session);
-			$code .= "document.write('<param name=\"IP_Teacher\" value=\"{$master_user->ip}\"/>');
-			document.write('<param name=\"MainFrame_Teacher\" value=\"{$ejsapp->mainframe}\"/>');";
-		}
-	} else {
-		$code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
-	} //col_session
-	
-	$code .= "document.write('</applet>');";
 
-  if ($state_file) {
-    //<to read the applet state, javascript must wait until the applet has been totally downloaded>
-    $state_load_msg = get_string('state_load_msg', 'ejsapp');
-    $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
-    $load_state_code = <<<EOC
+    if ($col_session) {
+        $code .= "document.write('<param name=\"is_collaborative\" value=\"true\"/>');
+		document.write('<param name=\"Port_Teacher\" value=\"$col_port\"/>');";
+        if ($session_director) {
+            $code .= "document.write('<param name=\"directorname\" value=\"$username\"/>');";
+        } else {
+            insert_collaborative_user($USER->id, null, $col_session);
+            $code .= "document.write('<param name=\"IP_Teacher\" value=\"$col_ip\"/>');
+			document.write('<param name=\"MainFrame_Teacher\" value=\"{$ejsapp->mainframe}\"/>');";
+        }
+    } else {
+        $code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
+    } //col_session
+
+    if ($practiceid) {
+        $code .= "document.write('<param name=\"ipserver\" value=\"{$sarlab_IP}\"/>');
+	  document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
+	  document.write('<param name=\"idExp\" value=\"$practiceid\"/>');
+	  document.write('<param name=\"user\" value=\"EJSApp\"/>');
+	  document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
+    }
+
+    $code .= "document.write('</applet>');";
+
+    if ($state_file) {
+        //<to read the applet state, javascript must wait until the applet has been totally downloaded>
+        $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
+        $state_load_msg = get_string('state_load_msg', 'ejsapp');
+        $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
+        $load_state_code = <<<EOC
     var applet = document.getElementById('{$ejsapp->applet_name}');
 
     function performAppletCode(count) {
@@ -168,105 +202,12 @@ function generate_applet_embedding_code($ejsapp,
 
     performAppletCode(10);
 EOC;
-    //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
-		$code .= $load_state_code;
+        //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
+        $code .= $load_state_code;
     } //end of if ($state_file)
 
     $code .= '</script>';
 
-    return $code;  
-    
+    return $code;
+
 } //end of generate_applet_embedding_code
-     
-     
-if (!array_key_exists('caller', $_GET)) {
-	$caller = 'ejsapp';
-} else {
-	$caller = $_GET['caller'];
-}
-
-
-switch ($caller) {
-
-	case 'ejsapp':
-		// do nothing
-		break;
-
-	case 'ejsapp_file_browser':
-	  $state_file_id = required_param('state_file_id', PARAM_INT);
-	  $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
-		$ejsapp = $DB->get_record('ejsapp', array('id' => $_GET['ejsapp_id']));
-
-	  $course = $DB->get_record('course', array('id' => $ejsapp->course), '*', MUST_EXIST);
-	  $cm     = get_coursemodule_from_instance('ejsapp', $ejsapp->id, $course->id, false, MUST_EXIST);
-	  require_login($course, true, $cm);
-	  add_to_log($course->id, 'ejsapp', 'view', "view.php?id=$cm->id", $ejsapp->name, $cm->id); 
-	  $PAGE->set_title($ejsapp->name);
-	  $PAGE->set_heading($course->fullname);
-
-		// get state_file and store it into the folder '/mod/ejsapp/tmp_state_files/'
-		store_tmp_state_file($state_file_id);
-
-		$context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
-		$PAGE->set_url('/mod/ejsapp/generate_applet_embedding_code.php', array('caller' => $caller, 'ejsapp_id' => $ejsapp->id, 'context_id' => $context->id, 'state_file_id' => $state_file_id));
-    $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'ejsapp')));
-		$PAGE->set_pagelayout('incourse'); 
-		echo $OUTPUT->header();
-		
-		$tmp_state_files_path = $CFG->wwwroot . '/mod/ejsapp/tmp_state_files/';
-		$state_file_tmp_name = $tmp_state_files_path . $state_file_id . '.xml';
-		echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $state_file_tmp_name, null, null));
-		
-		echo $OUTPUT->footer();
-		break;
-
-	case 'ejsapp_collab_session':
-		require("{$CFG->dirroot}/blocks/ejsapp_collab_session/init_page.php");
-		$session = required_param('session', PARAM_INT);
-		$courseid = required_param('courseid', PARAM_INT);
-		$contextid = required_param('contextid', PARAM_INT);
-		$PAGE->set_url('/mod/ejsapp/generate_applet_embedding_code.php', array('caller' => $caller, 'session' => $session, 'courseid' => $courseid, 'contextid' => $contextid));
-
-		$ejsapp = get_ejsapp_object($session);
-
-	  $course = $DB->get_record('course', array('id' => $ejsapp->course), '*', MUST_EXIST);
-	  $cm     = get_coursemodule_from_instance('ejsapp', $ejsapp->id, $course->id, false, MUST_EXIST);
-	  require_login($course, true, $cm);
-	  add_to_log($course->id, 'ejsapp', 'view', "view.php?id=$cm->id", $ejsapp->name, $cm->id);
-	  $PAGE->set_title($ejsapp->name);
-	  $PAGE->set_heading($course->fullname); 
-		//$PAGE->set_context($contextid);
-    //$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'ejsapp')));
-		//$PAGE->set_pagelayout('incourse'); 
-    //$PAGE->navbar->add($ejsapp->name);
-		//echo $OUTPUT->header();
-
-		$master_user = get_master_user_object($session);
-
-		$page_caller = $ejsapp->name;
-
-		echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp,null,$master_user, $session));
-
-		$close_url = $CFG->wwwroot .
-			"/blocks/ejsapp_collab_session/close_collaborative_session.php?session=$session&courseid=$courseid&contextid=$contextid";
-
-		if (am_i_master_user()) {
-			$close_button = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
-		} else {
-			$close_button = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
-		}
-
-    $button = <<<EOD
-    <center>
-    <form>
-    <input type="button" value="$close_button" onClick="window.location.href = '  $close_url'">
-    </form>
-    </center>
-EOD;
-
-		echo $button;
-
-		echo $OUTPUT->footer();
-		break;
-		
-} // end of switch   

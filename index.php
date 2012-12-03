@@ -23,18 +23,21 @@
 
 
 /**
+ *This page is used by Moodle when listing all the instances of your module that are in a
+ * particular course with the course id being passed to this script
+ *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
 
-$id = required_param('id', PARAM_INT);   // course
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
-if (! $course = $DB->get_record('course', array('id' => $id))) {
+$id = required_param('id', PARAM_INT); // course
+
+if (!$course = $DB->get_record('course', array('id' => $id))) {
     error('Course ID is incorrect');
 }
 
@@ -52,7 +55,7 @@ echo $OUTPUT->header();
 
 /// Get all the appropriate data
 
-if (! $ejsapps = get_all_instances_in_course('ejsapp', $course)) {
+if (!$ejsapps = get_all_instances_in_course('ejsapp', $course)) {
     echo $OUTPUT->heading(get_string('noejsapps', 'ejsapp'), 2);
     echo $OUTPUT->continue_button("view.php?id=$course->id");
     echo $OUTPUT->footer();
@@ -61,35 +64,35 @@ if (! $ejsapps = get_all_instances_in_course('ejsapp', $course)) {
 
 /// Print the list of instances
 
-$timenow  = time();
-$strname  = get_string('name');
-$strweek  = get_string('week');
+$timenow = time();
+$strname = get_string('name');
+$strweek = get_string('week');
 $strtopic = get_string('topic');
 
 if ($course->format == 'weeks') {
-    $table->head  = array ($strweek, $strname);
-    $table->align = array ('center', 'left');
+    $table->head = array($strweek, $strname);
+    $table->align = array('center', 'left');
 } else if ($course->format == 'topics') {
-    $table->head  = array ($strtopic, $strname);
-    $table->align = array ('center', 'left', 'left', 'left');
+    $table->head = array($strtopic, $strname);
+    $table->align = array('center', 'left', 'left', 'left');
 } else {
-    $table->head  = array ($strname);
-    $table->align = array ('left', 'left', 'left');
+    $table->head = array($strname);
+    $table->align = array('left', 'left', 'left');
 }
 
 foreach ($ejsapps as $ejsapp) {
     if (!$ejsapp->visible) {
         //Show dimmed if the mod is hidden
-        $link = '<a class="dimmed" href="view.php?id='.$ejsapp->coursemodule.'">'.format_string($ejsapp->name).'</a>';
+        $link = '<a class="dimmed" href="view.php?id=' . $ejsapp->coursemodule . '">' . format_string($ejsapp->name) . '</a>';
     } else {
         //Show normal if the mod is visible
-        $link = '<a href="view.php?id='.$ejsapp->coursemodule.'">'.format_string($ejsapp->name).'</a>';
+        $link = '<a href="view.php?id=' . $ejsapp->coursemodule . '">' . format_string($ejsapp->name) . '</a>';
     }
 
     if ($course->format == 'weeks' or $course->format == 'topics') {
-        $table->data[] = array ($ejsapp->section, $link);
+        $table->data[] = array($ejsapp->section, $link);
     } else {
-        $table->data[] = array ($link);
+        $table->data[] = array($link);
     }
 }
 

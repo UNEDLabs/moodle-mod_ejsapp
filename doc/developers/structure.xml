@@ -1,0 +1,1439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project version="2.0.0a11" title="">
+  <file path="backup\moodle2\backup_ejsapp_activity_task.class.php" hash="58e4333b735f54a87b4c8bbec1a01706" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Tasks file to perform the EJSApp backup</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="35" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <class final="false" abstract="false" namespace="global" line="41" package="Default">
+      <extends>\backup_activity_task</extends>
+      <name>backup_ejsapp_activity_task</name>
+      <full_name>\backup_ejsapp_activity_task</full_name>
+      <docblock line="37">
+        <description>EJSApp backup task that provides all the settings and steps to perform one
+complete backup of the activity</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="46" package="Default">
+        <name>define_my_settings</name>
+        <full_name>define_my_settings</full_name>
+        <docblock line="43">
+          <description>Define particular settings for this activity</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="54" package="Default">
+        <name>define_my_steps</name>
+        <full_name>define_my_steps</full_name>
+        <docblock line="51">
+          <description>Caller to define_structure-&gt;define_structure</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="global" line="65" package="Default">
+        <name>encode_content_links</name>
+        <full_name>encode_content_links</full_name>
+        <docblock line="59">
+          <description>Code the transformations to perform in the activity in
+ order to get transportable (encoded) links</description>
+          <long-description></long-description>
+          <tag line="59" name="param" description="" type="string" variable="$content">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="65">
+          <name>$content</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+  </file>
+  <file path="backup\moodle2\backup_ejsapp_stepslib.php" hash="5cbb765b37ef67b857363e76edf225a3" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Steps file to perform the EJSApp backup</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="global" line="39" package="Default">
+      <extends>\backup_activity_structure_step</extends>
+      <name>backup_ejsapp_activity_structure_step</name>
+      <full_name>\backup_ejsapp_activity_structure_step</full_name>
+      <docblock line="36">
+        <description>Define the complete EJSApp structure for backup, with file and id annotations</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="45" package="Default">
+        <name>define_structure</name>
+        <full_name>define_structure</full_name>
+        <docblock line="42">
+          <description>Define the complete EJSApp structure for backup, with file and id annotations</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+    </class>
+  </file>
+  <file path="backup\moodle2\restore_ejsapp_activity_task.class.php" hash="687f9e049afa2c8da1f78accddb1e152" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Tasks file to perform the EJSApp restore</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="35" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <class final="false" abstract="false" namespace="global" line="41" package="Default">
+      <extends>\restore_activity_task</extends>
+      <name>restore_ejsapp_activity_task</name>
+      <full_name>\restore_ejsapp_activity_task</full_name>
+      <docblock line="37">
+        <description>EJSApp restore task that provides all the settings and steps to perform one
+complete restore of the activity</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="47" package="Default">
+        <name>define_my_settings</name>
+        <full_name>define_my_settings</full_name>
+        <docblock line="44">
+          <description>Define (add) particular settings this activity can have</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="55" package="Default">
+        <name>define_my_steps</name>
+        <full_name>define_my_steps</full_name>
+        <docblock line="52">
+          <description>Define (add) particular steps this activity can have</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="global" line="65" package="Default">
+        <name>define_decode_contents</name>
+        <full_name>define_decode_contents</full_name>
+        <docblock line="61">
+          <description>Define the contents in the activity that must be
+processed by the link decoder</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="global" line="78" package="Default">
+        <name>define_decode_rules</name>
+        <full_name>define_decode_rules</full_name>
+        <docblock line="74">
+          <description>Define the decoding rules for links belonging
+to the activity to be executed by the link decoder</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="global" line="94" package="Default">
+        <name>define_restore_log_rules</name>
+        <full_name>define_restore_log_rules</full_name>
+        <docblock line="88">
+          <description>Define the restore log rules that will be applied
+by the {@link restore_logs_processor} when restoring
+ejsapp logs.</description>
+          <long-description>&lt;p&gt;It must return one array
+of {@link restore_log_rule} objects&lt;/p&gt;</long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="global" line="120" package="Default">
+        <name>define_restore_log_rules_for_course</name>
+        <full_name>define_restore_log_rules_for_course</full_name>
+        <docblock line="110">
+          <description>Define the restore log rules that will be applied
+by the {@link restore_logs_processor} when restoring
+course logs.</description>
+          <long-description>&lt;p&gt;It must return one array
+of {@link restore_log_rule} objects&lt;/p&gt;
+
+&lt;p&gt;Note this rules are applied when restoring course logs
+by the restore final task, but are defined here at
+activity level. All them are rules not linked to any module instance (cmid = 0)&lt;/p&gt;</long-description>
+        </docblock>
+      </method>
+    </class>
+  </file>
+  <file path="backup\moodle2\restore_ejsapp_stepslib.php" hash="9768ee624e47ae38f35d42761113612b" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Tasks file to perform the EJSApp backup</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="global" line="36" package="Default">
+      <extends>\restore_activity_structure_step</extends>
+      <name>restore_ejsapp_activity_structure_step</name>
+      <full_name>\restore_ejsapp_activity_structure_step</full_name>
+      <docblock line="33">
+        <description>Structure step to restore one EJSApp activity</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="42" package="Default">
+        <name>define_structure</name>
+        <full_name>define_structure</full_name>
+        <docblock line="39">
+          <description>Define structure</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="64" package="Default">
+        <name>process_ejsapp</name>
+        <full_name>process_ejsapp</full_name>
+        <docblock line="60">
+          <description>Process table ejsapp</description>
+          <long-description></long-description>
+          <tag line="60" name="param" description="" type="\stdClass" variable="$data">
+            <type by_reference="false">\stdClass</type>
+          </tag>
+        </docblock>
+        <argument line="64">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="82" package="Default">
+        <name>process_ejsapp_expsyst2pract</name>
+        <full_name>process_ejsapp_expsyst2pract</full_name>
+        <docblock line="78">
+          <description>Process table ejsapp_expsyst2pract</description>
+          <long-description></long-description>
+          <tag line="78" name="param" description="" type="\stdClass" variable="$data">
+            <type by_reference="false">\stdClass</type>
+          </tag>
+        </docblock>
+        <argument line="82">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="101" package="Default">
+        <name>process_ejsapp_remlab_conf</name>
+        <full_name>process_ejsapp_remlab_conf</full_name>
+        <docblock line="97">
+          <description>Process table ejsapp_remlab_conf</description>
+          <long-description></long-description>
+          <tag line="97" name="param" description="" type="\stdClass" variable="$data">
+            <type by_reference="false">\stdClass</type>
+          </tag>
+        </docblock>
+        <argument line="101">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="117" package="Default">
+        <name>process_ejsappbooking</name>
+        <full_name>process_ejsappbooking</full_name>
+        <docblock line="113">
+          <description>Process table ejsappbooking</description>
+          <long-description></long-description>
+          <tag line="113" name="param" description="" type="\stdClass" variable="$data">
+            <type by_reference="false">\stdClass</type>
+          </tag>
+        </docblock>
+        <argument line="117">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="137" package="Default">
+        <name>process_ejsappbooking_usersaccess</name>
+        <full_name>process_ejsappbooking_usersaccess</full_name>
+        <docblock line="133">
+          <description>Process table process_ejsappbooking_usersaccess</description>
+          <long-description></long-description>
+          <tag line="133" name="param" description="" type="\stdClass" variable="$data">
+            <type by_reference="false">\stdClass</type>
+          </tag>
+        </docblock>
+        <argument line="137">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="158" package="Default">
+        <name>process_ejsappbooking_remlab_access</name>
+        <full_name>process_ejsappbooking_remlab_access</full_name>
+        <docblock line="154">
+          <description>Process table process_ejsappbooking_remlab_access</description>
+          <long-description></long-description>
+          <tag line="154" name="param" description="" type="\stdClass" variable="$data">
+            <type by_reference="false">\stdClass</type>
+          </tag>
+        </docblock>
+        <argument line="158">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="global" line="176" package="Default">
+        <name>after_execute</name>
+        <full_name>after_execute</full_name>
+        <docblock line="173">
+          <description>Extract jarfiles to the ejsapp jar folder</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+    </class>
+  </file>
+  <file path="db\access.php" hash="e362b1b908b653479691cd64af2c6fe0" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Capability definitions for the ejsapp module</description>
+      <long-description>&lt;p&gt;The variable name for the capability definitions array is $capabilities&lt;/p&gt;</long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+  </file>
+  <file path="db\install.php" hash="c8e922a2cb442ba94dbbfedd2b6a861f" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Install file for the ejsapp module</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <function namespace="global" line="36" package="mod\ejsapp">
+      <name>xmldb_ejsapp_install</name>
+      <full_name>\xmldb_ejsapp_install</full_name>
+      <docblock line="33">
+        <description>Install function for the ejsapp module</description>
+        <long-description></long-description>
+      </docblock>
+    </function>
+  </file>
+  <file path="db\log.php" hash="eb0e49ca9afcba9f99f9fa7f4954fe65" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Log file for the ejsapp module</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+  </file>
+  <file path="db\uninstall.php" hash="d3f7d71678bbf51ea532dddbc0e42563" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Uninstall file for the ejsapp module</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio  &lt;ldelatorre@gmail.com rheradio@gmail.com&gt;"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <function namespace="global" line="36" package="mod\ejsapp">
+      <name>xmldb_ejsapp_uninstall</name>
+      <full_name>\xmldb_ejsapp_uninstall</full_name>
+      <docblock line="33">
+        <description>Custom uninstallation procedure</description>
+        <long-description></long-description>
+      </docblock>
+    </function>
+  </file>
+  <file path="db\upgrade.php" hash="9c1dbbbbecdb4ebb767aa9322520c1c0" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Upgrade file for the ejsapp module</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <function namespace="global" line="40" package="mod\ejsapp">
+      <name>xmldb_ejsapp_upgrade</name>
+      <full_name>\xmldb_ejsapp_upgrade</full_name>
+      <docblock line="35">
+        <description>Upgrade function for the ejsapp module</description>
+        <long-description></long-description>
+        <tag line="35" name="param" description="" type="string" variable="$oldversion">
+          <type by_reference="false">string</type>
+        </tag>
+      </docblock>
+      <argument line="40">
+        <name>$oldversion</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+  </file>
+  <file path="generate_applet_embedding_code.php" hash="5b5b3dd1ed5511aa15e4601f5300d606" package="mod\ejsapp">
+    <docblock line="24">
+      <description>This file generates the code that embeds the EJS applet into Moodle.</description>
+      <long-description>&lt;p&gt;It is
+used for three different cases: 1) when only the EJSApp activity is being
+used, 2) when the EJSApp File Browser is used to load a state file, and
+3) when the EJSApp Collab Session is used.&lt;/p&gt;</long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="40" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <function namespace="global" line="62" package="mod\ejsapp">
+      <name>generate_applet_embedding_code</name>
+      <full_name>\generate_applet_embedding_code</full_name>
+      <docblock line="43">
+        <description>Returns the code that embeds an EJS applet into Moodle</description>
+        <long-description>&lt;p&gt;This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
+It is used for three different cases:
+     1) when only the EJSApp activity is being used
+     2) when the EJSApp File Browser is used to load a state file
+     3) when the EJSApp Collab Session is used&lt;/p&gt;</long-description>
+        <tag line="43" name="param" description="record from table ejsapp" type="\stdClass" variable="$ejsapp">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="43" name="param" description="sarlab id (null if sarlab is not used)" type="int|null" variable="$sarlabinstance">
+          <type by_reference="false">int</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="param" description="practice id (null if sarlab is not used)" type="int|null" variable="$practiceid">
+          <type by_reference="false">int</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="param" description="if generate_applet_embedding_code is called from block ejsapp_file_browser it is the name of the xml file that stores the state of an EJS applet, elsewhere it is null" type="string|null" variable="$state_file">
+          <type by_reference="false">string</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="param" description="if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the session id, elsewhere it is null" type="int|null" variable="$col_session">
+          <type by_reference="false">int</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="param" description="if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the IP of the collaborative session master user, elsewhere it is null" type="string|null" variable="$col_ip">
+          <type by_reference="false">string</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="param" description="if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the port of the collaborative session master user, elsewhere it is null" type="int|null" variable="$col_port">
+          <type by_reference="false">int</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="param" description="if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the id of the collaborative session master user, elsewhere it is null" type="int|null" variable="$session_director">
+          <type by_reference="false">int</type>
+          <type by_reference="false">null</type>
+        </tag>
+        <tag line="43" name="return" description="code that embeds an EJS applet into Moodle" type="string">
+          <type by_reference="false">string</type>
+        </tag>
+      </docblock>
+      <argument line="62">
+        <name>$ejsapp</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$sarlabinstance</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$practiceid</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$state_file</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$col_session</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$col_ip</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$col_port</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="62">
+        <name>$session_director</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+  </file>
+  <file path="index.php" hash="33e35bd93543f7d617cbaced0e34a50e" package="mod\ejsapp">
+    <docblock line="25">
+      <description>This page is used by Moodle when listing all the instances of your module that are in a
+particular course with the course id being passed to this script</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="35" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="36" type="Require Once" package="Default">
+      <name/>
+    </include>
+  </file>
+  <file path="lang\en\ejsapp.php" hash="8c8df4c99fcb3afc1bcccbd7831794dd" package="mod\ejsapp">
+    <docblock line="25">
+      <description>English strings for ejsapp</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+  </file>
+  <file path="lang\es\ejsapp.php" hash="81f4e5b9a88800195f7f15d54729eed2" package="mod\ejsapp">
+    <docblock line="25">
+      <description>Spanish strings for ejsapp</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+  </file>
+  <file path="lib.php" hash="35a17840ada9af6050f32332f77deed8" package="mod\ejsapp">
+    <docblock line="25">
+      <description>Library of interface functions and constants for module ejsapp</description>
+      <long-description>&lt;p&gt;All the core Moodle functions, neeeded to allow the module to work
+integrated in Moodle are here.&lt;/p&gt;</long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="39" type="Require Once" package="Default">
+      <name>locallib.php</name>
+    </include>
+    <include line="186" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="293" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="504" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="528" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <function namespace="global" line="47" package="mod\ejsapp">
+      <name>ejsapp_supports</name>
+      <full_name>\ejsapp_supports</full_name>
+      <docblock line="41">
+        <description>Supported features by EJSApp</description>
+        <long-description></long-description>
+        <tag line="41" name="param" description="feature to be supported" type="\constant" variable="$feature">
+          <type by_reference="false">\constant</type>
+        </tag>
+        <tag line="41" name="return" description="true if EJSApp supports the feature, false elsewhere" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+      <argument line="47">
+        <name>$feature</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="72" package="mod\ejsapp">
+      <name>ejsapp_add_instance</name>
+      <full_name>\ejsapp_add_instance</full_name>
+      <docblock line="62">
+        <description>Given an object containing all the necessary data,
+(defined by the form in mod_form.php) this function
+will create a new instance and return the id number
+of the new instance.</description>
+        <long-description></long-description>
+        <tag line="62" name="param" description="An object from the form in mod_form.php" type="object" variable="$ejsapp">
+          <type by_reference="false">object</type>
+        </tag>
+        <tag line="62" name="param" description="" type="\global\" variable="$mform"/>
+        <tag line="62" name="return" description="The id of the newly inserted ejsapp record" type="int">
+          <type by_reference="false">int</type>
+        </tag>
+      </docblock>
+      <argument line="72">
+        <name>$ejsapp</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="72">
+        <name>$mform</name>
+        <default>null</default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="172" package="mod\ejsapp">
+      <name>ejsapp_update_instance</name>
+      <full_name>\ejsapp_update_instance</full_name>
+      <docblock line="163">
+        <description>Given an object containing all the necessary data,
+(defined by the form in mod_form.php) this function
+will update an existing instance with new data.</description>
+        <long-description></long-description>
+        <tag line="163" name="param" description="An object from the form in mod_form.php" type="object" variable="$ejsapp">
+          <type by_reference="false">object</type>
+        </tag>
+        <tag line="163" name="param" description="" type="\global\" variable="$mform"/>
+        <tag line="163" name="return" description="Success/Fail" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+      <argument line="172">
+        <name>$ejsapp</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="172">
+        <name>$mform</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="290" package="mod\ejsapp">
+      <name>ejsapp_delete_instance</name>
+      <full_name>\ejsapp_delete_instance</full_name>
+      <docblock line="282">
+        <description>Given an ID of an instance of this module,
+this function will permanently delete the instance
+and any data that depends on it.</description>
+        <long-description></long-description>
+        <tag line="282" name="param" description="Id of the module instance" type="int" variable="$id">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="282" name="return" description="Success/Failure" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+      <argument line="290">
+        <name>$id</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="335" package="mod\ejsapp">
+      <name>ejsapp_user_outline</name>
+      <full_name>\ejsapp_user_outline</full_name>
+      <docblock line="320">
+        <description>Return a small object with summary information about what a
+user has done with a given particular instance of this module
+Used for user activity reports.</description>
+        <long-description></long-description>
+        <tag line="320" name="param" description="" type="\global\" variable="$course"/>
+        <tag line="320" name="param" description="" type="\global\" variable="$user"/>
+        <tag line="320" name="param" description="" type="\global\" variable="$mod"/>
+        <tag line="320" name="param" description="" type="\global\" variable="$ejsapp"/>
+        <tag line="320" name="return" description="= the time they did it&#13;&#10;$return-&gt;info = a short text description" type="\$return-&gt;time">
+          <type by_reference="false">\$return-&gt;time</type>
+        </tag>
+      </docblock>
+      <argument line="335">
+        <name>$course</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="335">
+        <name>$user</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="335">
+        <name>$mod</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="335">
+        <name>$ejsapp</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="354" package="mod\ejsapp">
+      <name>ejsapp_user_complete</name>
+      <full_name>\ejsapp_user_complete</full_name>
+      <docblock line="343">
+        <description>Print a detailed representation of what a user has done with
+a given particular instance of this module, for user activity reports.</description>
+        <long-description></long-description>
+        <tag line="343" name="param" description="" type="\global\" variable="$course"/>
+        <tag line="343" name="param" description="" type="\global\" variable="$user"/>
+        <tag line="343" name="param" description="" type="\global\" variable="$mod"/>
+        <tag line="343" name="param" description="" type="\global\" variable="$ejsapp"/>
+        <tag line="343" name="return" description="" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+      <argument line="354">
+        <name>$course</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="354">
+        <name>$user</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="354">
+        <name>$mod</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="354">
+        <name>$ejsapp</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="369" package="mod\ejsapp">
+      <name>ejsapp_print_recent_activity</name>
+      <full_name>\ejsapp_print_recent_activity</full_name>
+      <docblock line="359">
+        <description>Given a course and a time, this module should find recent activity
+that has occurred in ejsapp activities and print it out.</description>
+        <long-description>&lt;p&gt;Return true if there was output, or false is there was none.&lt;/p&gt;</long-description>
+        <tag line="359" name="param" description="" type="\global\" variable="$course"/>
+        <tag line="359" name="param" description="" type="\global\" variable="$viewfullnames"/>
+        <tag line="359" name="param" description="" type="\global\" variable="$timestart"/>
+        <tag line="359" name="return" description="false" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+      <argument line="369">
+        <name>$course</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="369">
+        <name>$viewfullnames</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="369">
+        <name>$timestart</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="390" package="mod\ejsapp">
+      <name>ejsapp_get_recent_mod_activity</name>
+      <full_name>\ejsapp_get_recent_mod_activity</full_name>
+      <docblock line="374">
+        <description>Prepares the recent activity data</description>
+        <long-description>&lt;p&gt;This callback function is supposed to populate the passed array with
+custom activity records. These records are then rendered into HTML via
+{@link newmodule_print_recent_mod_activity()}.&lt;/p&gt;</long-description>
+        <tag line="374" name="param" description="sequentially indexed array of objects with the 'cmid' property" type="array" variable="$activities">
+          <type by_reference="false">array</type>
+        </tag>
+        <tag line="374" name="param" description="the index in the $activities to use for the next record" type="int" variable="$index">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="374" name="param" description="append activity since this time" type="int" variable="$timestart">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="374" name="param" description="the id of the course we produce the report for" type="int" variable="$courseid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="374" name="param" description="course module id" type="int" variable="$cmid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="374" name="param" description="check for a particular user's activity only, defaults to 0 (all users)" type="int" variable="$userid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="374" name="param" description="check for a particular group's activity only, defaults to 0 (all groups)" type="int" variable="$groupid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="374" name="return" description="adds items into $activities and increases $index" type="void">
+          <type by_reference="false">void</type>
+        </tag>
+      </docblock>
+      <argument line="390">
+        <name>$activities</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="390">
+        <name>$index</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="390">
+        <name>$timestart</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="390">
+        <name>$courseid</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="390">
+        <name>$cmid</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="390">
+        <name>$userid</name>
+        <default>0</default>
+        <type/>
+      </argument>
+      <argument line="390">
+        <name>$groupid</name>
+        <default>0</default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="403" package="mod\ejsapp">
+      <name>ejsapp_print_recent_mod_activity</name>
+      <full_name>\ejsapp_print_recent_mod_activity</full_name>
+      <docblock line="394">
+        <description>Prints single activity item prepared by {@see newmodule_get_recent_mod_activity()}</description>
+        <long-description></long-description>
+        <tag line="394" name="param" description="" type="\global\" variable="$activity"/>
+        <tag line="394" name="param" description="" type="\global\" variable="$courseid"/>
+        <tag line="394" name="param" description="" type="\global\" variable="$detail"/>
+        <tag line="394" name="param" description="" type="\global\" variable="$modnames"/>
+        <tag line="394" name="param" description="" type="\global\" variable="$viewfullnames"/>
+        <tag line="394" name="return" description="" type="void">
+          <type by_reference="false">void</type>
+        </tag>
+      </docblock>
+      <argument line="403">
+        <name>$activity</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="403">
+        <name>$courseid</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="403">
+        <name>$detail</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="403">
+        <name>$modnames</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="403">
+        <name>$viewfullnames</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="414" package="mod\ejsapp">
+      <name>ejsapp_cron</name>
+      <full_name>\ejsapp_cron</full_name>
+      <docblock line="407">
+        <description>Function to be run periodically according to the moodle cron
+This function searches for things that need to be done, such
+as sending out mail, toggling flags etc .</description>
+        <long-description>&lt;p&gt;..&lt;/p&gt;</long-description>
+        <tag line="407" name="return" description="" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+    </function>
+    <function namespace="global" line="425" package="mod\ejsapp">
+      <name>newmodule_get_extra_capabilities</name>
+      <full_name>\newmodule_get_extra_capabilities</full_name>
+      <docblock line="419">
+        <description>Returns all other caps used in the module</description>
+        <long-description></long-description>
+        <tag line="419" name="example" description="return array('moodle/site:accessallgroups');"/>
+        <tag line="419" name="return" description="" type="array">
+          <type by_reference="false">array</type>
+        </tag>
+      </docblock>
+    </function>
+    <function namespace="global" line="440" package="mod\ejsapp">
+      <name>ejsapp_get_participants</name>
+      <full_name>\ejsapp_get_participants</full_name>
+      <docblock line="430">
+        <description>Must return an array of users who are participants for a given instance
+of ejsapp.</description>
+        <long-description>&lt;p&gt;Must include every user involved in the instance,
+independient of his role (student, teacher, admin...). The returned
+objects must contain at least id property.
+See other modules as example.&lt;/p&gt;</long-description>
+        <tag line="430" name="param" description="ID of an instance of this module" type="int" variable="$ejsappid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="430" name="return" description="false if no participants, array of objects otherwise" type="boolean|array">
+          <type by_reference="false">boolean</type>
+          <type by_reference="false">array</type>
+        </tag>
+      </docblock>
+      <argument line="440">
+        <name>$ejsappid</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="461" package="mod\ejsapp">
+      <name>ejsapp_scale_used</name>
+      <full_name>\ejsapp_scale_used</full_name>
+      <docblock line="449">
+        <description>Is a given scale used by the instance of newmodule?</description>
+        <long-description>&lt;p&gt;This function returns if a scale is being used by one newmodule
+if it has support for grading and scales. Commented code should be
+modified if necessary. See forum, glossary or journal modules
+as reference.&lt;/p&gt;</long-description>
+        <tag line="449" name="param" description="ID of an instance of this module" type="int" variable="$newmoduleid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="449" name="param" description="" type="\global\" variable="$scaleid"/>
+        <tag line="449" name="return" description="true if the scale is used by the given newmodule instance" type="bool">
+          <type by_reference="false">bool</type>
+        </tag>
+      </docblock>
+      <argument line="461">
+        <name>$newmoduleid</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="461">
+        <name>$scaleid</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="481" package="mod\ejsapp">
+      <name>ejsapp_scale_used_anywhere</name>
+      <full_name>\ejsapp_scale_used_anywhere</full_name>
+      <docblock line="473">
+        <description>Checks if scale is being used by any instance of newmodule.</description>
+        <long-description>&lt;p&gt;This is used to find out if scale used anywhere.&lt;/p&gt;</long-description>
+        <tag line="473" name="param" description="int" type="\global\" variable="$scaleid"/>
+        <tag line="473" name="return" description="true if the scale is used by any newmodule instance" type="boolean">
+          <type by_reference="false">boolean</type>
+        </tag>
+      </docblock>
+      <argument line="481">
+        <name>$scaleid</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="501" package="mod\ejsapp">
+      <name>ejsapp_grade_item_update</name>
+      <full_name>\ejsapp_grade_item_update</full_name>
+      <docblock line="493">
+        <description>Creates or updates grade item for the give newmodule instance</description>
+        <long-description>&lt;p&gt;Needed by grade_update_mod_grades() in lib/gradelib.php&lt;/p&gt;</long-description>
+        <tag line="493" name="param" description="instance object with extra cmidnumber and modname property" type="\stdClass" variable="$newmodule">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="493" name="return" description="" type="void">
+          <type by_reference="false">void</type>
+        </tag>
+      </docblock>
+      <argument line="501">
+        <name>$newmodule</name>
+        <default></default>
+        <type>\stdClass</type>
+      </argument>
+    </function>
+    <function namespace="global" line="525" package="mod\ejsapp">
+      <name>ejsapp_update_grades</name>
+      <full_name>\ejsapp_update_grades</full_name>
+      <docblock line="516">
+        <description>Update newmodule grades in the gradebook</description>
+        <long-description>&lt;p&gt;Needed by grade_update_mod_grades() in lib/gradelib.php&lt;/p&gt;</long-description>
+        <tag line="516" name="param" description="instance object with extra cmidnumber and modname property" type="\stdClass" variable="$newmodule">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="516" name="param" description="update grade of specific user only, 0 means all participants" type="int" variable="$userid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="516" name="return" description="" type="void">
+          <type by_reference="false">void</type>
+        </tag>
+      </docblock>
+      <argument line="525">
+        <name>$newmodule</name>
+        <default></default>
+        <type>\stdClass</type>
+      </argument>
+      <argument line="525">
+        <name>$userid</name>
+        <default>0</default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="551" package="mod\ejsapp">
+      <name>ejsapp_get_file_areas</name>
+      <full_name>\ejsapp_get_file_areas</full_name>
+      <docblock line="540">
+        <description>Returns the lists of all browsable file areas within the given module context</description>
+        <long-description>&lt;p&gt;The file area 'intro' for the activity introduction field is added automatically
+by {@link file_browser::get_file_info_context_module()}&lt;/p&gt;</long-description>
+        <tag line="540" name="param" description="" type="\stdClass" variable="$course">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="540" name="param" description="" type="\stdClass" variable="$cm">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="540" name="param" description="" type="\stdClass" variable="$context">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="540" name="return" description="of [(string)filearea] =&gt; (string)description" type="array">
+          <type by_reference="false">array</type>
+        </tag>
+      </docblock>
+      <argument line="551">
+        <name>$course</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="551">
+        <name>$cm</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="551">
+        <name>$context</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="570" package="mod\ejsapp">
+      <name>ejsapp_get_file_info</name>
+      <full_name>\ejsapp_get_file_info</full_name>
+      <docblock line="556">
+        <description>File browsing support for ejsapp file areas</description>
+        <long-description></long-description>
+        <tag line="556" name="param" description="" type="\file_browser" variable="$browser">
+          <type by_reference="false">\file_browser</type>
+        </tag>
+        <tag line="556" name="param" description="" type="array" variable="$areas">
+          <type by_reference="false">array</type>
+        </tag>
+        <tag line="556" name="param" description="" type="\stdClass" variable="$course">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="556" name="param" description="" type="\stdClass" variable="$cm">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="556" name="param" description="" type="\stdClass" variable="$context">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="556" name="param" description="" type="string" variable="$filearea">
+          <type by_reference="false">string</type>
+        </tag>
+        <tag line="556" name="param" description="" type="int" variable="$itemid">
+          <type by_reference="false">int</type>
+        </tag>
+        <tag line="556" name="param" description="" type="string" variable="$filepath">
+          <type by_reference="false">string</type>
+        </tag>
+        <tag line="556" name="param" description="" type="string" variable="$filename">
+          <type by_reference="false">string</type>
+        </tag>
+        <tag line="556" name="return" description="instance or null if not found" type="\file_info">
+          <type by_reference="false">\file_info</type>
+        </tag>
+      </docblock>
+      <argument line="570">
+        <name>$browser</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$areas</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$course</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$cm</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$context</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$filearea</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$itemid</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$filepath</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="570">
+        <name>$filename</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="587" package="mod\ejsapp">
+      <name>ejsapp_pluginfile</name>
+      <full_name>\ejsapp_pluginfile</full_name>
+      <docblock line="575">
+        <description>Serves the files from the ejsapp file areas</description>
+        <long-description></long-description>
+        <tag line="575" name="param" description="the course object" type="\stdClass" variable="$course">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="575" name="param" description="the course module object" type="\stdClass" variable="$cm">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="575" name="param" description="the ejsapp's context" type="\stdClass" variable="$context">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="575" name="param" description="the name of the file area" type="string" variable="$filearea">
+          <type by_reference="false">string</type>
+        </tag>
+        <tag line="575" name="param" description="extra arguments (itemid, path)" type="array" variable="$args">
+          <type by_reference="false">array</type>
+        </tag>
+        <tag line="575" name="param" description="whether or not force download" type="bool" variable="$forcedownload">
+          <type by_reference="false">bool</type>
+        </tag>
+        <tag line="575" name="param" description="additional options affecting the file serving" type="array" variable="$options">
+          <type by_reference="false">array</type>
+        </tag>
+        <tag line="575" name="return" description="served file" type="\file">
+          <type by_reference="false">\file</type>
+        </tag>
+      </docblock>
+      <argument line="587">
+        <name>$course</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="587">
+        <name>$cm</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="587">
+        <name>$context</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="587">
+        <name>$filearea</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="587">
+        <name>$args</name>
+        <default></default>
+        <type>array</type>
+      </argument>
+      <argument line="587">
+        <name>$forcedownload</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="587">
+        <name>$options</name>
+        <default>null</default>
+        <type/>
+      </argument>
+    </function>
+  </file>
+  <file path="locallib.php" hash="edcf9a5f8c1d192a49b5b88e519b31a1" package="mod\ejsapp">
+    <docblock line="25">
+      <description>Internal library of functions for module ejsapp</description>
+      <long-description>&lt;p&gt;All the ejsappbooking specific functions, needed to implement the module
+logic, are here.&lt;/p&gt;</long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <function namespace="global" line="45" package="mod\ejsapp">
+      <name>update_db</name>
+      <full_name>\update_db</full_name>
+      <docblock line="39">
+        <description>Updates the EJSApp tables according to the .jar information</description>
+        <long-description></long-description>
+        <tag line="39" name="param" description="record from table ejsapp" type="\stdClass" variable="$ejsapp">
+          <type by_reference="false">\stdClass</type>
+        </tag>
+        <tag line="39" name="param" description="" type="int" variable="$contextid">
+          <type by_reference="false">int</type>
+        </tag>
+      </docblock>
+      <argument line="45">
+        <name>$ejsapp</name>
+        <default></default>
+        <type/>
+      </argument>
+      <argument line="45">
+        <name>$contextid</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="159" package="mod\ejsapp">
+      <name>delete_recursively</name>
+      <full_name>\delete_recursively</full_name>
+      <docblock line="153">
+        <description>Deletes a directory from the server</description>
+        <long-description></long-description>
+        <tag line="153" name="param" description="directory to delete" type="\file" variable="$dir">
+          <type by_reference="false">\file</type>
+        </tag>
+        <tag line="153" name="return" description="TRUE on success or FALSE on failure" type="bool">
+          <type by_reference="false">bool</type>
+        </tag>
+      </docblock>
+      <argument line="159">
+        <name>$dir</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+    <function namespace="global" line="179" package="mod\ejsapp">
+      <name>delete_non_alphanumeric_symbols</name>
+      <full_name>\delete_non_alphanumeric_symbols</full_name>
+      <docblock line="172">
+        <description>Removes non alphanumeric_symbols from a string</description>
+        <long-description></long-description>
+        <tag line="172" name="param" description="string" type="\global\" variable="$str"/>
+        <tag line="172" name="return" description="" type="string">
+          <type by_reference="false">string</type>
+        </tag>
+      </docblock>
+      <argument line="179">
+        <name>$str</name>
+        <default></default>
+        <type/>
+      </argument>
+    </function>
+  </file>
+  <file path="mod_form.php" hash="d91d1575cb46b411131f7d4548ed04c9" package="mod\ejsapp">
+    <docblock line="24">
+      <description>EJSApp settings form.</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="35" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="36" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="37" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="38" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="39" type="Require Once" package="Default">
+      <name>locallib.php</name>
+    </include>
+    <class final="false" abstract="false" namespace="global" line="45" package="Default">
+      <extends>\moodleform_mod</extends>
+      <name>mod_ejsapp_mod_form</name>
+      <full_name>\mod_ejsapp_mod_form</full_name>
+      <docblock line="42">
+        <description>Class that defines the EJSApp settings form.</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="global" line="53" package="Default">
+        <name>definition</name>
+        <full_name>definition</full_name>
+        <docblock line="48">
+          <description>Called from Moodle to define this form</description>
+          <long-description></long-description>
+          <tag line="48" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="global" line="249" package="Default">
+        <name>data_preprocessing</name>
+        <full_name>data_preprocessing</full_name>
+        <docblock line="244">
+          <description>Any data processing needed before the form is displayed
+(needed to set up draft areas for editor and filemanager elements)</description>
+          <long-description></long-description>
+          <tag line="244" name="param" description="&amp;$default_values" type="array" variable="$default_values">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="249">
+          <name>$default_values</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="global" line="312" package="Default">
+        <name>validation</name>
+        <full_name>validation</full_name>
+        <docblock line="307">
+          <description>Performs minimal validation on the settings form</description>
+          <long-description></long-description>
+          <tag line="307" name="param" description="" type="array" variable="$data">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="307" name="param" description="" type="array" variable="$files">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="312">
+          <name>$data</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="312">
+          <name>$files</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+  </file>
+  <file path="sarlab.php" hash="ae86fe4e7b84633b8a8a686771e7ac57" package="mod\ejsapp">
+    <docblock line="25">
+      <description>Prints a particular instance of ejsapp</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="37" type="Require Once" package="Default">
+      <name>../../config.php</name>
+    </include>
+  </file>
+  <file path="send_files_list.php" hash="eae2a6b5587b381a698b59942da7e507" package="mod\ejsapp">
+    <docblock line="25">
+      <description>This file is used to send to an EJS applet the list of .xml state files
+saved by that applet.</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="36" type="Require Once" package="Default">
+      <name>../../config.php</name>
+    </include>
+    <include line="38" type="Require Once" package="Default">
+      <name/>
+    </include>
+  </file>
+  <file path="settings.php" hash="372d6ed69564a69ac518f6aa3bab9da9" package="mod\ejsapp">
+    <docblock line="25">
+      <description>Use this file to configure the EJSApp module AND (when installed) the EJSApp
+Collab Sessions block.</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+  </file>
+  <file path="upload_file.php" hash="2889682cf44a7f3ae6d2bbe37180912a" package="mod\ejsapp">
+    <docblock line="25">
+      <description>This file is used to receive any .xml, text or image file saved by an EJS
+applet.</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="35" type="Require Once" package="Default">
+      <name>../../config.php</name>
+    </include>
+    <include line="37" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="38" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="39" type="Require Once" package="Default">
+      <name/>
+    </include>
+  </file>
+  <file path="version.php" hash="8a56d3048bd93b67d3614f93ed4b172d" package="mod\ejsapp">
+    <docblock line="25">
+      <description>Version file for the ejsapp module</description>
+      <long-description></long-description>
+      <tag line="25" name="package" description="mod"/>
+      <tag line="25" name="subpackage" description="ejsapp"/>
+      <tag line="25" name="copyright" description="2012 Luis de la Torre, Ruben Heradio and Javier Pav�n"/>
+      <tag line="25" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+  </file>
+  <file path="view.php" hash="7c851e3e1411c6a46d156624c67b5570" package="mod\ejsapp">
+    <docblock line="24">
+      <description>Prints a particular instance of EJSApp</description>
+      <long-description></long-description>
+      <tag line="24" name="package" description="mod"/>
+      <tag line="24" name="subpackage" description="ejsapp"/>
+      <tag line="24" name="copyright" description="2012 Luis de la Torre and Ruben Heradio"/>
+      <tag line="24" name="license" description="http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later"/>
+    </docblock>
+    <include line="33" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="34" type="Require Once" package="Default">
+      <name/>
+    </include>
+    <include line="35" type="Require Once" package="Default">
+      <name>generate_applet_embedding_code.php</name>
+    </include>
+  </file>
+  <package name="Default" full_name="Default"/>
+  <package name="mod" full_name="mod">
+    <package name="ejsapp" full_name="mod\ejsapp"/>
+  </package>
+  <namespace name="global" full_name="global"/>
+  <marker count="0">todo</marker>
+  <marker count="0">fixme</marker>
+  <deprecated count="0"/>
+</project>

@@ -23,8 +23,8 @@
 
 
 /**
- * This file is used to send to an EJS applet the list of .xml state files 
- * saved by that applet. 
+ * This file is used to send to an EJS applet the list of .xml state files
+ * saved by that applet.
  *
  * @package    mod
  * @subpackage ejsapp
@@ -32,27 +32,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-	//Some security issues when receiving data from users:
-	require_once('../../config.php');
-	require_login();
-	require_once("$CFG->libdir/moodlelib.php");
-	require_once('manage_tmp_state_files.php');
+//Some security issues when receiving data from users:
+require_once('../../config.php');
+require_login();
+require_once("$CFG->libdir/moodlelib.php");
 
-	global $DB, $USER;
+global $DB, $USER;
 
-	$ejsapp_id = required_param('ejsapp_id',PARAM_INT);
+$ejsapp_id = required_param('ejsapp_id', PARAM_INT);
 
-	$tmp_state_files_path = $CFG->wwwroot . '/mod/ejsapp/tmp_state_files/';
+$info = '';
+$sql = "Select * From mdl_files Where mdl_files.component = 'mod_ejsapp' And mdl_files.filearea = 'private' And mdl_files.userid = '$USER->id' And source = 'ejsappid=$ejsapp_id'";
+$records = $DB->get_records_sql($sql);
 
-	$info = '';
-	$sql = "Select * From mdl_files Where mdl_files.filearea = 'private' And mdl_files.userid = '$USER->id' And source = 'ejsapp=$ejsapp_id'";
-	$records = $DB->get_records_sql($sql);
+foreach ($records as $record) {
+    $ejsapp_xml_files_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
+    $info .= $record->filename . ';' . $ejsapp_xml_files_path . $record->filename . ';';
+}
 
-	foreach ($records as $record) {
-		store_tmp_state_file($record->id);
-		$info .= $record->filename . ';' . $tmp_state_files_path . $record->id . '.xml;';
-	}
-
-	echo $info;
-
+echo $info;
 ?>

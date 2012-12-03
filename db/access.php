@@ -22,7 +22,7 @@
 //  (UNED), Madrid, Spain
 
 /**
- * Capability definitions for the ejsappbooking module
+ * Capability definitions for the ejsapp module
  *
  * The variable name for the capability definitions array is $capabilities
  *
@@ -55,4 +55,4 @@ $capabilities = array(
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
-    );
+);

@@ -22,9 +22,7 @@
 //  (UNED), Madrid, Spain
 
 /**
- * Capability definitions for the ejsappbooking module
- *
- * The variable name for the capability definitions array is $capabilities
+ * Install file for the ejsapp module
  *
  * @package    mod
  * @subpackage ejsapp
@@ -32,5 +30,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_ejsapp_install() {
+/**
+ * Install function for the ejsapp module
+ */
+function xmldb_ejsapp_install()
+{
 }
