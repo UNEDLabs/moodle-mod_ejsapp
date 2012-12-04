@@ -43,10 +43,26 @@ https://github.com/UNEDLabs.
 An explanation of EJSApp is included in the folder "doc". There, you will also find a txt 
 file with relevant links.
 
-IMPORTANT: In Linux or Mac systems, you need to set permission rights to 777 for the jarfiles
-folder inside the ejsapp folder, i.e., the folder owner and group (apache) need to be able to 
-write, read and execute. Another possibility is to configure your apache to give permissions 
-to the superuser in this folder.
+-----------------------------------------------------------------------------------------------
+ IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), EJSApp requires that (i) the 
+ apache user is the owner of the "jarfiles" dir inside the "ejsapp" dir, and (ii) it has        
+ permissions to read, write and execute the jarfiles dir.                                          
+                                                                                                
+ The following points describe how to do it:                                                    
+                                                                                                
+ 1) go to the ejsapp dir:                                                                       
+ $ cd ejsapp                                                                                    
+                                                                                                
+ 2) Change the owner of the jarfiles dir to apache.                                             
+ For instance,                                                                                  
+ 2.a) in Linux CentOS, the apache user is "apache", so you should write                         
+ $ chown -R apache jarfiles                                                                     
+ 2.b) in Linux OpenSuse, the apache user is "wwwrun", so you should write                       
+ $ chown -R wwwrun jarfiles                                                                     
+                                                                                                
+ 3) Change the permissions of the apache user:                                                  
+ $ chmod -R 700 jarfiles                                                                        
+ -----------------------------------------------------------------------------------------------
 
 4. Configuration
 ================
@@ -82,5 +98,5 @@ EJSApp has been developed by:
  - Luis de la Torre: ldelatorre@dia.uned.es
  - Ruben Heradio: rheradio@issi.uned.es
 
-  at the Computer Science and Automatic Control, Spanish Open University (UNED), 
+  at the Computer Science and Automatic Control Department, Spanish Open University (UNED), 
   Madrid, Spain.                                                      

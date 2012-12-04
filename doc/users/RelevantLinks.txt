@@ -1,4 +1,4 @@
-EJSApp Moodle plugin webpage: https://moodle.org/plugins/...
+EJSApp Moodle plugin webpage: https://moodle.org/plugins/view.php?plugin=mod_ejsapp
 
 EJSApp UNEDLabs github repository: https://github.com/organizations/UNEDLabs
 
