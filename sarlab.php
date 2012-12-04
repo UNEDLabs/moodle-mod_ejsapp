@@ -41,6 +41,6 @@ global $DB;
 $key = $_GET["key"];
 echo "key=$key\n";
 
-if ($DB->record_exists('sarlab_keys', array('sarlabpass' => $key))) {
+if ($DB->record_exists('ejsapp_sarlab_keys', array('sarlabpass' => $key))) {
     echo "access=true\n";
 } else echo "access=false\n";

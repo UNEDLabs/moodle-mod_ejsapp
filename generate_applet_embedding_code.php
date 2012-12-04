@@ -72,7 +72,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
         $min = date("i", $time);
         $seg = date("s", $time);
         $time = mktime($hour, $min, $seg, $month, $day, $year);
-        $DB->delete_records('sarlab_keys', array('user' => $USER->username, 'creationtime' => $time - 5));
+        $DB->delete_records('ejsapp_sarlab_keys', array('user' => $USER->username, 'creationtime' => $time - 5));
         mt_srand(time());
         $random = mt_rand(0, 1000000);
         $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $practiceid . fullname($USER) . $USER->username . $random);
@@ -81,7 +81,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
         $new_sarlab_key->user = $USER->username;
         $new_sarlab_key->sarlabpass = $sarlab_key;
         $new_sarlab_key->creationtime = $time;
-        $DB->insert_record('sarlab_keys', $new_sarlab_key);
+        $DB->insert_record('ejsapp_sarlab_keys', $new_sarlab_key);
 
         $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
         $list_sarlab_ports = explode(";", $CFG->sarlab_port);

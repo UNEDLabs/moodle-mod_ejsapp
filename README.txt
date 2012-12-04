@@ -71,7 +71,12 @@ When installing ejsapp for the first time, you will need to set four variables:
    sarlab_port:	  This variable defines the port(s) used to communicate with the SARLAB 
                   system(s). If left empty, the plugin understands that SARLAB is not used.
                                               
-5. Authors
+5. Testing
+==========
+The "test" directory of ejsapp includes an EJS simulation that can be used 
+for testing purposes.
+
+6. Authors
 ==========
 EJSApp has been developed by:
  - Luis de la Torre: ldelatorre@dia.uned.es
