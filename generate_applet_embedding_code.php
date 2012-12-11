@@ -176,20 +176,23 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
     $code .= "document.write('</applet>');";
 
     $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'xmlfiles', 'itemid' => ($ejsapp->id)));
-    foreach($file_records as $file_record){
-      if ($file_record->filename != '.') {
-        break;
-      }  
+    if (empty($file_records)) {
+        $initial_state_file = false;
+    } else {
+        foreach($file_records as $initial_state_file){
+        if ($initial_state_file->filename != '.') {
+            break;
+          }
+        }
     }
-    $original_state_file = $CFG->wwwroot . "/pluginfile.php/" . $file_record->contextid . 
-                          "/" . $file_record->component . "/" . $file_record->filearea . 
-                          "/" . $file_record->itemid . "/" . $file_record->filename;
-    if ($state_file || $file_record) {
+    if ($state_file || $initial_state_file) {
         //<to read the applet state, javascript must wait until the applet has been totally downloaded>
         if ($state_file) {
           $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
         } else {
-          $state_file = $original_state_file;
+            $state_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_state_file->contextid .
+                "/" . $initial_state_file->component . "/" . $initial_state_file->filearea .
+                "/" . $initial_state_file->itemid . "/" . $initial_state_file->filename;
         }
         $state_load_msg = get_string('state_load_msg', 'ejsapp');
         $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
