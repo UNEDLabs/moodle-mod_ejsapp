@@ -93,7 +93,7 @@
             </INDEXES>
         </TABLE>
         <TABLE NAME="ejsapp_expsyst2pract" COMMENT="Relates the experimental systems with the experimental practices"
-               PREVIOUS="ejsapp_remlab_conf" NEXT="sarlab_keys">
+               PREVIOUS="ejsapp_remlab_conf" NEXT="ejsapp_sarlab_keys">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
                 <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
@@ -110,7 +110,7 @@
                 <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
             </INDEXES>
         </TABLE>
-        <TABLE NAME="sarlab_keys" COMMENT="Stores a temporal key to check authentication when using Sarlab"
+        <TABLE NAME="ejsapp_sarlab_keys" COMMENT="Stores a temporal key to check authentication when using Sarlab"
                PREVIOUS="ejsapp_expsyst2pract">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="user"/>

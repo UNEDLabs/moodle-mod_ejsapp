@@ -39,5 +39,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 function xmldb_ejsapp_upgrade($oldversion)
 {
+    global $DB;
+    if ($oldversion == '2012112900') {
+      // Rename sarlab_keys database table to ejsapp_sarlab_keys
+      $dbman = $DB->get_manager();
+      $table = new xmldb_table('sarlab_keys');
+      $dbman->rename_table($table, 'ejsapp_sarlab_keys');
+    }
     return true;
 }

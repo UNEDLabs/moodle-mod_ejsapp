@@ -77,8 +77,8 @@ function ejsapp_add_instance($ejsapp, $mform = null)
     $ejsapp->id = $DB->insert_record('ejsapp', $ejsapp);
 
     if ($mform) {
-        $ejsapp->appwording = $ejsapp->ejsapp['text'];
-        $ejsapp->appwordingformat = $ejsapp->ejsapp['format'];
+        $ejsapp->appwording = $ejsapp->ejsappwording['text'];
+        $ejsapp->appwordingformat = $ejsapp->ejsappwording['format'];
     }
 
     $cmid = $ejsapp->coursemodule;
@@ -151,10 +151,17 @@ function ejsapp_add_instance($ejsapp, $mform = null)
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     delete_recursively($path . 'temp');
 
-    if ($mform and !empty($ejsapp->ejsapp['itemid'])) {
-        $draftitemid = $ejsapp->ejsapp['itemid'];
+    if ($mform and !empty($ejsapp->ejsappwording['itemid'])) {
+        $draftitemid = $ejsapp->ejsappwording['itemid'];
         $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
         $DB->update_record('ejsapp', $ejsapp);
+    }
+    
+    // Creating the state file in dataroot and updating the files table in the database
+    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $draftitemid = $ejsapp->statefile;
+    if ($draftitemid) {
+        file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
     }
 
     return $ejsapp->id;
@@ -176,8 +183,8 @@ function ejsapp_update_instance($ejsapp, $mform)
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
 
-    $ejsapp->appwording = $ejsapp->ejsapp['text'];
-    $ejsapp->appwordingformat = $ejsapp->ejsapp['format'];
+    $ejsapp->appwording = $ejsapp->ejsappwording['text'];
+    $ejsapp->appwordingformat = $ejsapp->ejsappwording['format'];
 
     $cmid = $ejsapp->coursemodule;
     $context = get_context_instance(CONTEXT_MODULE, $cmid);
@@ -270,10 +277,17 @@ function ejsapp_update_instance($ejsapp, $mform)
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     delete_recursively($path . 'temp');
 
-    $draftitemid = $ejsapp->ejsapp['itemid'];
+    $draftitemid = $ejsapp->ejsappwording['itemid'];
     if ($draftitemid) {
         $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
         $DB->update_record('ejsapp', $ejsapp);
+    }
+
+    // Creating the state file in dataroot and updating the files table in the database
+    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $draftitemid = $ejsapp->statefile;
+    if ($draftitemid) {
+        file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
     }
 
     return $ejsapp->id;
@@ -594,7 +608,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles') {
+    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles') {
         return false;
     }
 

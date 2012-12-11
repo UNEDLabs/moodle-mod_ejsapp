@@ -109,13 +109,18 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->setType('custom_height', PARAM_INT);
         $mform->disabledIf('custom_height', 'applet_size_conf', 'neq', 2);
         $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
-
         // -------------------------------------------------------------------------------
-        //More optional text to be shown after the applet
+        // More optional text to be shown after the applet
         $mform->addElement('header', 'more_text', get_string('more_text', 'ejsapp'));
 
-        $mform->addElement('editor', 'ejsapp', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
-        $mform->setType('ejsapp', PARAM_RAW);
+        $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
+        $mform->setType('appwording', PARAM_RAW);
+        // -------------------------------------------------------------------------------
+        // Adding an optional state file to be read when the applet loads
+        $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
+        
+        $mform->addElement('filepicker', 'statefile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
@@ -251,16 +256,20 @@ class mod_ejsapp_mod_form extends moodleform_mod
         global $CFG;
         $mform = $this->_form;
 
-        // Fill the file picker element with a previous submitted file
+        // Fill the file picker elements with previous submitted files/data
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('appletfile');
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles', $this->current->instance, array('subdirs' => true));
             $default_values['appletfile'] = $draftitemid;
 
-            $draftitemid = file_get_submitted_draft_itemid('ejsapp');
-            $default_values['ejsapp']['format'] = $default_values['appwordingformat'];
-            $default_values['ejsapp']['text'] = file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
-            $default_values['ejsapp']['itemid'] = $draftitemid;
+            $draftitemid = file_get_submitted_draft_itemid('appwording');
+            $default_values['ejsappwording']['format'] = $default_values['appwordingformat'];
+            $default_values['ejsappwording']['text'] = file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
+            $default_values['ejsappwording']['itemid'] = $draftitemid;
+            
+            $draftitemid = file_get_submitted_draft_itemid('statefile');
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => true));
+            $default_values['statefile'] = $draftitemid;
         }
 
         $content = $this->get_file_content('appletfile');

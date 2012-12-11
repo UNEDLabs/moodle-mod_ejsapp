@@ -77,6 +77,11 @@ $string['custom_height_required'] = 'WARNING: Applet height was not set. You mus
 
 $string['appwording'] = 'Wording';
 
+$string['state_file'] = '.xml file with the state to be read when this EJS lab loads';
+
+$string['statefile'] = 'Easy Java Simulation State';
+$string['statefile_help'] = 'Select the .xml file with the state the Easy Java Simulation (EJS) application should load'.
+
 $string['rem_lab_conf'] = 'Remote Lab Configuration';
 
 $string['is_rem_lab'] = 'Remote experimental system?';

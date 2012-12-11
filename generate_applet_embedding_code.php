@@ -175,9 +175,22 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
 
     $code .= "document.write('</applet>');";
 
-    if ($state_file) {
+    $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'xmlfiles', 'itemid' => ($ejsapp->id)));
+    foreach($file_records as $file_record){
+      if ($file_record->filename != '.') {
+        break;
+      }  
+    }
+    $original_state_file = $CFG->wwwroot . "/pluginfile.php/" . $file_record->contextid . 
+                          "/" . $file_record->component . "/" . $file_record->filearea . 
+                          "/" . $file_record->itemid . "/" . $file_record->filename;
+    if ($state_file || $file_record) {
         //<to read the applet state, javascript must wait until the applet has been totally downloaded>
-        $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
+        if ($state_file) {
+          $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
+        } else {
+          $state_file = $original_state_file;
+        }
         $state_load_msg = get_string('state_load_msg', 'ejsapp');
         $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
         $load_state_code = <<<EOC
