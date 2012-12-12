@@ -22,15 +22,13 @@
 //  (UNED), Madrid, Spain
 
 /**
- * EJSApp Interface for IPAL (see http://www.compadre.org/ipal/)
+ * EJSApp Interface for external applications (such as IPAL: http://www.compadre.org/ipal/)
  *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 function get_ejsapp_instances($course_id=null) {
     global $DB;
@@ -177,7 +175,6 @@ function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height
                 "/" . $initial_state_file->component . "/" . $initial_state_file->filearea .
                 "/" . $initial_state_file->itemid . "/" . $initial_state_file->filename;
         }
-        $state_load_msg = get_string('state_load_msg', 'ejsapp');
         $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
         $load_state_code = <<<EOC
     var applet = document.getElementById('{$ejsapp->applet_name}');
@@ -206,11 +203,5 @@ EOC;
 
 } //draw_ejsapp_instance
 
-// example of use
-xdebug_var_dump(get_ejsapp_instances());
 
-xdebug_var_dump(get_ejsapp_states(85, true));
-echo draw_ejsapp_instance(85);
-echo "\n";
-echo draw_ejsapp_instance(85,'77/mod_ejsapp/private/0/Gyroscope_ruben.xml', 100, 200);
 
