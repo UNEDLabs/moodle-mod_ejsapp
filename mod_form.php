@@ -119,7 +119,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         // Adding an optional state file to be read when the applet loads
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
         
-        $mform->addElement('filepicker', 'statefile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
