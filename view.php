@@ -118,7 +118,7 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
                     $sarlabinstance = $remlab_conf->sarlabinstance;
                     $practiceid = $booking->practiceid;
                     $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $practiceid));
-                    $pracriceintro = $expsyst2pract->practiceintro;
+                    $practiceintro = $expsyst2pract->practiceintro;
                 }
                 echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceintro, $state_file, $session_id, $session_ip, $session_port, $session_director));
             } else {
