@@ -31,36 +31,41 @@
  */
 
 function get_ejsapp_instances($course_id=null) {
-    global $DB;
-    if (is_null($course_id)) {
-        $ejsapp_instances = $file_records = $DB->get_records('ejsapp', array());
+    global $DB, $USER;
+
+    $courses = array();
+    if (!is_null($course_id)) {
+        $courses[] = $course_id;
     } else {
-        $ejsapp_instances = $file_records = $DB->get_records('ejsapp', array('course'=>$course_id));
+        $course_records = $DB->get_records('course', array() );
+        foreach ($course_records as $course_record) {
+            $courses[] = $course_record->id;
+        }
     }
+
+    $ejsapp_instances = array();
+    foreach ($courses as $course) {
+        $context = get_context_instance(CONTEXT_COURSE,$course);
+        if (has_capability('mod/ejsapp:requestinformation', $context, $USER->id, TRUE)) {
+            $ejsapp_instances = array_merge($ejsapp_instances, $DB->get_records('ejsapp', array('course'=>$course)));
+        }
+    }
+
     $result = array_values($ejsapp_instances);
     return $result;
 }//get_ejsapp_instances
 
-function get_ejsapp_states($ejsapp_id, $all_users=false) {
+function get_ejsapp_states($ejsapp_id) {
     global $DB,$USER;
 
     // get private state files
-    if ($all_users) { //all users
-        $all_state_files = $DB->get_records('files',
-            array('mimetype' => 'application/xml',
-                'filearea' => 'private',
-                'component' => 'mod_ejsapp'
-            )
-        );
-    } else { //just me
-        $all_state_files = $DB->get_records('files',
-            array('userid' => $USER->id,
+    $all_state_files = $DB->get_records('files',
+        array('userid' => $USER->id,
                 'mimetype' => 'application/xml',
                 'filearea' => 'private',
                 'component' => 'mod_ejsapp'
-            )
-        );
-    }
+        )
+    );
     // get initial state files
     $all_state_files = array_merge($all_state_files,$DB->get_records('files',
         array('mimetype' => 'application/xml',

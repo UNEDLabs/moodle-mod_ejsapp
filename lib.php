@@ -252,8 +252,10 @@ function ejsapp_update_instance($ejsapp, $mform)
             //Grant remote access to admin user:
             $ejsappbooking_usersaccess->userid = 2;
             $ejsappbooking_usersaccess->allowremaccess = 1;  
-            if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'ejsappid'=>$ejsapp->id, 'userid'=>2, 'allowremaccess'=>1))) { 
+            if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'ejsappid'=>$ejsapp->id))) { 
               $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+            } else {
+              $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
             }
             //Consider other enrolled users:
             foreach ($users as $user) {
@@ -263,8 +265,10 @@ function ejsapp_update_instance($ejsapp, $mform)
               } else {
                 $ejsappbooking_usersaccess->allowremaccess = 1;
               }
-              if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id, 'allowremaccess'=>$ejsappbooking_usersaccess->allowremaccess))) {
+              if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id))) {
                 $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+              } else {
+                $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
               }
             }
         }

@@ -83,7 +83,9 @@
                 <FIELD NAME="weeklyslots" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="totalslots" NEXT="dailyslots"/>
                 <FIELD NAME="dailyslots" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="weeklyslots"/>
+                       SEQUENCE="false" PREVIOUS="weeklyslots" NEXT="active"/>
+                <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
+                       SEQUENCE="false" PREVIOUS="dailyslots"/>       
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

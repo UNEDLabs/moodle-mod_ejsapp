@@ -87,6 +87,7 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
             $sarlabinstance = $remlab_conf->sarlabinstance;
             $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id));
             if ($bookings) { // If the admin or teacher has a booking use that info
+                $currenttime = date('Y-m-d H:00:00');
                 foreach ($bookings as $booking) {
                     if ($booking->starttime >= $currenttime) {
                         break;
@@ -94,7 +95,7 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
                 }
                 $practiceid = $booking->practiceid;
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $practiceid));
-                $pracriceintro = $expsyst2pract->practiceintro;
+                $practiceintro = $expsyst2pract->practiceintro;
             } else { // If there is no booking, use any info
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => '1'));
                 $practiceintro = $expsyst2pract->practiceintro;

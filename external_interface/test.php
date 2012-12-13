@@ -51,7 +51,6 @@ $ejsapp_id = 85;
 $state_files = get_ejsapp_states(85);
 var_dump($state_files);
 
-
 // Draw ejsapp with id=85 following its form configuration
 $code_1 = draw_ejsapp_instance(85);
 echo $code_1;
@@ -63,5 +62,3 @@ $code_2 = draw_ejsapp_instance(85, $state_files[0]->state_id, 500, 300);
 echo $code_2;
 
 
-//echo "\n";
-//echo draw_ejsapp_instance(85,'77/mod_ejsapp/private/0/Gyroscope_ruben.xml', 100, 200);

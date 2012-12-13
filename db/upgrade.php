@@ -40,11 +40,21 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_ejsapp_upgrade($oldversion)
 {
     global $DB;
-    if ($oldversion == '2012112900') {
+    
+    if ($oldversion <= '2012112900') {
       // Rename sarlab_keys database table to ejsapp_sarlab_keys
       $dbman = $DB->get_manager();
       $table = new xmldb_table('sarlab_keys');
       $dbman->rename_table($table, 'ejsapp_sarlab_keys');
     }
+    
+    if ($oldversion < '2012121300') {
+      // Create "active" field in ejsapp_remlab_conf table
+      $dbman = $DB->get_manager();
+      $table = new xmldb_table('ejsapp_remlab_conf');
+      $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'dailyslots');
+      $dbman->add_field($table, $field);
+    }
+    
     return true;
 }
