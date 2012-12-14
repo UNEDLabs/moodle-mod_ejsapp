@@ -55,7 +55,7 @@
 
 \maketitle
 
-\abstract{This document summarizes the \emph{EJSApp external interface}, which supports the inter-operation between EJS simulations managed into moodle by EJSApp and third-party moodle plugins (e.g., IPAL: \url{http://www.compadre.org/ipal/})}. 
+\abstract{This document summarizes the \emph{EJSApp external interface}, which supports the inter-operation between EJS simulations managed into moodle by EJSApp and third-party moodle plugins (e.g., IPAL: \url{http://www.compadre.org/ipal/})}.
 
 Some test code for the interface has been included in the \verb"test.php" file, inside the \verb"external_interface" directory of EJSApp.
 
@@ -85,8 +85,10 @@ To get the available EJSApp instances in a moodle site, use the function \verb"g
 
 \begin{itemize}
   \item Figure \ref{fig:get-ejsapp-instances-course} gets all EJSApp instances in course with id 30. Figure \ref{fig:get-ejsapp-instances-course-result} shows the correspondent output for an hypothetical course.
-  \item Figure \ref{fig:get-ejsapp-instances} gets all EJSApp instances for the entire moodle site.
+  \item Figure \ref{fig:get-ejsapp-instances} gets all EJSApp instances for all courses where the user has editing permissions.
 \end{itemize}
+
+\textbf{Remark}: the resulting array produced by \verb"get_ejsapp_instances" just includes EJSApp instances of courses where the user has role \verb"editingteacher" or \verb"manager". That is, \verb"get_ejsapp_instances" guarantees that a teacher cannot retrieve information about EJSApp instances that belong to courses where he doesn't have editing permissions.
 
 \begin{figure}[htbp!]
 \begin{lstlisting}
@@ -182,14 +184,13 @@ $ejsapp_instances = get_ejsapp_instances();
 
 \subsection{Getting EJSApp state files}
 
-Through the EJSApp form, the user may specify an initial state file for an EJS simulation. In addition, the user can store additional state files by selecting the option \verb"State input\output"$\Rightarrow$\verb"Save state" on the contextual menu that emerges by clicking the mouse right button on an EJS applet. Such additional state files are stored in the user's private file area.
+Through the EJSApp form, the user may optionally specify an initial state file for an EJS simulation. In addition, the user can store additional state files by selecting the option \verb"State input\output"$\Rightarrow$\verb"Save state" on the contextual menu that emerges by clicking the mouse right button on an EJS applet. Such additional state files are stored in the user's private file area.
 
-To get all the state files related to an EJSApp, use the function \verb"get_ejsapp_states". It returns an array of objects with state file information and receives the following parameters:
+To get all the state files related to an EJSApp, use the function \verb"get_ejsapp_states". It receives the identifier of the EJSApp instance and returns an array of objects with information about:
 \begin{enumerate}
-  \item \verb"$ejsapp_id": identifier of the EJSApp instance.
-  \item \verb"$all_users": optional boolean parameter that specifies if the search includes the private files of all users (\verb"$all_users = true"), or just the current user (\verb"$all_users = false"). By default, \verb"$all_users = false".
+  \item The initial state file of the EJSApp instance (if it exists).
+  \item All the states files associated to the EJSApp instance that are stored in the user's private files area.
 \end{enumerate}
-
 For instance, Figures \ref{fig:get-state-files} and \ref{fig:get-state-files-result} show an example of retrieving the current user's state files associated to the EJSApp instance with id 85.
 
 \begin{figure}[htbp!]
@@ -225,7 +226,7 @@ Function \verb"draw_ejsapp_instance" generates the HTML and javascript code to v
 \begin{enumerate}
   \item \verb"$ejsapp_id": identifier of the EJSApp instance which is going to be visualized.
   \item \verb"$state_file": optional string parameter that identifies an state file (see the \verb"state_id" field in Figure \ref{fig:get-state-files-result}, lines 5 and 9). If it is specified, the EJSApp instance is printed in the state described by the \verb"$state_file" parameter, elsewhere, it values \verb"null" by default and the EJSApp instance is printed in the initial state file configured in the EJSApp form.
-  \item \verb"$width" and \verb"$height": optional int parameters that set the the size of the printed EJS simulation. If they are not specified, the simulation will be printed as configured in the EJSApp form. 
+  \item \verb"$width" and \verb"$height": optional int parameters that set the the size of the printed EJS simulation. If they are not specified, the simulation will be printed as configured in the EJSApp form.
 \end{enumerate}
 
 \textbf{Remark}: \verb"draw_ejsapp_instance" doesn't require that the EJSApp instances are visible. In other words, it can print EJSApp instances hidden by the course administrator.

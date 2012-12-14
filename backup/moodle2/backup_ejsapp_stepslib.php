@@ -65,7 +65,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         $ejsapp_remlab_conf = new backup_nested_element('ejsapp_remlab_conf', array('id'),
             array('usingsarlab', 'sarlabinstance', 'ip', 'port', 'totalslots',
-                  'weeklyslots', 'dailyslots'));
+                  'weeklyslots', 'dailyslots', 'active'));
 
             // Booking
 
@@ -114,6 +114,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         // Define file annotations
         $ejsapp->annotate_files('mod_ejsapp', 'jarfiles', null);
+        $ejsapp->annotate_files('mod_ejsapp', 'xmlfiles', null);
 
         // Moodle 2.3 does not backup user files!
         // $ejsapp->annotate_files('mod_ejsapp', 'private', null);

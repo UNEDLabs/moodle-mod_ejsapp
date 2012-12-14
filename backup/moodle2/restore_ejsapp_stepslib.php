@@ -35,7 +35,6 @@
  */
 class restore_ejsapp_activity_structure_step extends restore_activity_structure_step
 {
-
     /**
      * Define structure
      */
@@ -66,13 +65,19 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
+        $oldid = $data->id;
 
         $data->course = $this->get_courseid();
 
         // insert the ejsapp record
         $newitemid = $DB->insert_record('ejsapp', $data);
+
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
+
+        // mapping old_ejsapp_id->new_old_ejsapp_id for xml state_files
+        // (see after_execute)
+        $this->set_mapping('ejsapp', $oldid, $newitemid, true);
     }//process_ejsapp
 
     /**
@@ -84,13 +89,11 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
-        //$oldid = $data->id;
 
         $data->ejsappid = $this->get_new_parentid('ejsapp');
 
         // insert the ejsapp record
         $newitemid = $DB->insert_record('ejsapp_expsyst2pract', $data);
-//        $this->set_mapping('ejsapp_expsyst2pract', $oldid, $newitemid);
     }//process_ejsapp_expsyst2pract
 
 
@@ -178,11 +181,13 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         global $CFG, $DB;
 
+
+
         // Add ejsapp related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_ejsapp', 'jarfiles', null);
+        $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
 
         // restore ejsapp files:
-
         $sql = "select * from {$CFG->prefix}ejsapp";
         $ejsapp_records = $DB->get_records_sql($sql);
 
