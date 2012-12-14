@@ -48,7 +48,7 @@ function xmldb_ejsapp_upgrade($oldversion)
       $dbman->rename_table($table, 'ejsapp_sarlab_keys');
     }
     
-    if ($oldversion < '2012121302') {
+    if ($oldversion < '2012121300') {
       // Create "active" field in ejsapp_remlab_conf table
       $dbman = $DB->get_manager();
       $table = new xmldb_table('ejsapp_remlab_conf');
