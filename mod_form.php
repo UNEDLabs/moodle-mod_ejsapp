@@ -149,7 +149,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->disabledIf('sarlab_instance', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('sarlab_instance', 'sarlab', 'eq', 0);
         if ($this->current->instance) {
-            $rem_lab_data = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $this->current->instance));
             if ($rem_lab_data) {
                 $mform->setDefault('sarlab_instance', $rem_lab_data->sarlabinstance);
             }
@@ -162,7 +161,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->disabledIf('ip_lab', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('ip_lab', 'sarlab', 'eq', 1);
         if ($this->current->instance) {
-            $rem_lab_data = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $this->current->instance));
             if ($rem_lab_data) {
                 $mform->setDefault('ip_lab', $rem_lab_data->ip);
             }
@@ -203,12 +201,10 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
         $mform->addHelpButton('totalslots', 'totalslots', 'ejsapp');
         $mform->disabledIf('totalslots', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $mform->setDefault('totalslots', $rem_lab_data->totalslots);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('totalslots', $rem_lab_data->totalslots);
         } else {
-            $mform->setDefault('totalslots', 20);
+            $mform->setDefault('totalslots', 18);
         }
 
         $mform->addElement('text', 'weeklyslots', get_string('weeklyslots', 'ejsapp'), array('size' => '2'));
@@ -216,12 +212,10 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('weeklyslots', get_string('maximumchars', '', 3), 'maxlength', 3, 'client');
         $mform->addHelpButton('weeklyslots', 'weeklyslots', 'ejsapp');
         $mform->disabledIf('weeklyslots', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
         } else {
-            $mform->setDefault('weeklyslots', 10);
+            $mform->setDefault('weeklyslots', 9);
         }
 
         $mform->addElement('text', 'dailyslots', get_string('dailyslots', 'ejsapp'), array('size' => '2'));
@@ -229,10 +223,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('dailyslots', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
         $mform->addHelpButton('dailyslots', 'dailyslots', 'ejsapp');
         $mform->disabledIf('dailyslots', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
         } else {
             $mform->setDefault('dailyslots', 3);
         }
