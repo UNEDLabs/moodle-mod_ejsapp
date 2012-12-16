@@ -90,7 +90,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->setDefault('is_collaborative', 0);
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/jar'));
+        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/java-archive'));
         $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
