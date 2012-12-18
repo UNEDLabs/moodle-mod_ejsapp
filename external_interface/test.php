@@ -37,28 +37,36 @@ require_once ($CFG->dirroot.'/mod/ejsapp/external_interface/ejsapp_external_inte
  * Retrieving information from EJSApp
  */
 
-// Get the ejsapp instances in the course with id 30
-$courseid = 30;
+// Get the ejsapp instances in the course with id 2
+$courseid = 2;
 $ejsapp_instances = get_ejsapp_instances($courseid);
 var_dump($ejsapp_instances);
+
+echo '<br/>'; // write an end of line
+echo '<br/>'; // write an end of line
 
 // Get all ejsapp instances for the whole moodle site
 $ejsapp_instances = get_ejsapp_instances();
 var_dump($ejsapp_instances);
 
-// Get all state files for ejsapp with id=85
-$ejsapp_id = 85;
-$state_files = get_ejsapp_states(85);
+echo '<br/>'; // write an end of line
+echo '<br/>'; // write an end of line
+
+// Get all state files for ejsapp with id=1
+$ejsapp_id = 1;
+$state_files = get_ejsapp_states($ejsapp_id);
 var_dump($state_files);
 
-// Draw ejsapp with id=85 following its form configuration
-$code_1 = draw_ejsapp_instance(85);
+echo '<br/>'; // write an end of line
+echo '<br/>'; // write an end of line
+
+// Draw ejsapp with id=1 with state $state_files[0]->state_id, width=500 and height=300
+$code_1 = draw_ejsapp_instance($ejsapp_id, $state_files[0]->state_id, 500, 300);
 echo $code_1;
 
 echo '<br/>'; // write an end of line
+echo '<br/>'; // write an end of line
 
-// Draw ejsapp with id=85 with state $state_files[0]->state_id, width=500 and height=300
-$code_2 = draw_ejsapp_instance(85, $state_files[0]->state_id, 500, 300);
+// Draw ejsapp with id=1 keeping its form configuration
+$code_2 = draw_ejsapp_instance($ejsapp_id);
 echo $code_2;
-
-

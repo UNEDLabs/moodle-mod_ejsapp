@@ -73,18 +73,28 @@ if ($ejsapp->intro) { // If some text was written, show the intro
     echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
 }
 
-$practiceintro = null;
-$sarlabinstance = null;
+$sarlabinfo = null;
+if ($session_id && $session_ip && $session_port) {
+  $collabinfo = new stdClass();
+  $collabinfo->session = $session_id;
+  $collabinfo->ip = $session_ip;
+  $collabinfo->port = $session_port;
+  $collabinfo->director = $session_director;  
+} else {
+  $collabinfo = null;
+}
+
 //Check the access conditions, depending on whether sarlab is beeing used or not, whether the ejsapp booking system is beeing used or not and whether the ejsapp instance is a remote lab or not.
 if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('course' => $ejsapp->course)))) { //Virtual lab or not using ejsappbooking
     $practiceintro = null;
-    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceintro, $state_file, $session_id, $session_ip, $session_port, $session_director));
+    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
 } else { //Remote lab and using ejsappbooking 
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
     $usingsarlab = $remlab_conf->usingsarlab;
     if (has_capability('moodle/course:viewhiddensections', $context, $USER->id, true)) { //Admins and teachers
         if ($usingsarlab == 1) {
-            $sarlabinstance = $remlab_conf->sarlabinstance;
+            $sarlabinfo = new stdClass();
+            $sarlabinfo->instance = $remlab_conf->sarlabinstance;
             $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id));
             if ($bookings) { // If the admin or teacher has a booking use that info
                 $currenttime = date('Y-m-d H:00:00');
@@ -95,13 +105,13 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
                 }
                 $practiceid = $booking->practiceid;
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $practiceid));
-                $practiceintro = $expsyst2pract->practiceintro;
+                $sarlabinfo->practice = $expsyst2pract->practiceintro;
             } else { // If there is no booking, use any info
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => '1'));
-                $practiceintro = $expsyst2pract->practiceintro;
+                $sarlabinfo->practice = $expsyst2pract->practiceintro;
             }
         }
-        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceintro, $state_file, $session_id, $session_ip, $session_port, $session_director));
+        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
     } else { //Students
         if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id))) {
             $currenttime = date('Y-m-d H:00:00');
@@ -115,12 +125,13 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
             $valid = $booking->valid;
             if ($booking->starttime == $currenttime || has_capability('moodle/course:viewhiddensections', $context, $USER->id, true)) { //Check booking date and hour
                 if ($usingsarlab == 1) {
-                    $sarlabinstance = $remlab_conf->sarlabinstance;
+                    $sarlabinfo = new stdClass();
+                    $sarlabinfo->instance = $remlab_conf->sarlabinstance;
                     $practiceid = $booking->practiceid;
                     $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $practiceid));
-                    $practiceintro = $expsyst2pract->practiceintro;
+                    $sarlabinfo->practice = $expsyst2pract->practiceintro;
                 }
-                echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceintro, $state_file, $session_id, $session_ip, $session_port, $session_director));
+                echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
             } else {
                 echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
                 echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));

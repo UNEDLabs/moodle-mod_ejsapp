@@ -50,20 +50,25 @@ if ($DB->record_exists('block', array('name' => 'ejsapp_collab_session'))) {
  *      3) when the EJSApp Collab Session is used
  *
  * @param stdClass $ejsapp record from table ejsapp
- * @param int|null $sarlabinstance sarlab id (null if sarlab is not used)
- * @param int|null $practiceid practice id (null if sarlab is not used)
+ * @param stdClass|null $sarlabinfo 
+ *                                  $sarlabinfo->instance: int sarlab id, 
+ *                                  $sarlabinfo->practice: int practice id, 
+ *                                  Null if sarlab is not used 
  * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser it is the name of the xml file that stores the state of an EJS applet, elsewhere it is null
- * @param int|null $col_session if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the session id, elsewhere it is null
- * @param string|null $col_ip if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the IP of the collaborative session master user, elsewhere it is null
- * @param int|null $col_port if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the port of the collaborative session master user, elsewhere it is null
- * @param int|null $session_director if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the id of the collaborative session master user, elsewhere it is null
+ * @param stdClass|null $collabinfo 
+ *                                  $collabinfo->session: int collaborative session id, 
+ *                                  $collabinfo->ip: string collaborative session ip, 
+ *                                  $collabinfo->port: int collaborative session port,
+ *                                  $collabinfo->director: int id of the collaborative session master user, `
+ *                                  Null if generate_applet_embedding_code is not called from block ejsapp_collab_session 
+ * @param stdClass|null $external_size if generate_applet_embedding_code is called from the external interface (draw_ejsapp_instance() function), it provides the width and the height to draw the applet, elsewhere it is null 
  * @return string code that embeds an EJS applet into Moodle
  */
-function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $state_file, $col_session, $col_ip, $col_port, $session_director)
+function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $external_size)
 {
     global $DB, $USER, $CFG;
 
-    if ($practiceid) { // Sarlab is used to access this remote lab
+    if ($sarlabinfo) { // Sarlab is used to access this remote lab
         $time = time();
         $year = date("Y", $time);
         $month = date("n", $time);
@@ -75,7 +80,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
         $DB->delete_records('ejsapp_sarlab_keys', array('user' => $USER->username, 'creationtime' => $time - 5));
         mt_srand(time());
         $random = mt_rand(0, 1000000);
-        $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $practiceid . fullname($USER) . $USER->username . $random);
+        $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $sarlabinfo->practice . fullname($USER) . $USER->username . $random);
 
         $new_sarlab_key = new stdClass();
         $new_sarlab_key->user = $USER->username;
@@ -85,46 +90,47 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
 
         $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
         $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-        $sarlab_IP = $list_sarlab_IPs[$sarlabinstance];
-        $sarlab_port = $list_sarlab_ports[$sarlabinstance];
+        $sarlab_IP = $list_sarlab_IPs[$sarlabinfo->instance];
+        $sarlab_port = $list_sarlab_ports[$sarlabinfo->instance];
     }
 
     $code = '<script "text/javascript">';
 
     // <set the applet size on the screen>
-    switch ($ejsapp->applet_size_conf) {
-        case 0:
-            $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
-            break;
-        case 1:
-            $code .= "var w = 630, h = 460;
-		        if (window.innerWidth)
-                    w = window.innerWidth;
-                else if (document.body && document.body.offsetWidth)
-                    w = document.body.offsetWidth;
-                if (document.body && document.body.clientWidth)
-                    w= document.body.clientWidth;
-                else if (document.compatMode=='CSS1Compat' &&
-                         document.documentElement &&
-                         document.documentElement.offsetWidth )
-                    w = document.documentElement.offsetWidth;
-                else if (document.documentElement &&
-                        document.documentElement.clientWidth)
-                    w = document.documentElement.clientWidth;
-                w = w - $CFG->columns_width;
-                h = w*{$ejsapp->height}/{$ejsapp->width};";
-            break;
-        case 2:
-            if ($ejsapp->preserve_aspect_ratio == 0) {
-                $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
-            } else {
-                $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
-            }
-            break;
+    if ($external_size) {
+      $code .= "var w = $external_size->width, h = $external_size->height;";
+    } else {
+      switch ($ejsapp->applet_size_conf) {
+          case 0:
+              $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
+              break;
+          case 1:
+              $code .= "var w = 630, h = 460;
+  		        if (window.innerWidth)
+                w = window.innerWidth;
+              else if (document.body && document.body.offsetWidth)
+                w = document.body.offsetWidth;
+              if (document.body && document.body.clientWidth)
+                w= document.body.clientWidth;
+              else if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth)
+                w = document.documentElement.offsetWidth;
+              else if (document.documentElement && document.documentElement.clientWidth)
+                w = document.documentElement.clientWidth;
+              w = w - $CFG->columns_width;
+              h = w*{$ejsapp->height}/{$ejsapp->width};";
+              break;
+          case 2:
+              if ($ejsapp->preserve_aspect_ratio == 0) {
+                  $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
+              } else {
+                  $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
+              }
+              break;
+      }
     }
     // <\set the applet size on the screen>
 
-    if ($col_session && !$session_director) {
+    if ($collabinfo && !isset($collabinfo->director)) {
         $class_file = $ejsapp->class_file;
         $class_file = str_replace(".class", "Student.class", $class_file);
         $code .= "document.write('<applet code=\"$class_file\"');";
@@ -143,34 +149,34 @@ function generate_applet_embedding_code($ejsapp, $sarlabinstance, $practiceid, $
     document.write('width=\"'+w+'\"');
     document.write('height=\"'+h+'\">');
     document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
-	document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
-	document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
-	document.write('<param name=\"language\" value=\"$language\"/>');
-	document.write('<param name=\"username\" value=\"$username\"/>');
-	document.write('<param name=\"user_name\" value=\"$user_name\"/>');
-	document.write('<param name=\"password\" value=\"{$USER->password}\"/>');
-	document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
+	  document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
+	  document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
+	  document.write('<param name=\"language\" value=\"$language\"/>');
+	  document.write('<param name=\"username\" value=\"$username\"/>');
+	  document.write('<param name=\"user_name\" value=\"$user_name\"/>');
+	  document.write('<param name=\"password\" value=\"{$USER->password}\"/>');
+	  document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
 
-    if ($col_session) {
+    if ($collabinfo) {
         $code .= "document.write('<param name=\"is_collaborative\" value=\"true\"/>');
-		document.write('<param name=\"Port_Teacher\" value=\"$col_port\"/>');";
-        if ($session_director) {
+		    document.write('<param name=\"Port_Teacher\" value=\"$collabinfo->port\"/>');";
+        if (isset($collabinfo->director)) {
             $code .= "document.write('<param name=\"directorname\" value=\"$username\"/>');";
         } else {
-            insert_collaborative_user($USER->id, null, $col_session);
-            $code .= "document.write('<param name=\"IP_Teacher\" value=\"$col_ip\"/>');
-			document.write('<param name=\"MainFrame_Teacher\" value=\"{$ejsapp->mainframe}\"/>');";
+            insert_collaborative_user($USER->id, null, $collabinfo->session);
+            $code .= "document.write('<param name=\"IP_Teacher\" value=\"$collabinfo->ip\"/>');
+			      document.write('<param name=\"MainFrame_Teacher\" value=\"{$ejsapp->mainframe}\"/>');";
         }
     } else {
         $code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
     } //col_session
 
-    if ($practiceid) {
+    if ($sarlabinfo) {
         $code .= "document.write('<param name=\"ipserver\" value=\"{$sarlab_IP}\"/>');
-	  document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
-	  document.write('<param name=\"idExp\" value=\"$practiceid\"/>');
-	  document.write('<param name=\"user\" value=\"EJSApp\"/>');
-	  document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
+	      document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
+	      document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>');
+	      document.write('<param name=\"user\" value=\"EJSApp\"/>');
+	      document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
     }
 
     $code .= "document.write('</applet>');";

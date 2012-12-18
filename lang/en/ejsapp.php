@@ -85,7 +85,7 @@ $string['statefile_help'] = 'Select the .xml file with the state the Easy Java S
 $string['rem_lab_conf'] = 'Remote Lab Configuration';
 
 $string['is_rem_lab'] = 'Remote experimental system?';
-$string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources, select "yes". Otherwise, select "no".';
+$string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources AND you want the EJSApp Booking System to manage their access, select "yes". Otherwise, select "no".';
 
 $string['sarlab'] = "Using Sarlab?";
 $string['sarlab_help'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
@@ -114,6 +114,8 @@ $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file 
 
 $string['no_booking'] = 'You do not have an active booking for this lab.';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';
+
+$string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
 
 //Settings
 $string['default_display_set'] = "Default display settings";

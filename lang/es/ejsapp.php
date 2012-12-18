@@ -84,7 +84,7 @@ $string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la apl
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
 $string['is_rem_lab'] = 'Sistema experimental remoto?';
-$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota, selecciona "s&iacute;". En caso contrario, selecciona "no".';
+$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota Y quieres que el Sistema de Reservas EJSApp controle su acceso, selecciona "s&iacute;". En caso contrario, selecciona "no".';
 
 $string['sarlab'] = "Usar Sarlab?";
 $string['sarlab_help'] = "Seleccionar 'ss&iacute;' unicamente si se esta usando Sarlab; un sistema que gestiona las conexiones a recursos de laboratorios remotos";
@@ -113,6 +113,8 @@ $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto 
 
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';
+
+$string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
 
 //Settings
 $string['default_display_set'] = "Opciones de visualizaci&oacute;n por defecto";

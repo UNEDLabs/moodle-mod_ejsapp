@@ -97,116 +97,22 @@ function get_ejsapp_states($ejsapp_id) {
 
 function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height=null) {
     global $DB, $USER, $CFG;
-    $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsapp_id), '*', MUST_EXIST);
-
-    $code = '<script "text/javascript">';
-
-    // <set the applet size on the screen>
-    if ($width && $height) {
-        $code .= "var w = $width, h = $height;";
-    } else {
-        switch ($ejsapp->applet_size_conf) {
-            case 0:
-                $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
-                break;
-            case 1:
-                $code .= "var w = 630, h = 460;
-		        if (window.innerWidth)
-                    w = window.innerWidth;
-                else if (document.body && document.body.offsetWidth)
-                    w = document.body.offsetWidth;
-                if (document.body && document.body.clientWidth)
-                    w= document.body.clientWidth;
-                else if (document.compatMode=='CSS1Compat' &&
-                         document.documentElement &&
-                         document.documentElement.offsetWidth )
-                    w = document.documentElement.offsetWidth;
-                else if (document.documentElement &&
-                        document.documentElement.clientWidth)
-                    w = document.documentElement.clientWidth;
-                w = w - $CFG->columns_width;
-                h = w*{$ejsapp->height}/{$ejsapp->width};";
-                break;
-            case 2:
-                if ($ejsapp->preserve_aspect_ratio == 0) {
-                    $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
-                } else {
-                    $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
-                }
-                break;
-        }
-    }
-    // <\set the applet size on the screen>
-
-    $code .= "document.write('<applet code=\"{$ejsapp->class_file}\"');";
-
-    $context = get_context_instance(CONTEXT_USER, $USER->id);
-    $language = current_language();
-    $username = fullname($USER);
-    $user_name = $USER->username;
-    $code .= "document.write('codebase=\"{$ejsapp->codebase}\"');
-    document.write('archive=\"{$ejsapp->applet_name}.jar\"');
-    document.write('name=\"{$ejsapp->applet_name}\"');
-    document.write('id=\"{$ejsapp->applet_name}\"');
-    document.write('width=\"'+w+'\"');
-    document.write('height=\"'+h+'\">');
-    document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
-	document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
-	document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
-	document.write('<param name=\"language\" value=\"$language\"/>');
-	document.write('<param name=\"username\" value=\"$username\"/>');
-	document.write('<param name=\"user_name\" value=\"$user_name\"/>');
-	document.write('<param name=\"password\" value=\"{$USER->password}\"/>');
-	document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
-
-    $code .= "document.write('</applet>');";
-
-    $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'xmlfiles', 'itemid' => ($ejsapp->id)));
-    if (empty($file_records)) {
-        $initial_state_file = false;
-    } else {
-        foreach($file_records as $initial_state_file){
-            if ($initial_state_file->filename != '.') {
-                break;
-            }
-        }
-    }
-    if ($state_file || $initial_state_file) {
-        //<to read the applet state, javascript must wait until the applet has been totally downloaded>
-        if ($state_file) {
-            $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
-        } else {
-            $state_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_state_file->contextid .
-                "/" . $initial_state_file->component . "/" . $initial_state_file->filearea .
-                "/" . $initial_state_file->itemid . "/" . $initial_state_file->filename;
-        }
-        $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
-        $load_state_code = <<<EOC
-    var applet = document.getElementById('{$ejsapp->applet_name}');
-
-    function performAppletCode(count) {
-	    if (!applet._readState && count > 0) {
-	      window.setTimeout( function() { performAppletCode( --count ); }, 2000 );
+    
+    if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
+      $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsapp_id));
+      if ($width && $height) {
+        $external_size = new stdClass();
+        $external_size->width = $width;
+        $external_size->height = $height;
+      } else {
+        $external_size = null;
       }
-      else if (applet._readState) {
-        applet._readState('url:$state_file');
-      }
-      else {
-          alert('$state_fail_msg');
-      }
+      require_once($CFG->dirroot . '/mod/ejsapp/generate_applet_embedding_code.php');
+      $code = generate_applet_embedding_code($ejsapp, null, $state_file, null, $external_size);
     }
-
-    performAppletCode(10);
-EOC;
-        //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
-        $code .= $load_state_code;
-    } //end of if ($state_file)
-
-    $code .= '</script>';
-
+    else {
+      $code = get_string('ejsapp_error', 'ejsapp');
+    }
+    
     return $code;
-
 } //draw_ejsapp_instance
-
-
-
