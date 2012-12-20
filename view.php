@@ -86,8 +86,8 @@ if ($session_id && $session_ip && $session_port) {
 
 //Check the access conditions, depending on whether sarlab is beeing used or not, whether the ejsapp booking system is beeing used or not and whether the ejsapp instance is a remote lab or not.
 if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('course' => $ejsapp->course)))) { //Virtual lab or not using ejsappbooking
-    $practiceintro = null;
     echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
+    //TODO: Consider the possibility of using a remote lab with Sarlab and without booking system (select practice?)
 } else { //Remote lab and using ejsappbooking 
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
     $usingsarlab = $remlab_conf->usingsarlab;
@@ -103,10 +103,9 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
                         break;
                     }
                 }
-                $practiceid = $booking->practiceid;
-                $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $practiceid));
+                $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $sarlabinfo->practice = $expsyst2pract->practiceintro;
-            } else { // If there is no booking, use any info
+            } else { // If there is no booking, use any info ... ¿elegir practica?
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => '1'));
                 $sarlabinfo->practice = $expsyst2pract->practiceintro;
             }
@@ -127,8 +126,7 @@ if (($ejsapp->is_rem_lab == 0) || (!$DB->record_exists('ejsappbooking', array('c
                 if ($usingsarlab == 1) {
                     $sarlabinfo = new stdClass();
                     $sarlabinfo->instance = $remlab_conf->sarlabinstance;
-                    $practiceid = $booking->practiceid;
-                    $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $practiceid));
+                    $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                     $sarlabinfo->practice = $expsyst2pract->practiceintro;
                 }
                 echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));

@@ -37,8 +37,8 @@ This module has been tested in Moodle versions 2.0, 2.1, 2.2 and 2.3.
 
 This module enhances its functionality when used along with the ejsappbooking module and/or
 the ejsapp_file_browser and the ejsapp_collab_session blocks.
-You can find and download them at the plugins section in the Moodle.org webpage or at
-https://github.com/UNEDLabs.
+You can find and download them at https://moodle.org/plugins/view.php?plugin=mod_ejsapp, in
+the plugins section in the Moodle.org webpage or at https://github.com/UNEDLabs.
 
 An explanation of EJSApp is included in the folder "doc". There, you will also find a txt 
 file with relevant links.

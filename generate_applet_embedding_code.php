@@ -44,10 +44,11 @@ if ($DB->record_exists('block', array('name' => 'ejsapp_collab_session'))) {
  * Returns the code that embeds an EJS applet into Moodle
  *
  * This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
- * It is used for three different cases:
+ * It is used for four different cases:
  *      1) when only the EJSApp activity is being used
  *      2) when the EJSApp File Browser is used to load a state file
  *      3) when the EJSApp Collab Session is used
+ *      4) when third party plugins want to display EJS applets in their own activities by means of the EJSApp external interface
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param stdClass|null $sarlabinfo 
@@ -61,7 +62,10 @@ if ($DB->record_exists('block', array('name' => 'ejsapp_collab_session'))) {
  *                                  $collabinfo->port: int collaborative session port,
  *                                  $collabinfo->director: int id of the collaborative session master user, `
  *                                  Null if generate_applet_embedding_code is not called from block ejsapp_collab_session 
- * @param stdClass|null $external_size if generate_applet_embedding_code is called from the external interface (draw_ejsapp_instance() function), it provides the width and the height to draw the applet, elsewhere it is null 
+ * @param stdClass|null $external_size 
+ *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
+ *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
+ *                                  Null if generate_applet_embedding_code is not called from the external interface (draw_ejsapp_instance() function) 
  * @return string code that embeds an EJS applet into Moodle
  */
 function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $external_size)
