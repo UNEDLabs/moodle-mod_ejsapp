@@ -49,7 +49,7 @@ $string['pluginadministration'] = 'Administraci&oacute;n del EJSApp';
 $string['pluginname'] = 'EJSApp';
 
 $string['state_load_msg'] = 'Se va a actualizar el estado del laboratorio';
-$string['state_fail_msg'] = 'Fallo al cargar el estado';
+$string['state_fail_msg'] = 'Error al intentar cargar el estado';
 
 $string['more_text'] = 'Texto optional tras el applet';
 

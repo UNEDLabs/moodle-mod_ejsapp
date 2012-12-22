@@ -50,7 +50,7 @@ $string['pluginadministration'] = 'EJSApp administration';
 $string['pluginname'] = 'EJSApp';
 
 $string['state_load_msg'] = 'The lab state is going to be updated';
-$string['state_fail_msg'] = 'Applet failed to load';
+$string['state_fail_msg'] = 'Error while trying to load the state';
 
 $string['more_text'] = 'Optional text after the applet';
 

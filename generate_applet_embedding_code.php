@@ -204,30 +204,24 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                 "/" . $initial_state_file->component . "/" . $initial_state_file->filearea .
                 "/" . $initial_state_file->itemid . "/" . $initial_state_file->filename;
         }
-        $state_load_msg = get_string('state_load_msg', 'ejsapp');
         $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
-        $load_state_code = <<<EOC
-    var applet = document.getElementById('{$ejsapp->applet_name}');
-
-    function performAppletCode(count) {
-	    //if (count == 10) {alert('$state_load_msg')};
-	    if (!applet._readState && count > 0) {
-	      window.setTimeout( function() { performAppletCode( --count ); }, 2000 );
-      }
-      else if (applet._readState) {
-        applet._readState('url:$state_file');
-        //applet._view.resetTraces();
-        //applet._view.clearData();
-        //applet._view.clearElements();
-        //applet._view.resetElements();
-      }
-      else {
-      alert('$state_fail_msg');
-      }
-    }
-
-    performAppletCode(10);
-EOC;
+        $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+          function performAppletCode(count) {
+	          if (undefined == applet && count > 0) {
+	            window.setTimeout( function() { performAppletCode( --count ); }, 2000 );
+            }
+            else if (undefined != applet) {
+              applet._readState('url:$state_file');
+              //applet._view.resetTraces();
+              //applet._view.clearData();
+              //applet._view.clearElements();
+              //applet._view.resetElements();
+            }
+            else {
+              alert('$state_fail_msg');
+            }
+          }
+          performAppletCode(10);";
         //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
         $code .= $load_state_code;
     } //end of if ($state_file)
