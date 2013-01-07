@@ -63,7 +63,7 @@ function get_ejsapp_states($ejsapp_id) {
         array('userid' => $USER->id,
                 'mimetype' => 'application/xml',
                 'filearea' => 'private',
-                'component' => 'user'
+                'component' => 'mod_ejsapp'
         )
     );
     // get initial state files
