@@ -111,6 +111,7 @@ $string['dailyslots_help'] = 'Daily amount of maximum hours each student will be
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
+$string['EJS_version'] = "WARNING: The applet file was not generated with EJS 4.37 (build 121201), or higher. Recompile it with a newer version of EJS or some features may not work correctly.";
 
 $string['no_booking'] = 'You do not have an active booking for this lab.';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';

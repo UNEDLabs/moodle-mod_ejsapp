@@ -94,13 +94,13 @@ $string['sarlab_instance_help'] = "El orden se corresponde con aquel usado para 
 
 $string['ip_lab'] = 'direccis&oacute;n IP';
 $string['ip_lab_help'] = 'Direcci&oacute;n IP del sistema experimental.  Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
-$string['ip_lab_required'] = 'ATENCIs&Oacute;N: Debe proporcionar una direccis&oacute;n IP valida.';
+$string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direccis&oacute;n IP valida.';
 $string['port'] = 'Puerto';
 $string['port_help'] = 'El puerto a usar para establecer la comunicaci&oacute;n. Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
-$string['port_required'] = 'ATENCIs&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';
+$string['port_required'] = 'ATENCI&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';
 $string['practiceintro'] = 'Identificador de pr&aacute;ctica en Sarlab';
 $string['practiceintro_help'] = 'Pr&aacute;cticas (separadas por punto y coma) configuradas en Sarlab para este sistema experimental.';
-$string['practiceintro_required'] = 'ATENCIs&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
+$string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
 $string['totalslots'] = 'Horas de trabajo totales';
 $string['totalslots_help'] = 'Cantidad total de horas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
 $string['weeklyslots'] = 'Horas de trabajo semanales';
@@ -110,6 +110,7 @@ $string['dailyslots_help'] = 'Cantidad diaria de horas m&aacute;ximas que se le 
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
+$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute generado con EJS 4.37 (build 121201), o superior. Recomp&iacutelalo con una versi&oacuten m&aacutes moderna de EJS o puede que algunas caracter&iacutesticas no funciones correctamente.";
 
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';

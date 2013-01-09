@@ -110,6 +110,13 @@ function update_db($ejsapp, $contextid)
     preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
     if (count($matches) == 0) {
         $height = 0;
+        // If this field does not exist in the manifest, it means the version of 
+        // EJS used to compile the jar does not support Moodle.
+        $message = get_string('EJS_version', 'ejsapp');
+        $code = "<script type=\"text/javascript\">
+        window.alert(\"$message\")
+        </script>";
+        echo $code;
     } else {
         $height = $matches[1][0];
         $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
