@@ -52,6 +52,14 @@ var_dump($ejsapp_instances);
 echo '<br/>'; // write an end of line
 echo '<br/>'; // write an end of line
 
+// Get the size of ejsapp with id=1
+$ejsapp_id = 1;
+$size = get_ejsapp_size($ejsapp_id);
+var_dump($size);
+
+echo '<br/>'; // write an end of line
+echo '<br/>'; // write an end of line
+
 // Get all state files for ejsapp with id=1
 $ejsapp_id = 1;
 $state_files = get_ejsapp_states($ejsapp_id);

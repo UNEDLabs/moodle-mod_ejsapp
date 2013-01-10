@@ -62,6 +62,7 @@ function get_ejsapp_states($ejsapp_id) {
     $all_state_files = $DB->get_records('files',
         array('userid' => $USER->id,
                 'mimetype' => 'application/xml',
+                'mimetype' => 'application/xml',
                 'filearea' => 'private',
                 'component' => 'mod_ejsapp'
         )
@@ -116,3 +117,18 @@ function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height
     
     return $code;
 } //draw_ejsapp_instance
+
+function get_ejsapp_size($ejsapp_id) {
+    global $DB,$USER;
+
+    if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
+        $record = $DB->get_record('ejsapp', array('id' => $ejsapp_id));
+        $result = new stdClass();
+        $result->width = $record->width;
+        $result->height = $record->height;
+    }
+    else {
+        $result = get_string('ejsapp_error', 'ejsapp');
+    }
+    return $result;
+}//get_ejsapp_states

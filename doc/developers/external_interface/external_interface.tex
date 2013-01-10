@@ -182,6 +182,30 @@ $ejsapp_instances = get_ejsapp_instances();
 \caption{Retrieving all ejsapp instances for the whole moodle site}\label{fig:get-ejsapp-instances}
 \end{figure}
 
+\subsection{Getting the size of an EJSApp instance}
+
+To prevent safety problems, \verb"get_ejsapp_instances" is rather restrictive. Thus, students cannot use it to retrieve information about EJSApp instances. However, to draw correctly an EJSApp instance is sometimes useful to know its size. Such functionality is supported by \verb"get_ejsapp_size", which does not have any access limitation. It receives the identifier of the EJSApp instance and returns an object with its width and height.
+
+For instance, Figures \ref{fig:get-size} and \ref{fig:get-size-result} show an example of retrieving the size of the EJSApp instance with id 85.
+
+\begin{figure}[htbp!]
+\begin{lstlisting}
+$ejsapp_id = 85;
+$size = get_ejsapp_size($ejsapp_id);
+var_dump($size);
+\end{lstlisting}
+\caption{Retrieving the size of the EJSApp instance with id 85}\label{fig:get-size}
+\end{figure}
+
+\begin{figure}[htbp!]
+\begin{lstlisting}
+object(stdClass)[523]
+  public 'width' => string '554' (length=3)
+  public 'height' => string '540' (length=3)
+\end{lstlisting}
+\caption{Result of executing Figure \ref{fig:get-size}}\label{fig:get-size-result}
+\end{figure}
+
 \subsection{Getting EJSApp state files}
 
 Through the EJSApp form, the user may optionally specify an initial state file for an EJS simulation. In addition, the user can store additional state files by selecting the option \verb"State input\output"$\Rightarrow$\verb"Save state" on the contextual menu that emerges by clicking the mouse right button on an EJS applet. Such additional state files are stored in the user's private file area.
