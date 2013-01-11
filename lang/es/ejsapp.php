@@ -110,7 +110,7 @@ $string['dailyslots_help'] = 'Cantidad diaria de horas m&aacute;ximas que se le 
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
-$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute generado con EJS 4.37 (build 121201), o superior. Recomp&iacutelalo con una versi&oacuten m&aacutes moderna de EJS o puede que algunas caracter&iacutesticas no funciones correctamente.";
+$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lalo con una versi&oacute;n m&aacute;s moderna de EJS o puede que algunas caracter&iacute;sticas no funciones correctamente.";
 
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';
