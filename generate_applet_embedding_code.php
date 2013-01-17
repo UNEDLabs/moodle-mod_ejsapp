@@ -207,15 +207,11 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
         $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
           function performAppletCode(count) {
-	          if (undefined == applet && count > 0) {
+	        if (!applet.isActive() && count > 0) {
 	            window.setTimeout( function() { performAppletCode( --count ); }, 2000 );
             }
-            else if (undefined != applet) {
+            else if (applet.isActive()) {
               applet._readState('url:$state_file');
-              //applet._view.resetTraces();
-              //applet._view.clearData();
-              //applet._view.clearElements();
-              //applet._view.resetElements();
             }
             else {
               alert('$state_fail_msg');

@@ -32,9 +32,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">4</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
-                <ul></ul></a></li>
+                <ul><li>todo 
+                <span class="label label-info">1</span>
+</li></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
 </ul>
@@ -103,6 +105,20 @@
 <h3>Returns</h3>
 <div class="subelement response">
 <code>bool</code>TRUE on success or FALSE on failure</div>
+</div></div>
+</div>
+<a id="function_draw_ejsapp_instance"></a><div class="element clickable function  function_draw_ejsapp_instance" data-toggle="collapse" data-target=".function_draw_ejsapp_instance .collapse">
+<h2>draw_ejsapp_instance()
+        </h2>
+<pre>draw_ejsapp_instance($ejsapp_id, $state_file, $width, $height) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$ejsapp_id</h4></div>
+<div class="subelement argument"><h4>$state_file</h4></div>
+<div class="subelement argument"><h4>$width</h4></div>
+<div class="subelement argument"><h4>$height</h4></div>
 </div></div>
 </div>
 <a id="function_ejsapp_add_instance"></a><div class="element clickable function  function_ejsapp_add_instance" data-toggle="collapse" data-target=".function_ejsapp_add_instance .collapse">
@@ -281,18 +297,6 @@ custom activity records. These records are then rendered into HTML via
 </div>
 </div></div>
 </div>
-<a id="function_ejsapp_grade_item_update"></a><div class="element clickable function  function_ejsapp_grade_item_update" data-toggle="collapse" data-target=".function_ejsapp_grade_item_update .collapse">
-<h2>Creates or updates grade item for the give newmodule instance</h2>
-<pre>ejsapp_grade_item_update(\stdClass $newmodule) : void</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"><p>Needed by grade_update_mod_grades() in lib/gradelib.php</p></div>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$newmodule</h4>
-<code><a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a></code><p>instance object with extra cmidnumber and modname property</p></div>
-</div></div>
-</div>
 <a id="function_ejsapp_pluginfile"></a><div class="element clickable function  function_ejsapp_pluginfile" data-toggle="collapse" data-target=".function_ejsapp_pluginfile .collapse">
 <h2>Serves the files from the ejsapp file areas</h2>
 <pre>ejsapp_pluginfile(<a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> $course, <a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> $cm, <a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> $context, string $filearea, array $args, bool $forcedownload, array $options) : \file</pre>
@@ -358,39 +362,6 @@ that has occurred in ejsapp activities and print it out.</h2>
 <div class="subelement argument"><h4>$viewfullnames</h4></div>
 </div></div>
 </div>
-<a id="function_ejsapp_scale_used"></a><div class="element clickable function  function_ejsapp_scale_used" data-toggle="collapse" data-target=".function_ejsapp_scale_used .collapse">
-<h2>Is a given scale used by the instance of newmodule?</h2>
-<pre>ejsapp_scale_used(int $newmoduleid, $scaleid) : bool</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"><p>This function returns if a scale is being used by one newmodule
-if it has support for grading and scales. Commented code should be
-modified if necessary. See forum, glossary or journal modules
-as reference.</p></div>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$newmoduleid</h4>
-<code>int</code><p>ID of an instance of this module</p></div>
-<div class="subelement argument"><h4>$scaleid</h4></div>
-<h3>Returns</h3>
-<div class="subelement response">
-<code>bool</code>true if the scale is used by the given newmodule instance</div>
-</div></div>
-</div>
-<a id="function_ejsapp_scale_used_anywhere"></a><div class="element clickable function  function_ejsapp_scale_used_anywhere" data-toggle="collapse" data-target=".function_ejsapp_scale_used_anywhere .collapse">
-<h2>Checks if scale is being used by any instance of newmodule.</h2>
-<pre>ejsapp_scale_used_anywhere($scaleid) : boolean</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"><p>This is used to find out if scale used anywhere.</p></div>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$scaleid</h4><p>int</p></div>
-<h3>Returns</h3>
-<div class="subelement response">
-<code>boolean</code>true if the scale is used by any newmodule instance</div>
-</div></div>
-</div>
 <a id="function_ejsapp_supports"></a><div class="element clickable function  function_ejsapp_supports" data-toggle="collapse" data-target=".function_ejsapp_supports .collapse">
 <h2>Supported features by EJSApp</h2>
 <pre>ejsapp_supports(\constant $feature) : boolean</pre>
@@ -404,21 +375,6 @@ as reference.</p></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>boolean</code>true if EJSApp supports the feature, false elsewhere</div>
-</div></div>
-</div>
-<a id="function_ejsapp_update_grades"></a><div class="element clickable function  function_ejsapp_update_grades" data-toggle="collapse" data-target=".function_ejsapp_update_grades .collapse">
-<h2>Update newmodule grades in the gradebook</h2>
-<pre>ejsapp_update_grades(\stdClass $newmodule, int $userid) : void</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"><p>Needed by grade_update_mod_grades() in lib/gradelib.php</p></div>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$newmodule</h4>
-<code><a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a></code><p>instance object with extra cmidnumber and modname property</p></div>
-<div class="subelement argument">
-<h4>$userid</h4>
-<code>int</code><p>update grade of specific user only, 0 means all participants</p></div>
 </div></div>
 </div>
 <a id="function_ejsapp_update_instance"></a><div class="element clickable function  function_ejsapp_update_instance" data-toggle="collapse" data-target=".function_ejsapp_update_instance .collapse">
@@ -476,44 +432,70 @@ $return->info = a short text description</div>
 </div>
 <a id="function_generate_applet_embedding_code"></a><div class="element clickable function  function_generate_applet_embedding_code" data-toggle="collapse" data-target=".function_generate_applet_embedding_code .collapse">
 <h2>Returns the code that embeds an EJS applet into Moodle</h2>
-<pre>generate_applet_embedding_code(<a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> $ejsapp, int | null $sarlabinstance, int | null $practiceid, string | null $state_file, int | null $col_session, string | null $col_ip, int | null $col_port, int | null $session_director) : string</pre>
+<pre>generate_applet_embedding_code(<a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> $ejsapp, <a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> | null $sarlabinfo, string | null $state_file, <a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> | null $collabinfo, <a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a> | null $external_size) : string</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"><p>This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
-It is used for three different cases:
+It is used for four different cases:
      1) when only the EJSApp activity is being used
      2) when the EJSApp File Browser is used to load a state file
-     3) when the EJSApp Collab Session is used</p></div>
+     3) when the EJSApp Collab Session is used
+     4) when third party plugins want to display EJS applets in their own activities by means of the EJSApp external interface</p></div>
 <h3>Parameters</h3>
 <div class="subelement argument">
 <h4>$ejsapp</h4>
 <code><a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a></code><p>record from table ejsapp</p></div>
 <div class="subelement argument">
-<h4>$sarlabinstance</h4>
-<code>int</code><code>null</code><p>sarlab id (null if sarlab is not used)</p>
-</div>
-<div class="subelement argument">
-<h4>$practiceid</h4>
-<code>int</code><code>null</code><p>practice id (null if sarlab is not used)</p>
+<h4>$sarlabinfo</h4>
+<code><a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a></code><code>null</code><p>$sarlabinfo->instance: int sarlab id, $sarlabinfo->practice: int practice id, Null if sarlab is not used</p>
 </div>
 <div class="subelement argument">
 <h4>$state_file</h4>
 <code>string</code><code>null</code><p>if generate_applet_embedding_code is called from block ejsapp_file_browser it is the name of the xml file that stores the state of an EJS applet, elsewhere it is null</p></div>
 <div class="subelement argument">
-<h4>$col_session</h4>
-<code>int</code><code>null</code><p>if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the session id, elsewhere it is null</p></div>
+<h4>$collabinfo</h4>
+<code><a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a></code><code>null</code><p>$collabinfo->session: int collaborative session id, $collabinfo->ip: string collaborative session ip, $collabinfo->port: int collaborative session port, $collabinfo->director: int id of the collaborative session master user, ` Null if generate_applet_embedding_code is not called from block ejsapp_collab_session</p>
+</div>
 <div class="subelement argument">
-<h4>$col_ip</h4>
-<code>string</code><code>null</code><p>if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the IP of the collaborative session master user, elsewhere it is null</p></div>
-<div class="subelement argument">
-<h4>$col_port</h4>
-<code>int</code><code>null</code><p>if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the port of the collaborative session master user, elsewhere it is null</p></div>
-<div class="subelement argument">
-<h4>$session_director</h4>
-<code>int</code><code>null</code><p>if generate_applet_embedding_code is called from block ejsapp_collab_sessioncollaborative it is the id of the collaborative session master user, elsewhere it is null</p></div>
+<h4>$external_size</h4>
+<code><a href="http://php.net/manual/en/class.stdclass.php">\stdClass</a></code><code>null</code><p>$external_size->width: int value (in pixels) for the width of the applet to be drawn $external_size->height: int value (in pixels) for the height of the applet to be drawn Null if generate_applet_embedding_code is not called from the external interface (draw_ejsapp_instance() function)</p>
+</div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>string</code>code that embeds an EJS applet into Moodle</div>
+</div></div>
+</div>
+<a id="function_get_ejsapp_instances"></a><div class="element clickable function  function_get_ejsapp_instances" data-toggle="collapse" data-target=".function_get_ejsapp_instances .collapse">
+<h2>get_ejsapp_instances()
+        </h2>
+<pre>get_ejsapp_instances($course_id) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$course_id</h4></div>
+</div></div>
+</div>
+<a id="function_get_ejsapp_size"></a><div class="element clickable function  function_get_ejsapp_size" data-toggle="collapse" data-target=".function_get_ejsapp_size .collapse">
+<h2>get_ejsapp_size()
+        </h2>
+<pre>get_ejsapp_size($ejsapp_id) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$ejsapp_id</h4></div>
+</div></div>
+</div>
+<a id="function_get_ejsapp_states"></a><div class="element clickable function  function_get_ejsapp_states" data-toggle="collapse" data-target=".function_get_ejsapp_states .collapse">
+<h2>get_ejsapp_states()
+        </h2>
+<pre>get_ejsapp_states($ejsapp_id) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$ejsapp_id</h4></div>
 </div></div>
 </div>
 <a id="function_newmodule_get_extra_capabilities"></a><div class="element clickable function  function_newmodule_get_extra_capabilities" data-toggle="collapse" data-target=".function_newmodule_get_extra_capabilities .collapse">
@@ -584,7 +566,7 @@ It is used for three different cases:
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a11</a> and<br>
-            generated on 2012-12-03T13:22:52+01:00.<br></footer></div>
+            generated on 2013-01-17T12:45:56+01:00.<br></footer></div>
 </div>
 </body>
 </html>

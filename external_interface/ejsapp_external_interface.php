@@ -131,4 +131,4 @@ function get_ejsapp_size($ejsapp_id) {
         $result = get_string('ejsapp_error', 'ejsapp');
     }
     return $result;
-}//get_ejsapp_size
+}//get_ejsapp_states
