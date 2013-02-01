@@ -216,7 +216,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
         } else {
             $mform->setDefault('weeklyslots', 9);
-        }
+        }       
 
         $mform->addElement('text', 'dailyslots', get_string('dailyslots', 'ejsapp'), array('size' => '2'));
         $mform->setType('dailyslots', PARAM_INT);
@@ -288,9 +288,9 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $filename = $path . $applet_name;
             $this->save_file('appletfile', $filename, true);
 
-            // Extract the manifest.mf file from the .jar
+            // Extract the manifest.mf file from the .jar    
             $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
-            $mform->addElement('hidden', 'manifest', null);
+            $mform->addElement('hidden', 'manifest', null);               
             $mform->setType('manifest', PARAM_TEXT);
             $mform->setDefault('manifest', $manifest);
 
@@ -339,6 +339,15 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
             }
         }
+        
+        // Check whether the manifest has the necessary information
+        /*if (!empty($data['manifest'])) {
+            $pattern = '/Applet-Height\s*:\s*(\w+)/';
+            preg_match($pattern, $data['manifest'], $matches, PREG_OFFSET_CAPTURE);
+            if (count($matches) == 0) {
+                $errors['appletfile'] = get_string('EJS_version', 'ejsapp');
+            }
+        }*/
 
         return $errors;
     } // validation

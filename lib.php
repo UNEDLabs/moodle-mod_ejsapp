@@ -252,9 +252,11 @@ function ejsapp_update_instance($ejsapp, $mform)
             //Grant remote access to admin user:
             $ejsappbooking_usersaccess->userid = 2;
             $ejsappbooking_usersaccess->allowremaccess = 1;  
-            if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'ejsappid'=>$ejsapp->id))) { 
+            if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id))) { 
               $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
             } else {
+              $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
+              $ejsappbooking_usersaccess->id = $record->id;
               $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
             }
             //Consider other enrolled users:
@@ -265,9 +267,11 @@ function ejsapp_update_instance($ejsapp, $mform)
               } else {
                 $ejsappbooking_usersaccess->allowremaccess = 1;
               }
-              if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id))) {
+              if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id))) {
                 $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
               } else {
+                $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
+                $ejsappbooking_usersaccess->id = $record->id;
                 $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
               }
             }

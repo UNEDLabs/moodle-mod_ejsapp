@@ -33,7 +33,7 @@ ejsapp. If you downloaded it from Moodle.org, then you are fine.
 
 This is a module plugin for Moodle so you should place the ejsapp folder in your /mod
 folder,inside you Moodle installation.
-This module has been tested in Moodle versions 2.0, 2.1, 2.2 and 2.3.
+This module has been tested in all Moodle 2.x versions.
 
 This module enhances its functionality when used along with the ejsappbooking module and/or
 the ejsapp_file_browser and the ejsapp_collab_session blocks.
