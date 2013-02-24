@@ -109,19 +109,23 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
               $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
               break;
           case 1:
-              $code .= "var w = 630, h = 460;
-  		        if (window.innerWidth)
+              $code .= "var w = 630, h = 460, h_max = 460;
+  		        if (window.innerWidth && window.innerHeight) {
                 w = window.innerWidth;
-              else if (document.body && document.body.offsetWidth)
-                w = document.body.offsetWidth;
-              if (document.body && document.body.clientWidth)
-                w= document.body.clientWidth;
-              else if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth)
+                h_max = window.innerHeight;
+              } else if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth && document.documentElement.offsetHeight) {
                 w = document.documentElement.offsetWidth;
-              else if (document.documentElement && document.documentElement.clientWidth)
+                h_max = document.documentElement.offsetHeight;
+              } else if (document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight) {
                 w = document.documentElement.clientWidth;
+                h_max = document.documentElement.clientHeight;
+              }
               w = w - $CFG->columns_width;
-              h = w*{$ejsapp->height}/{$ejsapp->width};";
+              h = w*{$ejsapp->height}/{$ejsapp->width};
+              if (h > h_max) {
+                h = h_max;
+                w = h*{$ejsapp->width}/{$ejsapp->height};
+              }";
               break;
           case 2:
               if ($ejsapp->preserve_aspect_ratio == 0) {
