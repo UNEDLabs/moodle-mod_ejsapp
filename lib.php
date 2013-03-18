@@ -93,6 +93,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
         if ($ejsapp_rem_lab->usingsarlab == 1) {
             $sarlabinstance = $ejsapp->sarlab_instance;
             $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
+            $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
             $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
             $list_sarlab_ports = explode(";", $CFG->sarlab_port);
             $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
@@ -202,6 +203,7 @@ function ejsapp_update_instance($ejsapp, $mform)
         $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
         if ($ejsapp_rem_lab->usingsarlab == 1) {
             $sarlabinstance = $ejsapp->sarlab_instance;
+            $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
             $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
             $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
             $list_sarlab_ports = explode(";", $CFG->sarlab_port);
@@ -209,6 +211,7 @@ function ejsapp_update_instance($ejsapp, $mform)
             $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
         } else {
             $ejsapp_rem_lab->sarlabinstance = '0';
+            $ejsapp_rem_lab->sarlabcollab = '0';
             $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
             $ejsapp_rem_lab->port = $ejsapp->port;
         }

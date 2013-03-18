@@ -54,6 +54,7 @@ if ($DB->record_exists('block', array('name' => 'ejsapp_collab_session'))) {
  * @param stdClass|null $sarlabinfo 
  *                                  $sarlabinfo->instance: int sarlab id, 
  *                                  $sarlabinfo->practice: int practice id, 
+ *                                  $sarlabinfo->collab:   int collab whether sarlab offers collab access to this remote lab (1) or not (0), 
  *                                  Null if sarlab is not used 
  * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser it is the name of the xml file that stores the state of an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
@@ -179,13 +180,15 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
     } //col_session
 
-    if ($sarlabinfo) {
+    if ($sarlabinfo){
         $code .= "document.write('<param name=\"ipserver\" value=\"{$sarlab_IP}\"/>');
 	      document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
-	      document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>');
-	      document.write('<param name=\"user\" value=\"EJSApp\"/>');
-	      document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
-    }
+	      document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>');";
+        if ($sarlabinfo->collab == 0) {
+	          $code .= "document.write('<param name=\"user\" value=\"EJSApp\"/>');
+	          document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
+        }
+    }    
 
     $code .= "document.write('</applet>');";
 

@@ -56,5 +56,13 @@ function xmldb_ejsapp_upgrade($oldversion)
       $dbman->add_field($table, $field);
     }
     
+    if ($oldversion < '2013031800') {
+      // Create "active" field in ejsapp_remlab_conf table
+      $dbman = $DB->get_manager();
+      $table = new xmldb_table('ejsapp_remlab_conf');
+      $field = new xmldb_field('sarlabcollab', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sarlabinstance', 'ip');
+      $dbman->add_field($table, $field);
+    }
+    
     return true;
 }

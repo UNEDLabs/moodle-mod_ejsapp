@@ -92,9 +92,12 @@ $string['sarlab_help'] = "Seleccionar 'ss&iacute;' unicamente si se esta usando 
 $string['sarlab_instance'] = "Servidor Sarlab para este laboratorio";
 $string['sarlab_instance_help'] = "El orden se corresponde con aquel usado para los valores en las variables sarlab_IP y sarlab_port fijados en la p&aacute;gina de configuraci&oacute;n de ejsapp";
 
+$string['sarlab_collab'] = "Usar acceso colaborativo de Sarlab?";
+$string['sarlab_collab_help'] = "Si deseas que Sarlab ofrezca la opci&oacute;n de acceso colaborativo a este laboratorio remoto o no";
+
 $string['ip_lab'] = 'direccis&oacute;n IP';
 $string['ip_lab_help'] = 'Direcci&oacute;n IP del sistema experimental.  Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
-$string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direccis&oacute;n IP valida.';
+$string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direcci&oacute;n IP valida.';
 $string['port'] = 'Puerto';
 $string['port_help'] = 'El puerto a usar para establecer la comunicaci&oacute;n. Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['port_required'] = 'ATENCI&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';

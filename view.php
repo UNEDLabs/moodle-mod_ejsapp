@@ -108,6 +108,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
         if ($usingsarlab == 1) {
             $sarlabinfo = new stdClass();
             $sarlabinfo->instance = $remlab_conf->sarlabinstance;
+            $sarlabinfo->collab = $remlab_conf->sarlabcollab;
             $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id));
             if ($bookings) { // If the admin or teacher has a booking use that info
                 $currenttime = date('Y-m-d H:00:00');
@@ -139,6 +140,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
                 if ($usingsarlab == 1) {
                     $sarlabinfo = new stdClass();
                     $sarlabinfo->instance = $remlab_conf->sarlabinstance;
+                    $sarlabinfo->collab = $remlab_conf->sarlabcollab;
                     $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                     $sarlabinfo->practice = $expsyst2pract->practiceintro;
                 }

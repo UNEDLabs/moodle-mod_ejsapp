@@ -153,6 +153,35 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $mform->setDefault('sarlab_instance', $rem_lab_data->sarlabinstance);
             }
         }
+        
+        $mform->addElement('selectyesno', 'sarlab_collab', get_string('sarlab_collab', 'ejsapp'));
+        $mform->addHelpButton('sarlab_collab', 'sarlab_collab', 'ejsapp');
+        $mform->disabledIf('sarlab_instance', 'is_rem_lab', 'eq', 0);
+        $mform->disabledIf('sarlab_collab', 'sarlab', 'eq', 0);
+        if ($this->current->instance) {
+            $rem_lab_data = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $this->current->instance));
+            if ($rem_lab_data) {
+                $mform->setDefault('sarlab_collab', $rem_lab_data->sarlabcollab);
+            }
+        }
+        
+        $mform->addElement('text', 'practiceintro', get_string('practiceintro', 'ejsapp'), array('size' => '50'));
+        $mform->setType('practiceintro', PARAM_TEXT);
+        $mform->addRule('practiceintro', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
+        $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
+        $mform->disabledIf('practiceintro', 'sarlab', 'eq', 0);
+        if ($this->current->instance) {
+            if ($rem_lab_data) {
+                $expsyst2pract_datas = $DB->get_records('ejsapp_expsyst2pract', array('ejsappid' => $this->current->instance));
+                $practicesintro = '';
+                foreach ($expsyst2pract_datas as $expsyst2pract_data) {
+                    $practicesintro = $practicesintro . $expsyst2pract_data->practiceintro . ';';
+                }
+                $practicesintro = substr($practicesintro, 0, -1);
+                $mform->setDefault('practiceintro', $practicesintro);
+            }
+        }
 
         $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'), array('size' => '12'));
         $mform->setType('ip_lab', PARAM_TEXT);
@@ -175,24 +204,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         if ($this->current->instance) {
             if ($rem_lab_data) {
                 $mform->setDefault('port', $rem_lab_data->port);
-            }
-        }
-
-        $mform->addElement('text', 'practiceintro', get_string('practiceintro', 'ejsapp'), array('size' => '50'));
-        $mform->setType('practiceintro', PARAM_TEXT);
-        $mform->addRule('practiceintro', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
-        $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('practiceintro', 'sarlab', 'eq', 0);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $expsyst2pract_datas = $DB->get_records('ejsapp_expsyst2pract', array('ejsappid' => $this->current->instance));
-                $practicesintro = '';
-                foreach ($expsyst2pract_datas as $expsyst2pract_data) {
-                    $practicesintro = $practicesintro . $expsyst2pract_data->practiceintro . ';';
-                }
-                $practicesintro = substr($practicesintro, 0, -1);
-                $mform->setDefault('practiceintro', $practicesintro);
             }
         }
 

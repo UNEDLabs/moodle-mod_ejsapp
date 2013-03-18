@@ -72,7 +72,9 @@
                 <FIELD NAME="usingsarlab" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="ejsappid" NEXT="sarlabinstance"/>
                 <FIELD NAME="sarlabinstance" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="usingsarlab" NEXT="ip"/>
+                       SEQUENCE="false" PREVIOUS="usingsarlab" NEXT="sarlabcollab"/>
+                <FIELD NAME="sarlabcollab" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="sarlabinstance" NEXT="ip"/>
                 <FIELD NAME="ip" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
                        COMMENT="IP direction of the computer that controls the access to the remote equipment"
                        PREVIOUS="sarlabinstance" NEXT="port"/>

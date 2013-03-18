@@ -93,6 +93,9 @@ $string['sarlab_help'] = "Only select yes if you are using Sarlab; a system that
 $string['sarlab_instance'] = "Sarlab server for this lab";
 $string['sarlab_instance_help'] = "The order corresponds to the one used for the values in the sarlab_IP and sarlab_port variables configured at the ejsapp settings page";
 
+$string['sarlab_collab'] = "Use collaborative access provided by Sarlab?";
+$string['sarlab_collab_help'] = "Whether you want Sarlab to provide collaborative access to this remote laboratory or not";
+
 $string['ip_lab'] = 'IP direction';
 $string['ip_lab_help'] = 'Esperimental system IP direction. If you are using Sarlab, you dont have to worry about this parameter.';
 $string['ip_lab_required'] = 'WARNING: You need to provide a valid IP direction.';
