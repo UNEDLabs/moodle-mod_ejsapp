@@ -108,7 +108,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
         if ($usingsarlab == 1) {
             $sarlabinfo = new stdClass();
             $sarlabinfo->instance = $remlab_conf->sarlabinstance;
-            $sarlabinfo->collab = $remlab_conf->sarlabcollab;
+            $sarlabinfo->collab = 0;
             $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id));
             if ($bookings) { // If the admin or teacher has a booking use that info
                 $currenttime = date('Y-m-d H:00:00');
@@ -126,32 +126,32 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
         }
         echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
     } else { //Students
-        if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id))) {
-            $currenttime = date('Y-m-d H:00:00');
-            $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id));
-            foreach ($bookings as $booking) {
-                if ($booking->starttime >= $currenttime) {
-                    break;
-                }
-            }
+        $currenttime = date('Y-m-d H:00:00');
+        if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'starttime' => $currenttime))) {
+            $booking = $DB->get_record('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'starttime' => $currenttime));
             $endtime = $booking->endtime;
             $valid = $booking->valid;
-            if ($booking->starttime == $currenttime || has_capability('moodle/course:viewhiddensections', $context, $USER->id, true)) { //Check booking date and hour
-                if ($usingsarlab == 1) {
-                    $sarlabinfo = new stdClass();
-                    $sarlabinfo->instance = $remlab_conf->sarlabinstance;
-                    $sarlabinfo->collab = $remlab_conf->sarlabcollab;
-                    $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
-                    $sarlabinfo->practice = $expsyst2pract->practiceintro;
-                }
-                echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
+            if ($usingsarlab == 1) {
+                $sarlabinfo = new stdClass();
+                $sarlabinfo->instance = $remlab_conf->sarlabinstance;
+                $sarlabinfo->collab = 0;
+                $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
+                $sarlabinfo->practice = $expsyst2pract->practiceintro;
+            }
+            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
+        } else { //No active booking
+            echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
+            if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) {
+                echo $OUTPUT->heading('You can still work in collaborative mode if you have been invited by a user with an active booking');
+                $sarlabinfo = new stdClass();
+                $sarlabinfo->instance = $remlab_conf->sarlabinstance;
+                $sarlabinfo->collab = $remlab_conf->sarlabcollab;
+                //WE NEED THE INFORMATION OF PRACTICE_ID!!!  
+                $sarlabinfo->practice = 'NULL';
+                echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));  
             } else {
-                echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
                 echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));
             }
-        } else {
-            echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
-            echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));
         }
     }
 } //if(($ejsapp->is_rem_lab == 0)... else

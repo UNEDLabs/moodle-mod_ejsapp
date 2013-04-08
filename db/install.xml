@@ -77,7 +77,7 @@
                        SEQUENCE="false" PREVIOUS="sarlabinstance" NEXT="ip"/>
                 <FIELD NAME="ip" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
                        COMMENT="IP direction of the computer that controls the access to the remote equipment"
-                       PREVIOUS="sarlabinstance" NEXT="port"/>
+                       PREVIOUS="sarlabcollab" NEXT="port"/>
                 <FIELD NAME="port" TYPE="int" LENGTH="6" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ip"
                        NEXT="totalslots"/>
                 <FIELD NAME="totalslots" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0"

@@ -162,7 +162,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
 	  document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
 	  document.write('<param name=\"language\" value=\"$language\"/>');
 	  document.write('<param name=\"username\" value=\"$username\"/>');
-	  document.write('<param name=\"user_name\" value=\"$user_name\"/>');
+	  document.write('<param name=\"user\" value=\"$user_name\"/>');
 	  document.write('<param name=\"password\" value=\"{$USER->password}\"/>');
 	  document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
 
