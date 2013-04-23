@@ -43,8 +43,8 @@ the plugins section in the Moodle.org webpage or at https://github.com/UNEDLabs.
 An explanation of EJSApp is included in the folder "doc". There, you will also find a txt 
 file with relevant links.
 
- WARNING: If you are updating ejsapp from a previous version, DO NOT replace your old jarfiles
- directory inside your old ejsapp directory with the one in the newer version.
+ WARNING: If you are updating ejsapp from a previous version, DO NOT replace/delete your old 
+ jarfiles directory inside your old ejsapp directory.
 
 -----------------------------------------------------------------------------------------------
  IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), EJSApp requires that (i) the 

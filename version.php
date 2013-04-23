@@ -27,15 +27,15 @@
  *
  * @package    mod
  * @subpackage ejsapp
- * @copyright  2012 Luis de la Torre, Ruben Heradio and Javier Pav�n
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2013031800;  // The current module version (Date: YYYYMMDDXX)
+$module->version  = 2013042300;  // The current module version (Date: YYYYMMDDXX)
 $module->requires = 2010112400;
 $module->cron     = 0;           // Period for cron to check this module (secs)
 $module->component = 'mod_ejsapp'; // To check on upgrade, that module sits in correct place
 $module->maturity = MATURITY_STABLE;
-$module->release = '1.4 (Build: 2013031800)';
+$module->release = '1.4 (Build: 2013042300)';

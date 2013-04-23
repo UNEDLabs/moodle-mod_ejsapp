@@ -146,7 +146,6 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
                 $sarlabinfo = new stdClass();
                 $sarlabinfo->instance = $remlab_conf->sarlabinstance;
                 $sarlabinfo->collab = $remlab_conf->sarlabcollab;
-                //WE NEED THE INFORMATION OF PRACTICE_ID!!!  
                 $sarlabinfo->practice = 'NULL';
                 echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));  
             } else {
