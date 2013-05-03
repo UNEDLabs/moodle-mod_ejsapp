@@ -79,7 +79,7 @@ $string['appwording'] = 'Enunciado';
 $string['state_file'] = 'Archivo .xml con el estado que este laboratorio EJS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicación EJS debe cargar al ejecutarse'.
+$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicación EJS debe cargar al ejecutarse.';
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
