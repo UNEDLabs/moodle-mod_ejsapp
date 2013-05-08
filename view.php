@@ -35,12 +35,28 @@ require_once(dirname(__FILE__) . '/lib.php');
 require_once('generate_applet_embedding_code.php');
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n = optional_param('n', 0, PARAM_INT); // ejsapp instance ID - it should be named as the first character of the module
 $state_file = optional_param('state_file', null, PARAM_TEXT);
 $session_id = optional_param('colsession', null, PARAM_INT);
-$session_director = optional_param('sessiondirector', null, PARAM_INT);
-$session_ip = optional_param('colip', null, PARAM_TEXT);
-$session_port = optional_param('colport', null, PARAM_INT);
+
+if (!is_null($session_id)) {
+    $collab_session = $DB->get_record('collaborative_sessions',array('id'=>$session_id));
+    $session_director = $DB->get_record('collaborative_users',array('id'=>$collab_session->master_user));
+    $session_ip = $session_director->ip;
+    $session_port = $collab_session->port;
+    $n = $collab_session->ejsapp;
+
+    $collabinfo = new stdClass();
+    $collabinfo->session = $session_id;
+    $collabinfo->ip = $session_ip;
+    $collabinfo->port = $session_port;
+
+    require_once(dirname(__FILE__) . '/../../blocks/ejsapp_collab_session/manage_collaborative_db.php');
+    if (am_i_master_user()) {
+        $collabinfo->director = $session_director->id;
+    }
+} else {
+    $collabinfo = null;
+}
 
 if ($id) {
     $cm = get_coursemodule_from_id('ejsapp', $id, 0, false, MUST_EXIST);
@@ -74,15 +90,9 @@ if ($ejsapp->intro) { // If some text was written, show the intro
 }
 
 $sarlabinfo = null;
-if ($session_id && $session_ip && $session_port) {
-  $collabinfo = new stdClass();
-  $collabinfo->session = $session_id;
-  $collabinfo->ip = $session_ip;
-  $collabinfo->port = $session_port;
-  $collabinfo->director = $session_director;  
-} else {
-  $collabinfo = null;
-}
+
+
+
 
 $module = new stdClass();
 $booking_module = new stdClass();
@@ -119,7 +129,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
                 }
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $sarlabinfo->practice = $expsyst2pract->practiceintro;
-            } else { // If there is no booking, use any info ... ¿choose practice?
+            } else { // If there is no booking, use any info ... ï¿½choose practice?
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => '1'));
                 $sarlabinfo->practice = $expsyst2pract->practiceintro;
             }

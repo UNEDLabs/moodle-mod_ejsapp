@@ -139,18 +139,27 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
     }
     // <\set the applet size on the screen>
 
+    /////////////////////////////////////////////////////////////
+    /*$file_record = $DB->get_record('files', array('filename' => $ejsapp->applet_name.'.jar', 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsapp->id));
+    $app_codebase = $CFG->wwwroot . "/pluginfile.php/" . $file_record->contextid . "/" . $file_record->component . "/" . $file_record->filearea . "/" . $file_record->itemid . $file_record->filepath;
+    //$fullpath = '/'.$file_record->contextid.$file_record->component.$file_record->filearea.'/'.$file_record->itemid.'/'.$file_record->filename;
+    $archive = $app_codebase . $file_record->filename;*/
+    /////////////////////////////////////////////////////////////
+
     if ($collabinfo && !isset($collabinfo->director)) {
         $class_file = $ejsapp->class_file;
         $class_file = str_replace(".class", "Student.class", $class_file);
         $code .= "document.write('<applet code=\"$class_file\"');";
-    } else {
+    } else {       
         $code .= "document.write('<applet code=\"{$ejsapp->class_file}\"');";
     }
 
     $context = get_context_instance(CONTEXT_USER, $USER->id);
     $language = current_language();
     $username = fullname($USER); //For collab
-    $user_name = $USER->username; //For checking Moodle connection*/
+    $user_name = $USER->username; //For checking Moodle connection
+
+    //$code .= "document.write('archive=\"$archive\"');
     $code .= "document.write('codebase=\"{$ejsapp->codebase}\"');
     document.write('archive=\"{$ejsapp->applet_name}.jar\"');
     document.write('name=\"{$ejsapp->applet_name}\"');
