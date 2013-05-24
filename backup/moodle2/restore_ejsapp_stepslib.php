@@ -227,16 +227,16 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
                         fclose($fh);
 
                         // <update ejsapp table>
-                        mysql_connect($CFG->dbhost, $CFG->dbuser, $CFG->dbpass) or die(mysql_error());
-                        mysql_select_db($CFG->dbname) or die(mysql_error());
                         $codebase = '';
                         preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
                         if (!empty($match_result) and $match_result[1]) {
                             $codebase .= '/' . $match_result[1];
                         }
                         $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp_record->course . '/' . $ejsapp_record->id . '/';
-                        $sql = "update {$CFG->prefix}ejsapp set codebase='$codebase' where id='{$ejsapp_record->id}'";
-                        mysql_query($sql) or die(mysql_error());
+                        $record = new stdClass();
+                        $record->id = $ejsapp_record->id;
+                        $record->codebase = $codebase;
+                        $DB->update_record('ejsapp', $record);
                     } //if ($file)
                 } //foreach
             } //if ($file_records)

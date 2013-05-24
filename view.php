@@ -55,6 +55,7 @@ if (!is_null($session_id)) {
         $collabinfo->director = $session_director->id;
     }
 } else {
+    $n = optional_param('n', null, PARAM_INT);
     $collabinfo = null;
 }
 

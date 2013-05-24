@@ -80,7 +80,7 @@ $string['appwording'] = 'Wording';
 $string['state_file'] = '.xml file with the state to be read when this EJS lab loads';
 
 $string['statefile'] = 'Easy Java Simulation State';
-$string['statefile_help'] = 'Select the .xml file with the state the Easy Java Simulation (EJS) application should load.';
+$string['statefile_help'] = 'Select the .xml file with the state the Easy Java Simulation (EJS) application should load'.
 
 $string['rem_lab_conf'] = 'Remote Lab Configuration';
 
