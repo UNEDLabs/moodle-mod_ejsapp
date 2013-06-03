@@ -54,7 +54,9 @@
                 <FIELD NAME="height" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="is_rem_lab" NEXT="width"/>
                 <FIELD NAME="width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="height"/>
+                       PREVIOUS="height" NEXT="personalvars"/>
+                <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="width"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -115,7 +117,7 @@
             </INDEXES>
         </TABLE>
         <TABLE NAME="ejsapp_sarlab_keys" COMMENT="Stores a temporal key to check authentication when using Sarlab"
-               PREVIOUS="ejsapp_expsyst2pract">
+               PREVIOUS="ejsapp_expsyst2pract" NEXT="ejsapp_personal_vars">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="user"/>
                 <FIELD NAME="user" TYPE="char" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
@@ -130,6 +132,28 @@
             </KEYS>
             <INDEXES>
                 <INDEX NAME="user" UNIQUE="false" FIELDS="user"/>
+            </INDEXES>
+        </TABLE>
+        <TABLE NAME="ejsapp_personal_vars" COMMENT="Contains information for generating personalized values for EJS variables"
+               PREVIOUS="ejsapp_sarlab_keys">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
+                <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
+                       NEXT="name"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="ejsappid" NEXT="type"/>
+                <FIELD NAME="type" TYPE="char" LENGTH="8" NOTNULL="true" SEQUENCE="false"
+                       PREVIOUS="name" NEXT="minval"/>
+                <FIELD NAME="minval" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false"
+                       PREVIOUS="type" NEXT="maxval"/>
+                <FIELD NAME="maxval" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false"
+                       PREVIOUS="minval"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
             </INDEXES>
         </TABLE>
     </TABLES>

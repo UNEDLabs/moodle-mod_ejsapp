@@ -69,17 +69,37 @@ $string['preserve_aspect_ratio'] = 'Mantener relaci&oacute;n de tama&ntilde;o';
 $string['preserve_aspect_ratio_help'] = 'Si selecciona esta opci&oacute;n, se respetar&aacute; la relaci&oacute;n de tama&ntilde;o original del applet. En ese caso, el usuario podr&aacute; modificar la anchura del applet y el sistema ajustar&aacute; autom&aacute;ticamente el valor para su altura. Si no se selecciona, el usuario podr&aacute; fijar tanto su anchura como su altura.';
 
 $string['custom_width'] = 'Anchura del applet (px)';
-$string['custom_width_required'] = 'ATENCI&Oacute;N: La anchura del applet no fue fijada. Debes proporcionar un valor distinto.';
+$string['custom_width_required'] = 'ATENCI&Oacute;N: La anchura del applet no ha sido fijada. Debes proporcionar un valor distinto.';
 
 $string['custom_height'] = 'Altura del applet (px)';
-$string['custom_height_required'] = 'ATENCI&Oacute;N: La altura del applet no fue fijada. Debes proporcionar un valor distinto.';
+$string['custom_height_required'] = 'ATENCI&Oacute;N: La altura del applet no ha sido fijada. Debes proporcionar un valor distinto.';
 
 $string['appwording'] = 'Enunciado';
 
 $string['state_file'] = 'Archivo .xml con el estado que este laboratorio EJS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicación EJS debe cargar al ejecutarse'.
+$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicaciï¿½n EJS debe cargar al ejecutarse.';
+
+$string['personalize_vars'] = 'Personalizar variables del laboratorio EJS';
+
+$string['use_personalized_vars'] = 'Personalizar variables para cada usuario?';
+$string['use_personalized_vars_help'] = 'Seleccione "ss&iacute;" si conoce el nombre de alguna de las variables en el modelo EJS y deseas que adquieran valores diferentes para cada usuario que acceda a esta aplicaci&oacute;n.';
+
+$string['var_name'] = 'Nombre {no}';
+$string['var_name_help'] = 'Nombre de la variable en el modelo EJS.';
+
+$string['var_type'] = 'Tipo {no}';
+$string['var_type_help'] = 'Tipo de la variable en el modelo EJS.';
+
+$string['min_value'] = 'Valor m&iacute;nimo {no}';
+$string['min_value_help'] = 'M&iacute;nimo valor permitido para la variable.';
+
+$string['max_value'] = 'M&aacute;ximo valor {no}';
+$string['max_value_help'] = 'M&aacute;ximo valor permitido para la variable.';
+
+$string['vars_required'] = 'ATENCI&Oacute;N: Si desea utilizar variables personalizadas, debe espeficificar al menos una.';
+$string['vars_incorrect_type'] = 'ATENCI&Oacute;N: El tipo y los valores especificados para esta variable no se corresponden entre s&iacute;.';
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
@@ -113,7 +133,7 @@ $string['dailyslots_help'] = 'Cantidad diaria de horas m&aacute;ximas que se le 
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
-$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lalo con una versi&oacute;n m&aacute;s moderna de EJS o puede que algunas caracter&iacute;sticas no funciones correctamente.";
+$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lalo con una versi&oacute;n m&aacute;s moderna de EJS.";
 
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';

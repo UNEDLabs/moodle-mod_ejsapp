@@ -108,6 +108,7 @@ function update_db($ejsapp, $contextid)
     // height
     $pattern = '/Applet-Height\s*:\s*(\w+)/';
     preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+    $ejs_ok = false;
     if (count($matches) == 0) {
         $height = 0;
         // If this field does not exist in the manifest, it means the version of 
@@ -118,6 +119,7 @@ function update_db($ejsapp, $contextid)
         </script>";
         echo $code;
     } else {
+        $ejs_ok = true;
         $height = $matches[1][0];
         $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
     }
@@ -147,6 +149,38 @@ function update_db($ejsapp, $contextid)
     $fs->create_file_from_pathname($fileinfo, $uploaded_file);
     // </update files table>
 
+    //Personalizing EJS variables <update ejsapp_personal_vars table>
+    $old_ejsapp = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
+    if (isset($old_ejsapp)) {  // We clean all the personalized variables configuration and start over again
+        $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
+    }
+    if($ejsapp->personalvars == 1) {
+        $personal_vars = new stdClass();
+        $personal_vars->ejsappid = $ejsapp->id;
+        for ($i=0; $i < count($ejsapp->var_name); $i++) {
+            if (strcmp($ejsapp->var_name[$i],'') != 0) { // Variables without name are ignored
+                $personal_vars->name = $ejsapp->var_name[$i];
+                $type_info = 'Boolean';
+                $min_value = 0;
+                $max_value = 1;
+                if ($ejsapp->var_type[$i] == 1) {
+                    $type_info = 'Integer';
+                    $min_value = $ejsapp->min_value[$i];
+                    $max_value = $ejsapp->max_value[$i];
+                } elseif ($ejsapp->var_type[$i]== 2) {
+                    $type_info = 'Double';
+                    $min_value = $ejsapp->min_value[$i];
+                    $max_value = $ejsapp->max_value[$i];
+                }
+                $personal_vars->type = $type_info;
+                $personal_vars->minval = $min_value;
+                $personal_vars->maxval = $max_value;
+                $DB->insert_record('ejsapp_personal_vars', $personal_vars);
+            }
+        }
+    }
+    // </update ejsapp_personal_vars table>
+
     $ejsapp->class_file = $class_file;
     $ejsapp->codebase = $codebase;
     $ejsapp->mainframe = $mainframe;
@@ -155,7 +189,8 @@ function update_db($ejsapp, $contextid)
     $ejsapp->width = $width;
     $DB->update_record('ejsapp', $ejsapp);
 
-} //update_db
+    return $ejs_ok;
+ } //update_db
 
 /**
  * Deletes a directory from the server

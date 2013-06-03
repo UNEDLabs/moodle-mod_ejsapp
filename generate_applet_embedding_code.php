@@ -62,14 +62,18 @@ if ($DB->record_exists('block', array('name' => 'ejsapp_collab_session'))) {
  *                                  $collabinfo->ip: string collaborative session ip, 
  *                                  $collabinfo->port: int collaborative session port,
  *                                  $collabinfo->director: int id of the collaborative session master user, `
- *                                  Null if generate_applet_embedding_code is not called from block ejsapp_collab_session 
+ *                                  Null if generate_applet_embedding_code is not called from block ejsapp_collab_session
+ * @param stdClass|null $personalvarsinfo
+ *                                  $personalvarsinfo->name: string[] name(s) of the EJS variable(s)
+ *                                  $personalvarsinfo->value: double[] value(s) of the EJS variable(s)
+ *                                  $personalvarsinfo->type: string[] type(s) of the EJS variable(s)
  * @param stdClass|null $external_size 
  *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
  *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
  *                                  Null if generate_applet_embedding_code is not called from the external interface (draw_ejsapp_instance() function) 
  * @return string code that embeds an EJS applet into Moodle
  */
-function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $external_size)
+function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $external_size)
 {
     global $DB, $USER, $CFG;
 
@@ -222,9 +226,9 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         }
         $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
         $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
-          function performAppletCode(count) {
-	          if (!applet._readState && count > 0) {
-	            window.setTimeout( function() { performAppletCode( --count ); }, 2000 );
+          function loadState(count) {
+	        if (!applet._readState && count > 0) {
+	            window.setTimeout( function() { loadState( --count ); }, 2000 );
             }
             else if (applet._readState) {
               applet._readState('url:$state_file');
@@ -237,10 +241,41 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
               alert('$state_fail_msg');
             }
           }
-          performAppletCode(10);";
+          loadState(10);";
         //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
         $code .= $load_state_code;
     } //end of if ($state_file)
+
+    // Personalized variables
+    if (!$collabinfo && $personalvarsinfo) {
+        $js_vars_names = json_encode($personalvarsinfo->name);
+        $js_vars_values = json_encode($personalvarsinfo->value);
+        $js_vars_types = json_encode($personalvarsinfo->type);
+        $personalize_vars_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+          var js_vars_names = ". $js_vars_names . ";
+          var js_vars_values = ". $js_vars_values . ";
+          var js_vars_types = ". $js_vars_types . ";
+          function personalizeVars(count) {
+	        if (!applet._simulation.setVariable && count > 0) {
+	            window.setTimeout( function() { personalizeVars( --count ); }, 2000 );
+            }
+            else if (applet._simulation.setVariable) {
+                for (var i=0; i<js_vars_names.length; i++) {
+                    if (js_vars_types[i] != \"Boolean\") {
+                        applet._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
+                    } else {
+                        var bool = (js_vars_values[i] == 1);
+                        applet._simulation.setVariable(js_vars_names[i],bool);
+                    }
+                }
+                applet._simulation.update();
+                applet._initialize();
+                //applet._view.update();
+            }
+          }
+          personalizeVars(10);";
+        $code .= $personalize_vars_code;
+    }
 
     $code .= '</script>';
 

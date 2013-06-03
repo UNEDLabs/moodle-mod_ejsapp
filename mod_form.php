@@ -44,6 +44,7 @@ require_once('locallib.php');
 class mod_ejsapp_mod_form extends moodleform_mod
 {
 
+
     /**
      * Called from Moodle to define this form
      *
@@ -120,6 +121,45 @@ class mod_ejsapp_mod_form extends moodleform_mod
         
         $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
+        // -------------------------------------------------------------------------------
+        // Personalize variables from the EJS application
+        $mform->addElement('header', 'personalize_vars', get_string('personalize_vars', 'ejsapp'));
+
+        $mform->addElement('selectyesno', 'personalvars', get_string('use_personalized_vars', 'ejsapp'));
+        $mform->addHelpButton('personalvars', 'use_personalized_vars', 'ejsapp');
+
+        $varsarray = array();
+        $varsarray[] = $mform->createElement('text', 'var_name', get_string('var_name', 'ejsapp'));
+        $varsarray[] = $mform->createElement('select', 'var_type', get_string('var_type', 'ejsapp'),  array('Boolean', 'Integer', 'Double'));
+        $varsarray[] = $mform->createElement('text', 'min_value', get_string('min_value', 'ejsapp'), array('size' => '8'));
+        $varsarray[] = $mform->createElement('text', 'max_value', get_string('max_value', 'ejsapp'), array('size' => '8'));
+        $varsarray[] = $mform->createElement('hidden', 'optionid', 0);
+        $mform->setType('optionid', PARAM_INT);
+
+        $repeateloptions = array();
+        $repeateloptions['var_name']['disabledif'] = array('personalvars', 'eq', 0);
+        $repeateloptions['var_name']['type'] = PARAM_TEXT;
+        $repeateloptions['var_name']['helpbutton'] = array('var_name', 'ejsapp');
+        $repeateloptions['var_type']['disabledif'] = array('personalvars', 'eq', 0);
+        $repeateloptions['var_type']['type'] = PARAM_TEXT;
+        $repeateloptions['var_type']['helpbutton'] = array('var_type', 'ejsapp');
+        $repeateloptions['min_value']['disabledif'] = array('personalvars', 'eq', 0);
+        $repeateloptions['min_value']['disabledif'] = array('var_type', 'eq', 0);
+        $repeateloptions['min_value']['type'] = PARAM_FLOAT;
+        $repeateloptions['min_value']['helpbutton'] = array('min_value', 'ejsapp');
+        $repeateloptions['max_value']['disabledif'] = array('personalvars', 'eq', 0);
+        $repeateloptions['max_value']['disabledif'] = array('var_type', 'eq', 0);
+        $repeateloptions['max_value']['type'] = PARAM_FLOAT;
+        $repeateloptions['max_value']['helpbutton'] = array('max_value', 'ejsapp');
+
+        $no = 2;
+        if ($this->current->instance) {
+            if ($personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance))) {
+                $no = count($personal_vars);
+            }
+        }
+
+        $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats', 'option_add_vars', 2, null, true);
         // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
@@ -248,6 +288,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $this->add_action_buttons();
     } // definition
 
+
     /**
      * Any data processing needed before the form is displayed
      * (needed to set up draft areas for editor and filemanager elements)
@@ -255,7 +296,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
      */
     function data_preprocessing(&$default_values)
     {
-        global $CFG;
+        global $CFG, $DB;
         $mform = $this->_form;
 
         // Fill the file picker elements with previous submitted files/data
@@ -272,6 +313,21 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $draftitemid = file_get_submitted_draft_itemid('statefile');
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => true));
             $default_values['statefile'] = $draftitemid;
+
+            $personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
+            $key = 0;
+            foreach ($personal_vars as $personal_var) {
+                $default_values['var_name['.$key.']'] = $personal_var->name;
+                $vartype = '0';
+                if (strcmp($personal_var->type,'Integer') == 0) $vartype = '1';
+                elseif (strcmp($personal_var->type,'Double') == 0) $vartype = '2';
+                $default_values['var_type['.$key.']'] = $vartype;
+                if ($vartype != 0) {
+                    $default_values['min_value['.$key.']'] = $personal_var->minval;
+                    $default_values['max_value['.$key.']'] = $personal_var->maxval;
+                }
+                $key ++;
+            }
         }
 
         $content = $this->get_file_content('appletfile');
@@ -315,6 +371,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         } //if ($content)
     } // data_preprocessing
 
+
     /**
      * Performs minimal validation on the settings form
      * @param array $data
@@ -349,6 +406,23 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
             }
         }
+
+        if ($data['personalvars'] == 1) {
+            if (empty($data['var_name'])) {
+                $errors['var_name[0]'] = get_string('vars_required', 'ejsapp');
+            }
+            $i = 0;
+            foreach ($data['var_type'] as $this_var_type) {
+                $min_values = $data['min_value'];
+                $max_values = $data['max_value'];
+                if ($this_var_type == 1 && (!(floor($min_values[$i]) == $min_values[$i]) || !(floor($max_values[$i]) == $max_values[$i]))) {
+                    $errors['var_type['.$i.']'] = get_string('vars_incorrect_type', 'ejsapp');
+                } elseif ($this_var_type == 2 && (!is_float($min_values[$i]) || !is_float($max_values[$i]))) {
+                    $errors['var_type['.$i.']'] = get_string('vars_incorrect_type', 'ejsapp');
+                }
+                $i++;
+            }
+        }
         
         // Check whether the manifest has the necessary information
         /*if (!empty($data['manifest'])) {
@@ -361,5 +435,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
         return $errors;
     } // validation
+
 
 } // class mod_ejsapp_mod_form

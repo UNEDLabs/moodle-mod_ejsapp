@@ -34,6 +34,8 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/lib.php');
 require_once('generate_applet_embedding_code.php');
 
+global $USER;
+
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $state_file = optional_param('state_file', null, PARAM_TEXT);
 $session_id = optional_param('colsession', null, PARAM_INT);
@@ -92,9 +94,6 @@ if ($ejsapp->intro) { // If some text was written, show the intro
 
 $sarlabinfo = null;
 
-
-
-
 $module = new stdClass();
 $booking_module = new stdClass();
 if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) {
@@ -108,9 +107,26 @@ if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) {
   $booking_module->visible = 0;
 }
 
+$personalvarsinfo = null;
+if ($ejsapp->personalvars == 1) {
+    $personalvarsinfo = new stdClass();
+    $personalvars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
+    $i = 0;
+    foreach ($personalvars as $personalvar) {
+        $uniqueval = filter_var(md5($USER->firstname . $i . $USER->username . $USER->lastname . $USER->id . $personalvar->id . $personalvar->name . $personalvar->type . $USER->email . $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
+        mt_srand($uniqueval/(pow(10,strlen($USER->username))));
+        $personalvarsinfo->name[$i] = $personalvar->name;
+        $factor = 1;
+        if (strcmp($personalvar->type, 'Double') == 0)  $factor = 1000;
+        $personalvarsinfo->value[$i] = mt_rand($factor*$personalvar->minval, $factor*$personalvar->maxval)/$factor;
+        $personalvarsinfo->type[$i] = $personalvar->type;
+        $i++;
+    }
+}
+
 //Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not.
 if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual lab or not using ejsappbooking
-    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
+    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, null));
     //TODO: Consider the possibility of using a remote lab with Sarlab and without booking system (select practice?)
 } else { //Remote lab and using ejsappbooking 
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
@@ -135,7 +151,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
                 $sarlabinfo->practice = $expsyst2pract->practiceintro;
             }
         }
-        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
+        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, null));
     } else { //Students
         $currenttime = date('Y-m-d H:00:00');
         if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'starttime' => $currenttime))) {
@@ -149,7 +165,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $sarlabinfo->practice = $expsyst2pract->practiceintro;
             }
-            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));
+            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, null));
         } else { //No active booking
             echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
             if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) {
@@ -158,7 +174,7 @@ if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual l
                 $sarlabinfo->instance = $remlab_conf->sarlabinstance;
                 $sarlabinfo->collab = $remlab_conf->sarlabcollab;
                 $sarlabinfo->practice = 'NULL';
-                echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, null));  
+                echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, null));
             } else {
                 echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));
             }

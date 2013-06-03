@@ -80,9 +80,29 @@ $string['appwording'] = 'Wording';
 $string['state_file'] = '.xml file with the state to be read when this EJS lab loads';
 
 $string['statefile'] = 'Easy Java Simulation State';
-$string['statefile_help'] = 'Select the .xml file with the state the Easy Java Simulation (EJS) application should load'.
+$string['statefile_help'] = 'Select the .xml file with the state the Easy Java Simulation (EJS) application should load.';
 
-$string['rem_lab_conf'] = 'Remote Lab Configuration';
+$string['personalize_vars'] = 'Personalize variables of the EJS lab';
+
+$string['use_personalized_vars'] = 'Personalize variables for each user?';
+$string['use_personalized_vars_help'] = 'Select yes if you know the name of some of the variables in the EJS model and you want them to adquire different values for each of the users accessing this application.';
+
+$string['var_name'] = 'Name {no}';
+$string['var_name_help'] = 'Name of the variable in the EJS model.';
+
+$string['var_type'] = 'Type {no}';
+$string['var_type_help'] = 'Type of the variable in the EJS model.';
+
+$string['min_value'] = 'Minimum value {no}';
+$string['min_value_help'] = 'Minimum value allowed for the variable.';
+
+$string['max_value'] = 'Maximum value {no}';
+$string['max_value_help'] = 'Maximum value allowed for the variable.';
+
+$string['vars_required'] = 'WARNING: If you want to use personalized variables, you must specify at least one.';
+$string['vars_incorrect_type'] = 'WARNING: The specified type and values for this variable does not correspond to each other.';
+
+$string['rem_lab_conf'] = 'Remote lab configuration';
 
 $string['is_rem_lab'] = 'Remote experimental system?';
 $string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources AND you want the EJSApp Booking System to manage their access, select "yes". Otherwise, select "no".';
@@ -94,7 +114,7 @@ $string['sarlab_instance'] = "Sarlab server for this lab";
 $string['sarlab_instance_help'] = "The order corresponds to the one used for the values in the sarlab_IP and sarlab_port variables configured at the ejsapp settings page";
 
 $string['sarlab_collab'] = "Use collaborative access provided by Sarlab?";
-$string['sarlab_collab_help'] = "Whether you want Sarlab to provide collaborative access to this remote laboratory or not";
+$string['sarlab_collab_help'] = "Whether you want Sarlab to provide collaborative access to this remote laboratory or not.";
 
 $string['ip_lab'] = 'IP direction';
 $string['ip_lab_help'] = 'Esperimental system IP direction. If you are using Sarlab, you dont have to worry about this parameter.';
@@ -114,7 +134,7 @@ $string['dailyslots_help'] = 'Daily amount of maximum hours each student will be
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
-$string['EJS_version'] = "WARNING: The applet file was not generated with EJS 4.37 (build 121201), or higher. Recompile it with a newer version of EJS or some features may not work correctly.";
+$string['EJS_version'] = "WARNING: The applet file was not generated with EJS 4.37 (build 121201), or higher. Recompile it with a newer version of EJS.";
 
 $string['no_booking'] = 'You do not have an active booking for this lab.';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';

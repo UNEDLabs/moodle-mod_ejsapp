@@ -42,7 +42,7 @@ global $DB, $USER;
 $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
 
 $info = '';
-$sql = "Select * From mdl_files Where mdl_files.component = 'mod_ejsapp' And mdl_files.filearea = 'private' And mdl_files.userid = '$USER->id' And source = 'ejsappid=$ejsapp_id'";
+$sql = "SELECT * FROM {$CFG->prefix}files WHERE component = 'user' AND filearea = 'private' AND userid = '$USER->id' AND source = 'ejsappid=$ejsapp_id'";
 $records = $DB->get_records_sql($sql);
 
 foreach ($records as $record) {

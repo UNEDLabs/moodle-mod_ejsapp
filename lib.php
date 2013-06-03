@@ -83,86 +83,90 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 
     $cmid = $ejsapp->coursemodule;
     $context = get_context_instance(CONTEXT_MODULE, $cmid);
-    update_db($ejsapp, $context->id);
+    $ejs_ok = update_db($ejsapp, $context->id);
 
-    // Remote labs
-    if ($ejsapp->is_rem_lab == 1) {
-        $ejsapp_rem_lab = new stdClass();
-        $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-        $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
-        if ($ejsapp_rem_lab->usingsarlab == 1) {
-            $sarlabinstance = $ejsapp->sarlab_instance;
-            $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
-            $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
-            $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-            $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-            $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
-            $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
-        } else {
-            $ejsapp_rem_lab->sarlabinstance = '0';
-            $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
-            $ejsapp_rem_lab->port = $ejsapp->port;
-        }
-        $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
-        $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
-        $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
-        $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+    if ($ejs_ok) {
+        // Remote labs
+        if ($ejsapp->is_rem_lab == 1) {
+            $ejsapp_rem_lab = new stdClass();
+            $ejsapp_rem_lab->ejsappid = $ejsapp->id;
+            $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
+            if ($ejsapp_rem_lab->usingsarlab == 1) {
+                $sarlabinstance = $ejsapp->sarlab_instance;
+                $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
+                $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
+                $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+                $list_sarlab_ports = explode(";", $CFG->sarlab_port);
+                $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
+                $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
+            } else {
+                $ejsapp_rem_lab->sarlabinstance = '0';
+                $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+                $ejsapp_rem_lab->port = $ejsapp->port;
+            }
+            $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
+            $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
+            $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+            $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
 
-        $ejsapp_expsyst2pract = new stdClass();
-        $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-        //Receive parameters from Sarlab's config tool (if it is used)... TODO
-        if ($ejsapp_rem_lab->usingsarlab == 1) {
-            $expsyst2pract_list = explode(';', $ejsapp->practiceintro);
-            for ($i = 0; $i < count($expsyst2pract_list); $i++) {
-                $ejsapp_expsyst2pract->practiceid = $i + 1;
-                $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$i];
+            $ejsapp_expsyst2pract = new stdClass();
+            $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+            //Receive parameters from Sarlab's config tool (if it is used)... TODO
+            if ($ejsapp_rem_lab->usingsarlab == 1) {
+                $expsyst2pract_list = explode(';', $ejsapp->practiceintro);
+                for ($i = 0; $i < count($expsyst2pract_list); $i++) {
+                    $ejsapp_expsyst2pract->practiceid = $i + 1;
+                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$i];
+                    $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
+                }
+            } else {
+                $ejsapp_expsyst2pract->practiceid = 1;
+                $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
                 $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
             }
-        } else {
-            $ejsapp_expsyst2pract->practiceid = 1;
-            $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
-            $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
-        }
-        // EJSApp booking system
-        if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-            $context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
-            $users = get_enrolled_users($context);
-            $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
-            //ejsappbooking_usersaccess table:
-            $ejsappbooking_usersaccess = new stdClass();
-            $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
-            $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
-            //Grant remote access to admin user:
-            $ejsappbooking_usersaccess->userid = 2;
-            $ejsappbooking_usersaccess->allowremaccess = 1;   
-            $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-            //Consider other enrolled users:
-            foreach ($users as $user) {
-              $ejsappbooking_usersaccess->userid = $user->id;
-              if (!has_capability('moodle/course:viewhiddensections', $context, $user->id, false)) {
-                $ejsappbooking_usersaccess->allowremaccess = 0;
-              } else {
+            // EJSApp booking system
+            if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
+                $context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
+                $users = get_enrolled_users($context);
+                $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
+                //ejsappbooking_usersaccess table:
+                $ejsappbooking_usersaccess = new stdClass();
+                $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
+                $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
+                //Grant remote access to admin user:
+                $ejsappbooking_usersaccess->userid = 2;
                 $ejsappbooking_usersaccess->allowremaccess = 1;
-              }
-              $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                //Consider other enrolled users:
+                foreach ($users as $user) {
+                  $ejsappbooking_usersaccess->userid = $user->id;
+                  if (!has_capability('moodle/course:viewhiddensections', $context, $user->id, false)) {
+                    $ejsappbooking_usersaccess->allowremaccess = 0;
+                  } else {
+                    $ejsappbooking_usersaccess->allowremaccess = 1;
+                  }
+                  $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                }
             }
         }
-    }
 
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-    delete_recursively($path . 'temp');
+        $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+        delete_recursively($path . 'temp');
 
-    if ($mform and !empty($ejsapp->ejsappwording['itemid'])) {
-        $draftitemid = $ejsapp->ejsappwording['itemid'];
-        $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
-        $DB->update_record('ejsapp', $ejsapp);
-    }
-    
-    // Creating the state file in dataroot and updating the files table in the database
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
-    $draftitemid = $ejsapp->statefile;
-    if ($draftitemid) {
-        file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
+        if ($mform and !empty($ejsapp->ejsappwording['itemid'])) {
+            $draftitemid = $ejsapp->ejsappwording['itemid'];
+            $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
+            $DB->update_record('ejsapp', $ejsapp);
+        }
+
+        // Creating the state file in dataroot and updating the files table in the database
+        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $draftitemid = $ejsapp->statefile;
+        if ($draftitemid) {
+            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
+        }
+    } else {
+        ejsapp_delete_instance($ejsapp->id);
     }
 
     return $ejsapp->id;
@@ -194,115 +198,120 @@ function ejsapp_update_instance($ejsapp, $mform)
     require_once($CFG->libdir . '/filelib.php');
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    update_db($ejsapp, $context->id);
+    $ejs_ok = update_db($ejsapp, $context->id);
 
-    // Remote labs
-    if ($ejsapp->is_rem_lab == 1) {
-        $ejsapp_rem_lab = new stdClass();
-        $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-        $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
-        if ($ejsapp_rem_lab->usingsarlab == 1) {
-            $sarlabinstance = $ejsapp->sarlab_instance;
-            $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
-            $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
-            $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-            $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-            $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
-            $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
-        } else {
-            $ejsapp_rem_lab->sarlabinstance = '0';
-            $ejsapp_rem_lab->sarlabcollab = '0';
-            $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
-            $ejsapp_rem_lab->port = $ejsapp->port;
-        }
-        $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
-        $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
-        $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+    if ($ejs_ok) {
+        // Remote labs
+        if ($ejsapp->is_rem_lab == 1) {
+            $ejsapp_rem_lab = new stdClass();
+            $ejsapp_rem_lab->ejsappid = $ejsapp->id;
+            $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
+            if ($ejsapp_rem_lab->usingsarlab == 1) {
+                $sarlabinstance = $ejsapp->sarlab_instance;
+                $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
+                $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
+                $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+                $list_sarlab_ports = explode(";", $CFG->sarlab_port);
+                $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
+                $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
+            } else {
+                $ejsapp_rem_lab->sarlabinstance = '0';
+                $ejsapp_rem_lab->sarlabcollab = '0';
+                $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+                $ejsapp_rem_lab->port = $ejsapp->port;
+            }
+            $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
+            $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
+            $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
 
-        $rem_lab = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
-        if ($rem_lab != null) {
-            $ejsapp_rem_lab->id = $rem_lab->id;
-            $DB->update_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
-        } else {
-            $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
-        }
+            $rem_lab = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
+            if ($rem_lab != null) {
+                $ejsapp_rem_lab->id = $rem_lab->id;
+                $DB->update_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+            } else {
+                $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+            }
 
-        $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
-        $ejsapp_expsyst2pract = new stdClass();
-        $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-        //Receive parameters from Sarlab's config tool (if it is used)... TODO
-        if ($ejsapp->sarlab == 1) {
-            $expsyst2pract_list = explode(';', $ejsapp->practiceintro);
-            for ($i = 0; $i < count($expsyst2pract_list); $i++) {
-                $ejsapp_expsyst2pract->practiceid = $i + 1;
-                $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$i];
+            $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
+            $ejsapp_expsyst2pract = new stdClass();
+            $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+            //Receive parameters from Sarlab's config tool (if it is used)... TODO
+            if ($ejsapp->sarlab == 1) {
+                $expsyst2pract_list = explode(';', $ejsapp->practiceintro);
+                for ($i = 0; $i < count($expsyst2pract_list); $i++) {
+                    $ejsapp_expsyst2pract->practiceid = $i + 1;
+                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$i];
+                    $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
+                }
+            } else {
+                $ejsapp_expsyst2pract->practiceid = 1;
+                $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
                 $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
             }
-        } else {
-            $ejsapp_expsyst2pract->practiceid = 1;
-            $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
-            $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
-        }
-        // EJSApp booking system
-        if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-            $context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
-            $users = get_enrolled_users($context);
-            $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
-            //ejsappbooking_usersaccess table:
-            $ejsappbooking_usersaccess = new stdClass();
-            $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
-            $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
-            //Grant remote access to admin user:
-            $ejsappbooking_usersaccess->userid = 2;
-            $ejsappbooking_usersaccess->allowremaccess = 1;  
-            if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id))) { 
-              $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-            } else {
-              $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
-              $ejsappbooking_usersaccess->id = $record->id;
-              $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-            }
-            //Consider other enrolled users:
-            foreach ($users as $user) {
-              $ejsappbooking_usersaccess->userid = $user->id;
-              if (!has_capability('moodle/course:viewhiddensections', $context, $user->id, false)) {
-                $ejsappbooking_usersaccess->allowremaccess = 0;
-              } else {
+            // EJSApp booking system
+            if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
+                $context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
+                $users = get_enrolled_users($context);
+                $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
+                //ejsappbooking_usersaccess table:
+                $ejsappbooking_usersaccess = new stdClass();
+                $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
+                $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
+                //Grant remote access to admin user:
+                $ejsappbooking_usersaccess->userid = 2;
                 $ejsappbooking_usersaccess->allowremaccess = 1;
-              }
-              if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id))) {
-                $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-              } else {
-                $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
-                $ejsappbooking_usersaccess->id = $record->id;
-                $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-              }
+                if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id))) {
+                  $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                } else {
+                  $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
+                  $ejsappbooking_usersaccess->id = $record->id;
+                  $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                }
+                //Consider other enrolled users:
+                foreach ($users as $user) {
+                  $ejsappbooking_usersaccess->userid = $user->id;
+                  if (!has_capability('moodle/course:viewhiddensections', $context, $user->id, false)) {
+                    $ejsappbooking_usersaccess->allowremaccess = 0;
+                  } else {
+                    $ejsappbooking_usersaccess->allowremaccess = 1;
+                  }
+                  if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id))) {
+                    $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                  } else {
+                    $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
+                    $ejsappbooking_usersaccess->id = $record->id;
+                    $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+                  }
+                }
+            }
+        } elseif ($rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id)) != null) {
+            $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
+            $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
+            // EJSApp booking system
+            if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
+              $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
+              $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
             }
         }
-    } elseif ($rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id)) != null) {
-        $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
-        $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
-        // EJSApp booking system
-        if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-          $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
-          $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
+
+        $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+        delete_recursively($path . 'temp');
+
+        $draftitemid = $ejsapp->ejsappwording['itemid'];
+        if ($draftitemid) {
+            $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
+            $DB->update_record('ejsapp', $ejsapp);
         }
-    }
 
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-    delete_recursively($path . 'temp');
+        // Creating the state file in dataroot and updating the files table in the database
+        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $draftitemid = $ejsapp->statefile;
+        if ($draftitemid) {
+            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
+        }
 
-    $draftitemid = $ejsapp->ejsappwording['itemid'];
-    if ($draftitemid) {
-        $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
-        $DB->update_record('ejsapp', $ejsapp);
-    }
-
-    // Creating the state file in dataroot and updating the files table in the database
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
-    $draftitemid = $ejsapp->statefile;
-    if ($draftitemid) {
-        file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
+    } else {
+        ejsapp_delete_instance($ejsapp->id);
     }
 
     return $ejsapp->id;
@@ -339,6 +348,10 @@ function ejsapp_delete_instance($id)
           $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
           $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
         }
+    }
+
+    if ($ejsapp->personalvars == 1) {
+        $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
     }
 
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $id;

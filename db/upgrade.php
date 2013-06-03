@@ -42,27 +42,49 @@ function xmldb_ejsapp_upgrade($oldversion)
     global $DB;
     
     if ($oldversion <= '2012112900') {
-      // Rename sarlab_keys database table to ejsapp_sarlab_keys
-      $dbman = $DB->get_manager();
-      $table = new xmldb_table('sarlab_keys');
-      $dbman->rename_table($table, 'ejsapp_sarlab_keys');
+        // Rename sarlab_keys database table to ejsapp_sarlab_keys
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('sarlab_keys');
+        $dbman->rename_table($table, 'ejsapp_sarlab_keys');
     }
     
     if ($oldversion < '2012121300') {
-      // Create "active" field in ejsapp_remlab_conf table
-      $dbman = $DB->get_manager();
-      $table = new xmldb_table('ejsapp_remlab_conf');
-      $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'dailyslots');
-      $dbman->add_field($table, $field);
+        // Create "active" field in ejsapp_remlab_conf table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_remlab_conf');
+        $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'dailyslots');
+        $dbman->add_field($table, $field);
     }
     
     if ($oldversion < '2013031800') {
-      // Create "active" field in ejsapp_remlab_conf table
-      $dbman = $DB->get_manager();
-      $table = new xmldb_table('ejsapp_remlab_conf');
-      $field = new xmldb_field('sarlabcollab', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sarlabinstance', 'ip');
-      $dbman->add_field($table, $field);
+        // Create "sarlabcollab" field in ejsapp_remlab_conf table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_remlab_conf');
+        $field = new xmldb_field('sarlabcollab', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sarlabinstance', 'ip');
+        $dbman->add_field($table, $field);
     }
-    
+
+    if  ($oldversion < '2013060101') {
+        // Create "personalvars" field in ejsapp table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('personalvars', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'width');
+        $dbman->add_field($table, $field);
+
+        //Create "ejsapp_personal_vars" table
+        $table = new xmldb_table('ejsapp_personal_vars');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, true, null);
+        $table->add_field('ejsappid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_TEXT, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_TEXT, '8', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('minval', XMLDB_TYPE_NUMBER, '10', null, null, null);
+        $table->add_field('maxval', XMLDB_TYPE_NUMBER, '10', null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('ejsappid', XMLDB_INDEX_NOTUNIQUE, array('ejsappid'));
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    }
+
     return true;
 }
