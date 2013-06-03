@@ -103,18 +103,18 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $sarlab_port = $list_sarlab_ports[$sarlabinfo->instance];
     }
 
-    $code = '<script "text/javascript">';
+    $code = '<script type="text/javascript">';
 
     // <set the applet size on the screen>
     if ($external_size) {
-      $code .= "var w = $external_size->width, h = $external_size->height;";
+      $code .= " var w = $external_size->width, h = $external_size->height;";
     } else {
       switch ($ejsapp->applet_size_conf) {
           case 0:
-              $code .= "var w = {$ejsapp->width}, h = {$ejsapp->height};";
+              $code .= " var w = {$ejsapp->width}, h = {$ejsapp->height};";
               break;
           case 1:
-              $code .= "var w = 630, h = 460, h_max = 460;
+              $code .= " var w = 630, h = 460, h_max = 460;
   		        if (window.innerWidth && window.innerHeight) {
                 w = window.innerWidth;
                 h_max = window.innerHeight;
@@ -134,9 +134,9 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
               break;
           case 2:
               if ($ejsapp->preserve_aspect_ratio == 0) {
-                  $code .= "var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
+                  $code .= " var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
               } else {
-                  $code .= "var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
+                  $code .= " var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
               }
               break;
       }
@@ -164,12 +164,12 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
     $user_name = $USER->username; //For checking Moodle connection
 
     //$code .= "document.write('archive=\"$archive\"');
-    $code .= "document.write('codebase=\"{$ejsapp->codebase}\"');
-    document.write('archive=\"{$ejsapp->applet_name}.jar\"');
-    document.write('name=\"{$ejsapp->applet_name}\"');
-    document.write('id=\"{$ejsapp->applet_name}\"');
-    document.write('width=\"'+w+'\"');
-    document.write('height=\"'+h+'\">');
+    $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');
+    document.write(' archive=\"{$ejsapp->applet_name}.jar\"');
+    document.write(' name=\"{$ejsapp->applet_name}\"');
+    document.write(' id=\"{$ejsapp->applet_name}\"');
+    document.write(' width=\"'+w+'\"');
+    document.write(' height=\"'+h+'\">');
     document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
 	  document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
 	  document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
@@ -228,10 +228,10 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
           function loadState(count) {
 	        if (!applet._readState && count > 0) {
-	            window.setTimeout( function() { loadState( --count ); }, 2000 );
+	            window.setTimeout( function() { loadState( --count ); }, 1000 );
             }
             else if (applet._readState) {
-              applet._readState('url:$state_file');
+              window.setTimeout( function() { applet._readState('url:$state_file'); }, 100 );
               //applet._view.resetTraces();
               //applet._view.clearData();
               //applet._view.clearElements();
@@ -247,7 +247,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
     } //end of if ($state_file)
 
     // Personalized variables
-    if (!$collabinfo && $personalvarsinfo) {
+    if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
         $js_vars_names = json_encode($personalvarsinfo->name);
         $js_vars_values = json_encode($personalvarsinfo->value);
         $js_vars_types = json_encode($personalvarsinfo->type);
@@ -256,10 +256,10 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
           var js_vars_values = ". $js_vars_values . ";
           var js_vars_types = ". $js_vars_types . ";
           function personalizeVars(count) {
-	        if (!applet._simulation.setVariable && count > 0) {
-	            window.setTimeout( function() { personalizeVars( --count ); }, 2000 );
+	        if (!applet._simulation && count > 0) {
+	            window.setTimeout( function() { personalizeVars( --count ); }, 1000 );
             }
-            else if (applet._simulation.setVariable) {
+            else if (applet._simulation) {
                 for (var i=0; i<js_vars_names.length; i++) {
                     if (js_vars_types[i] != \"Boolean\") {
                         applet._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
