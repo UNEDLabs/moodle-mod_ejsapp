@@ -71,7 +71,7 @@ function xmldb_ejsapp_upgrade($oldversion)
         $field = new xmldb_field('personalvars', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'width');
         $dbman->add_field($table, $field);
 
-        //Create "ejsapp_personal_vars" table
+        // Create "ejsapp_personal_vars" table
         $table = new xmldb_table('ejsapp_personal_vars');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, true, null);
         $table->add_field('ejsappid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -84,6 +84,14 @@ function xmldb_ejsapp_upgrade($oldversion)
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
+    }
+
+    if  ($oldversion < '2013071600') {
+        // Create "freeaccess" field in ejsapp table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('free_access', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'personalvars');
+        $dbman->add_field($table, $field);
     }
 
     return true;

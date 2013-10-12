@@ -49,7 +49,7 @@ function update_db($ejsapp, $contextid)
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . delete_non_alphanumeric_symbols($ejsapp->name) . '/';
     $new_path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
-    if (file_exists($new_path)) { // the ejsapp has been renamed or  the applet has been updated
+    if (file_exists($new_path)) { // the ejsapp activity has been renamed or updated
         delete_recursively($new_path);
     }
 
@@ -57,21 +57,16 @@ function update_db($ejsapp, $contextid)
 
     $applet_name = $ejsapp->applet_name;
     $manifest = $ejsapp->manifest;
+    $metadata = $ejsapp->metadata;
+
+    $ext = '.zip';
+    $class_file = '';
+    $mainframe = '';
+    $is_collaborative = 0;
+    $height = 0;
+    $width = 0;
 
     // Get params
-
-    // class_file
-    $pattern = '/Main-Class\s*:\s*(.+)\s*/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    $sub_str = $matches[1][0];
-    if (strlen($matches[1][0]) == 59) {
-        $pattern = '/^\s(.+)\s*/m';
-        if ((preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0)) {
-            $sub_str = $sub_str . $matches[1][0];
-        }
-    }
-    $class_file = $sub_str . 'Applet.class';
-    $class_file = preg_replace('/\s+/', "", $class_file); // delete all white-spaces and the first newline
 
     // codebase
     $codebase = '';
@@ -81,57 +76,95 @@ function update_db($ejsapp, $contextid)
     }
     $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
-    // mainframe
-    $pattern = '/Main-Frame\s*:\s*(.+)\s*/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    if (count($matches) == 0) {
-        $mainframe = '';
-    } else {
-        $mainframe = $matches[1][0];
-        $mainframe = preg_replace('/\s+/', "", $mainframe); // delete all white-spaces
-    }
+    if ($manifest != 'EJsS') { //Java Applet
+        $ext = '.jar';
 
-    // is_collaborative
-    $pattern = '/Is-Collaborative\s*:\s*(\w+)/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    if (count($matches) == 0) {
-        $is_collaborative = 0;
-    } else {
-        $is_collaborative = trim($matches[1][0]);
-        if ($is_collaborative == 'true') {
-            $is_collaborative = 1;
-        } else {
-            $is_collaborative = 0;
+        // class_file
+        $pattern = '/Main-Class\s*:\s*(.+)\s*/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        $sub_str = $matches[1][0];
+        if (strlen($matches[1][0]) == 59) { //TODO
+            $pattern = '/^\s(.+)\s*/m';     //PROBLEM WITH THOSE THAT ARE EXACTLY 59 AND NOT MORE!!
+            if ((preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0)) {
+                $sub_str = $sub_str . $matches[1][0];
+            }
         }
-    }
+        $class_file = $sub_str . 'Applet.class';
+        $class_file = preg_replace('/\s+/', "", $class_file); // delete all white-spaces and the first newline
 
-    // height
-    $pattern = '/Applet-Height\s*:\s*(\w+)/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    $ejs_ok = false;
-    if (count($matches) == 0) {
-        $height = 0;
-        // If this field does not exist in the manifest, it means the version of 
-        // EJS used to compile the jar does not support Moodle.
-        $message = get_string('EJS_version', 'ejsapp');
-        $code = "<script type=\"text/javascript\">
-        window.alert(\"$message\")
-        </script>";
-        echo $code;
-    } else {
-        $ejs_ok = true;
-        $height = $matches[1][0];
-        $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
-    }
+        // mainframe
+        $pattern = '/Main-Frame\s*:\s*(.+)\s*/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        if (count($matches) == 0) {
+            $mainframe = '';
+        } else {
+            $mainframe = $matches[1][0];
+            $mainframe = preg_replace('/\s+/', "", $mainframe); // delete all white-spaces
+        }
 
-    // width
-    $pattern = '/Applet-Width\s*:\s*(\w+)/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    if (count($matches) == 0) {
-        $width = 0;
-    } else {
-        $width = $matches[1][0];
-        $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
+        // is_collaborative
+        $pattern = '/Is-Collaborative\s*:\s*(\w+)/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        if (count($matches) == 0) {
+            $is_collaborative = 0;
+        } else {
+            $is_collaborative = trim($matches[1][0]);
+            if ($is_collaborative == 'true') {
+                $is_collaborative = 1;
+            } else {
+                $is_collaborative = 0;
+            }
+        }
+
+        // height
+        $pattern = '/Applet-Height\s*:\s*(\w+)/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        $ejs_ok = false;
+        if (count($matches) == 0) {
+            $height = 0;
+            // If this field does not exist in the manifest, it means the version of
+            // EJS used to compile the jar does not support Moodle.
+            $message = get_string('EJS_version', 'ejsapp');
+            $code = "<script type=\"text/javascript\">
+            window.alert(\"$message\")
+            </script>";
+            echo $code;
+        } else {
+            $ejs_ok = true;
+            $height = $matches[1][0];
+            $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
+        }
+
+        // width
+        $pattern = '/Applet-Width\s*:\s*(\w+)/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        if (count($matches) == 0) {
+            $width = 0;
+        } else {
+            $width = $matches[1][0];
+            $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
+        }
+    } else { //Javascript
+        $zip = new ZipArchive;
+        if ($zip->open($new_path . $applet_name . '.zip') === TRUE) {
+            $zip->extractTo($new_path);
+            $zip->close();
+            $ejs_ok = true;
+        } else {
+            $ejs_ok = false;
+        }
+
+        // Search in _metadata for the name of the main Javascript file
+        $pattern = '/main-simulation\s*:\s*(.+)\s*/';
+        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
+        $sub_str = $matches[1][0];
+        if (strlen($matches[1][0]) == 59) {
+            $pattern = '/^\s(.+)\s*/m';
+            if ((preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE) > 0)) {
+                $sub_str = $sub_str . $matches[1][0];
+            }
+        }
+        $ejsapp->applet_name = $sub_str;
     }
 
     // <update files table>
@@ -143,10 +176,23 @@ function update_db($ejsapp, $contextid)
         'filearea' => 'jarfiles', // usually = table name
         'itemid' => $ejsapp->id, // usually = ID of row in table
         'filepath' => '/',
-        'filename' => $applet_name . '.jar'); // any filename
+        'filename' => $applet_name . $ext); // any filename
     // Create the stored file
-    $uploaded_file = $new_path . $applet_name . '.jar';
+    $uploaded_file = $new_path . $applet_name . $ext;
     $fs->create_file_from_pathname($fileinfo, $uploaded_file);
+
+    if($manifest == 'EJsS') {
+        if (file_exists($new_path . $ejsapp->applet_name)) $code = file_get_contents($new_path . $ejsapp->applet_name);
+        $path = $CFG->wwwroot . $codebase;
+        $search = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","_ejs_library/",null);';
+        $replace = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","' . $path . '/_ejs_library/","' . $path . '");';
+        $code = str_replace($search,$replace,$code);
+        file_put_contents($new_path . $ejsapp->applet_name, $code);
+        /*$fileinfo['filename'] = $ejsapp->applet_name;
+        $fs = get_file_storage();
+        $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
+        unlink($new_path . $applet_name . '.zip');
+    }
     // </update files table>
 
     //Personalizing EJS variables <update ejsapp_personal_vars table>
@@ -200,15 +246,20 @@ function update_db($ejsapp, $contextid)
  */
 function delete_recursively($dir)
 {
-    if (is_file($dir)) {
-        return @unlink($dir);
-    } elseif (is_dir($dir)) {
-        $scan = glob(rtrim($dir, '/') . '/*');
-        foreach ($scan as $index => $path) {
-            delete_recursively($path);
+    $it = new RecursiveDirectoryIterator($dir);
+    $files = new RecursiveIteratorIterator($it,
+        RecursiveIteratorIterator::CHILD_FIRST);
+    foreach($files as $file) {
+        if ($file->getFilename() === '.' || $file->getFilename() === '..') {
+            continue;
         }
-        return @rmdir($dir);
+        if ($file->isDir()){
+            rmdir($file->getRealPath());
+        } else {
+            unlink($file->getRealPath());
+        }
     }
+    return @rmdir($dir);
 }//delete_recursively
 
 /**
@@ -222,4 +273,3 @@ function delete_non_alphanumeric_symbols($str)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $str);
 }
-

@@ -41,21 +41,25 @@ $state_file = optional_param('state_file', null, PARAM_TEXT);
 $session_id = optional_param('colsession', null, PARAM_INT);
 
 if (!is_null($session_id)) {
-    $collab_session = $DB->get_record('collaborative_sessions',array('id'=>$session_id));
-    $session_director = $DB->get_record('collaborative_users',array('id'=>$collab_session->master_user));
-    $session_ip = $session_director->ip;
-    $session_port = $collab_session->port;
-    $n = $collab_session->ejsapp;
+    $collab_session = $DB->get_record('ejsapp_collab_sessions',array('id'=>$session_id));
+    if (isset($collab_session->localport)) {
+        require_once(dirname(__FILE__) . '/../../blocks/ejsapp_collab_session/manage_collaborative_db.php');
 
-    $collabinfo = new stdClass();
-    $collabinfo->session = $session_id;
-    $collabinfo->ip = $session_ip;
-    $collabinfo->port = $session_port;
+        $n = $collab_session->ejsapp;
 
-    require_once(dirname(__FILE__) . '/../../blocks/ejsapp_collab_session/manage_collaborative_db.php');
-    if (am_i_master_user()) {
-        $collabinfo->director = $session_director->id;
-    }
+        $collabinfo = new stdClass();
+        $collabinfo->session = $session_id;
+        $collabinfo->ip = $collab_session->ip;
+        $collabinfo->localport = $collab_session->localport;
+        if ($collab_session->sarlabport != 0) $collabinfo->sarlabport = $collab_session->sarlabport;
+
+        if (am_i_master_user()) {
+            $collabinfo->director = $collab_session->id;
+        }
+        elseif (!$DB->record_exists('ejsapp_collab_acceptances', array('accepted_user'=>$USER->id))) {
+            $DB->insert_record('ejsapp_collab_acceptances', array('accepted_user'=>$USER->id,'collaborative_session'=>$session_id));
+        }
+    } else print_error(get_string('cantJoinSessionErr2', 'block_ejsapp_collab_session'));
 } else {
     $n = optional_param('n', null, PARAM_INT);
     $collabinfo = null;
@@ -70,7 +74,7 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $ejsapp->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('ejsapp', $ejsapp->id, $course->id, false, MUST_EXIST);
 } else {
-    error('You must specify a course_module ID or an instance ID');
+    print_error('You must specify a course_module ID or an instance ID');
 }
 
 require_login($course, true, $cm);
@@ -92,8 +96,6 @@ if ($ejsapp->intro) { // If some text was written, show the intro
     echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
 }
 
-$sarlabinfo = null;
-
 $module = new stdClass();
 $booking_module = new stdClass();
 if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) {
@@ -107,6 +109,10 @@ if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) {
   $booking_module->visible = 0;
 }
 
+//Check the free access configuration option
+if (($ejsapp->is_rem_lab == 1) && ($ejsapp->free_access == 1)) $booking_module->visible = 0;
+
+//Check if there are variables configured to be personalized in this EJSApp
 $personalvarsinfo = null;
 if ($ejsapp->personalvars == 1) {
     $personalvarsinfo = new stdClass();
@@ -125,10 +131,11 @@ if ($ejsapp->personalvars == 1) {
 }
 
 //Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not.
+$sarlabinfo = null;
 if (($ejsapp->is_rem_lab == 0) || ($booking_module->visible == 0)) { //Virtual lab or not using ejsappbooking
     echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, null));
     //TODO: Consider the possibility of using a remote lab with Sarlab and without booking system (select practice?)
-} else { //Remote lab and using ejsappbooking 
+} else { //Remote lab and using ejsappbooking
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
     $usingsarlab = $remlab_conf->usingsarlab;
     if (has_capability('moodle/course:viewhiddensections', $context, $USER->id, true)) { //Admins and teachers
@@ -192,13 +199,11 @@ if ($ejsapp->appwording) { // If some text was written, show it
 }
 
 //Buttons to close or leave collab sessions:
-if ($session_id) {
+if (isset($collab_session->master_user)) {
     $close_url = $CFG->wwwroot .
         "/blocks/ejsapp_collab_session/close_collaborative_session.php?session=" .
         $session_id . "&courseid=" . $course->id;
-    // . "&cmid=" . $cm->id;
-
-    if ($session_director) {
+    if ($USER->id == $collab_session->master_user) {
         $close_button = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
     } else {
         $close_button = get_string('closeStudSessBut', 'block_ejsapp_collab_session');

@@ -53,10 +53,43 @@ function ejsapp_supports($feature)
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_CONTROLS_GRADE_VISIBILITY:
+            return true;
 
         default:
             return null;
     }
+}
+
+/**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ * @param $data the data submitted from the reset course.
+ * @return array status array
+ */
+function ejsapp_reset_userdata($data) {
+    return array();
+}
+
+/**
+ * List of view style log actions
+ * @return array
+ */
+function ejsapp_get_view_actions() {
+    return array('view', 'view all');
+}
+
+/**
+ * List of update style log actions
+ * @return array
+ */
+function ejsapp_get_post_actions() {
+    return array('update', 'add');
 }
 
 /**
@@ -97,7 +130,8 @@ function ejsapp_add_instance($ejsapp, $mform = null)
                 $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
                 $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
                 $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-                $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
+                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'")+1);
+                $ejsapp_rem_lab->ip = $ip;
                 $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
             } else {
                 $ejsapp_rem_lab->sarlabinstance = '0';
@@ -149,9 +183,6 @@ function ejsapp_add_instance($ejsapp, $mform = null)
                 }
             }
         }
-
-        $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-        delete_recursively($path . 'temp');
 
         if ($mform and !empty($ejsapp->ejsappwording['itemid'])) {
             $draftitemid = $ejsapp->ejsappwording['itemid'];
@@ -212,7 +243,8 @@ function ejsapp_update_instance($ejsapp, $mform)
                 $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
                 $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
                 $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-                $ejsapp_rem_lab->ip = $list_sarlab_IPs[intval($sarlabinstance)];
+                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'")+1);
+                $ejsapp_rem_lab->ip = $ip;
                 $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
             } else {
                 $ejsapp_rem_lab->sarlabinstance = '0';
@@ -294,9 +326,6 @@ function ejsapp_update_instance($ejsapp, $mform)
             }
         }
 
-        $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-        delete_recursively($path . 'temp');
-
         $draftitemid = $ejsapp->ejsappwording['itemid'];
         if ($draftitemid) {
             $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
@@ -354,6 +383,7 @@ function ejsapp_delete_instance($id)
         $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
     }
 
+    // Delete recursively
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $id;
     delete_recursively($path);
     return true;
@@ -376,10 +406,21 @@ function ejsapp_delete_instance($id)
  */
 function ejsapp_user_outline($course, $user, $mod, $ejsapp)
 {
-    $return = new stdClass;
-    $return->time = 0;
-    $return->info = '';
-    return $return;
+    global $DB;
+
+    if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
+        'action'=>'view', 'info'=>$ejsapp->id), 'time ASC')) {
+
+        $numviews = count($logs);
+        $lastlog = array_pop($logs);
+
+        $result = new stdClass();
+        $result->info = get_string('numviews', '', $numviews);
+        $result->time = $lastlog->time;
+
+        return $result;
+    }
+    return NULL;
 }
 
 /**
@@ -395,7 +436,21 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
  */
 function ejsapp_user_complete($course, $user, $mod, $ejsapp)
 {
-    return true;
+    global $CFG, $DB;
+
+    if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
+        'action'=>'view', 'info'=>$ejsapp->id), 'time ASC')) {
+        $numviews = count($logs);
+        $lastlog = array_pop($logs);
+
+        $strmostrecently = get_string('mostrecently');
+        $strnumviews = get_string('numviews', '', $numviews);
+
+        echo "$strnumviews - $strmostrecently ".userdate($lastlog->time);
+
+    } else {
+        print_string('neverseen', 'ejsapp');
+    }
 }
 
 /**
@@ -455,6 +510,8 @@ function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnam
  **/
 function ejsapp_cron()
 {
+    global $DB;
+    $DB->delete_records('ejsapp_sarlab_keys');
     return true;
 }
 
@@ -464,7 +521,7 @@ function ejsapp_cron()
  * @example return array('moodle/site:accessallgroups');
  * @return array
  */
-function newmodule_get_extra_capabilities()
+function ejsapp_get_extra_capabilities()
 {
     return array();
 }
@@ -472,7 +529,7 @@ function newmodule_get_extra_capabilities()
 /**
  * Must return an array of users who are participants for a given instance
  * of ejsapp. Must include every user involved in the instance,
- * independient of his role (student, teacher, admin...). The returned
+ * independent of his role (student, teacher, admin...). The returned
  * objects must contain at least id property.
  * See other modules as example.
  *

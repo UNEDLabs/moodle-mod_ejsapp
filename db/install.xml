@@ -56,7 +56,9 @@
                 <FIELD NAME="width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="height" NEXT="personalvars"/>
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="width"/>
+                       PREVIOUS="width" NEXT="free_access"/>
+                <FIELD NAME="free_access" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="personalvars"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

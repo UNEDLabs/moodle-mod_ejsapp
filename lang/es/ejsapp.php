@@ -118,12 +118,18 @@ $string['sarlab_collab_help'] = "Si deseas que Sarlab ofrezca la opci&oacute;n d
 $string['ip_lab'] = 'direccis&oacute;n IP';
 $string['ip_lab_help'] = 'Direcci&oacute;n IP del sistema experimental.  Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direcci&oacute;n IP valida.';
+
 $string['port'] = 'Puerto';
 $string['port_help'] = 'El puerto a usar para establecer la comunicaci&oacute;n. Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['port_required'] = 'ATENCI&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';
+
 $string['practiceintro'] = 'Identificador de pr&aacute;ctica en Sarlab';
 $string['practiceintro_help'] = 'Pr&aacute;cticas (separadas por punto y coma) configuradas en Sarlab para este sistema experimental.';
 $string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
+
+$string['free_access'] = 'Acceso libre';
+$string['free_access_help'] = 'Habilitar el acceso libre (sin necesidad de realizar reservas) a este laboratorio remoto.';
+
 $string['totalslots'] = 'Horas de trabajo totales';
 $string['totalslots_help'] = 'Cantidad total de horas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
 $string['weeklyslots'] = 'Horas de trabajo semanales';
@@ -146,9 +152,7 @@ $string['default_communication_set'] = "Opciones de comunicaci&oacute;n por defe
 $string['columns_width'] = "Ancho de columnas";
 $string['columns_width_description'] = "Ancho total ocupado (en px) por las columnas en tu tema visual de Moodle";
 //$string['sarlab_description'] = "Seleccionar 'si' unicamente si se esta usando Sarlab; un sistema que gestiona las conexiones a recursos de laboratorios remotos";
-$string['collaborative_port'] = "Puerto para sesiones colaborativas";
-$string['collaborative_port_description'] = "Puerto usado para establecer la comunicacis&oacute;n en las sesiones colaborativas (requiere el bloque EJSApp collab sessions)";
-$string['sarlab_IP'] = "Direcci&aacute;n IP del servidor Sarlab";
+$string['sarlab_IP'] = "Nombre y direcci&aacute;n IP del servidor Sarlab";
 $string['sarlab_IP_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la direcci&oacute;n IP del servidor que ejecuta el sistema Sarlab que desea utilizar. En caso contrario, este valor no es usado, de modo que puede dejar el valor por defecto";
-$string['sarlab_port'] = "Puerto de comunicaciones con Sarlab";
+$string['sarlab_port'] = "Puerto(s) de comunicaci&oacute; con Sarlab";
 $string['sarlab_port_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar un puerto v&aacute;lido para establecer las comunicaciones necesarias con el servidor de Sarlab. En caso contrario, este valor no es usado, de modo que puede dejar el valor por defecto";

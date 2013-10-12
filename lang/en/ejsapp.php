@@ -116,15 +116,21 @@ $string['sarlab_instance_help'] = "The order corresponds to the one used for the
 $string['sarlab_collab'] = "Use collaborative access provided by Sarlab?";
 $string['sarlab_collab_help'] = "Whether you want Sarlab to provide collaborative access to this remote laboratory or not.";
 
-$string['ip_lab'] = 'IP direction';
-$string['ip_lab_help'] = 'Esperimental system IP direction. If you are using Sarlab, you dont have to worry about this parameter.';
-$string['ip_lab_required'] = 'WARNING: You need to provide a valid IP direction.';
+$string['ip_lab'] = 'IP address';
+$string['ip_lab_help'] = 'Esperimental system IP address. If you are using Sarlab, you dont have to worry about this parameter.';
+$string['ip_lab_required'] = 'WARNING: You need to provide a valid IP address.';
+
 $string['port'] = 'Port';
 $string['port_help'] = 'The port used to establish the communication. If you are using Sarlab, you dont have to worry about this parameter.';
 $string['port_required'] = 'WARNING: You need to provide a valid port.';
+
 $string['practiceintro'] = 'Practice identifier in Sarlab';
 $string['practiceintro_help'] = 'Practices (separated by semicolons) configured in Sarlab for this experimental system.';
 $string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
+
+$string['free_access'] = 'Free access';
+$string['free_access_help'] = 'Enable free access mode (no need to make a booking) for this remote lab.';
+
 $string['totalslots'] = 'Total hours of work';
 $string['totalslots_help'] = 'Total amount of maximum hours each student will be allowed to work with this lab.';
 $string['weeklyslots'] = 'Weekly hours of work';
@@ -147,9 +153,7 @@ $string['default_communication_set'] = "Default communication settings";
 $string['columns_width'] = "Columns width";
 $string['columns_width_description'] = "Total width (px) occupied by the columns in your Moodle visual theme";
 //$string['sarlab_description'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
-$string['collaborative_port'] = "Port for collaborative sessions";
-$string['collaborative_port_description'] = "Port used to establish communication for the collaborative sessions (requires the EJSApp collab sessions block)";
-$string['sarlab_IP'] = "IP direction of the Sarlab server";
-$string['sarlab_IP_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide the IP direction of the server that runs the Sarlab system you want to use. Otherwise, this value will not be used, so you can leave the default value. If you have more than one sarlab server (for example, one at 127.0.0.1 and a second one at 127.0.0.2), insert the IPs direction separated by semicolons: 127.0.0.1;127.0.0.2";
-$string['sarlab_port'] = "Sarlab communication port";
+$string['sarlab_IP'] = "Name and IP address of the Sarlab server(s)";
+$string['sarlab_IP_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide the IP address of the server that runs the Sarlab system you want to use. Otherwise, this value will not be used, so you can leave the default value. If you have more than one sarlab server (for example, one at 127.0.0.1 and a second one at 127.0.0.2), insert the IPs address separated by semicolons: 127.0.0.1;127.0.0.2. Additionally, you can provide a name in order to identify each Sarlab server: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
+$string['sarlab_port'] = "Sarlab communication port(s)";
 $string['sarlab_port_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide a valid port for establishing the communications with the Sarlab server. Otherwise, this value will not be used, so you can leave the default value. If you have more than one sarlab server (for example, one using port 443 and a second one also using port 443), insert the values separated by semicolons: 443;443";

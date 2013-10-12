@@ -74,16 +74,12 @@ When installing ejsapp for the first time, you will need to set four variables:
 
    columns_width: This is the total width occupied by your columns (in pixels) in your Moodle
                   visual theme. This variable is used to resize the applet size when embedded
-		  in Moodle and the "Preserve original applet layout" options is set to no.
-		  Default configuration works well with the default theme and with many others
+		          in Moodle and the "Preserve original applet layout" options is set to no.
+		          Default configuration works well with the default theme and with many others
                   based on the two columns format. However, other themes may require changes 
                   in this variable.
 
-   collaborative_port: When the "EJSApp Collaborative Sessions" block is also installed, this
-		       variable sets the port used for establishing TCP connections in the 
-                       collaborative sessions.
-
-   sarlab_IP:	  This variable defines the IP(s) direction(s) of the SARLAB system(s) used for 
+   sarlab_IP:	  This variable defines the IP(s) address(es) of the SARLAB system(s) used for 
                   managing the access to the remote laboratories. If left empty, the plugin
                   understands that SARLAB is not used.
 
@@ -102,4 +98,4 @@ EJSApp has been developed by:
  - Ruben Heradio: rheradio@issi.uned.es
 
   at the Computer Science and Automatic Control Department, Spanish Open University (UNED), 
-  Madrid, Spain.                                                      
+  Madrid, Spain.

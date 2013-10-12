@@ -36,21 +36,47 @@
 defined('MOODLE_INTERNAL') || die;
 
 //columns_width,      Total width occupied by the column(s) (in pixels) in your Moodle visual theme
-//collaborative_port, Port used for establishing TCP connections in the collaborative sessions (requires the EJSApp Collab Sessions block)
 //sarlab_IP,          If one or more SARLAB systems are used for accessing the remote laboratories, the list of their IPs directions must be written here.
 //sarlab_port,       If one or more SARLAB systems are used for accessing the remote laboratories, the list of the ports used to connect with them must be written here.  
 
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_heading('ejsapp/displaysettings', get_string('default_display_set', 'ejsapp'), ''));
+    $settings->add(new admin_setting_heading(
+        'ejsapp/displaysettings',
+        get_string('default_display_set', 'ejsapp'),
+        ''
+    ));
 
-    $settings->add(new admin_setting_configtext('columns_width', get_string('columns_width', 'ejsapp'), get_string('columns_width_description', 'ejsapp'), 480, PARAM_INT, '2'));
+    $settings->add(new admin_setting_configtext(
+        'columns_width',
+        get_string('columns_width', 'ejsapp'),
+        get_string('columns_width_description', 'ejsapp'),
+        480,
+        PARAM_INT,
+        '2'
+    ));
 
-    $settings->add(new admin_setting_heading('ejsapp/communicationsettings', get_string('default_communication_set', 'ejsapp'), ''));
+    $settings->add(new admin_setting_heading(
+        'ejsapp/communicationsettings',
+        get_string('default_communication_set', 'ejsapp'),
+        ''
+    ));
 
-    $settings->add(new admin_setting_configtext('collaborative_port', get_string('collaborative_port', 'ejsapp'), get_string('collaborative_port_description', 'ejsapp'), 50000, PARAM_INT, '2'));
+    $settings->add(new admin_setting_configtext(
+        'sarlab_IP',
+        get_string('sarlab_IP', 'ejsapp'),
+        get_string('sarlab_IP_description', 'ejsapp'),
+        '127.0.0.1',
+        PARAM_TEXT,
+        '13'
+    ));
 
-    $settings->add(new admin_setting_configtext('sarlab_IP', get_string('sarlab_IP', 'ejsapp'), get_string('sarlab_IP_description', 'ejsapp'), '127.0.0.1', PARAM_TEXT, '11'));
-
-    $settings->add(new admin_setting_configtext('sarlab_port', get_string('sarlab_port', 'ejsapp'), get_string('sarlab_port_description', 'ejsapp'), 443, PARAM_TEXT, '2'));
+    $settings->add(new admin_setting_configtext(
+        'sarlab_port',
+        get_string('sarlab_port', 'ejsapp'),
+        get_string('sarlab_port_description', 'ejsapp'),
+        443,
+        PARAM_TEXT,
+        '2'
+    ));
 }
 ?>

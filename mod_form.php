@@ -90,7 +90,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->setDefault('is_collaborative', 0);
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/java-archive'));
+        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive'))); //'accepted_types' => array('application/java-archive', 'application/zip')));
         $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
@@ -118,7 +118,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         // -------------------------------------------------------------------------------
         // Adding an optional state file to be read when the applet loads
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
-        
+
         $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
@@ -178,9 +178,24 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
 
         $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-        $sarlab_instance_options = array('1');
-        for ($i = 2; $i <= count($list_sarlab_IPs); $i++) {
-            array_push($sarlab_instance_options, $i);
+        if(is_array($list_sarlab_IPs)) $sarlab_IP = $list_sarlab_IPs[0];
+        else  $sarlab_IP = $CFG->sarlab_IP;
+        $init_pos = strpos($sarlab_IP, "'");
+        $end_pos = strrpos($sarlab_IP, "'");
+        if(($init_pos === false) || ($init_pos === $end_pos)) {
+            $sarlab_instance_options = array('Sarlab server 1');
+        } else {
+            $sarlab_instance_options = array(substr($sarlab_IP,$init_pos+1,$end_pos-$init_pos-1));
+        }
+        for ($i = 1; $i < count($list_sarlab_IPs); $i++) {
+            $sarlab_instance_options_temp = $list_sarlab_IPs[$i];
+            $init_pos = strpos($sarlab_instance_options_temp, "'");
+            $end_pos = strrpos($sarlab_instance_options_temp, "'");
+            if(($init_pos === false) || ($init_pos === $end_pos)) {
+                array_push($sarlab_instance_options, 'Sarlab server ' . ($i+1));
+            } else {
+                array_push($sarlab_instance_options, substr($sarlab_instance_options_temp,$init_pos+1,$end_pos-$init_pos-1));
+            }
         }
 
         $mform->addElement('select', 'sarlab_instance', get_string('sarlab_instance', 'ejsapp'), $sarlab_instance_options);
@@ -246,11 +261,16 @@ class mod_ejsapp_mod_form extends moodleform_mod
             }
         }
 
+        $mform->addElement('selectyesno', 'free_access', get_string('free_access', 'ejsapp'));
+        $mform->addHelpButton('free_access', 'free_access', 'ejsapp');
+        $mform->disabledIf('free_access', 'is_rem_lab', 'eq', 0);
+
         $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'), array('size' => '2'));
         $mform->setType('totalslots', PARAM_INT);
         $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
         $mform->addHelpButton('totalslots', 'totalslots', 'ejsapp');
         $mform->disabledIf('totalslots', 'is_rem_lab', 'eq', 0);
+        $mform->disabledIf('totalslots', 'free_access', 'eq', 1);
         if ($this->current->instance && $rem_lab_data) {
             $mform->setDefault('totalslots', $rem_lab_data->totalslots);
         } else {
@@ -262,6 +282,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('weeklyslots', get_string('maximumchars', '', 3), 'maxlength', 3, 'client');
         $mform->addHelpButton('weeklyslots', 'weeklyslots', 'ejsapp');
         $mform->disabledIf('weeklyslots', 'is_rem_lab', 'eq', 0);
+        $mform->disabledIf('weeklyslots', 'free_access', 'eq', 1);
         if ($this->current->instance && $rem_lab_data) {
             $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
         } else {
@@ -273,6 +294,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('dailyslots', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
         $mform->addHelpButton('dailyslots', 'dailyslots', 'ejsapp');
         $mform->disabledIf('dailyslots', 'is_rem_lab', 'eq', 0);
+        $mform->disabledIf('dailyslots', 'free_access', 'eq', 1);
         if ($this->current->instance && $rem_lab_data) {
             $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
         } else {
@@ -354,14 +376,29 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $filename = $path . $applet_name;
             $this->save_file('appletfile', $filename, true);
 
-            // Extract the manifest.mf file from the .jar    
-            $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
-            $mform->addElement('hidden', 'manifest', null);               
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $manifest = 'EJsS';
+            $metadata = '';
+            if ($ext == 'jar') {
+                // Extract the manifest.mf file from the .jar
+                $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
+            } else {
+                // Extract the _metadata file from the .jar
+                $metadata = file_get_contents('zip://' . $filename . '#' . '_metadata.txt');
+            }
+            $mform->addElement('hidden', 'manifest', null);
             $mform->setType('manifest', PARAM_TEXT);
             $mform->setDefault('manifest', $manifest);
+            $mform->addElement('hidden', 'metadata', null);
+            $mform->setType('metadata', PARAM_TEXT);
+            $mform->setDefault('metadata', $metadata);
 
             // Set the mod_form element
-            $pattern = '/(\w+)[.]jar/';
+            if ($ext == 'jar') {
+                $pattern = '/(\w+)[.]jar/';
+            } else {
+                $pattern = '/(\w+)[.]zip/';
+            }
             preg_match($pattern, $applet_name, $matches, PREG_OFFSET_CAPTURE);
             $applet_name = $matches[1][0];
             $mform->addElement('hidden', 'applet_name', null);
@@ -376,6 +413,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
      * Performs minimal validation on the settings form
      * @param array $data
      * @param array $files
+     * @return errors
      */
     function validation($data, $files)
     {

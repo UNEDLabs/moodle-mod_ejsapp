@@ -23,7 +23,7 @@
 
 
 /**
- *This page is used by Moodle when listing all the instances of your module that are in a
+ * This page is used by Moodle when listing all the instances of your module that are in a
  * particular course with the course id being passed to this script
  *
  * @package    mod
@@ -38,7 +38,7 @@ require_once(dirname(__FILE__) . '/lib.php');
 $id = required_param('id', PARAM_INT); // course
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
-    error('Course ID is incorrect');
+    print_error('Course ID is incorrect');
 }
 
 require_course_login($course);
@@ -68,6 +68,8 @@ $timenow = time();
 $strname = get_string('name');
 $strweek = get_string('week');
 $strtopic = get_string('topic');
+$table = new html_table();
+$table->attributes['class'] = 'generaltable mod_ejsapp';
 
 if ($course->format == 'weeks') {
     $table->head = array($strweek, $strname);
@@ -97,7 +99,7 @@ foreach ($ejsapps as $ejsapp) {
 }
 
 echo $OUTPUT->heading(get_string('modulenameplural', 'ejsapp'), 2);
-print_table($table);
+echo html_writer::table($table);
 
 /// Finish the page
 
