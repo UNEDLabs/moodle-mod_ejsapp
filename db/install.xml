@@ -146,9 +146,9 @@
                        PREVIOUS="ejsappid" NEXT="type"/>
                 <FIELD NAME="type" TYPE="char" LENGTH="8" NOTNULL="true" SEQUENCE="false"
                        PREVIOUS="name" NEXT="minval"/>
-                <FIELD NAME="minval" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false"
+                <FIELD NAME="minval" TYPE="float" LENGTH="10" DECIMALS ="6" NOTNULL="false" SEQUENCE="false"
                        PREVIOUS="type" NEXT="maxval"/>
-                <FIELD NAME="maxval" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false"
+                <FIELD NAME="maxval" TYPE="float" LENGTH="10" DECIMALS ="6" NOTNULL="false" SEQUENCE="false"
                        PREVIOUS="minval"/>
             </FIELDS>
             <KEYS>

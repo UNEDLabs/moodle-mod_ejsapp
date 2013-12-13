@@ -219,8 +219,8 @@ function update_db($ejsapp, $contextid)
                     $max_value = $ejsapp->max_value[$i];
                 }
                 $personal_vars->type = $type_info;
-                $personal_vars->minval = $min_value;
-                $personal_vars->maxval = $max_value;
+                $personal_vars->minval = $min_value + 0;
+                $personal_vars->maxval = $max_value + 0;
                 $DB->insert_record('ejsapp_personal_vars', $personal_vars);
             }
         }

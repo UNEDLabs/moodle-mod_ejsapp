@@ -62,7 +62,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
-            $mform->setType('name', PARAM_CLEAN);
+            $mform->setType('name', PARAM_NOTAGS);
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
@@ -133,8 +133,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $varsarray[] = $mform->createElement('select', 'var_type', get_string('var_type', 'ejsapp'),  array('Boolean', 'Integer', 'Double'));
         $varsarray[] = $mform->createElement('text', 'min_value', get_string('min_value', 'ejsapp'), array('size' => '8'));
         $varsarray[] = $mform->createElement('text', 'max_value', get_string('max_value', 'ejsapp'), array('size' => '8'));
-        $varsarray[] = $mform->createElement('hidden', 'optionid', 0);
-        $mform->setType('optionid', PARAM_INT);
 
         $repeateloptions = array();
         $repeateloptions['var_name']['disabledif'] = array('personalvars', 'eq', 0);
@@ -287,7 +285,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
         } else {
             $mform->setDefault('weeklyslots', 9);
-        }       
+        }
 
         $mform->addElement('text', 'dailyslots', get_string('dailyslots', 'ejsapp'), array('size' => '2'));
         $mform->setType('dailyslots', PARAM_INT);

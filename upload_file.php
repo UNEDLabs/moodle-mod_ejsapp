@@ -114,7 +114,7 @@ $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
 // </store the file into the user repository>
 
 // <store the file into the mod_ejsapp repository>
-if (strcmp($file_extension, 'xml') == 0) {
+//if (strcmp($file_extension, 'xml') == 0) {
     $fileinfo = array(
         'contextid' => $context_id,
         'component' => 'mod_ejsapp',
@@ -131,7 +131,7 @@ if (strcmp($file_extension, 'xml') == 0) {
     }
     // </if is there an old file in the mod_ejsapp repository with the same name, then delete it>
     $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
-}
+//}
 // </store the file into the mod_ejsapp repository>
 
 // remove the temporal file from the temporal folder

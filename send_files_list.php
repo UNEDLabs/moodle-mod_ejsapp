@@ -40,14 +40,18 @@ require_once("$CFG->libdir/moodlelib.php");
 global $DB, $USER;
 
 $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
+$type = optional_param('type', '.xml', PARAM_TEXT);
 
 $info = '';
 $sql = "SELECT * FROM {$CFG->prefix}files WHERE component = 'user' AND filearea = 'private' AND userid = '$USER->id' AND source = 'ejsappid=$ejsapp_id'";
 $records = $DB->get_records_sql($sql);
 
 foreach ($records as $record) {
-    $ejsapp_xml_files_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
-    $info .= $record->filename . ';' . $ejsapp_xml_files_path . $record->filename . ';';
+    $file_extension = substr($record->filename,-4);
+    if ( (strcmp($type,'.xml') == 0 && strcmp($file_extension,'.xml') == 0) || (strcmp($type,'text') == 0 && strcmp($file_extension,'.txt') == 0) ) {
+        $ejsapp_file_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
+        $info .= $record->filename . ';' . $ejsapp_file_path . $record->filename . ';';
+    }
 }
 
 echo $info;

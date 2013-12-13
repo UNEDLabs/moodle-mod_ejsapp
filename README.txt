@@ -72,12 +72,12 @@ file with relevant links.
 
 When installing ejsapp for the first time, you will need to set four variables:
 
-   columns_width: This is the total width occupied by your columns (in pixels) in your Moodle
-                  visual theme. This variable is used to resize the applet size when embedded
-		          in Moodle and the "Preserve original applet layout" options is set to no.
-		          Default configuration works well with the default theme and with many others
-                  based on the two columns format. However, other themes may require changes 
-                  in this variable.
+   central_column_width: This is the total width occupied by your central columns (in pixels)
+                  in your Moodle visual theme. This variable is used to resize the applet size
+		          when embedded in Moodle and the "Let Moodle resixe the applet" options is
+		          set to yes. Default configuration works well with the default theme and with
+                  many others based on the two columns format. However, other themes may require
+                  changes in this variable.
 
    sarlab_IP:	  This variable defines the IP(s) address(es) of the SARLAB system(s) used for 
                   managing the access to the remote laboratories. If left empty, the plugin

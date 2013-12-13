@@ -35,9 +35,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-//columns_width,      Total width occupied by the column(s) (in pixels) in your Moodle visual theme
-//sarlab_IP,          If one or more SARLAB systems are used for accessing the remote laboratories, the list of their IPs directions must be written here.
-//sarlab_port,       If one or more SARLAB systems are used for accessing the remote laboratories, the list of the ports used to connect with them must be written here.  
+//central_column_width, Total width occupied by the central column (in pixels) in your Moodle visual theme
+//sarlab_IP,            If one or more SARLAB systems are used for accessing the remote laboratories, the list of their IPs directions must be written here.
+//sarlab_port,          If one or more SARLAB systems are used for accessing the remote laboratories, the list of the ports used to connect with them must be written here.
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
@@ -47,10 +47,10 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_configtext(
-        'columns_width',
-        get_string('columns_width', 'ejsapp'),
-        get_string('columns_width_description', 'ejsapp'),
-        480,
+        'central_column_width',
+        get_string('central_column_width', 'ejsapp'),
+        get_string('central_column_width_description', 'ejsapp'),
+        900,
         PARAM_INT,
         '2'
     ));

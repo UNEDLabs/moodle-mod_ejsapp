@@ -77,8 +77,12 @@ function xmldb_ejsapp_upgrade($oldversion)
         $table->add_field('ejsappid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('name', XMLDB_TYPE_TEXT, '20', null, XMLDB_NOTNULL, null, null);
         $table->add_field('type', XMLDB_TYPE_TEXT, '8', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('minval', XMLDB_TYPE_NUMBER, '10', null, null, null);
-        $table->add_field('maxval', XMLDB_TYPE_NUMBER, '10', null, null, null);
+        $min_value = new xmldb_field('minval', XMLDB_TYPE_FLOAT, '10', null, null, null, null);
+        $min_value->setDecimals('6');
+        $table->addField($min_value);
+        $max_value = new xmldb_field('maxval', XMLDB_TYPE_FLOAT, '10', null, null, null, null);
+        $max_value->setDecimals('6');
+        $table->addField($max_value);
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_index('ejsappid', XMLDB_INDEX_NOTUNIQUE, array('ejsappid'));
         if (!$dbman->table_exists($table)) {
@@ -94,5 +98,18 @@ function xmldb_ejsapp_upgrade($oldversion)
         $dbman->add_field($table, $field);
     }
 
+    if  ($oldversion < '2013110301') {
+        // Modify "ejsapp_personal_vars" table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_personal_vars');
+        $min_value = new xmldb_field('minval', XMLDB_TYPE_FLOAT, '10', null, null, null, null, 'type');
+        $min_value->setDecimals('6');
+        $max_value = new xmldb_field('maxval', XMLDB_TYPE_FLOAT, '10', null, null, null, null, 'minval');
+        $max_value->setDecimals('6');
+        $dbman->change_field_type($table, $min_value);
+        $dbman->change_field_type($table, $max_value);
+        $table->deleteField('maxval');
+        $table->deleteField('minval');
+    }
     return true;
 }

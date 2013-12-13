@@ -69,6 +69,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
  *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
  *                                  Null if generate_applet_embedding_code is not called from the external interface (draw_ejsapp_instance() function)
+
  * @return string code that embeds an EJS applet into Moodle
  */
 function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $external_size)
@@ -132,20 +133,20 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
               case 1:
                   $code .= " var w = 630, h = 460, h_max = 460;
                     if (window.innerWidth && window.innerHeight) {
-                        w = window.innerWidth;
+                        w_max = window.innerWidth;
                         h_max = window.innerHeight;
                     } else if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth && document.documentElement.offsetHeight) {
-                        w = document.documentElement.offsetWidth;
+                        w_max = document.documentElement.offsetWidth;
                         h_max = document.documentElement.offsetHeight;
                     } else if (document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight) {
-                        w = document.documentElement.clientWidth;
+                        w_max = document.documentElement.clientWidth;
                         h_max = document.documentElement.clientHeight;
                     }
-                    w = w - $CFG->columns_width;
-                    h = w*{$ejsapp->height}/{$ejsapp->width};
-                    if (h > h_max) {
-                        h = h_max;
-                        w = h*{$ejsapp->width}/{$ejsapp->height};
+                    h = 0.93*h_max;
+                    w = h*{$ejsapp->width}/{$ejsapp->height};
+                    if (w > $CFG->central_column_width) {
+                        w = $CFG->central_column_width;
+                        h = w*{$ejsapp->height}/{$ejsapp->width};
                     }";
                   break;
               case 2:
@@ -179,6 +180,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $username = fullname($USER); //For collab
 
         //$code .= "document.write('archive=\"$archive\"');
+        //document.write('<param name=\"permissions\" value=\"all-permissions\"/>');
         $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');
                   document.write(' archive=\"{$ejsapp->applet_name}.jar\"');
                   document.write(' name=\"{$ejsapp->applet_name}\"');
@@ -240,7 +242,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             }
         }
 
-        if ($state_file || $initial_state_file) {
+        if ($state_file || ($initial_state_file && $initial_state_file->filename != '.')) {
             //<to read the applet state, javascript must wait until the applet has been totally downloaded>
             if ($state_file) {
               $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
