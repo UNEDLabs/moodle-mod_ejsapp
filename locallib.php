@@ -25,7 +25,7 @@
 /**
  * Internal library of functions for module ejsapp
  *
- * All the ejsappbooking specific functions, needed to implement the module
+ * All the ejsapp specific functions, needed to implement the module
  * logic, are here.
  *
  * @package    mod
@@ -41,6 +41,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param int $contextid
+ *
+ * @return boolean ejs_ok
  */
 function update_db($ejsapp, $contextid)
 {
@@ -83,10 +85,12 @@ function update_db($ejsapp, $contextid)
         $pattern = '/Main-Class\s*:\s*(.+)\s*/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
         $sub_str = $matches[1][0];
-        if (strlen($matches[1][0]) == 59) { //TODO
-            $pattern = '/^\s(.+)\s*/m';     //PROBLEM WITH THOSE THAT ARE EXACTLY 59 AND NOT MORE!!
-            if ((preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0)) {
-                $sub_str = $sub_str . $matches[1][0];
+        if (strlen($matches[1][0]) == 59) {
+            $pattern = '/^\s(.+)\s*/m';
+            if (preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
+                if (preg_match('/\s*:\s*/', $matches[1][0], $matches2, PREG_OFFSET_CAPTURE) == 0){
+                    $sub_str = $sub_str . $matches[1][0];
+                }
             }
         }
         $class_file = $sub_str . 'Applet.class';
@@ -241,7 +245,7 @@ function update_db($ejsapp, $contextid)
 /**
  * Deletes a directory from the server
  *
- * @param file $dir directory to delete
+ * @param string $dir directory to delete
  * @return bool TRUE on success or FALSE on failure
  */
 function delete_recursively($dir)
@@ -265,11 +269,56 @@ function delete_recursively($dir)
 /**
  * Removes non alphanumeric_symbols from a string
  *
- * @param $str string
+ * @param string $str
  * @return string
  *
  */
 function delete_non_alphanumeric_symbols($str)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $str);
+}
+
+/**
+ *
+ * Creates the list of all Sarlab experiences accessible by a particular user.
+ *
+ * @param string $username
+ * @param array $list_sarlab_IPs
+ * @return array $listExperiences
+ *
+ */
+function get_experiences_sarlab($username, $list_sarlab_IPs) {
+    $listExperiences = '';
+
+    $dom = new DOMDocument;
+    $dom->validateOnParse = true;
+
+    foreach ($list_sarlab_IPs as $sarlab_IP) {
+        $init_char = strrpos($sarlab_IP,"'");
+        if ($init_char != 0) $init_char++;
+        $ip = substr($sarlab_IP,$init_char);
+        $URI = 'http://' . $ip . '/idExperiences.xml';
+        $file_headers = @get_headers($URI);
+        if ($file_headers[0] != 'HTTP/1.1 404 Not Found') {
+            if ($dom->load($URI)) {
+                $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
+                foreach ($experiences as $experience) {
+                    $owneUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
+                    foreach ($owneUsers as $owneUser) {
+                        if ($username == $owneUser->nodeValue || $username == 'admin') { //Check whether the required user has access to the experience
+                            $idExperiences = $experience->getElementsByTagName('idExperience');
+                            foreach ($idExperiences as $idExperience) {
+                                $listExperiences .= $idExperience->nodeValue . ';' ; //Add the experience to the user's list of accessible experiences
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $listExperiences = substr($listExperiences,0,-1);
+
+    return $listExperiences;
 }

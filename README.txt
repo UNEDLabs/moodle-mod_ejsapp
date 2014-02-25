@@ -72,10 +72,10 @@ file with relevant links.
 
 When installing ejsapp for the first time, you will need to set four variables:
 
-   central_column_width: This is the total width occupied by your central columns (in pixels)
+   central_column_width: This is the total width occupied by your central column (in pixels)
                   in your Moodle visual theme. This variable is used to resize the applet size
-		          when embedded in Moodle and the "Let Moodle resixe the applet" options is
-		          set to yes. Default configuration works well with the default theme and with
+		  when embedded in Moodle and the "Let Moodle resize the applet" option is
+		  set to 'Yes'. Default configuration works well with the default theme and with
                   many others based on the two columns format. However, other themes may require
                   changes in this variable.
 
@@ -85,6 +85,9 @@ When installing ejsapp for the first time, you will need to set four variables:
 
    sarlab_port:	  This variable defines the port(s) used to communicate with the SARLAB 
                   system(s). If left empty, the plugin understands that SARLAB is not used.
+
+   sarlab_enc_key:This 16 characters long variable must be configure to match exactly the key set
+		  in the SARLAB system(s).
                                               
 5. Testing
 ==========

@@ -38,6 +38,7 @@ defined('MOODLE_INTERNAL') || die;
 //central_column_width, Total width occupied by the central column (in pixels) in your Moodle visual theme
 //sarlab_IP,            If one or more SARLAB systems are used for accessing the remote laboratories, the list of their IPs directions must be written here.
 //sarlab_port,          If one or more SARLAB systems are used for accessing the remote laboratories, the list of the ports used to connect with them must be written here.
+//sarlab_enc_key        If one or more SARLAB systems are used for accessing the remote laboratories, the list of their encoding keys must be written here.
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
@@ -78,5 +79,13 @@ if ($ADMIN->fulltree) {
         PARAM_TEXT,
         '2'
     ));
+
+    $settings->add(new admin_setting_configtext(
+        'sarlab_enc_key',
+        get_string('sarlab_enc_key', 'ejsapp'),
+        get_string('sarlab_enc_key_description', 'ejsapp'),
+        '1234567890123456',
+        PARAM_TEXT,
+        '30'
+    ));
 }
-?>

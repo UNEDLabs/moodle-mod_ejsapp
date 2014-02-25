@@ -24,15 +24,13 @@
 
 /**
  *
- * Prints a particular instance of ejsapp
+ * Check conditions in order to allow or restrict the access to the remote lab applet when using Sarlab
  *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-//Check conditions in order to allow or restrict the access to the applet.   
 
 require_once ('../../config.php');
 

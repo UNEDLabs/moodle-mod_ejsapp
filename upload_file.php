@@ -23,7 +23,7 @@
 
 
 /**
- * This file is used to receive any .xml, text or image file saved by an EJS
+ * This file is used to receive any .xml, .exp, text or image file saved by an EJS
  * applet.
  *
  * @package    mod
@@ -34,6 +34,9 @@
 
 require_once('../../config.php'); // getting $CFG
 require_login();
+
+global $CFG;
+
 require_once("$CFG->libdir/formslib.php");
 require_once("$CFG->libdir/dml/moodle_database.php");
 require_once("$CFG->libdir/blocklib.php");
@@ -64,8 +67,7 @@ preg_match('/_user_id_(\d+)/', $safe_file, $match);
 $user_id = $match[1];
 preg_match('/_ejsapp_id_(\d+)/', $safe_file, $match);
 $ejsapp_id = $match[1];
-preg_match('/[.](\w+)$/', $safe_file, $match);
-$file_extension = $match[1];
+$file_extension = pathinfo($safe_file, PATHINFO_EXTENSION);
 
 // <upload the file to a temporal folder>
 $upload_dir = $CFG->dataroot . "/tmp/";
@@ -114,7 +116,7 @@ $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
 // </store the file into the user repository>
 
 // <store the file into the mod_ejsapp repository>
-//if (strcmp($file_extension, 'xml') == 0) {
+//if ($file_extension == 'xml') {
     $fileinfo = array(
         'contextid' => $context_id,
         'component' => 'mod_ejsapp',
@@ -136,5 +138,3 @@ $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
 
 // remove the temporal file from the temporal folder
 unlink("$path");
-
-?>

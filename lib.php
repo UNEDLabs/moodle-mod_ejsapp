@@ -69,7 +69,7 @@ function ejsapp_supports($feature)
 
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
- * @param $data the data submitted from the reset course.
+ * @param string $data the data submitted from the reset course.
  * @return array status array
  */
 function ejsapp_reset_userdata($data) {
@@ -99,7 +99,7 @@ function ejsapp_get_post_actions() {
  * of the new instance.
  *
  * @param object $ejsapp An object from the form in mod_form.php
- * @param $mform
+ * @param object $mform
  * @return int The id of the newly inserted ejsapp record
  */
 function ejsapp_add_instance($ejsapp, $mform = null)
@@ -115,7 +115,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
     }
 
     $cmid = $ejsapp->coursemodule;
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $context = context_module::instance($cmid);
     $ejs_ok = update_db($ejsapp, $context->id);
 
     if ($ejs_ok) {
@@ -130,7 +130,9 @@ function ejsapp_add_instance($ejsapp, $mform = null)
                 $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
                 $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
                 $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'")+1);
+                $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'");
+                if ($init_char != 0) $init_char++;
+                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],$init_char);
                 $ejsapp_rem_lab->ip = $ip;
                 $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
             } else {
@@ -145,12 +147,13 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 
             $ejsapp_expsyst2pract = new stdClass();
             $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-            //Receive parameters from Sarlab's config tool (if it is used)... TODO
             if ($ejsapp_rem_lab->usingsarlab == 1) {
-                $expsyst2pract_list = explode(';', $ejsapp->practiceintro);
-                for ($i = 0; $i < count($expsyst2pract_list); $i++) {
+                $expsyst2pract_list = $ejsapp->list_practices;
+                $expsyst2pract_list = explode(";", $expsyst2pract_list);
+                $selected_practices = $ejsapp->practiceintro;
+                for ($i = 0; $i < count($selected_practices); $i++) {
                     $ejsapp_expsyst2pract->practiceid = $i + 1;
-                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$i];
+                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
                     $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
                 }
             } else {
@@ -160,7 +163,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
             }
             // EJSApp booking system
             if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-                $context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
+                $context = context_course::instance($ejsapp->course);
                 $users = get_enrolled_users($context);
                 $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
                 //ejsappbooking_usersaccess table:
@@ -174,7 +177,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
                 //Consider other enrolled users:
                 foreach ($users as $user) {
                   $ejsappbooking_usersaccess->userid = $user->id;
-                  if (!has_capability('moodle/course:viewhiddensections', $context, $user->id, false)) {
+                  if (!has_capability('mod/ejsapp:addinstance', $context, $user->id, false)) {
                     $ejsappbooking_usersaccess->allowremaccess = 0;
                   } else {
                     $ejsappbooking_usersaccess->allowremaccess = 1;
@@ -190,12 +193,20 @@ function ejsapp_add_instance($ejsapp, $mform = null)
             $DB->update_record('ejsapp', $ejsapp);
         }
 
+        $maxbytes = get_max_upload_file_size($CFG->maxbytes);
+
         // Creating the state file in dataroot and updating the files table in the database
-        $context = get_context_instance(CONTEXT_MODULE, $cmid);
         $draftitemid = $ejsapp->statefile;
         if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
+            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         }
+
+        // Creating the experiment file in dataroot and updating the files table in the database
+        $draftitemid = $ejsapp->expfile;
+        if ($draftitemid) {
+            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'expfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        }
+
     } else {
         ejsapp_delete_instance($ejsapp->id);
     }
@@ -209,7 +220,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
  * will update an existing instance with new data.
  *
  * @param object $ejsapp An object from the form in mod_form.php
- * @param $mform
+ * @param object $mform
  * @return boolean Success/Fail
  */
 function ejsapp_update_instance($ejsapp, $mform)
@@ -223,9 +234,9 @@ function ejsapp_update_instance($ejsapp, $mform)
     $ejsapp->appwordingformat = $ejsapp->ejsappwording['format'];
 
     $cmid = $ejsapp->coursemodule;
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $context = context_module::instance($cmid);
 
-    // If the file attached to the updated EJSApp instance has been updated, delete older file and create the new one (TODO)
+    // TODO: If the file attached to the updated EJSApp instance has been updated, delete older file and create the new one
     require_once($CFG->libdir . '/filelib.php');
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
@@ -243,7 +254,9 @@ function ejsapp_update_instance($ejsapp, $mform)
                 $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
                 $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
                 $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'")+1);
+                $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'");
+                if ($init_char != 0) $init_char++;
+                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],$init_char);
                 $ejsapp_rem_lab->ip = $ip;
                 $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
             } else {
@@ -267,12 +280,13 @@ function ejsapp_update_instance($ejsapp, $mform)
             $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
             $ejsapp_expsyst2pract = new stdClass();
             $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-            //Receive parameters from Sarlab's config tool (if it is used)... TODO
             if ($ejsapp->sarlab == 1) {
-                $expsyst2pract_list = explode(';', $ejsapp->practiceintro);
-                for ($i = 0; $i < count($expsyst2pract_list); $i++) {
+                $expsyst2pract_list = $ejsapp->list_practices;
+                $expsyst2pract_list = explode(";", $expsyst2pract_list);
+                $selected_practices = $ejsapp->practiceintro;
+                for ($i = 0; $i < count($selected_practices); $i++) {
                     $ejsapp_expsyst2pract->practiceid = $i + 1;
-                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$i];
+                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
                     $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
                 }
             } else {
@@ -282,7 +296,7 @@ function ejsapp_update_instance($ejsapp, $mform)
             }
             // EJSApp booking system
             if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-                $context = get_context_instance(CONTEXT_COURSE, $ejsapp->course);
+                $context = context_course::instance($ejsapp->course);
                 $users = get_enrolled_users($context);
                 $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
                 //ejsappbooking_usersaccess table:
@@ -302,7 +316,7 @@ function ejsapp_update_instance($ejsapp, $mform)
                 //Consider other enrolled users:
                 foreach ($users as $user) {
                   $ejsappbooking_usersaccess->userid = $user->id;
-                  if (!has_capability('moodle/course:viewhiddensections', $context, $user->id, false)) {
+                  if (!has_capability('mod/ejsapp:addinstance', $context, $user->id, false)) {
                     $ejsappbooking_usersaccess->allowremaccess = 0;
                   } else {
                     $ejsappbooking_usersaccess->allowremaccess = 1;
@@ -332,11 +346,18 @@ function ejsapp_update_instance($ejsapp, $mform)
             $DB->update_record('ejsapp', $ejsapp);
         }
 
+        $maxbytes = get_max_upload_file_size($CFG->maxbytes);
+
         // Creating the state file in dataroot and updating the files table in the database
-        $context = get_context_instance(CONTEXT_MODULE, $cmid);
         $draftitemid = $ejsapp->statefile;
         if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => true));
+            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        }
+
+        // Creating the experiment file in dataroot and updating the files table in the database
+        $draftitemid = $ejsapp->expfile;
+        if ($draftitemid) {
+            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'expfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
     } else {
@@ -363,7 +384,7 @@ function ejsapp_delete_instance($id)
         return false;
     }
 
-    $context = get_system_context();
+    $context = context_system::instance();
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
@@ -394,12 +415,12 @@ function ejsapp_delete_instance($id)
  * user has done with a given particular instance of this module
  * Used for user activity reports.
  *
- * @param $course
- * @param $user
- * @param $mod
- * @param $ejsapp
+ * @param object $course
+ * @param object $user
+ * @param object $mod
+ * @param object $ejsapp
  *
- * @return
+ * @return object $result
  *
  * $return->time = the time they did it
  * $return->info = a short text description
@@ -427,10 +448,10 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @param $course
- * @param $user
- * @param $mod
- * @param $ejsapp
+ * @param object $course
+ * @param object $user
+ * @param object $mod
+ * @param object $ejsapp
  *
  * @return boolean
  */
@@ -458,7 +479,7 @@ function ejsapp_user_complete($course, $user, $mod, $ejsapp)
  * that has occurred in ejsapp activities and print it out.
  * Return true if there was output, or false is there was none.
  *
- * @param $course
+ * @param object $course
  * @param $viewfullnames
  * @param $timestart
  * @return boolean false
@@ -490,8 +511,9 @@ function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
 
 /**
  * Prints single activity item prepared by {@see newmodule_get_recent_mod_activity()}
+ *
  * @param $activity
- * @param $courseid
+ * @param int $courseid
  * @param $detail
  * @param $modnames
  * @param $viewfullnames
@@ -604,7 +626,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles') {
+    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'expfiles') {
         return false;
     }
 
@@ -615,12 +637,12 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
     }
 
     $relativepath = implode('/', $args);
-    //The previous line of code works for the saved xml state files but not with the embedded EJS jar files that use DefaultState.out
-    /*$extension = substr($relativepath,-4);
-    if (strcmp($extension,'.xml') != 0 && strcmp($extension,'.gif') != 0 && strcmp($extension,'.jpg') != 0 && strcmp($extension,'.bmp') != 0) { //not an .xml state file or an image
+    //The previous line of code works for the saved xml, txt and experiment files but not with the embedded EJS jar files that use DefaultState.out (and, probably, other stuff)
+    /*$extension = pathinfo($relativepath, PATHINFO_EXTENSION);
+    if ($extension != 'xml' && $extension != 'ejs' && $extension != 'txt' && $extension != 'gif' && $extension != 'jpg' && $extension != 'bmp') { //not an .xml state file, an experiment, a .txt file or an image
       if (count($submissions) == 2) { //EJS jar files have two registers in the files table
         foreach ($submissions as $submission) {
-          if ($submission->source == null && strcmp($submission->filename,'.') != 0) { //jar file
+          if ($submission->source == null && $submission->filename != '.') { //jar file
             //$relativepath = $submission->filename;
             //return true;
           }

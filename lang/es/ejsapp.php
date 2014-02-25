@@ -51,6 +51,9 @@ $string['pluginname'] = 'EJSApp';
 $string['state_load_msg'] = 'Se va a actualizar el estado del laboratorio';
 $string['state_fail_msg'] = 'Error al intentar cargar el estado';
 
+$string['exp_load_msg'] = 'Se va a ejecutar un experimento para este laboratorio';
+$string['exp_fail_msg'] = 'Error al intentar ejecutar el experimento';
+
 $string['more_text'] = 'Texto optional tras el applet';
 
 $string['jar_file'] = 'Archivo .jar que encapsula el laboratorio EJS';
@@ -79,7 +82,7 @@ $string['appwording'] = 'Enunciado';
 $string['state_file'] = 'Archivo .xml con el estado que este laboratorio EJS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicaci�n EJS debe cargar al ejecutarse.';
+$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicaci&oacute;n EJS debe cargar al ejecutarse.';
 
 $string['personalize_vars'] = 'Personalizar variables del laboratorio EJS';
 
@@ -100,6 +103,11 @@ $string['max_value_help'] = 'M&aacute;ximo valor permitido para la variable.';
 
 $string['vars_required'] = 'ATENCI&Oacute;N: Si desea utilizar variables personalizadas, debe espeficificar al menos una.';
 $string['vars_incorrect_type'] = 'ATENCI&Oacute;N: El tipo y los valores especificados para esta variable no se corresponden entre s&iacute;.';
+
+$string['experiment_file'] = 'Archivo .exp con el experimento que la aplicaci&oacute;n EJS debe ejecutar al cargarse';
+
+$string['expfile'] = 'Experimento del Easy Java Simulation';
+$string['expfile_help'] = 'Seleccione el archivo .exp con el experimento que la aplicaci&oacute;n EJS debe ejecutar al cargarse.';
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
@@ -123,8 +131,8 @@ $string['port'] = 'Puerto';
 $string['port_help'] = 'El puerto a usar para establecer la comunicaci&oacute;n. Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['port_required'] = 'ATENCI&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';
 
-$string['practiceintro'] = 'Identificador de pr&aacute;ctica en Sarlab';
-$string['practiceintro_help'] = 'Pr&aacute;cticas (separadas por punto y coma) configuradas en Sarlab para este sistema experimental.';
+$string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica en Sarlab';
+$string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), tal y como est&aacute; configurado en Sarlab, que desea usar con este sistema experimental.';
 $string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
 
 $string['free_access'] = 'Acceso libre';
@@ -142,17 +150,21 @@ $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto 
 $string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lalo con una versi&oacute;n m&aacute;s moderna de EJS.";
 
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
+$string['collab_access'] = 'Sin embargo, puede trabajar en modo colaborativo si ha sido invitado por un usuario con una reserva activa.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';
+$string['lab_in_use'] = 'El laboratorio est&aacute; ocupado en este instante. Pruebe de nuevo más adelante.';
 
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
 
 //Settings
-$string['default_display_set'] = "Opciones de visualizaci&oacute;n por defecto";
-$string['default_communication_set'] = "Opciones de comunicaci&oacute;n por defecto";
+$string['default_display_set'] = "Opciones de visualizaci&oacute;n";
+$string['default_communication_set'] = "Opciones de comunicaci&oacute;n. (Importante s&oacute;lo si tambi&eacute;n usa Sarlab";
 $string['central_column_width'] = "Ancho de la columna central (o principal)";
 $string['central_column_width_description'] = "Ancho total ocupado (en px) por la columna central (principal) en tu tema visual de Moodle";
 //$string['sarlab_description'] = "Seleccionar 'si' unicamente si se esta usando Sarlab; un sistema que gestiona las conexiones a recursos de laboratorios remotos";
 $string['sarlab_IP'] = "Nombre y direcci&aacute;n IP del servidor Sarlab";
-$string['sarlab_IP_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la direcci&oacute;n IP del servidor que ejecuta el sistema Sarlab que desea utilizar. En caso contrario, esta variable se usa, de modo que puede dejar el valor por defecto. Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno en 127.0.0.1 y otro en 127.0.0.2), inserte las direcciones IP separadas por puntos y comas: 127.0.0.1;127.0.0.2. Adem&aacute;s, puede proporcionar un nombre para identificar cada servidor Sarlab: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
+$string['sarlab_IP_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la direcci&oacute;n IP del servidor que ejecuta el sistema Sarlab que desea utilizar. En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto. Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno en 127.0.0.1 y otro en 127.0.0.2), inserte las direcciones IP separadas por puntos y comas: 127.0.0.1;127.0.0.2. Adem&aacute;s, puede proporcionar un nombre para identificar cada servidor Sarlab: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
 $string['sarlab_port'] = "Puerto(s) de comunicaci&oacute; con Sarlab";
-$string['sarlab_port_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar un puerto v&aacute;lido para establecer las comunicaciones necesarias con el servidor de Sarlab. En caso contrario, esta variable no usa, de modo que puede dejar el valor por defecto.  Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno usando el puerto 443 y un segundo usando tambi&eacute;n el puerto 443), inserte los valores separados por puntos y comas: 443;443";
+$string['sarlab_port_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar un puerto v&aacute;lido para establecer las comunicaciones necesarias con el servidor de Sarlab. En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto. Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno usando el puerto 443 y un segundo usando tambi&eacute;n el puerto 443), inserte los valores separados por puntos y comas: 443;443";
+$string['sarlab_enc_key'] = "Clave de encriptaci&oacute;n para comunicarse con Sarlab";
+$string['sarlab_enc_key_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la clave de 16 caracteres para encriptar/desencriptar las comunicaciones con el servidor Sarlab (esta clave debe ser la misma que la configurada en el servidor Sarlab). En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto.";

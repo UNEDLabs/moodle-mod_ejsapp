@@ -32,7 +32,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
-require_once ($CFG->libdir . '/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/filestorage/zip_packer.php');
 require_once('locallib.php');
@@ -52,7 +52,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
      */
     function definition()
     {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
         $mform = & $this->_form;
         // -------------------------------------------------------------------------------
         // Adding the "general" fieldset, where all the common settings are showed
@@ -90,7 +90,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->setDefault('is_collaborative', 0);
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive'))); //'accepted_types' => array('application/java-archive', 'application/zip')));
+        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
         $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
@@ -119,7 +119,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         // Adding an optional state file to be read when the applet loads
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
 
-        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
         // Personalize variables from the EJS application
@@ -158,6 +158,12 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
 
         $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats', 'option_add_vars', 2, null, true);
+        // -------------------------------------------------------------------------------
+        // Adding an optional text file with an experiment to automatically run it when the applet loads
+        $mform->addElement('header', 'experiment_file', get_string('experiment_file', 'ejsapp'));
+
+        $mform->addElement('filemanager', 'expfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.exp'));
+        $mform->addHelpButton('expfile', 'expfile', 'ejsapp');
         // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
@@ -216,24 +222,35 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $mform->setDefault('sarlab_collab', $rem_lab_data->sarlabcollab);
             }
         }
-        
-        $mform->addElement('text', 'practiceintro', get_string('practiceintro', 'ejsapp'), array('size' => '50'));
-        $mform->setType('practiceintro', PARAM_TEXT);
-        $mform->addRule('practiceintro', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+
+        // Obtain the list of Sarlab experiences the current user can configure and add them to the form
+        $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
+        $list_sarlab_experiences = explode(";", $listExperiences);
+        $select_practice = $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_sarlab_experiences);
         $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
         $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('practiceintro', 'sarlab', 'eq', 0);
+        $select_practice->setMultiple(true);
         if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $expsyst2pract_datas = $DB->get_records('ejsapp_expsyst2pract', array('ejsappid' => $this->current->instance));
-                $practicesintro = '';
-                foreach ($expsyst2pract_datas as $expsyst2pract_data) {
-                    $practicesintro = $practicesintro . $expsyst2pract_data->practiceintro . ';';
+            $practices_data = $DB->get_records('ejsapp_expsyst2pract', array('ejsappid' => $this->current->instance));
+            if ($practices_data) {
+                $selected_practice_index = array();
+                foreach ($practices_data as $practice_data) {
+                    $i = 0;
+                    foreach ($list_sarlab_experiences as $sarlab_experience) {
+                        if ($practice_data->practiceintro == $sarlab_experience) {
+                            array_push($selected_practice_index, $i);
+                            break;
+                        }
+                        $i++;
+                    }
                 }
-                $practicesintro = substr($practicesintro, 0, -1);
-                $mform->setDefault('practiceintro', $practicesintro);
+                $mform->setDefault('practiceintro', $selected_practice_index);
             }
         }
+        $mform->addElement('hidden', 'list_practices', null);
+        $mform->setType('list_practices', PARAM_TEXT);
+        $mform->setDefault('list_practices', $listExperiences);
 
         $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'), array('size' => '12'));
         $mform->setType('ip_lab', PARAM_TEXT);
@@ -319,10 +336,12 @@ class mod_ejsapp_mod_form extends moodleform_mod
         global $CFG, $DB;
         $mform = $this->_form;
 
-        // Fill the file picker elements with previous submitted files/data
+        $maxbytes = get_max_upload_file_size($CFG->maxbytes);
+
+        // Fill the form elements with previous submitted files/data
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('appletfile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles', $this->current->instance, array('subdirs' => true));
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
             $default_values['appletfile'] = $draftitemid;
 
             $draftitemid = file_get_submitted_draft_itemid('appwording');
@@ -331,16 +350,20 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $default_values['ejsappwording']['itemid'] = $draftitemid;
             
             $draftitemid = file_get_submitted_draft_itemid('statefile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => true));
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
             $default_values['statefile'] = $draftitemid;
+
+            $draftitemid = file_get_submitted_draft_itemid('expfile');
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'expfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $default_values['expfile'] = $draftitemid;
 
             $personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
             $key = 0;
             foreach ($personal_vars as $personal_var) {
                 $default_values['var_name['.$key.']'] = $personal_var->name;
                 $vartype = '0';
-                if (strcmp($personal_var->type,'Integer') == 0) $vartype = '1';
-                elseif (strcmp($personal_var->type,'Double') == 0) $vartype = '2';
+                if ($personal_var->type == 'Integer') $vartype = '1';
+                elseif ($personal_var->type == 'Double') $vartype = '2';
                 $default_values['var_type['.$key.']'] = $vartype;
                 if ($vartype != 0) {
                     $default_values['min_value['.$key.']'] = $personal_var->minval;
@@ -351,7 +374,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
 
         $content = $this->get_file_content('appletfile');
-
         if ($content) {
             $form_data = $this->get_data();
 
@@ -381,7 +403,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 // Extract the manifest.mf file from the .jar
                 $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
             } else {
-                // Extract the _metadata file from the .jar
+                // Extract the _metadata.txt file from the .jar
                 $metadata = file_get_contents('zip://' . $filename . '#' . '_metadata.txt');
             }
             $mform->addElement('hidden', 'manifest', null);
@@ -411,7 +433,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
      * Performs minimal validation on the settings form
      * @param array $data
      * @param array $files
-     * @return errors
+     * @return array $errors
      */
     function validation($data, $files)
     {
@@ -459,15 +481,24 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $i++;
             }
         }
-        
-        // Check whether the manifest has the necessary information
+
+        // Check whether the manifest/metadata file has the necessary information
         /*if (!empty($data['manifest'])) {
-            $pattern = '/Applet-Height\s*:\s*(\w+)/';
-            preg_match($pattern, $data['manifest'], $matches, PREG_OFFSET_CAPTURE);
-            if (count($matches) == 0) {
-                $errors['appletfile'] = get_string('EJS_version', 'ejsapp');
+            if ($data['manifest'] != 'EJsS') { //java
+                $pattern = '/Applet-Height\s*:\s*(\w+)/';
+                preg_match($pattern, $data['manifest'], $matches, PREG_OFFSET_CAPTURE);
+                if (count($matches) == 0) {
+                    $errors['appletfile'] = get_string('EJS_version', 'ejsapp');
+                }
+            } else { //javascript
+                $pattern = '/main-simulation\s*:\s*(\w+)/';
+                preg_match($pattern, $data['metadata'], $matches, PREG_OFFSET_CAPTURE);
+                if (count($matches) == 0) {
+                    $errors['appletfile'] = get_string('EJS_version', 'ejsapp');
+                }
             }
         }*/
+
 
         return $errors;
     } // validation

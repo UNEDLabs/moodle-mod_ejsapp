@@ -23,8 +23,8 @@
 
 
 /**
- * This file is used to send to an EJS applet the list of .xml state files
- * saved by that applet.
+ * This file is used to send to an EJS applet the list of .xml state files,
+ * .exp file or text plain files saved by that applet.
  *
  * @package    mod
  * @subpackage ejsapp
@@ -35,24 +35,23 @@
 //Some security issues when receiving data from users:
 require_once('../../config.php');
 require_login();
-require_once("$CFG->libdir/moodlelib.php");
 
-global $DB, $USER;
+global $DB, $USER, $CFG;
+
+require_once($CFG->libdir . '/moodlelib.php');
 
 $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
 $type = optional_param('type', '.xml', PARAM_TEXT);
 
 $info = '';
-$sql = "SELECT * FROM {$CFG->prefix}files WHERE component = 'user' AND filearea = 'private' AND userid = '$USER->id' AND source = 'ejsappid=$ejsapp_id'";
-$records = $DB->get_records_sql($sql);
+$records = $DB->get_records('files',array('component'=>'user', 'filearea'=>'private', 'userid'=>$USER->id, 'source'=>'ejsappid='.$ejsapp_id));
 
 foreach ($records as $record) {
-    $file_extension = substr($record->filename,-4);
-    if ( (strcmp($type,'.xml') == 0 && strcmp($file_extension,'.xml') == 0) || (strcmp($type,'text') == 0 && strcmp($file_extension,'.txt') == 0) ) {
+    $file_extension = pathinfo($record->filename, PATHINFO_EXTENSION);
+    if ( ($type == '.xml' && $file_extension == 'xml') || ($type == 'text' && $file_extension == 'txt') || ($type == '.exp' && $file_extension == 'exp') ) {
         $ejsapp_file_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
         $info .= $record->filename . ';' . $ejsapp_file_path . $record->filename . ';';
     }
 }
 
 echo $info;
-?>

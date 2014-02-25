@@ -52,7 +52,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $sarlabinfo->practice: int practice id, 
  *                                  $sarlabinfo->collab:   int collab whether sarlab offers collab access to this remote lab (1) or not (0), 
  *                                  Null if sarlab is not used 
- * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser it is the name of the xml file that stores the state of an EJS applet, elsewhere it is null
+ * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
  *                                  $collabinfo->session: int collaborative session id, 
  *                                  $collabinfo->ip: string collaborative session ip, 
@@ -65,6 +65,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $personalvarsinfo->value: double[] value(s) of the EJS variable(s),
  *                                  $personalvarsinfo->type: string[] type(s) of the EJS variable(s),
  *                                  Null if no personal variables were defined for this EJSApp
+ * @param string|null $exp_file if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .exp file that stores the experiment of an EJS applet, elsewhere it is null
  * @param stdClass|null $external_size 
  *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
  *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
@@ -72,7 +73,7 @@ defined('MOODLE_INTERNAL') || die();
 
  * @return string code that embeds an EJS applet into Moodle
  */
-function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $external_size)
+function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, $external_size)
 {
     global $DB, $USER, $CFG;
 
@@ -85,7 +86,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $min = date("i", $time);
         $seg = date("s", $time);
         $time = mktime($hour, $min, $seg, $month, $day, $year);
-        $DB->delete_records('ejsapp_sarlab_keys', array('user' => $USER->username, 'creationtime' => $time - 5));
+        $DB->delete_records('ejsapp_sarlab_keys', array('user' => $USER->username)); //WARNING: This also deletes keys for collab sessions with Sarlab!!
         mt_srand(time());
         $random = mt_rand(0, 1000000);
         if ($sarlabinfo) $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $sarlabinfo->practice . fullname($USER) . $USER->username . $random);
@@ -175,25 +176,28 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             $code .= "document.write('<applet code=\"{$ejsapp->class_file}\"');";
         }
 
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        $context = context_user::instance($USER->id);
         $language = current_language();
         $username = fullname($USER); //For collab
 
         //$code .= "document.write('archive=\"$archive\"');
-        //document.write('<param name=\"permissions\" value=\"all-permissions\"/>');
+        $permissions = 'sandbox';
+        if ($ejsapp->is_rem_lab == 1) $permissions = 'all-permissions';
         $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');
                   document.write(' archive=\"{$ejsapp->applet_name}.jar\"');
                   document.write(' name=\"{$ejsapp->applet_name}\"');
                   document.write(' id=\"{$ejsapp->applet_name}\"');
                   document.write(' width=\"'+w+'\"');
                   document.write(' height=\"'+h+'\">');
+                  document.write('<param name=\"permissions\" value=\"{$permissions}\"/>');
+                  document.write('<param name=\"codebase_lookup\" value=\"false\"/>');
                   document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
                   document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
                   document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
                   document.write('<param name=\"language\" value=\"$language\"/>');
                   document.write('<param name=\"username\" value=\"$username\"/>');
                   document.write('<param name=\"user_moodle\" value=\"{$USER->username}\"/>');
-                  document.write('<param name=\"password_moodle\" value=\"{$USER->password}\"/>');
+                  document.write('<param name=\"password_moodle\" value=\"TODO\"/>');
                   document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
 
         if ($collabinfo) {
@@ -232,17 +236,16 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
 
         // <Loading state files>
         $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'xmlfiles', 'itemid' => ($ejsapp->id)));
-        if (empty($file_records)) {
-            $initial_state_file = false;
-        } else {
+        $initial_state_file = new stdClass();
+        if (!empty($file_records)) {
             foreach($file_records as $initial_state_file){
-            if ($initial_state_file->filename != '.') {
-                break;
-              }
+                if ($initial_state_file->filename != '.') {
+                    break;
+                }
             }
         }
 
-        if ($state_file || ($initial_state_file && $initial_state_file->filename != '.')) {
+        if ($state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
             //<to read the applet state, javascript must wait until the applet has been totally downloaded>
             if ($state_file) {
               $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
@@ -304,6 +307,45 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             $code .= $personalize_vars_code;
         }
         // <\Loading personalized variables>
+
+        // <Loading experiment files>
+        $file_records2 = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'expfiles', 'itemid' => ($ejsapp->id)));
+        $initial_exp_file = new stdClass();
+        if (!empty($file_records2)) {
+            foreach($file_records2 as $initial_exp_file){
+                if ($initial_exp_file->filename != '.') {
+                    break;
+                }
+            }
+        }
+
+        if ($exp_file || (isset($initial_exp_file->filename) && $initial_exp_file->filename != '.')) {
+            //<to allow the applet running the experiment, javascript must wait until the applet has been totally downloaded>
+            if ($exp_file) {
+                $exp_file = $CFG->wwwroot . "/pluginfile.php/" . $exp_file;
+            } else {
+                $exp_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_exp_file->contextid .
+                    "/" . $initial_exp_file->component . "/" . $initial_exp_file->filearea .
+                    "/" . $initial_exp_file->itemid . "/" . $initial_exp_file->filename;
+            }
+            $exp_fail_msg = get_string('exp_fail_msg', 'ejsapp');
+            $load_exp_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+              function loadExperiment(count) {
+                if (!applet._simulation.runLoadExperiment && count > 0) {
+                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
+                }
+                else if (applet._simulation.runLoadExperiment) {
+                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$exp_file'); }, 100 );
+                }
+                else {
+                  alert('$exp_fail_msg');
+                }
+              }
+              loadExperiment(10);";
+            //<\to allow the applet running the experiment, javascript must wait until the applet has been totally downloaded>
+            $code .= $load_exp_code;
+        } //end of if ($experiment_file)
+        // <\Loading experiment files>
 
         $code .= '</script>';
 

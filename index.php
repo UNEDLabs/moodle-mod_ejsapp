@@ -35,6 +35,8 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/lib.php');
 
+global $DB, $PAGE, $OUTPUT;
+
 $id = required_param('id', PARAM_INT); // course
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {

@@ -45,7 +45,7 @@ function get_ejsapp_instances($course_id=null) {
 
     $ejsapp_instances = array();
     foreach ($courses as $course) {
-        $context = get_context_instance(CONTEXT_COURSE,$course);
+        $context = context_course::instance($course);
         if (has_capability('mod/ejsapp:requestinformation', $context, $USER->id, TRUE)) {
             $ejsapp_instances = array_merge($ejsapp_instances, $DB->get_records('ejsapp', array('course'=>$course)));
         }
@@ -61,7 +61,6 @@ function get_ejsapp_states($ejsapp_id) {
     // get private state files
     $all_state_files = $DB->get_records('files',
         array('userid' => $USER->id,
-                'mimetype' => 'application/xml',
                 'mimetype' => 'application/xml',
                 'filearea' => 'private',
                 'component' => 'mod_ejsapp'
@@ -97,7 +96,7 @@ function get_ejsapp_states($ejsapp_id) {
 }//get_ejsapp_states
 
 function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height=null) {
-    global $DB, $USER, $CFG;
+    global $DB, $CFG;
     
     if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
       $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsapp_id));
@@ -109,7 +108,7 @@ function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height
         $external_size = null;
       }
       require_once($CFG->dirroot . '/mod/ejsapp/generate_applet_embedding_code.php');
-      $code = generate_applet_embedding_code($ejsapp, null, $state_file, null, null, $external_size);
+      $code = generate_applet_embedding_code($ejsapp, null, $state_file, null, null, null, $external_size);
     }
     else {
       $code = get_string('ejsapp_error', 'ejsapp');
@@ -119,7 +118,7 @@ function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height
 } //draw_ejsapp_instance
 
 function get_ejsapp_size($ejsapp_id) {
-    global $DB,$USER;
+    global $DB;
 
     if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
         $record = $DB->get_record('ejsapp', array('id' => $ejsapp_id));

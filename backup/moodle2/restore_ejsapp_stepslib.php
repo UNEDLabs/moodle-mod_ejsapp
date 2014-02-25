@@ -93,7 +93,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $data->ejsappid = $this->get_new_parentid('ejsapp');
 
         // insert the ejsapp record
-        $newitemid = $DB->insert_record('ejsapp_expsyst2pract', $data);
+        $DB->insert_record('ejsapp_expsyst2pract', $data);
     }//process_ejsapp_expsyst2pract
 
 
@@ -110,7 +110,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $data->ejsappid = $this->get_new_parentid('ejsapp');
 
         // insert the ejsapp record
-        $newitemid = $DB->insert_record('ejsapp_remlab_conf', $data);
+        $DB->insert_record('ejsapp_remlab_conf', $data);
     }//process_ejsapp_remlab_conf
 
     /**
@@ -129,7 +129,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $is_ejsappbooking_restored = $DB->get_records('ejsappbooking',array('course'=>$data->course));
         $is_ejsappbooking_restored = !empty($is_ejsappbooking_restored);
         if (!$is_ejsappbooking_restored) {
-            $newitemid = $DB->insert_record('ejsappbooking', $data);
+            $DB->insert_record('ejsappbooking', $data);
         }
     }//process_ejsappbooking
 
@@ -149,9 +149,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
 
         // insert the ejsapp record
-
-        $newitemid = $DB->insert_record('ejsappbooking_usersaccess', $data);
-
+        $DB->insert_record('ejsappbooking_usersaccess', $data);
     }//process_ejsappbooking_usersaccess
 
     /**
@@ -168,9 +166,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $data->ejsappid = $this->get_new_parentid('ejsapp');
 
         // insert the ejsapp record
-        $newitemid = $DB->insert_record('ejsappbooking_remlab_access', $data);
-
-
+        $DB->insert_record('ejsappbooking_remlab_access', $data);
     }//process_ejsappbooking_remlab_access
 
     /**
@@ -181,11 +177,10 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         global $CFG, $DB;
 
-
-
         // Add ejsapp related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_ejsapp', 'jarfiles', null);
+        $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
+        $this->add_related_files('mod_ejsapp', 'expfiles', 'ejsapp');
 
         // restore ejsapp files:
         $sql = "select * from {$CFG->prefix}ejsapp";

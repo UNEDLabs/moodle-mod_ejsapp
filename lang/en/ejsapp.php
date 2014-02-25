@@ -52,6 +52,9 @@ $string['pluginname'] = 'EJSApp';
 $string['state_load_msg'] = 'The lab state is going to be updated';
 $string['state_fail_msg'] = 'Error while trying to load the state';
 
+$string['exp_load_msg'] = 'An experiment for this lab is going to be run';
+$string['exp_fail_msg'] = 'Error while trying to run the experiment';
+
 $string['more_text'] = 'Optional text after the applet';
 
 $string['jar_file'] = '.jar file that encapsulates the  EJS lab';
@@ -102,6 +105,11 @@ $string['max_value_help'] = 'Maximum value allowed for the variable.';
 $string['vars_required'] = 'WARNING: If you want to use personalized variables, you must specify at least one.';
 $string['vars_incorrect_type'] = 'WARNING: The specified type and values for this variable does not correspond to each other.';
 
+$string['experiment_file'] = '.exp file with the experiment to be run when this EJS lab loads';
+
+$string['expfile'] = 'Easy Java Simulation Experiment';
+$string['expfile_help'] = 'Select the .exp file with the experiment the Easy Java Simulation (EJS) application should run.';
+
 $string['rem_lab_conf'] = 'Remote lab configuration';
 
 $string['is_rem_lab'] = 'Remote experimental system?';
@@ -117,15 +125,15 @@ $string['sarlab_collab'] = "Use collaborative access provided by Sarlab?";
 $string['sarlab_collab_help'] = "Whether you want Sarlab to provide collaborative access to this remote laboratory or not.";
 
 $string['ip_lab'] = 'IP address';
-$string['ip_lab_help'] = 'Esperimental system IP address. If you are using Sarlab, you dont have to worry about this parameter.';
+$string['ip_lab_help'] = "Experimental system IP address. If you are using Sarlab, you don't have to worry about this parameter.";
 $string['ip_lab_required'] = 'WARNING: You need to provide a valid IP address.';
 
 $string['port'] = 'Port';
-$string['port_help'] = 'The port used to establish the communication. If you are using Sarlab, you dont have to worry about this parameter.';
+$string['port_help'] = "The port used to establish the communication. If you are using Sarlab, you don't have to worry about this parameter.";
 $string['port_required'] = 'WARNING: You need to provide a valid port.';
 
-$string['practiceintro'] = 'Practice identifier in Sarlab';
-$string['practiceintro_help'] = 'Practices (separated by semicolons) configured in Sarlab for this experimental system.';
+$string['practiceintro'] = 'Practice identifier(s) in Sarlab';
+$string['practiceintro_help'] = 'The identifier of the practice(s), as configured in Sarlab, you want to use with this experimental system.';
 $string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
 
 $string['free_access'] = 'Free access';
@@ -143,13 +151,15 @@ $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file 
 $string['EJS_version'] = "WARNING: The applet file was not generated with EJS 4.37 (build 121201), or higher. Recompile it with a newer version of EJS.";
 
 $string['no_booking'] = 'You do not have an active booking for this lab.';
+$string['collab_access'] = 'However, you can still work in collaborative mode if you have been invited by a user with an active booking';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';
+$string['lab_in_use'] = 'The lab is currently being used. Try again later.';
 
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
 
 //Settings
-$string['default_display_set'] = "Default display settings";
-$string['default_communication_set'] = "Default communication settings";
+$string['default_display_set'] = "Display settings";
+$string['default_communication_set'] = "Communication settings. (Only important if you are also using Sarlab)";
 $string['central_column_width'] = "Central (main) column width";
 $string['central_column_width_description'] = "Total width (px) occupied by the central or main column in your Moodle visual theme";
 //$string['sarlab_description'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
@@ -157,3 +167,5 @@ $string['sarlab_IP'] = "Name and IP address of the Sarlab server(s)";
 $string['sarlab_IP_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide the IP address of the server that runs the Sarlab system you want to use. Otherwise, this value will not be used, so you can leave the default value. If you have more than one Sarlab server (for example, one at 127.0.0.1 and a second one at 127.0.0.2), insert the IP addresses separated by semicolons: 127.0.0.1;127.0.0.2. Additionally, you can provide a name in order to identify each Sarlab server: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
 $string['sarlab_port'] = "Sarlab communication port(s)";
 $string['sarlab_port_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide a valid port for establishing the communications with the Sarlab server. Otherwise, this value will not be used, so you can leave the default value. If you have more than one Sarlab server (for example, one using port 443 and a second one also using port 443), insert the values separated by semicolons: 443;443";
+$string['sarlab_enc_key'] = "Encryption key to communicate with Sarlab";
+$string['sarlab_enc_key_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide the 16 characters long encryption key for encrypting/decrypting the communications with the Sarlab server (this key should be the same as configured in the Sarlab server). Otherwise, this value will not be used, so you can leave the default value.";
