@@ -186,16 +186,28 @@ function update_db($ejsapp, $contextid)
     $fs->create_file_from_pathname($fileinfo, $uploaded_file);
 
     if($manifest == 'EJsS') {
-        if (file_exists($new_path . $ejsapp->applet_name)) $code = file_get_contents($new_path . $ejsapp->applet_name);
-        $path = $CFG->wwwroot . $codebase;
-        $search = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","_ejs_library/",null);';
-        $replace = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","' . $path . '/_ejs_library/","' . $path . '");';
-        $code = str_replace($search,$replace,$code);
-        file_put_contents($new_path . $ejsapp->applet_name, $code);
-        /*$fileinfo['filename'] = $ejsapp->applet_name;
-        $fs = get_file_storage();
-        $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
-        unlink($new_path . $applet_name . '.zip');
+        if (file_exists($new_path . $ejsapp->applet_name)) {
+            $code = file_get_contents($new_path . $ejsapp->applet_name);
+            $code1 = substr($code, 0, -strlen($code)+strpos($code, '</head>')) . '</head><body><div id="_topFrame" style="text-align:center"></div>';
+            $code2 = substr($code, strpos($code, '</head>'));
+            if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
+                $code2 = substr($code2, strpos($code2, '<script type'));
+                $code = $code1 . $code2;
+                $code = update_links($codebase, $ejsapp, $code, 'old');
+            } else { //New EJS version with an external .js file for the Javascript TODO: Watch out with backups in this case!!!!!!
+                $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . substr($ejsapp->applet_name, 0, -4) .'js"></script></body></html>';
+                $code = $code1 . $code2;
+                $codeJS = file_get_contents($new_path . substr($ejsapp->applet_name, 0, -4) .'js');
+                $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new');
+                file_put_contents($new_path . substr($ejsapp->applet_name, 0, -4) .'js', $codeJS);
+            }
+            file_put_contents($new_path . $ejsapp->applet_name, $code);
+            //TODO: Use Moodle file system
+            /*$fileinfo['filename'] = $ejsapp->applet_name;
+            $fs = get_file_storage();
+            $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
+            unlink($new_path . $applet_name . '.zip');
+        }
     }
     // </update files table>
 
@@ -242,6 +254,7 @@ function update_db($ejsapp, $contextid)
     return $ejs_ok;
  } //update_db
 
+
 /**
  * Deletes a directory from the server
  *
@@ -266,6 +279,7 @@ function delete_recursively($dir)
     return @rmdir($dir);
 }//delete_recursively
 
+
 /**
  * Removes non alphanumeric_symbols from a string
  *
@@ -277,6 +291,7 @@ function delete_non_alphanumeric_symbols($str)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $str);
 }
+
 
 /**
  *
@@ -321,4 +336,32 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
     $listExperiences = substr($listExperiences,0,-1);
 
     return $listExperiences;
+}
+
+
+/**
+ *
+ * Modifies links to libraries and images used by the javascript application.
+ *
+ * @param string $codebase
+ * @param stdClass $ejsapp
+ * @param string $code
+ * @param string method
+ * @return string $code
+ *
+ */
+function update_links($codebase, $ejsapp, $code, $method) {
+    global $CFG;
+
+    $path = $CFG->wwwroot . $codebase;
+    if ($method == 'old') {
+        $search = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","_ejs_library/",null);';
+        $replace = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
+    } else {
+        $search = '("_topFrame","_ejs_library/",null);';
+        $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
+    }
+    $code = str_replace($search,$replace,$code);
+
+    return $code;
 }

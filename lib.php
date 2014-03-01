@@ -430,7 +430,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
     global $DB;
 
     if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
-        'action'=>'view', 'info'=>$ejsapp->id), 'time ASC')) {
+        'info'=>$ejsapp->name), 'time ASC')) {
 
         $numviews = count($logs);
         $lastlog = array_pop($logs);
@@ -460,7 +460,7 @@ function ejsapp_user_complete($course, $user, $mod, $ejsapp)
     global $CFG, $DB;
 
     if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
-        'action'=>'view', 'info'=>$ejsapp->id), 'time ASC')) {
+        'info'=>$ejsapp->name), 'time ASC')) {
         $numviews = count($logs);
         $lastlog = array_pop($logs);
 
