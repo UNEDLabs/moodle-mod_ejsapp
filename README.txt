@@ -1,5 +1,5 @@
 ##############
-# EJSApp 1.5 #
+# EJSApp 1.6 #
 ##############
 
 1. Content
@@ -37,8 +37,8 @@ folder,inside you Moodle installation.
 This module has been tested in all Moodle 2.x versions.
 
 This module enhances its functionality when used along with the ejsappbooking module and/or
-the ejsapp_file_browser and the ejsapp_collab_session blocks.
-You can find and download them at https://moodle.org/plugins/view.php?plugin=mod_ejsapp, in
+the ejsapp_file_browser, the ejsapp_collab_session blocks and the osp repository plugin.
+You can find and download them at https://moodle.org/plugins/browse.php?list=set&id=27, in
 the plugins section in the Moodle.org webpage or at https://github.com/UNEDLabs.
 
 An explanation of EJSApp is included in the folder "doc". There, you will also find a txt 
@@ -92,8 +92,8 @@ When installing ejsapp for the first time, you will need to set four variables:
                                               
 5. Testing
 ==========
-The "test" directory of ejsapp includes an EJS simulation that can be used 
-for testing purposes.
+The "test" directory of ejsapp includes a two EJS applications (one is a java applet and the other
+one is a javascript simulation) that can be used for testing purposes.
 
 6. Authors
 ==========

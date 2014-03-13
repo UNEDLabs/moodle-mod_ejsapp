@@ -1,20 +1,20 @@
 <?php
 
-// This file is part of the Moodle block "EJSApp File Browser"
+// This file is part of the Moodle module "EJSApp"
 //
-// EJSApp File Browser is free software: you can redistribute it and/or modify
+// EJSApp is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// EJSApp File Browser is distributed in the hope that it will be useful,
+// EJSApp is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // The GNU General Public License is available on <http://www.gnu.org/licenses/>
 //
-// EJSApp File Browser has been developed by:
+// EJSApp has been developed by:
 //  - Luis de la Torre: ldelatorre@dia.uned.es
 //	- Ruben Heradio: rheradio@issi.uned.es
 //
@@ -39,10 +39,6 @@ global $PAGE;
 $course_id = required_param('courseid', PARAM_INT);
 $cm_id = required_param('activityid', PARAM_INT);
 $ejsapp_name = required_param('ejsappname', PARAM_TEXT);
-
-$file = fopen("test.txt","w");
-fwrite($file,$course_id.'//'.$cm_id.'//'.$ejsapp_name);
-fclose($file);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/add_to_log.php');

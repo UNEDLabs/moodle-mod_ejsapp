@@ -257,10 +257,10 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
             $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
               function loadState(count) {
-                if (!applet._readState && count > 0) {
+                if (!applet && count > 0) {
                     window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if (applet._readState) {
+                else if (applet) {
                   window.setTimeout( function() { applet._readState('url:$state_file'); }, 100 );
                   applet._view.resetTraces();
                   //applet._view.clearData();
@@ -331,10 +331,10 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             $exp_fail_msg = get_string('exp_fail_msg', 'ejsapp');
             $load_exp_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
               function loadExperiment(count) {
-                if (!applet._simulation.runLoadExperiment && count > 0) {
+                if (!applet._simulation && count > 0) {
                     window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
                 }
-                else if (applet._simulation.runLoadExperiment) {
+                else if (applet._simulation) {
                   window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$exp_file'); }, 100 );
                 }
                 else {

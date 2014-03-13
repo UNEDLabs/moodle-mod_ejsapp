@@ -236,7 +236,6 @@ function ejsapp_update_instance($ejsapp, $mform)
     $cmid = $ejsapp->coursemodule;
     $context = context_module::instance($cmid);
 
-    // TODO: If the file attached to the updated EJSApp instance has been updated, delete older file and create the new one
     require_once($CFG->libdir . '/filelib.php');
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);

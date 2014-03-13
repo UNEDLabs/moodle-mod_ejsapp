@@ -1,18 +1,18 @@
-// This file is part of the Moodle block "EJSApp File Browser"
+// This file is part of the Moodle module "EJSApp"
 //
-// EJSApp File Browser is free software: you can redistribute it and/or modify
+// EJSApp is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either moodle_version 3 of the License, or
 // (at your option) any later moodle_version.
 //
-// EJSApp File Browser is distributed in the hope that it will be useful,
+// EJSApp is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // The GNU General Public License is available on <http://www.gnu.org/licenses/>
 //
-// EJSApp File Browser has been developed by:
+// EJSApp has been developed by:
 //  - Luis de la Torre: ldelatorre@dia.uned.es
 //	- Ruben Heradio: rheradio@issi.uned.es
 //
@@ -42,7 +42,7 @@ M.mod_ejsapp.init_add_log = function(Y, url, moodle_version, frequency){
         failure:handleFailure
     };
     var max_times = Math.round(3600/frequency); //A user can occupy a lab just for one hour
-    var counter = 0;
+    var counter = 1;
     var checkActivity = function() {
         if (counter < max_times) {
             //Call php code to insert log in Moodle table
@@ -57,5 +57,3 @@ M.mod_ejsapp.init_add_log = function(Y, url, moodle_version, frequency){
     }
     setInterval(checkActivity,1000*frequency);
 };
-
-//Call checkActivity() only  times

@@ -72,9 +72,11 @@ function update_db($ejsapp, $contextid)
 
     // codebase
     $codebase = '';
-    preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
-    if (!empty($match_result) and $match_result[1]) {
-        $codebase .= '/' . $match_result[1];
+    if ($manifest != 'EJsS') {
+        preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
+        if (!empty($match_result) and $match_result[1]) {
+            $codebase .= '/' . $match_result[1];
+        }
     }
     $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
@@ -185,7 +187,7 @@ function update_db($ejsapp, $contextid)
     $uploaded_file = $new_path . $applet_name . $ext;
     $fs->create_file_from_pathname($fileinfo, $uploaded_file);
 
-    if($manifest == 'EJsS') {
+    if($manifest == 'EJsS') {  //TODO: Watch out with backups in this case!!!!!!
         if (file_exists($new_path . $ejsapp->applet_name)) {
             $code = file_get_contents($new_path . $ejsapp->applet_name);
             $code1 = substr($code, 0, -strlen($code)+strpos($code, '</head>')) . '</head><body><div id="_topFrame" style="text-align:center"></div>';
@@ -194,7 +196,7 @@ function update_db($ejsapp, $contextid)
                 $code2 = substr($code2, strpos($code2, '<script type'));
                 $code = $code1 . $code2;
                 $code = update_links($codebase, $ejsapp, $code, 'old');
-            } else { //New EJS version with an external .js file for the Javascript TODO: Watch out with backups in this case!!!!!!
+            } else { //New EJS version with an external .js file for the Javascript
                 $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . substr($ejsapp->applet_name, 0, -4) .'js"></script></body></html>';
                 $code = $code1 . $code2;
                 $codeJS = file_get_contents($new_path . substr($ejsapp->applet_name, 0, -4) .'js');
@@ -202,7 +204,7 @@ function update_db($ejsapp, $contextid)
                 file_put_contents($new_path . substr($ejsapp->applet_name, 0, -4) .'js', $codeJS);
             }
             file_put_contents($new_path . $ejsapp->applet_name, $code);
-            //TODO: Use Moodle file system
+            //TODO: Use Moodle files system
             /*$fileinfo['filename'] = $ejsapp->applet_name;
             $fs = get_file_storage();
             $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/

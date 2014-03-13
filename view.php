@@ -120,13 +120,15 @@ if ($ejsapp->personalvars == 1) {
 //For logging purposes:
 $action = 'view';
 $check_activity = 600;   //register if the user is still in the activity every 10 min
+$accessed = false;
 
 //Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not.
 $sarlabinfo = null;
 if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
+    $accessed = true;
     echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
 } else { //<Remote lab>
-    //<Check if we should grant the user free access to the user for this remote lab>
+    //<Check if we should grant free access to the user for this remote lab>
     $module = new stdClass();
     $allow_free_access = true;
     $using_bookings = false;
@@ -141,13 +143,13 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             }
         }
     }
-    //</Check if we should grant the user free access to the user for this remote lab>
+    //</Check if we should grant free access to the user for this remote lab>
 
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
     $usingsarlab = $remlab_conf->usingsarlab;
     $currenttime = date('Y-m-d H:i:s');
     if ($allow_free_access) { //Admins and teachers, not using ejsappbooking or free access remote lab
-        //<Search past accesses to the same remote lab added as a different activity in this or any other course>
+        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different activity in this or any other course>
         $time_last_access_list = array(0);
         if ($remlab_conf->usingsarlab == 0) {
             $ejsapp_lab_conf = $DB->get_field('ejsapp_remlab_conf', 'ip', array('ejsappid'=>$ejsapp->id));
@@ -173,7 +175,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             }
         }
         $time_last_access = max($time_last_access_list);
-        //</Search past accesses to the same remote lab added as a different activity in this or any other course>
+        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different activity in this or any other course>
         $currenttime_UNIX = strtotime($currenttime);
         $lab_in_use = true;
         if ($currenttime_UNIX - $time_last_access > $check_activity+10) $lab_in_use = false;
@@ -187,15 +189,17 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                     $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $expsyst2pract->practiceintro);
                 }
             }
+            $accessed = true;
             echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
         } else {
-            echo $OUTPUT->heading(get_string('lab_in_use', 'ejsapp'));
+            echo $OUTPUT->heading(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
             $action = 'need_to_wait';
         }
     } else { //Students trying to access a remote lab with restricted access
         //Check if there is a booking and obtain the needed information for Sarlab in case it is used:
         $sarlabinfo = check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf);
         if (!is_null($sarlabinfo)) {
+            $accessed = true;
             echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
         } else { //No active booking
             echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
@@ -215,8 +219,11 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
 // Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not:
 add_to_log($course->id, 'ejsapp', $action, "view.php?id=$cm->id", $ejsapp->name, $cm->id);
 // Monitoring for how long the user works with the lab:
-$url = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsapp->name;
-$PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url, $CFG->version, $check_activity));
+if ($accessed) {
+    add_to_log($course->id, 'ejsapp', 'working', "view.php?id=$cm->id", $ejsapp->name, $cm->id);
+    $url = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsapp->name;
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url, $CFG->version, $check_activity));
+}
 
 // If some text was written, show it
 if ($ejsapp->appwording) {
@@ -270,7 +277,7 @@ function check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf) {
     if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1))) {
         $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1));
         foreach ($bookings as $booking) { // If the user has an active booking, use that info
-            if ($currenttime >= $booking->starttime && $currenttime < $booking->starttime) {
+            if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;
                 $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $practice);
