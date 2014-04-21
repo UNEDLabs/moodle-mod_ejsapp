@@ -47,6 +47,7 @@ $string['ejsappname_help'] = 'Nombre con que figurar&aacute; el laboratorio en e
 $string['ejsapp'] = 'EJSApp';
 $string['pluginadministration'] = 'Administraci&oacute;n del EJSApp';
 $string['pluginname'] = 'EJSApp';
+$string['noejsapps'] = 'No hay actividades EJSApp en este curso';
 
 $string['state_load_msg'] = 'Se va a actualizar el estado del laboratorio';
 $string['state_fail_msg'] = 'Error al intentar cargar el estado';
@@ -157,11 +158,14 @@ $string['lab_in_use'] = 'El laboratorio est&aacute; ocupado en este instante. Pr
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
 
 //Settings
-$string['default_display_set'] = "Opciones de visualizaci&oacute;n";
+$string['default_certificate_set'] = "Opciones del certificado de confianza. (Importante s&oacute;lo si se desea firmar de manera autom&aacute;tica los applets subidos con EJSApp)";
+$string['certificate_path'] = "Ruta al fichero del certificado de confianza";
+$string['certificate_path_description'] = "La ruta en el servidor Moodle al fichero del certificado de confianza que se usar&aacute; para firmar los applets de Java";
+$string['certificate_password'] = "Contraseña del certificado de confianza";
+$string['certificate_password_description'] = "La contraseña requerida para usar el certificado de confianza";
+$string['certificate_alias'] = "Alias del certificado de confianza";
+$string['certificate_alias_description'] = "El alias asignado al certificado de confianza";
 $string['default_communication_set'] = "Opciones de comunicaci&oacute;n. (Importante s&oacute;lo si tambi&eacute;n usa Sarlab";
-$string['central_column_width'] = "Ancho de la columna central (o principal)";
-$string['central_column_width_description'] = "Ancho total ocupado (en px) por la columna central (principal) en tu tema visual de Moodle";
-//$string['sarlab_description'] = "Seleccionar 'si' unicamente si se esta usando Sarlab; un sistema que gestiona las conexiones a recursos de laboratorios remotos";
 $string['sarlab_IP'] = "Nombre y direcci&aacute;n IP del servidor Sarlab";
 $string['sarlab_IP_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la direcci&oacute;n IP del servidor que ejecuta el sistema Sarlab que desea utilizar. En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto. Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno en 127.0.0.1 y otro en 127.0.0.2), inserte las direcciones IP separadas por puntos y comas: 127.0.0.1;127.0.0.2. Adem&aacute;s, puede proporcionar un nombre para identificar cada servidor Sarlab: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
 $string['sarlab_port'] = "Puerto(s) de comunicaci&oacute; con Sarlab";

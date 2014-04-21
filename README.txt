@@ -1,5 +1,5 @@
 ##############
-# EJSApp 1.6 #
+# EJSApp 1.7 #
 ##############
 
 1. Content
@@ -47,7 +47,7 @@ file with relevant links.
  WARNING: If you are updating ejsapp from a previous version, DO NOT replace/delete your old 
  jarfiles directory inside your old ejsapp directory.
 
------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
  IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), EJSApp requires that (i) the 
  apache user is the owner of the "jarfiles" dir inside the "ejsapp" dir, and (ii) it has        
  permissions to read, write and execute the jarfiles dir.                                          
@@ -66,29 +66,56 @@ file with relevant links.
                                                                                                 
  3) Change the permissions of the apache user:                                                  
  $ chmod -R 700 jarfiles                                                                        
- -----------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+ IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), if you have a trust certificate 
+ and you want to use the option to automatically sign the Java applets, you must give the apache 
+ user permissions over the jarsigner (Java installation folder) and the sign.sh script (included
+ with this plugin) files.
+                                                                                                
+ The following points describe how to do it:                                                    
+                                                                                                
+ 1) Install jarsigner alternative
+ $ alternatives --install /usr/bin/jarsigner jarsigner /usr/java/jdk1.7.0_51/bin/jarsigner 20000
+ $ alternatives --set jarsigner /usr/java/jdk1.7.0_51/bin/jarsigner                                                                                    
+                                                                                                
+ 2) Change the owner of the jarsigner file to apache.                                             
+ For instance,                                                                                  
+ 2.a) in Linux CentOS, you should write                         
+ $ chown apache /usr/bin/jarsigner                                                                     
+ 2.b) in Linux OpenSuse,you should write                       
+ $ chown wwwrun /usr/bin/jarsigner                                                                     
+                                                                                                
+ 3) Set owner of mod/ejsapp/sign.sh to apache user in your machine (Note you may need to repeat
+ this step when you update your EJSApp plugin).
+ $ cd ejsapp
+ 3.a) in Linux CentOS, you should write                         
+ $ chown apache sign.sh                                                                     
+ 3.b) in Linux OpenSuse,you should write                       
+ $ chown wwwrun sign.sh                                                                       
+------------------------------------------------------------------------------------------------
 
 4. Configuration
 ================
 
-When installing ejsapp for the first time, you will need to set four variables:
+When installing ejsapp for the first time, you will need to set a few variables:
 
-   central_column_width: This is the total width occupied by your central column (in pixels)
-                  in your Moodle visual theme. This variable is used to resize the applet size
-		  when embedded in Moodle and the "Let Moodle resize the applet" option is
-		  set to 'Yes'. Default configuration works well with the default theme and with
-                  many others based on the two columns format. However, other themes may require
-                  changes in this variable.
+   certificate_path:	This variable defines the absolute path to the trust certificate file.
 
-   sarlab_IP:	  This variable defines the IP(s) address(es) of the SARLAB system(s) used for 
-                  managing the access to the remote laboratories. If left empty, the plugin
-                  understands that SARLAB is not used.
+   certificate_password:	This variable must contain the password of the trust certificate.
 
-   sarlab_port:	  This variable defines the port(s) used to communicate with the SARLAB 
-                  system(s). If left empty, the plugin understands that SARLAB is not used.
+   certificate_alias: This variable stores the alias given to your trust certificate.
 
-   sarlab_enc_key:This 16 characters long variable must be configure to match exactly the key set
-		  in the SARLAB system(s).
+   sarlab_IP:	  	This variable defines the IP(s) address(es) of the SARLAB system(s) used for 
+                  	managing the access to the remote laboratories. If left empty, the plugin
+                  	understands that SARLAB is not used.
+
+   sarlab_port:	This variable defines the port(s) used to communicate with the SARLAB 
+                  	system(s). If left empty, the plugin understands that SARLAB is not used.
+
+   sarlab_enc_key:	This 16 characters long variable must be configure to match exactly the key set
+		  	in the SARLAB system(s).
                                               
 5. Testing
 ==========

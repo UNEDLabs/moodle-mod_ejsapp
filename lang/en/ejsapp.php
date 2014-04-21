@@ -48,6 +48,7 @@ $string['ejsappname_help'] = 'Name that will appear in the course for this labor
 $string['ejsapp'] = 'EJSApp';
 $string['pluginadministration'] = 'EJSApp administration';
 $string['pluginname'] = 'EJSApp';
+$string['noejsapps'] = 'There are no EJSApp activities in this course';
 
 $string['state_load_msg'] = 'The lab state is going to be updated';
 $string['state_fail_msg'] = 'Error while trying to load the state';
@@ -158,11 +159,14 @@ $string['lab_in_use'] = 'The lab is currently being used. Try again later.';
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
 
 //Settings
-$string['default_display_set'] = "Display settings";
+$string['default_certificate_set'] = "Trust certificate settings. (Only important if you want to automatically sign the applets uploaded with EJSApp)";
+$string['certificate_path'] = "Trust certificate file path";
+$string['certificate_path_description'] = "The path in the Moodle server to the trust certificate file to be used for signing the Java applets";
+$string['certificate_password'] = "Trust certificate password";
+$string['certificate_password_description'] = "The password required for using the trust certificate";
+$string['certificate_alias'] = "Trust certificate alias";
+$string['certificate_alias_description'] = "The alias given to the trust certificate";
 $string['default_communication_set'] = "Communication settings. (Only important if you are also using Sarlab)";
-$string['central_column_width'] = "Central (main) column width";
-$string['central_column_width_description'] = "Total width (px) occupied by the central or main column in your Moodle visual theme";
-//$string['sarlab_description'] = "Only select yes if you are using Sarlab; a system that manages connections to remote laboratories resources";
 $string['sarlab_IP'] = "Name and IP address of the Sarlab server(s)";
 $string['sarlab_IP_description'] = "If you are using Sarlab (a system that manages connections to remote laboratories resources), you need to provide the IP address of the server that runs the Sarlab system you want to use. Otherwise, this value will not be used, so you can leave the default value. If you have more than one Sarlab server (for example, one at 127.0.0.1 and a second one at 127.0.0.2), insert the IP addresses separated by semicolons: 127.0.0.1;127.0.0.2. Additionally, you can provide a name in order to identify each Sarlab server: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
 $string['sarlab_port'] = "Sarlab communication port(s)";

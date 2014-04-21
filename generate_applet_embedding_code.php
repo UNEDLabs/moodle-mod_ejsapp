@@ -121,7 +121,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
 
     } else { //EJS Applet
 
-        $code = '<script type="text/javascript">';
+        $code = '<div id = "EJsS"><script type="text/javascript">';
 
         // <set the applet size on the screen>
         if (isset($external_size->width)) {
@@ -132,22 +132,19 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                   $code .= " var w = {$ejsapp->width}, h = {$ejsapp->height};";
                   break;
               case 1:
-                  $code .= " var w = 630, h = 460, h_max = 460;
+                  $code .= " h_max = 460;
                     if (window.innerWidth && window.innerHeight) {
-                        w_max = window.innerWidth;
                         h_max = window.innerHeight;
                     } else if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth && document.documentElement.offsetHeight) {
-                        w_max = document.documentElement.offsetWidth;
                         h_max = document.documentElement.offsetHeight;
                     } else if (document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight) {
-                        w_max = document.documentElement.clientWidth;
                         h_max = document.documentElement.clientHeight;
                     }
-                    h = 0.93*h_max;
-                    w = h*{$ejsapp->width}/{$ejsapp->height};
-                    if (w > $CFG->central_column_width) {
-                        w = $CFG->central_column_width;
-                        h = w*{$ejsapp->height}/{$ejsapp->width};
+                    w = document.getElementById('EJsS').offsetWidth
+                    h = w*{$ejsapp->height}/{$ejsapp->width};
+                    if (h > h_max) {
+                        h = 0.93*h_max;
+                        w = h*{$ejsapp->width}/{$ejsapp->height};
                     }";
                   break;
               case 2:
@@ -347,7 +344,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         } //end of if ($experiment_file)
         // <\Loading experiment files>
 
-        $code .= '</script>';
+        $code .= '</script></div>';
 
     }
 

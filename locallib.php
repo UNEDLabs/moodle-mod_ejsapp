@@ -210,6 +210,22 @@ function update_db($ejsapp, $contextid)
             $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
             unlink($new_path . $applet_name . '.zip');
         }
+    } else { //Sign the applet
+        // Check whether a certificate is installed and in use
+        if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
+            // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
+            $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
+            preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+            if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
+                // Sign the applet
+                shell_exec('sh ' . dirname(__FILE__) . '/sign.sh ' .
+                    $uploaded_file . ' ' .                                  // parameter 1
+                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
+                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
+                    get_config('ejsapp', 'certificate_alias')               // parameter 4
+                );
+            }
+        }
     }
     // </update files table>
 
@@ -313,25 +329,28 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
     foreach ($list_sarlab_IPs as $sarlab_IP) {
         $init_char = strrpos($sarlab_IP,"'");
         if ($init_char != 0) $init_char++;
-        $ip = substr($sarlab_IP,$init_char);
-        $URI = 'http://' . $ip . '/idExperiences.xml';
-        $file_headers = @get_headers($URI);
-        if ($file_headers[0] != 'HTTP/1.1 404 Not Found') {
-            if ($dom->load($URI)) {
-                $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
-                foreach ($experiences as $experience) {
-                    $owneUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
-                    foreach ($owneUsers as $owneUser) {
-                        if ($username == $owneUser->nodeValue || $username == 'admin') { //Check whether the required user has access to the experience
-                            $idExperiences = $experience->getElementsByTagName('idExperience');
-                            foreach ($idExperiences as $idExperience) {
-                                $listExperiences .= $idExperience->nodeValue . ';' ; //Add the experience to the user's list of accessible experiences
+        $ip = substr($sarlab_IP, $init_char);
+        if($fp = fsockopen($ip, '80', $errCode, $errStr, 1)){
+            $URI = 'http://' . $ip . '/idExperiences.xml';
+            $file_headers = @get_headers($URI);
+            if (substr($file_headers[0], 9, 3) == 200) {
+                if ($dom->load($URI)) {
+                    $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
+                    foreach ($experiences as $experience) {
+                        $owneUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
+                        foreach ($owneUsers as $owneUser) {
+                            if ($username == $owneUser->nodeValue || $username == 'admin') { //Check whether the required user has access to the experience
+                                $idExperiences = $experience->getElementsByTagName('idExperience');
+                                foreach ($idExperiences as $idExperience) {
+                                    $listExperiences .= $idExperience->nodeValue . ';' ; //Add the experience to the user's list of accessible experiences
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
             }
+            fclose($fp);
         }
     }
 
@@ -343,7 +362,7 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
 
 /**
  *
- * Modifies links to libraries and images used by the javascript application.
+ * Modifies links to libraries and images used by the EJsS javascript applications.
  *
  * @param string $codebase
  * @param stdClass $ejsapp

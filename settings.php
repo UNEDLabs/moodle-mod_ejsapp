@@ -35,25 +35,45 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-//central_column_width, Total width occupied by the central column (in pixels) in your Moodle visual theme
+//certificate_path,     The path to your trust certificate for signing the java applets.
+//certificate_password, The password for using your trust certificate.
+//certificate_alia,     The alias of your trust certificate.
 //sarlab_IP,            If one or more SARLAB systems are used for accessing the remote laboratories, the list of their IPs directions must be written here.
 //sarlab_port,          If one or more SARLAB systems are used for accessing the remote laboratories, the list of the ports used to connect with them must be written here.
 //sarlab_enc_key        If one or more SARLAB systems are used for accessing the remote laboratories, the list of their encoding keys must be written here.
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
-        'ejsapp/displaysettings',
-        get_string('default_display_set', 'ejsapp'),
+        'ejsapp/certificatesettings',
+        get_string('default_certificate_set', 'ejsapp'),
         ''
     ));
 
     $settings->add(new admin_setting_configtext(
-        'central_column_width',
-        get_string('central_column_width', 'ejsapp'),
-        get_string('central_column_width_description', 'ejsapp'),
-        900,
-        PARAM_INT,
-        '2'
+        'ejsapp/certificate_path',
+        get_string('certificate_path', 'ejsapp'),
+        get_string('certificate_path_description', 'ejsapp'),
+        dirname(__FILE__) . '/firmadia.pfx',
+        PARAM_TEXT,
+        '20'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'ejsapp/certificate_password',
+        get_string('certificate_password', 'ejsapp'),
+        get_string('certificate_password_description', 'ejsapp'),
+        '',
+        PARAM_TEXT,
+        '20'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'ejsapp/certificate_alias',
+        get_string('certificate_alias', 'ejsapp'),
+        get_string('certificate_alias_description', 'ejsapp'),
+        '',
+        PARAM_TEXT,
+        '40'
     ));
 
     $settings->add(new admin_setting_heading(
@@ -77,7 +97,7 @@ if ($ADMIN->fulltree) {
         get_string('sarlab_port_description', 'ejsapp'),
         443,
         PARAM_TEXT,
-        '2'
+        '4'
     ));
 
     $settings->add(new admin_setting_configtext(
