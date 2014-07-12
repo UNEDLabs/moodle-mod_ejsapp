@@ -41,6 +41,9 @@ $capabilities = array(
         'archetypes' => array(
             'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
+            'teacher' => CAP_PROHIBIT,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
         )
     ),
 
@@ -49,10 +52,27 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'guest' => CAP_PROHIBIT,
+            'user' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
+    ),
+
+    // capability for accessing remote labs
+    'mod/ejsapp:accessremotelab' => array(
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'guest' => CAP_PROHIBIT,
+            'user' => CAP_PROHIBIT,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
     ),
 
     // capability for ejsapp_external_interface
@@ -60,9 +80,12 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'guest' => CAP_PROHIBIT,
+            'user' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-        ),
+        )
     )
 
 );

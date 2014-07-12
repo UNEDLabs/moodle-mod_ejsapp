@@ -190,18 +190,29 @@ function update_db($ejsapp, $contextid)
     if($manifest == 'EJsS') {  //TODO: Watch out with backups in this case!!!!!!
         if (file_exists($new_path . $ejsapp->applet_name)) {
             $code = file_get_contents($new_path . $ejsapp->applet_name);
-            $code1 = substr($code, 0, -strlen($code)+strpos($code, '</head>')) . '</head><body><div id="_topFrame" style="text-align:center"></div>';
+            //<get the whole code from </title> (not included) onwards>
+            $code = explode('</title>',$code);
+            $code = '<div id="EJsS">' . $code[1];
+            //</get the whole code from </title> (not included) onwards>
+            //<$code1 is $code till </head> (not included) and with the missing standard part>
+            $code1 = substr($code, 0, -strlen($code)+strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
+            //</$code1 is $code till </head> (not included) and with the missing standard part>
+            //<$code2 is $code from </head> to </body> tags, none of them included>
             $code2 = substr($code, strpos($code, '</head>'));
+            $code2 = explode('</body>',$code2);
+            $code2 = $code2[0] . '</div>';
+            //</$code2 is $code from </head> to </body> tags, none of them included>
             if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
                 $code2 = substr($code2, strpos($code2, '<script type'));
                 $code = $code1 . $code2;
-                $code = update_links($codebase, $ejsapp, $code, 'old');
+                $code = update_links($codebase, $ejsapp, $code, 'old', false);
             } else { //New EJS version with an external .js file for the Javascript
                 $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . substr($ejsapp->applet_name, 0, -4) .'js"></script></body></html>';
                 $code = $code1 . $code2;
-                $codeJS = file_get_contents($new_path . substr($ejsapp->applet_name, 0, -4) .'js');
-                $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new');
-                file_put_contents($new_path . substr($ejsapp->applet_name, 0, -4) .'js', $codeJS);
+                $exploded_file_name = explode(".", $ejsapp->applet_name);
+                $codeJS = file_get_contents($new_path . $exploded_file_name[0] .'.js');
+                $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
+                file_put_contents($new_path . $exploded_file_name[0] .'.js', $codeJS);
             }
             file_put_contents($new_path . $ejsapp->applet_name, $code);
             //TODO: Use Moodle files system
@@ -218,7 +229,7 @@ function update_db($ejsapp, $contextid)
             preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
             if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
                 // Sign the applet
-                shell_exec('sh ' . dirname(__FILE__) . '/sign.sh ' .
+                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
                     $uploaded_file . ' ' .                                  // parameter 1
                     get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
                     get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
@@ -367,20 +378,33 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
  * @param string $codebase
  * @param stdClass $ejsapp
  * @param string $code
- * @param string method
+ * @param string $method
+ * @param boolean $use_css
  * @return string $code
  *
  */
-function update_links($codebase, $ejsapp, $code, $method) {
+function update_links($codebase, $ejsapp, $code, $method, $use_css) {
     global $CFG;
 
     $path = $CFG->wwwroot . $codebase;
+
+    // Replace links for images
     if ($method == 'old') {
-        $search = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","_ejs_library/",null);';
-        $replace = "window.addEventListener('load', function () {  new " . substr($ejsapp->applet_name,0,-16) . '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
+        $exploded_name = explode("_Simulation",$ejsapp->applet_name);
+        $search = "window.addEventListener('load', function () {  new " . $exploded_name[0] . '("_topFrame","_ejs_library/",null);';
+        $replace = "window.addEventListener('load', function () {  new " . $exploded_name[0] . '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
     } else {
         $search = '("_topFrame","_ejs_library/",null);';
         $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
+    }
+    $code = str_replace($search,$replace,$code);
+
+    // Replace link for css
+    $search = '<link rel="stylesheet"  type="text/css" href="_ejs_library/css/ejsSimulation.css" />';
+    if ($use_css) {
+        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . '_ejs_library/css/ejsSimulation.css" />';
+    } else {
+        $replace = '';
     }
     $code = str_replace($search,$replace,$code);
 

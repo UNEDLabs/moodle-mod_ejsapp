@@ -124,6 +124,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
             $ejsapp_rem_lab = new stdClass();
             $ejsapp_rem_lab->ejsappid = $ejsapp->id;
             $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
+            $ejsapp_rem_lab->active = $ejsapp->active;
             if ($ejsapp_rem_lab->usingsarlab == 1) {
                 $sarlabinstance = $ejsapp->sarlab_instance;
                 $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
@@ -177,7 +178,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
                 //Consider other enrolled users:
                 foreach ($users as $user) {
                   $ejsappbooking_usersaccess->userid = $user->id;
-                  if (!has_capability('mod/ejsapp:addinstance', $context, $user->id, false)) {
+                  if (!has_capability('mod/ejsapp:accessremotelab', $context, $user->id, false)) {
                     $ejsappbooking_usersaccess->allowremaccess = 0;
                   } else {
                     $ejsappbooking_usersaccess->allowremaccess = 1;
@@ -247,6 +248,7 @@ function ejsapp_update_instance($ejsapp, $mform)
             $ejsapp_rem_lab = new stdClass();
             $ejsapp_rem_lab->ejsappid = $ejsapp->id;
             $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
+            $ejsapp_rem_lab->active = $ejsapp->active;
             if ($ejsapp_rem_lab->usingsarlab == 1) {
                 $sarlabinstance = $ejsapp->sarlab_instance;
                 $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
@@ -315,7 +317,7 @@ function ejsapp_update_instance($ejsapp, $mform)
                 //Consider other enrolled users:
                 foreach ($users as $user) {
                   $ejsappbooking_usersaccess->userid = $user->id;
-                  if (!has_capability('mod/ejsapp:addinstance', $context, $user->id, false)) {
+                  if (!has_capability('mod/ejsapp:accessremotelab', $context, $user->id, false)) {
                     $ejsappbooking_usersaccess->allowremaccess = 0;
                   } else {
                     $ejsappbooking_usersaccess->allowremaccess = 1;

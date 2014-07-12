@@ -125,6 +125,10 @@ $string['sarlab_instance_help'] = "The order corresponds to the one used for the
 $string['sarlab_collab'] = "Use collaborative access provided by Sarlab?";
 $string['sarlab_collab_help'] = "Whether you want Sarlab to provide collaborative access to this remote laboratory or not.";
 
+$string['practiceintro'] = 'Practice identifier(s) in Sarlab';
+$string['practiceintro_help'] = 'The identifier of the practice(s), as configured in Sarlab, you want to use with this experimental system.';
+$string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
+
 $string['ip_lab'] = 'IP address';
 $string['ip_lab_help'] = "Experimental system IP address. If you are using Sarlab, you don't have to worry about this parameter.";
 $string['ip_lab_required'] = 'WARNING: You need to provide a valid IP address.';
@@ -133,9 +137,8 @@ $string['port'] = 'Port';
 $string['port_help'] = "The port used to establish the communication. If you are using Sarlab, you don't have to worry about this parameter.";
 $string['port_required'] = 'WARNING: You need to provide a valid port.';
 
-$string['practiceintro'] = 'Practice identifier(s) in Sarlab';
-$string['practiceintro_help'] = 'The identifier of the practice(s), as configured in Sarlab, you want to use with this experimental system.';
-$string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
+$string['active'] = 'Available';
+$string['active_help'] = 'Whether this remote lab is operative at the moment or not.';
 
 $string['free_access'] = 'Free access';
 $string['free_access_help'] = 'Enable free access mode (no need to make a booking) for this remote lab.';
@@ -151,6 +154,7 @@ $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
 $string['EJS_version'] = "WARNING: The applet file was not generated with EJS 4.37 (build 121201), or higher. Recompile it with a newer version of EJS.";
 
+$string['inactive_lab'] = 'The remote lab is inactive at this moment.';
 $string['no_booking'] = 'You do not have an active booking for this lab.';
 $string['collab_access'] = 'However, you can still work in collaborative mode if you have been invited by a user with an active booking';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';

@@ -124,6 +124,10 @@ $string['sarlab_instance_help'] = "El orden se corresponde con aquel usado para 
 $string['sarlab_collab'] = "Usar acceso colaborativo de Sarlab?";
 $string['sarlab_collab_help'] = "Si deseas que Sarlab ofrezca la opci&oacute;n de acceso colaborativo a este laboratorio remoto o no";
 
+$string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica en Sarlab';
+$string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), tal y como est&aacute; configurado en Sarlab, que desea usar con este sistema experimental.';
+$string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
+
 $string['ip_lab'] = 'direcci&oacute;n IP';
 $string['ip_lab_help'] = 'Direcci&oacute;n IP del sistema experimental.  Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direcci&oacute;n IP valida.';
@@ -132,9 +136,8 @@ $string['port'] = 'Puerto';
 $string['port_help'] = 'El puerto a usar para establecer la comunicaci&oacute;n. Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['port_required'] = 'ATENCI&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';
 
-$string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica en Sarlab';
-$string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), tal y como est&aacute; configurado en Sarlab, que desea usar con este sistema experimental.';
-$string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
+$string['active'] = 'Disponible';
+$string['active_help'] = 'Si este laboratorio remoto se encuentra operativo en este momento o no.';
 
 $string['free_access'] = 'Acceso libre';
 $string['free_access_help'] = 'Habilitar el acceso libre (sin necesidad de realizar reservas) a este laboratorio remoto.';
@@ -150,6 +153,7 @@ $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
 $string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lalo con una versi&oacute;n m&aacute;s moderna de EJS.";
 
+$string['inactive_lab'] = 'El laboratorio remoto es&aacute; inactivo en este momento.';
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['collab_access'] = 'Sin embargo, puede trabajar en modo colaborativo si ha sido invitado por un usuario con una reserva activa.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';

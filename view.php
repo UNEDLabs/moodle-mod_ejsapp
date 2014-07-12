@@ -128,11 +128,19 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $accessed = true;
     echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
 } else { //<Remote lab>
+    //<Check if the remote lab is operative>
+    $allow_access = true;
+    $ejsapp_lab_active = $DB->get_field('ejsapp_remlab_conf', 'active', array('ejsappid'=>$ejsapp->id));
+    if ($ejsapp_lab_active == 0) {
+        $allow_access = false;
+    }
+    //</Check if the remote lab is operative>
+
     //<Check if we should grant free access to the user for this remote lab>
     $module = new stdClass();
     $allow_free_access = true;
     $using_bookings = false;
-    if ( ($ejsapp->free_access != 1) && (!has_capability('mod/ejsapp:addinstance', $coursecontext, $USER->id, true)) ) {     //Not free access and the user does not have special privileges
+    if ( ($ejsapp->free_access != 1) && (!has_capability('mod/ejsapp:accessremotelab', $coursecontext, $USER->id, true)) ) {     //Not free access and the user does not have special privileges
         if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) { //Is EJSApp Booking System plugins installed?
             $module = $DB->get_record('modules', array('name' => 'ejsappbooking'));
             if ($DB->record_exists('course_modules', array('course' => $ejsapp->course, 'module' => $module->id))) { //Is there an ejsappbooking instance in the course?
@@ -148,7 +156,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
     $usingsarlab = $remlab_conf->usingsarlab;
     $currenttime = date('Y-m-d H:i:s');
-    if ($allow_free_access) { //Admins and teachers, not using ejsappbooking or free access remote lab
+    if ($allow_free_access && $allow_access) { //Admins and teachers, not using ejsappbooking or free access remote lab AND the remote lab is operative
         //<Search past accesses to this ejsapp lab or to the same remote lab added as a different activity in this or any other course>
         $time_last_access_list = array(0);
         if ($remlab_conf->usingsarlab == 0) {
@@ -195,22 +203,27 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             echo $OUTPUT->heading(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
             $action = 'need_to_wait';
         }
-    } else { //Students trying to access a remote lab with restricted access
-        //Check if there is a booking and obtain the needed information for Sarlab in case it is used:
-        $sarlabinfo = check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf);
-        if (!is_null($sarlabinfo)) {
-            $accessed = true;
-            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
-        } else { //No active booking
-            echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
-            if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) {
-                echo $OUTPUT->heading(get_string('collab_access', 'ejsapp'));
-                $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL');
+    } else { //Students trying to access a remote lab with restricted access OR remote lab not operative
+        if (!$allow_access) { //Remote lab not operative
+            echo $OUTPUT->heading(get_string('inactive_lab', 'ejsapp'));
+            $action = 'inactive_lab';
+        } else {    //Students trying to access a remote lab with restricted access
+            //Check if there is a booking and obtain the needed information for Sarlab in case it is used:
+            $sarlabinfo = check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf);
+            if (!is_null($sarlabinfo)) {
+                $accessed = true;
                 echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
-                $action = 'collab_view';
-            } else {
-                echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));
-                $action = 'need_to_book';
+            } else { //No active booking
+                echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
+                if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) {
+                    echo $OUTPUT->heading(get_string('collab_access', 'ejsapp'));
+                    $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL');
+                    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
+                    $action = 'collab_view';
+                } else {
+                    echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));
+                    $action = 'need_to_book';
+                }
             }
         }
     } //</Remote lab>
@@ -276,7 +289,7 @@ function check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf) {
 
     if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1))) {
         $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1));
-        foreach ($bookings as $booking) { // If the user has an active booking, use that info
+	 foreach ($bookings as $booking) { // If the user has an active booking, use that info
             if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
                 $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;

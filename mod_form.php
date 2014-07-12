@@ -276,6 +276,15 @@ class mod_ejsapp_mod_form extends moodleform_mod
             }
         }
 
+        $mform->addElement('selectyesno', 'active', get_string('active', 'ejsapp'));
+        $mform->addHelpButton('active', 'active', 'ejsapp');
+        $mform->disabledIf('active', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance) {
+            if ($rem_lab_data) {
+                $mform->setDefault('active', $rem_lab_data->active);
+            }
+        }
+
         $mform->addElement('selectyesno', 'free_access', get_string('free_access', 'ejsapp'));
         $mform->addHelpButton('free_access', 'free_access', 'ejsapp');
         $mform->disabledIf('free_access', 'is_rem_lab', 'eq', 0);
