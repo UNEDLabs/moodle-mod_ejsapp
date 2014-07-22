@@ -44,8 +44,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @return boolean ejs_ok
  */
-function update_db($ejsapp, $contextid)
-{
+function update_db($ejsapp, $contextid) {
     global $CFG, $DB;
 
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . delete_non_alphanumeric_symbols($ejsapp->name) . '/';
@@ -290,8 +289,7 @@ function update_db($ejsapp, $contextid)
  * @param string $dir directory to delete
  * @return bool TRUE on success or FALSE on failure
  */
-function delete_recursively($dir)
-{
+function delete_recursively($dir) {
     $it = new RecursiveDirectoryIterator($dir);
     $files = new RecursiveIteratorIterator($it,
         RecursiveIteratorIterator::CHILD_FIRST);
@@ -306,7 +304,7 @@ function delete_recursively($dir)
         }
     }
     return @rmdir($dir);
-}//delete_recursively
+} //delete_recursively
 
 
 /**
@@ -316,8 +314,7 @@ function delete_recursively($dir)
  * @return string
  *
  */
-function delete_non_alphanumeric_symbols($str)
-{
+function delete_non_alphanumeric_symbols($str) {
     return preg_replace('/[^a-zA-Z0-9]/', '', $str);
 }
 
@@ -368,7 +365,7 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
     $listExperiences = substr($listExperiences,0,-1);
 
     return $listExperiences;
-}
+} //get_experiences_sarlab
 
 
 /**
@@ -409,4 +406,4 @@ function update_links($codebase, $ejsapp, $code, $method, $use_css) {
     $code = str_replace($search,$replace,$code);
 
     return $code;
-}
+} //update_links

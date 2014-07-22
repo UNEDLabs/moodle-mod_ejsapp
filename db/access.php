@@ -39,53 +39,46 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
-            'teacher' => CAP_PROHIBIT,
+            'guest' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
+            'manager' => CAP_ALLOW,
+        ),
+    ),
+
+    // capability for accessing remote labs
+    'mod/ejsapp:accessremotelabs' => array(
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ),
     ),
 
     'mod/ejsapp:addinstance' => array(
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'guest' => CAP_PROHIBIT,
-            'user' => CAP_PROHIBIT,
-            'teacher' => CAP_PROHIBIT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
-    ),
-
-    // capability for accessing remote labs
-    'mod/ejsapp:accessremotelab' => array(
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'guest' => CAP_PROHIBIT,
-            'user' => CAP_PROHIBIT,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
     ),
 
     // capability for ejsapp_external_interface
     'mod/ejsapp:requestinformation' => array(
         'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'guest' => CAP_PROHIBIT,
-            'user' => CAP_PROHIBIT,
-            'teacher' => CAP_PROHIBIT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    )
+            'manager' => CAP_ALLOW,
+        ),
+    ),
 
 );

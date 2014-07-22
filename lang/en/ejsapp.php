@@ -58,11 +58,11 @@ $string['exp_fail_msg'] = 'Error while trying to run the experiment';
 
 $string['more_text'] = 'Optional text after the applet';
 
-$string['jar_file'] = '.jar file that encapsulates the  EJS lab';
+$string['jar_file'] = '.jar or .zip file that encapsulates the  EJsS lab';
 
-$string['appletfile'] = 'Easy Java Simulation';
-$string['appletfile_required'] = 'A .jar file must be selected';
-$string['appletfile_help'] = 'Select the .jar file that encapsulates the Easy Java Simulation (EJS) application. The official website of EJS is http://fem.um.es/Ejs/';
+$string['appletfile'] = 'Easy Java(script) Simulation';
+$string['appletfile_required'] = 'A .jar or a .zip file must be selected';
+$string['appletfile_help'] = 'Select the .jar or .zip file that encapsulates the Easy Java(script) Simulation (EJsS) application. The official website of EJsS is http://fem.um.es/Ejs/';
 
 $string['applet_size_conf'] = 'Size the applet';
 $string['applet_size_conf_help'] = 'Three options: 1) "Preserve original size" will preserve the original size of the EJS applet, 2) "Let Moodle set the size" will resize the applet to take up all the possible space while mantaining the original aspect ratio, 3) "Let the user set the size" will let the user to set the size of the applet and select whether to preserve its original aspect ratio or not.';
@@ -161,6 +161,19 @@ $string['check_bookings'] = 'Check your active bookings with the booking system.
 $string['lab_in_use'] = 'The lab is currently being used. Try again later.';
 
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
+
+//Capabilities
+$string['ejsapp:accessremotelabs'] = "Access to all the remote laboratories";
+$string['ejsapp:addinstance'] = "Add a new EJSApp activity";
+$string['ejsapp:view'] = "View an EJSApp activity";
+$string['ejsapp:requestinformation'] = "Request information for third parties plugins";
+
+//Events
+$string['event_working'] = "Working with the EJSApp activity";
+$string['event_wait'] = "Waiting for the lab to be free";
+$string['event_book'] = "Need to make a booking";
+$string['event_collab'] = "Working with the EJSApp activity in collaborative mode";
+$string['event_inactive'] = "Lab is inactive";
 
 //Settings
 $string['default_certificate_set'] = "Trust certificate settings. (Only important if you want to automatically sign the applets uploaded with EJSApp)";

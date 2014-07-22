@@ -58,10 +58,12 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             'mainframe', 'is_collaborative', 'applet_size_conf', 'preserve_aspect_ratio',
             'custom_width', 'custom_height', 'is_rem_lab', 'height', 'width', 'personalvars', 'free_access'));
 
-
         $ejsapp_expsyst2practs = new backup_nested_element('ejsapp_expsyst2practs');
         $ejsapp_expsyst2pract = new backup_nested_element('ejsapp_expsyst2pract', array('id'),
             array('practiceid', 'practiceintro'));
+
+        $ejsapp_personal_vars = new backup_nested_element('ejsapp_personal_vars', array('id'),
+            array('name', 'type', 'minval', 'maxval'));
 
         $ejsapp_remlab_conf = new backup_nested_element('ejsapp_remlab_conf', array('id'),
             array('usingsarlab', 'sarlabinstance', 'sarlabcollab', 'ip', 'port', 'totalslots',
@@ -71,17 +73,17 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         $ejsappbooking = new backup_nested_element('ejsappbooking', array('id'),
             array('course', 'name', 'intro', 'introformat', 'timecreated', 'timemodified'));
 
-        $ejsappbooking_usersaccesses = new backup_nested_element('ejsappbooking_usersaccesses');
-        $ejsappbooking_usersaccess = new backup_nested_element('ejsappbooking_usersaccess',
-            array('id'), array('bookingid', 'userid', 'allowremaccess'));
-
         $ejsappbooking_remlab_accesses = new backup_nested_element('ejsappbooking_remlab_accesses');
         $ejsappbooking_remlab_access = new backup_nested_element('ejsappbooking_remlab_access',
             array('id'), array('username', 'practiceid', 'starttime', 'endtime', 'valid'));
 
+        $ejsappbooking_usersaccesses = new backup_nested_element('ejsappbooking_usersaccesses');
+        $ejsappbooking_usersaccess = new backup_nested_element('ejsappbooking_usersaccess',
+            array('id'), array('bookingid', 'userid', 'allowremaccess'));
 
         // Build the tree
         $ejsapp->add_child($ejsapp_expsyst2practs);
+        $ejsapp->add_child($ejsapp_personal_vars);
         $ejsapp->add_child($ejsapp_remlab_conf);
         $ejsapp->add_child($ejsappbooking);
         $ejsapp->add_child($ejsappbooking_usersaccesses);

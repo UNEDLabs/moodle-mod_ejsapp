@@ -42,7 +42,7 @@ M.mod_ejsapp.init_add_log = function(Y, url, moodle_version, frequency){
         failure:handleFailure
     };
     var max_times = Math.round(3600/frequency); //A user can occupy a lab just for one hour
-    var counter = 1;
+    var counter = 0;
     var checkActivity = function() {
         if (counter < max_times) {
             //Call php code to insert log in Moodle table
@@ -55,5 +55,36 @@ M.mod_ejsapp.init_add_log = function(Y, url, moodle_version, frequency){
             });
         } else clearInterval(checkActivity);
     }
+    //Call a first time:
+    checkActivity();
+    //Call periodically:
     setInterval(checkActivity,1000*frequency);
 };
+
+/*M.mod_ejsapp.countdown = function(Y, url, moodle_version){
+    var handleSuccess = function(o) {
+        /*success handler code*/
+    /*};
+    var handleFailure = function(o) {
+        /*failure handler code*/
+    /*};
+    var callback = {
+        success:handleSuccess,
+        failure:handleFailure
+    };
+    var max_times = 3600;
+    var counter = 1;
+    var checkActivity = function() {
+        if (counter < max_times) {
+            //Call php code to insert log in Moodle table
+            Y.use('yui2-connection', function(Y) {
+                if (moodle_version >= 2012120300) { //Moodle 2.4 or higher
+                    YAHOO = Y.YUI2;
+                }
+                YAHOO.util.Connect.asyncRequest('GET', url, callback);
+                counter++;
+            });
+        } else clearInterval(checkActivity);
+    }
+    setInterval(checkActivity,1000);
+};*/

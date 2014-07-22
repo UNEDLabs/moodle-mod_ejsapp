@@ -282,8 +282,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
         if ($this->current->instance) {
             if ($rem_lab_data) {
                 $mform->setDefault('active', $rem_lab_data->active);
-            }
-        }
+            } else $mform->setDefault('active', '1');
+        } else $mform->setDefault('active', '1');
 
         $mform->addElement('selectyesno', 'free_access', get_string('free_access', 'ejsapp'));
         $mform->addHelpButton('free_access', 'free_access', 'ejsapp');

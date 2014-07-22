@@ -31,7 +31,6 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/lib.php');
 require_once('generate_applet_embedding_code.php');
 
 global $USER, $DB, $CFG, $PAGE, $OUTPUT;
@@ -93,6 +92,12 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, get_string('modulename', 'ejsapp')));
 
+//Set CSS style
+/*$cssfilename = '/mod/ejsapp/styles.css';
+if (file_exists($CFG->dirroot.$cssfilename)) {
+    $PAGE->requires->css($cssfilename);
+}*/
+
 // Output starts here
 echo $OUTPUT->header();
 if ($ejsapp->intro) { // If some text was written, show the intro
@@ -119,7 +124,7 @@ if ($ejsapp->personalvars == 1) {
 
 //For logging purposes:
 $action = 'view';
-$check_activity = 600;   //register if the user is still in the activity every 10 min
+$check_activity = 300;   //register whether the user is still in the activity or not every 5 min
 $accessed = false;
 
 //Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not.
@@ -140,7 +145,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $module = new stdClass();
     $allow_free_access = true;
     $using_bookings = false;
-    if ( ($ejsapp->free_access != 1) && (!has_capability('mod/ejsapp:accessremotelab', $coursecontext, $USER->id, true)) ) {     //Not free access and the user does not have special privileges
+    if ( ($ejsapp->free_access != 1) && (!has_capability('mod/ejsapp:addinstance', $coursecontext, $USER->id, true)) ) {     //Not free access and the user does not have special privileges
         if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) { //Is EJSApp Booking System plugins installed?
             $module = $DB->get_record('modules', array('name' => 'ejsappbooking'));
             if ($DB->record_exists('course_modules', array('course' => $ejsapp->course, 'module' => $module->id))) { //Is there an ejsappbooking instance in the course?
@@ -150,49 +155,64 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 }
             }
         }
-    }
+    } //TODO: Labs with free access in a course but with Booking System in a different course.
     //</Check if we should grant free access to the user for this remote lab>
 
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
     $usingsarlab = $remlab_conf->usingsarlab;
-    $currenttime = date('Y-m-d H:i:s');
-    if ($allow_free_access && $allow_access) { //Admins and teachers, not using ejsappbooking or free access remote lab AND the remote lab is operative
-        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different activity in this or any other course>
-        $time_last_access_list = array(0);
+    if ($allow_free_access && $allow_access) { //Admins and teachers, not using ejsappbooking or free access remote lab, AND the remote lab is operative
+        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
         if ($remlab_conf->usingsarlab == 0) {
-            $ejsapp_lab_conf = $DB->get_field('ejsapp_remlab_conf', 'ip', array('ejsappid'=>$ejsapp->id));
-            $repeated_ejsapp_labs = $DB->get_records('ejsapp_remlab_conf', array('ip'=>$ejsapp_lab_conf));
-        }
-        else {
+            $ejsapp_lab_ip = $DB->get_field('ejsapp_remlab_conf', 'ip', array('ejsappid'=>$ejsapp->id));
+            $ejsapp_lab_port = $DB->get_field('ejsapp_remlab_conf', 'port', array('ejsappid'=>$ejsapp->id));
+            $repeated_ejsapp_labs = $DB->get_records('ejsapp_remlab_conf', array('ip'=>$ejsapp_lab_ip, 'port'=>$ejsapp_lab_port));
+        } else {
             $ejsapp_lab_conf = $DB->get_field('ejsapp_expsyst2pract', 'practiceintro', array('ejsappid'=>$ejsapp->id));
-            $repeated_ejsapp_labs = $DB->get_records('ejsapp_expsyst2pract', array('practiceintro'=>$ejsapp_lab_conf)); //TODO: This may identify two different remote labs in two different SARLAB systems as only one!
+            $repeated_practices = $DB->get_records('ejsapp_expsyst2pract', array('practiceintro'=>$ejsapp_lab_conf));
+            $ejsappids = array(0);
+            foreach ($repeated_practices as $repeated_practice){
+                array_push($ejsappids, $repeated_practice->ejsappid);
+            }
+            $repeated_practices = $DB->get_records_list('ejsapp_remlab_conf', 'ejsappid', $ejsappids);
+            //The previous queries may identify two different remote labs in two different SARLAB systems as only one, so we need to do something more
+            $sarlab_instance = $DB->get_field('ejsapp_remlab_conf', 'sarlabinstance', array('ejsappid'=>$ejsapp->id));
+            $repeated_ejsapp_labs = array(0);
+            foreach ($repeated_practices as $repeated_practice) { //check whether the remote lab is in the same SARLAB instance or not
+                if ($repeated_practice->usingsarlab == 1 && $repeated_practice->sarlabinstance == $sarlab_instance){
+                    array_push($repeated_ejsapp_labs, $repeated_practice);
+                }
+            }
         }
+        $time_last_access = 0;
         foreach($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
             if (isset($repeated_ejsapp_lab->ejsappid)) {
-                $repeated_ejsapps = $DB->get_records('ejsapp', array('id'=>$repeated_ejsapp_lab->ejsappid));
-                foreach($repeated_ejsapps as $repeated_ejsapp) {
-                    if (isset($repeated_ejsapp->name)) {
+                $repeated_ejsapp = $DB->get_record('ejsapp', array('id'=>$repeated_ejsapp_lab->ejsappid));
+                if (isset($repeated_ejsapp->name)) {
+                    if ($CFG->version < 2013111800) { //Moodle 2.5 or inferior
                         $log_records = $DB->get_records('log', array('module'=>'ejsapp', 'info'=>$repeated_ejsapp->name, 'action'=>'working'));
-                        foreach ($log_records as $log_record) {
-                            if ($log_record->userid != $USER->id) {
-                                array_push($time_last_access_list, $log_record->time);
-                            }
+                    } else {
+                        // Retrieve information from ejsapp's logging table
+                        $log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'working'));
+                    }
+                    foreach ($log_records as $log_record) {
+                        if ($log_record->userid != $USER->id) {
+                            $time_last_access = max($time_last_access, $log_record->time);
                         }
                     }
                 }
             }
         }
-        $time_last_access = max($time_last_access_list);
-        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different activity in this or any other course>
+        //</Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
+        $currenttime = date('Y-m-d H:i:s');
         $currenttime_UNIX = strtotime($currenttime);
         $lab_in_use = true;
         if ($currenttime_UNIX - $time_last_access > $check_activity+10) $lab_in_use = false;
         if (!$lab_in_use) {
             if ($usingsarlab == 1) {
                 if ($using_bookings) {
-                    //Check if there is a booking and obtain the needed information for Sarlab in case it is used:
+                    //Check if there is a booking and obtain the needed information for Sarlab in case there is:
                     $sarlabinfo = check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf);
-                } else { //If there is no active booking, the user can still enter to the first experience defined for this remote lab TODO: Let choosing the experience
+                } else { //If there is no active booking, the user can still enter to the first experience defined for this remote lab... TODO: Let choosing the experience
                     $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => 1));
                     $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $expsyst2pract->practiceintro);
                 }
@@ -202,6 +222,8 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
         } else {
             echo $OUTPUT->heading(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
             $action = 'need_to_wait';
+            /*$url = $CFG->wwwroot . '/mod/ejsapp/countdown.php';
+            $PAGE->requires->js_init_call('M.mod_ejsapp.countdown', array($url, $CFG->version));*/
         }
     } else { //Students trying to access a remote lab with restricted access OR remote lab not operative
         if (!$allow_access) { //Remote lab not operative
@@ -209,7 +231,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             $action = 'inactive_lab';
         } else {    //Students trying to access a remote lab with restricted access
             //Check if there is a booking and obtain the needed information for Sarlab in case it is used:
-            $sarlabinfo = check_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf);
+            $sarlabinfo = check_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlab_conf);
             if (!is_null($sarlabinfo)) {
                 $accessed = true;
                 echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
@@ -230,11 +252,53 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
 } //if(($ejsapp->is_rem_lab == 0)... else
 
 // Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not:
-add_to_log($course->id, 'ejsapp', $action, "view.php?id=$cm->id", $ejsapp->name, $cm->id);
+if ($CFG->version < 2013111800) { //Moodle 2.5 or inferior
+    add_to_log($course->id, 'ejsapp', $action, "view.php?id=$cm->id", $ejsapp->name, $cm->id);
+} else {
+    switch ($action) {
+        case 'view':
+            $event = \mod_ejsapp\event\course_module_viewed::create(array(
+                'objectid' => $ejsapp->id,
+                'context' => $modulecontext
+            ));
+            break;
+        case 'need_to_wait':
+            $event = \mod_ejsapp\event\course_module_wait::create(array(
+                'objectid' => $ejsapp->id,
+                'context' => $modulecontext
+            ));
+            break;
+        case 'need_to_book':
+            $event = \mod_ejsapp\event\course_module_book::create(array(
+                'objectid' => $ejsapp->id,
+                'context' => $modulecontext
+            ));
+            break;
+        case 'collab_view':
+            $event = \mod_ejsapp\event\course_module_collab::create(array(
+                'objectid' => $ejsapp->id,
+                'context' => $modulecontext
+            ));
+            break;
+        case 'inactive_lab':
+            $event = \mod_ejsapp\event\course_module_inactive::create(array(
+                'objectid' => $ejsapp->id,
+                'context' => $modulecontext,
+            ));
+            break;
+    }
+    /*$event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('ejsapp', $ejsapp);*/
+    $event->trigger();
+}
 // Monitoring for how long the user works with the lab:
 if ($accessed) {
-    add_to_log($course->id, 'ejsapp', 'working', "view.php?id=$cm->id", $ejsapp->name, $cm->id);
-    $url = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsapp->name;
+    if ($CFG->version < 2013111800) { //Moodle 2.5 or inferior
+        $url = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsapp->name.'&method=0';
+    } else {
+        $url = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsapp->name.'&method=1&userid='.$USER->id;
+    }
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url, $CFG->version, $check_activity));
 }
 

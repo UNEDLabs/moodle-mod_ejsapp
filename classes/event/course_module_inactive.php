@@ -21,9 +21,8 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-
 /**
- * Version file for the ejsapp module
+ * Class for logging the inactive lab event of an EJSApp
  *
  * @package    mod
  * @subpackage ejsapp
@@ -31,11 +30,31 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_ejsapp\event;
+
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2014072113;         // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2010112400;
-$module->cron     = 604800;             // Period for cron to check this module (secs)
-$module->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$module->maturity = MATURITY_STABLE;
-$module->release = '1.7 (Build: 2014072113)';
+class course_module_inactive extends \core\event\base {
+    protected function init() {
+        $this->data['crud'] = 'c'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'ejsapp';
+    }
+
+    public static function get_name() {
+        return get_string('event_inactive', 'ejsapp');
+    }
+
+    public function get_description() {
+        return "User {$this->userid} attempted to access the EJSApp remote lab with id {$this->objectid} but it was inactive.";
+    }
+
+    /**
+     * Get URL related to the action
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url('/mod/ejsapp/view.php', array('n' => $this->objectid));
+    }
+} 

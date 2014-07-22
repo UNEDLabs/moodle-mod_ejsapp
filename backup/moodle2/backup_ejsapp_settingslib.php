@@ -21,9 +21,8 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-
 /**
- * Version file for the ejsapp module
+ * custom settings to be used by EJSApp backup
  *
  * @package    mod
  * @subpackage ejsapp
@@ -31,11 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$module->version  = 2014072113;         // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2010112400;
-$module->cron     = 604800;             // Period for cron to check this module (secs)
-$module->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$module->maturity = MATURITY_STABLE;
-$module->release = '1.7 (Build: 2014072113)';
+// This activity has not particular settings but the inherited from the generic
+// backup_activity_task so here there isn't any class definition, like the ones
+// existing in /backup/moodle2/backup_settingslib.php (activities section)

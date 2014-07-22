@@ -43,6 +43,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $paths = array();
         $paths[] = new restore_path_element('ejsapp', '/activity/ejsapp');
         $paths[] = new restore_path_element('ejsapp_expsyst2pract', '/activity/ejsapp/ejsapp_expsyst2practs/ejsapp_expsyst2pract');
+        $paths[] = new restore_path_element('ejsapp_personal_vars', '/activity/ejsapp/ejsapp_personal_vars/personal_vars');
         $paths[] = new restore_path_element('ejsapp_remlab_conf', '/activity/ejsapp/ejsapp_remlab_conf');
 
         $userinfo = $this->get_setting_value('userinfo');
@@ -50,7 +51,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
             $paths[] = new restore_path_element('ejsappbooking_usersaccess', '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
             $paths[] = new restore_path_element('ejsappbooking_remlab_access', '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
         }
-
 
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
@@ -96,6 +96,21 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $DB->insert_record('ejsapp_expsyst2pract', $data);
     }//process_ejsapp_expsyst2pract
 
+    /**
+     * Process table ejsapp_personal_vars
+     * @param stdClass $data
+     */
+    protected function process_ejsapp_personal_vars($data)
+    {
+        global $DB;
+
+        $data = (object)$data;
+
+        $data->ejsappid = $this->get_new_parentid('ejsapp');
+
+        // insert the ejsapp record
+        $DB->insert_record('ejsapp_personal_vars', $data);
+    }//process_ejsapp_personal_vars
 
     /**
      * Process table ejsapp_remlab_conf

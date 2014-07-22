@@ -111,5 +111,21 @@ function xmldb_ejsapp_upgrade($oldversion)
         $table->deleteField('maxval');
         $table->deleteField('minval');
     }
+
+    if  ($oldversion < '2014072107') {
+        // Create "ejsapp_log" table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_log');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, true, null);
+        $table->add_field('time', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('action', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('info', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    }
+
     return true;
 }

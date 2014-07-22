@@ -103,15 +103,15 @@ When installing ejsapp for the first time, you will need to set a few variables:
 
    certificate_path:	This variable defines the absolute path to the trust certificate file.
 
-   certificate_password:	This variable must contain the password of the trust certificate.
+   certificate_password:This variable must contain the password of the trust certificate.
 
-   certificate_alias: This variable stores the alias given to your trust certificate.
+   certificate_alias: 	This variable stores the alias given to your trust certificate.
 
    sarlab_IP:	  	This variable defines the IP(s) address(es) of the SARLAB system(s) used for 
                   	managing the access to the remote laboratories. If left empty, the plugin
                   	understands that SARLAB is not used.
 
-   sarlab_port:	This variable defines the port(s) used to communicate with the SARLAB 
+   sarlab_port:		This variable defines the port(s) used to communicate with the SARLAB 
                   	system(s). If left empty, the plugin understands that SARLAB is not used.
 
    sarlab_enc_key:	This 16 characters long variable must be configure to match exactly the key set

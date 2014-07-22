@@ -23,7 +23,7 @@
 
 
 /**
- * Version file for the ejsapp module
+ * Definition of event observers and handlers for ejsapp
  *
  * @package    mod
  * @subpackage ejsapp
@@ -33,9 +33,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2014072113;         // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2010112400;
-$module->cron     = 604800;             // Period for cron to check this module (secs)
-$module->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$module->maturity = MATURITY_STABLE;
-$module->release = '1.7 (Build: 2014072113)';
+$observers = array(
+
+    array(
+        'eventname'   => '\mod_ejsapp\event\course_module_working',
+        'callback'    => 'mod_ejsapp\observers::course_module_working',
+    ),
+
+);

@@ -45,7 +45,16 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 
 require_course_login($course);
 
-add_to_log($course->id, 'ejsapp', 'view all', "index.php?id=$course->id", '');
+if ($CFG->version < 2013111800) { //Moodle 2.5 or inferior
+    add_to_log($course->id, 'ejsapp', 'view all', "index.php?id=$course->id", '');
+} else {
+    $params = array(
+        'context' => context_course::instance($course->id)
+    );
+    $event = \mod_ejsapp\event\course_module_instance_list_viewed::create($params);
+    $event->add_record_snapshot('course', $course);
+    $event->trigger();
+}
 
 /// Print the header
 

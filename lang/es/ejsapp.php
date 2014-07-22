@@ -57,11 +57,11 @@ $string['exp_fail_msg'] = 'Error al intentar ejecutar el experimento';
 
 $string['more_text'] = 'Texto optional tras el applet';
 
-$string['jar_file'] = 'Archivo .jar que encapsula el laboratorio EJS';
+$string['jar_file'] = 'Archivo .jar o .zip que encapsula el laboratorio EJsS';
 
-$string['appletfile'] = 'Easy Java Simulation';
-$string['appletfile_required'] = 'Se debe seleccionar un archivo .jar';
-$string['appletfile_help'] = 'Selecione el archivo .jar que encapsula el laboratorio EJS (Easy Java Simulation). La p&aacute;gina oficial de EJS es http://fem.um.es/Ejs/';
+$string['appletfile'] = 'Easy Java(script) Simulation';
+$string['appletfile_required'] = 'Se debe seleccionar un archivo .jar o .zip';
+$string['appletfile_help'] = 'Selecione el archivo .jar o .zip que encapsula el laboratorio EJsS (Easy Java(script) Simulation). La p&aacute;gina oficial de EJsS es http://fem.um.es/Ejs/';
 
 $string['applet_size_conf'] = 'Reescalado del applet';
 $string['applet_size_conf_help'] = 'Tres opciones: 1) "Mantener tama&ntilde;o original" mantendr&aacute; el tama&ntilde;o original del applet en EJS, 2) "Permitir que Moodle fije el tama&ntilde;o" redimensionar&aacute; el applet para que ocupe todo el espacio posible a la par que respeta la relaci&oacute;n de tama&ntilde;o original, 3) "Permitir que el usuario fije el tama&ntilde;o" permitir&aacute; al usuario establecer el tama&ntilde;o del applet y seleccionar si desea mantener, o no, su relaci&oacute;n de tama&ntilde;o original.';
@@ -160,6 +160,19 @@ $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de res
 $string['lab_in_use'] = 'El laboratorio est&aacute; ocupado en este instante. Pruebe de nuevo más adelante.';
 
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
+
+//Capabilities
+$string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";
+$string['ejsapp:addinstance'] = "Añadir una nueva actividad EJSApp";
+$string['ejsapp:view'] = "Ver una actividad EJSApp";
+$string['ejsapp:requestinformation'] = "Pedir informaci&oacute;n para plugins de terceros";
+
+//Events
+$string['event_working'] = "Working with the EJSApp activity";
+$string['event_wait'] = "Waiting for the lab to be free";
+$string['event_book'] = "Need to make a booking";
+$string['event_collab'] = "Working with the EJSApp activity in collaborative mode";
+$string['event_inactive'] = "Lab is inactive";
 
 //Settings
 $string['default_certificate_set'] = "Opciones del certificado de confianza. (Importante s&oacute;lo si se desea firmar de manera autom&aacute;tica los applets subidos con EJSApp)";

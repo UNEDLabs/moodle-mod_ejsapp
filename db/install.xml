@@ -158,5 +158,22 @@
                 <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
             </INDEXES>
         </TABLE>
+        <TABLE NAME="ejsapp_personal_vars" COMMENT="Contains logs to track the EJSApp labs usage"
+               PREVIOUS="ejsapp_sarlab_keys">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="time"/>
+                <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
+                       NEXT="userid"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="time" NEXT="action"/>
+                <FIELD NAME="action" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"
+                       PREVIOUS="userid" NEXT="info"/>
+                <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
+                       PREVIOUS="action"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
     </TABLES>
 </XMLDB> 

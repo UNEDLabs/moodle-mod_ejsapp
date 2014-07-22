@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -23,7 +22,7 @@
 
 
 /**
- * Version file for the ejsapp module
+ * Event observers used in ejsapp
  *
  * @package    mod
  * @subpackage ejsapp
@@ -31,11 +30,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
+namespace mod_ejsapp;
+
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2014072113;         // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2010112400;
-$module->cron     = 604800;             // Period for cron to check this module (secs)
-$module->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$module->maturity = MATURITY_STABLE;
-$module->release = '1.7 (Build: 2014072113)';
+class observers {
+
+    /**
+     * A user is working with an EJSApp remote lab.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_working($event) {
+        //Write info in the db
+        global $DB;
+        $record =  $event->get_record_snapshot('record', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+}

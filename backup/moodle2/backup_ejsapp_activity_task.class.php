@@ -33,6 +33,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/ejsapp/backup/moodle2/backup_ejsapp_stepslib.php');
+require_once($CFG->dirroot . '/mod/ejsapp/backup/moodle2/backup_ejsapp_settingslib.php');
 
 /**
  * EJSApp backup task that provides all the settings and steps to perform one
@@ -61,6 +62,7 @@ class backup_ejsapp_activity_task extends backup_activity_task
      *  order to get transportable (encoded) links
      *
      * @param string $content
+     * @return string $content
      */
     static public function encode_content_links($content)
     {

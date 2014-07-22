@@ -21,9 +21,8 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-
 /**
- * Version file for the ejsapp module
+ * Class for logging the view all event of an EJSApp
  *
  * @package    mod
  * @subpackage ejsapp
@@ -31,11 +30,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_ejsapp\event;
+
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2014072113;         // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2010112400;
-$module->cron     = 604800;             // Period for cron to check this module (secs)
-$module->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$module->maturity = MATURITY_STABLE;
-$module->release = '1.7 (Build: 2014072113)';
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+    // No need for any code here as everything is handled by the parent class.
+}
