@@ -132,7 +132,7 @@ class MCrypt {
         mcrypt_generic_init($td, $this->key, $iv);
         if (function_exists('mdecrypt_generic')) {
             $decrypted = mdecrypt_generic($td, $code);
-        } else echo "mcrypt not installed"; //can happen in unix systems!
+        } else echo "mcrypt not installed in your system"; //can happen in unix systems?
 
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);

@@ -33,8 +33,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'EJSApp';
-$string['modulenameplural'] = 'EJSApps';
+$string['modulename'] = 'ejsapp';
+$string['modulenameplural'] = 'ejsapps';
 $string['modulename_help'] = 'The EJSApp activity module enables teachers to add a java applets created with Easy Java Simulations (EJS) into their Moodle courses.
 
 EJS applets will be embedded into Moodle courses. The teacher can select to keep the orginal applet size or let Moodle to resize it according to the available space. If the EJS applet was compiled using the "Add language facilities" option in EJS, the applet embedded into Moodle with the EJSApp activity will automatically set its language to the one selected by the user in Moodle, if possible. This activity supports configuring conditional access restrictions.
@@ -58,6 +58,8 @@ $string['exp_fail_msg'] = 'Error while trying to run the experiment';
 
 $string['more_text'] = 'Optional text after the applet';
 
+$string['css_style'] = 'CSS stylesheet';
+
 $string['jar_file'] = '.jar or .zip file that encapsulates the  EJsS lab';
 
 $string['appletfile'] = 'Easy Java(script) Simulation';
@@ -80,6 +82,8 @@ $string['custom_height'] = 'Applet height (px)';
 $string['custom_height_required'] = 'WARNING: Applet height was not set. You must provide a different value.';
 
 $string['appwording'] = 'Wording';
+
+$string['css_rules'] = 'Create your own css rules to change the visual aspect of the javascript application';
 
 $string['state_file'] = '.xml file with the state to be read when this EJS lab loads';
 

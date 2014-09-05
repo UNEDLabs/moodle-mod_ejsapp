@@ -116,6 +116,11 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
         $mform->setType('appwording', PARAM_RAW);
         // -------------------------------------------------------------------------------
+        // Optional CSS styles
+        $mform->addElement('header', 'css_style', get_string('css_style', 'ejsapp'));
+
+        $mform->addElement('textarea', 'css', get_string('css_rules', 'ejsapp'), 'wrap="virtual" rows="8" cols="50"');
+        // -------------------------------------------------------------------------------
         // Adding an optional state file to be read when the applet loads
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
 

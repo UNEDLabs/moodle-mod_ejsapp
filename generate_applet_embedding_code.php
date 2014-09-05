@@ -51,7 +51,8 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $sarlabinfo->instance: int sarlab id, 
  *                                  $sarlabinfo->practice: int practice id, 
  *                                  $sarlabinfo->collab:   int collab whether sarlab offers collab access to this remote lab (1) or not (0), 
- *                                  Null if sarlab is not used 
+ *                                  Null if sarlab is not used
+ *                                  $sarlabinfo->labmanager: int laboratory manager (1) or student (0)
  * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
  *                                  $collabinfo->session: int collaborative session id, 
@@ -95,7 +96,9 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         $new_sarlab_key = new stdClass();
         $new_sarlab_key->user = $USER->username;
         $new_sarlab_key->sarlabpass = $sarlab_key;
+        $new_sarlab_key->labmanager = $sarlabinfo->labmanager;
         $new_sarlab_key->creationtime = $time;
+
         $DB->insert_record('ejsapp_sarlab_keys', $new_sarlab_key);
 
         if ($sarlabinfo) {
@@ -194,7 +197,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                   document.write('<param name=\"language\" value=\"$language\"/>');
                   document.write('<param name=\"username\" value=\"$username\"/>');
                   document.write('<param name=\"user_moodle\" value=\"{$USER->username}\"/>');
-                  document.write('<param name=\"password_moodle\" value=\"TODO\"/>');
+                  document.write('<param name=\"password_moodle\" value=\"DEPRECATED\"/>');
                   document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
 
         if ($collabinfo) {
@@ -214,6 +217,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                               document.write('<param name=\"idExp\" value=\"EJS Collab\"/>');
                               document.write('<param name=\"user\" value=\"EJSApp\"/>');
                               document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
+                              //document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
                 }
         } else {
             $code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
@@ -226,6 +230,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             if ($sarlabinfo->collab == 0) {
                   $code .= "document.write('<param name=\"user\" value=\"EJSApp\"/>');
                             document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
+                            //document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
             }
         } // sarlabinfo for remote laboratories
 

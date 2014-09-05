@@ -33,8 +33,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'EJSApp';
-$string['modulenameplural'] = 'EJSApps';
+$string['modulename'] = 'ejsapp';
+$string['modulenameplural'] = 'ejsapps';
 $string['modulename_help'] = 'El m&oacute;dulo de actividad EJSApp permite a un profesor a&ntilde;adir applets de Java creados con Easy Java Simulations (EJS) en sus cursos de Moodle.
 
 Los applets de EJS quedar&aacute;n embebidos dentro de los cursos de Moodle. El profesor puede seleccionar si mantener el tama&ntilde;o original del applet o permitir que Moodle lo reescale de acuerdo al espacio disponible. Si el applet fue compilado con la opci&oacute;n "A&ntilde;adir soporte idiomas" en EJS, el applet embebido en Moodle con la actividad EJSApp configurar&aacute; autom&aacute;ticamente su idioma a aquel seleccionado por el usuario de Moodle, si esto es posible. Esta actividad es compatible con la configuraci&oacute;n de restricciones de acceso condicional.
@@ -56,6 +56,8 @@ $string['exp_load_msg'] = 'Se va a ejecutar un experimento para este laboratorio
 $string['exp_fail_msg'] = 'Error al intentar ejecutar el experimento';
 
 $string['more_text'] = 'Texto optional tras el applet';
+
+$string['css_style'] = 'Hoja de estilos CSS';
 
 $string['jar_file'] = 'Archivo .jar o .zip que encapsula el laboratorio EJsS';
 
@@ -79,6 +81,8 @@ $string['custom_height'] = 'Altura del applet (px)';
 $string['custom_height_required'] = 'ATENCI&Oacute;N: La altura del applet no ha sido fijada. Debes proporcionar un valor distinto.';
 
 $string['appwording'] = 'Enunciado';
+
+$string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visual de la aplicaci&oacute;n javascript';
 
 $string['state_file'] = 'Archivo .xml con el estado que este laboratorio EJS debe leer';
 
@@ -128,7 +132,7 @@ $string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica en Sarlab';
 $string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), tal y como est&aacute; configurado en Sarlab, que desea usar con este sistema experimental.';
 $string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
 
-$string['ip_lab'] = 'direcci&oacute;n IP';
+$string['ip_lab'] = 'Direcci&oacute;n IP';
 $string['ip_lab_help'] = 'Direcci&oacute;n IP del sistema experimental.  Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
 $string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direcci&oacute;n IP valida.';
 

@@ -127,5 +127,21 @@ function xmldb_ejsapp_upgrade($oldversion)
         }
     }
 
+    if  ($oldversion < '2014083100') {
+        // Create "labmanager" field in ejsapp_sarlab_keys table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_sarlab_keys');
+        $field = new xmldb_field('labmanager', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sarlabpass', 'creationtime');
+        $dbman->add_field($table, $field);
+    }
+
+    if  ($oldversion < '2014090205') {
+        // Create "css" field in ejsapp table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('css', XMLDB_TYPE_TEXT, '1024', null, null, null, null, 'appwordingformat', 'timecreated');
+        $dbman->add_field($table, $field);
+    }
+
     return true;
 }

@@ -21,9 +21,11 @@
                        COMMENT="Wording associated to the EJS applet" PREVIOUS="introformat" NEXT="appwordingformat"/>
                 <FIELD NAME="appwordingformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"
                        COMMENT="Format of the appwording field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="appwording"
-                       NEXT="timecreated"/>
+                       NEXT="css"/>
+                <FIELD NAME="css" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="CSS styles for javascript apps" PREVIOUS="appwordingformat" NEXT="timecreated"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="appwordingformat" NEXT="timemodified"/>
+                       PREVIOUS="css" NEXT="timemodified"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="timecreated" NEXT="applet_name"/>
                 <FIELD NAME="applet_name" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
@@ -125,9 +127,11 @@
                 <FIELD NAME="user" TYPE="char" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
                        NEXT="sarlabpass"/>
                 <FIELD NAME="sarlabpass" TYPE="char" LENGTH="40" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="user" NEXT="creationtime"/>
+                       PREVIOUS="user" NEXT="labmanager"/>
+                <FIELD NAME="labmanager" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="sarlabpass" NEXT="creationtime"/>
                 <FIELD NAME="creationtime" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"
-                       PREVIOUS="sarlabpass"/>
+                       PREVIOUS="labmanager"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -137,7 +141,7 @@
             </INDEXES>
         </TABLE>
         <TABLE NAME="ejsapp_personal_vars" COMMENT="Contains information for generating personalized values for EJS variables"
-               PREVIOUS="ejsapp_sarlab_keys">
+               PREVIOUS="ejsapp_sarlab_keys" NEXT="ejsapp_log">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
                 <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
@@ -158,8 +162,8 @@
                 <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
             </INDEXES>
         </TABLE>
-        <TABLE NAME="ejsapp_personal_vars" COMMENT="Contains logs to track the EJSApp labs usage"
-               PREVIOUS="ejsapp_sarlab_keys">
+        <TABLE NAME="ejsapp_log" COMMENT="Contains logs to track the EJSApp labs usage"
+               PREVIOUS="ejsapp_personal_vars">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="time"/>
                 <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"

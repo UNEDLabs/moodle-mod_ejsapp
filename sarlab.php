@@ -41,4 +41,7 @@ echo "key=$key\n";
 
 if ($DB->record_exists('ejsapp_sarlab_keys', array('sarlabpass' => $key))) {
     echo "access=true\n";
+    /*$permissions = "labmanager=false\n";
+    if($DB->get_field('ejsapp_sarlab_keys', 'labmanager') == 1) $permissions = "labmanager=true\n";
+    echo "access=true\n".$permissions;*/
 } else echo "access=false\n";

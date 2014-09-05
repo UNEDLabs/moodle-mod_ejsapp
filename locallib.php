@@ -170,6 +170,18 @@ function update_db($ejsapp, $contextid) {
             }
         }
         $ejsapp->applet_name = $sub_str;
+
+        //Create/delete the css file to modify the visual aspect of the javascript application
+        $css_file_location = $CFG->dirroot . $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
+        if ($ejsapp->css == '' && file_exists($css_file_location)) {
+            unlink($css_file_location);
+        }
+        if ($ejsapp->css != '') {
+            $css_file_content = '#EJsS{' . $ejsapp->css . '}';
+            $file = fopen($css_file_location,"w");
+            fwrite($file,$css_file_content);
+            fclose($file);
+        }
     }
 
     // <update files table>
