@@ -302,7 +302,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                         }
                     }
                     applet._simulation.update();
-                    applet._initialize();
+                    //applet._initialize();
                 }
               }
               personalizeVars(10);";

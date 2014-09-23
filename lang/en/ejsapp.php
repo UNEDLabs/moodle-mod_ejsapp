@@ -163,8 +163,21 @@ $string['no_booking'] = 'You do not have an active booking for this lab.';
 $string['collab_access'] = 'However, you can still work in collaborative mode if you have been invited by a user with an active booking';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';
 $string['lab_in_use'] = 'The lab is currently being used. Try again later.';
+$string['booked_lab'] = 'This lab has been booked for this hour in a different course. Try again later.';
 
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
+
+$string['personal_vars_button'] = 'View personalized variables';
+
+//personalized_vars_values.php
+$string['personalVars_pageTitle'] = 'Values of the personalized variables';
+$string['users_ejsapp_selection'] = 'Select the users and the EJSApp activity';
+$string['ejsapp_activity_selection'] = 'EJSApp activity selection';
+$string['variable_name'] = 'Variable';
+$string['variable_value'] = 'Value';
+$string['export_all_data'] = 'Export data for all EJSApp activities in this course';
+$string['export_this_data'] = 'Export data for this EJSAppp activity';
+$string['no_ejsapps'] = 'The selected EJSApp activity doesn\'t have personalized variables';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Access to all the remote laboratories";
@@ -178,6 +191,7 @@ $string['event_wait'] = "Waiting for the lab to be free";
 $string['event_book'] = "Need to make a booking";
 $string['event_collab'] = "Working with the EJSApp activity in collaborative mode";
 $string['event_inactive'] = "Lab is inactive";
+$string['event_booked'] = "Lab is booked in a different course";
 
 //Settings
 $string['default_certificate_set'] = "Trust certificate settings. (Only important if you want to automatically sign the applets uploaded with EJSApp)";

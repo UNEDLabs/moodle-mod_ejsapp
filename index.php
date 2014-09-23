@@ -45,7 +45,7 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 
 require_course_login($course);
 
-if ($CFG->version < 2013111800) { //Moodle 2.5 or inferior
+if ($CFG->version < 2013111899) { //Moodle 2.6 or inferior
     add_to_log($course->id, 'ejsapp', 'view all', "index.php?id=$course->id", '');
 } else {
     $params = array(

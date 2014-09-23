@@ -161,9 +161,22 @@ $string['inactive_lab'] = 'El laboratorio remoto es&aacute; inactivo en este mom
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['collab_access'] = 'Sin embargo, puede trabajar en modo colaborativo si ha sido invitado por un usuario con una reserva activa.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';
-$string['lab_in_use'] = 'El laboratorio est&aacute; ocupado en este instante. Pruebe de nuevo más adelante.';
+$string['lab_in_use'] = 'El laboratorio est&aacute; ocupado en este instante. Pruebe de nuevo m&aacute;s adelante.';
+$string['booked_lab'] = 'Este laboratorio ha sido reservado para esta hora en un curso distinto. Pruebe de nuevo m&aacute;s adelante.';
 
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
+
+$string['personal_vars_button'] = 'Ver variables personalizadas';
+
+//personalized_vars_values.php
+$string['personalVars_pageTitle'] = 'Valores de las variables personalizadas';
+$string['users_ejsapp_selection'] = 'Seleccione los usuarios y la actividad EJSApp';
+$string['ejsapp_activity_selection'] = 'Selecci&oacute; de la actividad EJSApp';
+$string['variable_name'] = 'Variable';
+$string['variable_value'] = 'Valor';
+$string['export_all_data'] = 'Exportar datos para todas las actividades EJSApp en este curso';
+$string['export_this_data'] = 'Exportar datos para esta actividad EJSApp';
+$string['no_ejsapps'] = 'La actividad EJSApp seleccionada no tiene variables personalizadas';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";
@@ -177,6 +190,7 @@ $string['event_wait'] = "Waiting for the lab to be free";
 $string['event_book'] = "Need to make a booking";
 $string['event_collab'] = "Working with the EJSApp activity in collaborative mode";
 $string['event_inactive'] = "Lab is inactive";
+$string['event_booked'] = "Lab is booked in a different course";
 
 //Settings
 $string['default_certificate_set'] = "Opciones del certificado de confianza. (Importante s&oacute;lo si se desea firmar de manera autom&aacute;tica los applets subidos con EJSApp)";

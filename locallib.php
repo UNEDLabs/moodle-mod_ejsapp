@@ -419,3 +419,58 @@ function update_links($codebase, $ejsapp, $code, $method, $use_css) {
 
     return $code;
 } //update_links
+
+
+/**
+ *
+ * Generates the values of the personalized variables in a particular EJS application for a given user.
+ *
+ * @param stdClass $ejsapp
+ * @param stdClass $user
+ * @return stdClass $personalvarsinfo
+ *
+ */
+function personalize_vars($ejsapp, $user) {
+    global $DB;
+    $personalvarsinfo = null;
+    if ($ejsapp->personalvars == 1) {
+        $personalvarsinfo = new stdClass();
+        $personalvars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
+        $i = 0;
+        foreach ($personalvars as $personalvar) {
+            $uniqueval = filter_var(md5($user->firstname . $i . $user->username . $user->lastname . $user->id . $personalvar->id . $personalvar->name . $personalvar->type . $user->email . $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
+            mt_srand($uniqueval/(pow(10,strlen($user->username))));
+            $personalvarsinfo->name[$i] = $personalvar->name;
+            $factor = 1;
+            if ($personalvar->type == 'Double')  $factor = 1000;
+            $personalvarsinfo->value[$i] = mt_rand($factor*$personalvar->minval, $factor*$personalvar->maxval)/$factor;
+            $personalvarsinfo->type[$i] = $personalvar->type;
+            $i++;
+        }
+    }
+
+    return $personalvarsinfo;
+} //personalize_vars
+
+
+/**
+ *
+ * Generates the values of the personalized variables in a particular EJS application for all the users in the course that ejsapp activity is.
+ *
+ * @param stdClass $ejsapp
+ * @return array $userspersonalvarsinfo
+ *
+ */
+function users_personalized_vars($ejsapp) {
+    global $DB;
+    $courseid = $ejsapp->course;
+    $enrolids = $DB->get_fieldset_select('enrol', 'id', 'courseid = :courseid', array('courseid'=>$courseid));
+    $usersids = $DB->get_fieldset_sql('SELECT userid FROM {user_enrolments} WHERE enrolid IN (' . implode(',',$enrolids) . ')');
+    $users = $DB->get_records_sql('SELECT * FROM {user} WHERE id IN (' . implode(',',$usersids) . ')');
+    $userspersonalvarsinfo = array();
+    foreach ($users as $user) {
+        $userspersonalvarsinfo[$user->id.''] = personalize_vars($ejsapp, $user);
+    }
+
+    return $userspersonalvarsinfo;
+} //users_personalized_vars
