@@ -60,7 +60,6 @@ function update_db($ejsapp, $contextid) {
     $manifest = $ejsapp->manifest;
     $metadata = $ejsapp->metadata;
 
-    $ext = '.zip';
     $class_file = '';
     $mainframe = '';
     $is_collaborative = 0;
@@ -81,6 +80,7 @@ function update_db($ejsapp, $contextid) {
 
     if ($manifest != 'EJsS') { //Java Applet
         $ext = '.jar';
+        $uploaded_file = $new_path . $applet_name . $ext;
 
         // class_file
         $pattern = '/Main-Class\s*:\s*(.+)\s*/';
@@ -149,7 +149,27 @@ function update_db($ejsapp, $contextid) {
             $width = $matches[1][0];
             $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
         }
+
+        //Sign the applet
+        // Check whether a certificate is installed and in use
+        if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
+            // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
+            $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
+            preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+            if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
+                // Sign the applet
+                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
+                    $uploaded_file . ' ' .                                  // parameter 1
+                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
+                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
+                    get_config('ejsapp', 'certificate_alias')               // parameter 4
+                );
+            }
+        }
     } else { //Javascript
+        $ext = '.zip';
+        $uploaded_file = $new_path . $applet_name . $ext;
+
         $zip = new ZipArchive;
         if ($zip->open($new_path . $applet_name . '.zip') === TRUE) {
             $zip->extractTo($new_path);
@@ -188,14 +208,13 @@ function update_db($ejsapp, $contextid) {
     $fs = get_file_storage();
     // Prepare file record object
     $fileinfo = array(
-        'contextid' => $contextid, // ID of context
-        'component' => 'mod_ejsapp', // usually = table name
-        'filearea' => 'jarfiles', // usually = table name
-        'itemid' => $ejsapp->id, // usually = ID of row in table
-        'filepath' => '/',
+        'contextid' => $contextid,          // ID of context
+        'component' => 'mod_ejsapp',        // usually = table name
+        'filearea' => 'jarfiles',           // usually = table name
+        'itemid' => $ejsapp->id,            // usually = ID of row in table
+        'filepath' => '/',                  // any path beginning and ending in /
         'filename' => $applet_name . $ext); // any filename
     // Create the stored file
-    $uploaded_file = $new_path . $applet_name . $ext;
     $fs->create_file_from_pathname($fileinfo, $uploaded_file);
 
     if($manifest == 'EJsS') {  //TODO: Watch out with backups in this case!!!!!!
@@ -210,7 +229,7 @@ function update_db($ejsapp, $contextid) {
             //</$code1 is $code till </head> (not included) and with the missing standard part>
             //<$code2 is $code from </head> to </body> tags, none of them included>
             $code2 = substr($code, strpos($code, '</head>'));
-            $code2 = explode('</body>',$code2);
+            $code2 = explode('</body>', $code2);
             $code2 = $code2[0] . '</div>';
             //</$code2 is $code from </head> to </body> tags, none of them included>
             if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
@@ -232,25 +251,10 @@ function update_db($ejsapp, $contextid) {
             $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
             unlink($new_path . $applet_name . '.zip');
         }
-    } else { //Sign the applet
-        // Check whether a certificate is installed and in use
-        if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
-            // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
-            $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
-            preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-            if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
-                // Sign the applet
-                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
-                    $uploaded_file . ' ' .                                  // parameter 1
-                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
-                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
-                    get_config('ejsapp', 'certificate_alias')               // parameter 4
-                );
-            }
-        }
     }
     // </update files table>
 
+    // <update ejsapp_personal_vars table>
     //Personalizing EJS variables <update ejsapp_personal_vars table>
     $old_ejsapp = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
     if (isset($old_ejsapp)) {  // We clean all the personalized variables configuration and start over again
@@ -302,20 +306,22 @@ function update_db($ejsapp, $contextid) {
  * @return bool TRUE on success or FALSE on failure
  */
 function delete_recursively($dir) {
-    $it = new RecursiveDirectoryIterator($dir);
-    $files = new RecursiveIteratorIterator($it,
-        RecursiveIteratorIterator::CHILD_FIRST);
-    foreach($files as $file) {
-        if ($file->getFilename() === '.' || $file->getFilename() === '..') {
-            continue;
+    if (file_exists($dir)) {
+        $it = new RecursiveDirectoryIterator($dir);
+        $files = new RecursiveIteratorIterator($it,
+            RecursiveIteratorIterator::CHILD_FIRST);
+        foreach($files as $file) {
+            if ($file->getFilename() === '.' || $file->getFilename() === '..') {
+                continue;
+            }
+            if ($file->isDir()){
+                rmdir($file->getRealPath());
+            } else {
+                unlink($file->getRealPath());
+            }
         }
-        if ($file->isDir()){
-            rmdir($file->getRealPath());
-        } else {
-            unlink($file->getRealPath());
-        }
+        return @rmdir($dir);
     }
-    return @rmdir($dir);
 } //delete_recursively
 
 
@@ -345,15 +351,14 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
 
     $dom = new DOMDocument;
     $dom->validateOnParse = true;
-
     foreach ($list_sarlab_IPs as $sarlab_IP) {
-        $init_char = strrpos($sarlab_IP,"'");
-        if ($init_char != 0) $init_char++;
-        $ip = substr($sarlab_IP, $init_char);
-        if($fp = fsockopen($ip, '80', $errCode, $errStr, 1)){
-            $URI = 'http://' . $ip . '/idExperiences.xml';
+        $last_quote_mark = strrpos($sarlab_IP, "'");
+        if ($last_quote_mark != 0) $last_quote_mark++;
+        $ip = substr($sarlab_IP, $last_quote_mark);
+        if($fp = @fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
+            $URI = 'http://' . $ip .'/';
             $file_headers = @get_headers($URI);
-            if (substr($file_headers[0], 9, 3) == 200) {
+            if (substr($file_headers[0], 9, 3) == 200) { //Valid file
                 if ($dom->load($URI)) {
                     $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
                     foreach ($experiences as $experience) {

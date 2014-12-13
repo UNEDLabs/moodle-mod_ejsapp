@@ -72,7 +72,7 @@ $file_extension = pathinfo($safe_file, PATHINFO_EXTENSION);
 // <upload the file to a temporal folder>
 $upload_dir = $CFG->dataroot . "/tmp/";
 if (!file_exists($upload_dir)) {
-    mkdir($upload_dir, 0777);
+    mkdir($upload_dir, 0700);
 }
 
 $path = $upload_dir . $file_name . '.' . $file_extension;
@@ -105,19 +105,19 @@ $fileinfo = array(
     'filename' => $file_name . '.' . $file_extension);
 // </prepare the file info data>
 
-// <if is there an old file in the user repository with the same name, then delete it>
+// <if there is an old file in the user repository with the same name, then delete it>
 $old_file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
 if ($old_file) {
     $old_file->delete();
 }
-// </if is there an old file in the user repository with the same name, then delete it>
+// </if there is an old file in the user repository with the same name, then delete it>
 
 $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
 // </store the file into the user repository>
 
 // <store the file into the mod_ejsapp repository>
 //if ($file_extension == 'xml') {
-    $fileinfo = array(
+/*    $fileinfo = array(
         'contextid' => $context_id,
         'component' => 'mod_ejsapp',
         'filearea' => 'private',
@@ -133,7 +133,7 @@ $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
     }
     // </if is there an old file in the mod_ejsapp repository with the same name, then delete it>
     $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
-//}
+//}*/
 // </store the file into the mod_ejsapp repository>
 
 // remove the temporal file from the temporal folder

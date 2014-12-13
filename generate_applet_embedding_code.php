@@ -215,9 +215,8 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                     $code .= "document.write('<param name=\"ipserver\" value=\"{$collabinfo->ip}\"/>');
                               document.write('<param name=\"portserver\" value=\"{$collabinfo->sarlabport}\"/>');
                               document.write('<param name=\"idExp\" value=\"EJS Collab\"/>');
-                              document.write('<param name=\"user\" value=\"EJSApp\"/>');
+                              document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
                               document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
-                              //document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
                 }
         } else {
             $code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
@@ -228,9 +227,8 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
                       document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
                       document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>');";
             if ($sarlabinfo->collab == 0) {
-                  $code .= "document.write('<param name=\"user\" value=\"EJSApp\"/>');
+                  $code .= "document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
                             document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
-                            //document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
             }
         } // sarlabinfo for remote laboratories
 

@@ -44,7 +44,7 @@ $method = required_param('method', PARAM_INT);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/add_to_log.php');
 
-if ($method == 0) { //Moodle 2.5 or inferior
+if ($method == 0) { //Moodle 2.6 or inferior
     add_to_log($course_id, 'ejsapp', 'working', "view.php?id=$cm_id", $ejsapp_name, $cm_id);
 } else {
     $user_id = required_param('userid', PARAM_INT);

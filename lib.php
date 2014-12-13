@@ -538,14 +538,134 @@ function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnam
  **/
 function ejsapp_cron()
 {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/filter/multilang/filter.php');
 
-    //Delete all stored Sarlab keys
+    //Delete all stored Sarlab keys:
     $DB->delete_records('ejsapp_sarlab_keys');
 
-    //Delete all 'working' logs for EJSApp activities older than 15 min
+    //Delete all 'working' logs for EJSApp activities older than 15 min:
     $params = array(strtotime(date('Y-m-d H:i:s'))-900);
     $DB->delete_records_select('ejsapp_log', "time < ?", $params);
+
+    //CHECKING WHETHER REMOTE LABS ARE OPERATIVE OR NOT:
+    function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
+        global $devices_info;
+
+        $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
+        $not_checkable = false;
+        if ($alive && $usingsarlab) {
+            //Obtain the xml filename from idExp
+            $URI = 'http://' . $host . '/';
+            $file_headers = @get_headers($URI);
+            if (substr($file_headers[0], 9, 3) == 200) { // Valid file
+                $dom = new DOMDocument;
+                $dom->validateOnParse = true;
+                if ($dom->load($URI)) {
+                    $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
+                    $xmlfilename = 'null';
+                    foreach ($experiences as $experience) {
+                        $idExperiences = $experience->getElementsByTagName('idExperience'); //Get the name of the experience
+                        foreach ($idExperiences as $idExperience) {
+                            if ($idExperience->nodeValue == $idExp) {
+                                $file_experiences = $experience->getElementsByTagName('fileName'); //Get the name of the xml file
+                                foreach ($file_experiences as $file_experience) {
+                                    $xmlfilename = $file_experience->nodeValue;
+                                }
+                                break 2;
+                            }
+                        }
+                    }
+                    $URL = $URI . 'isAliveExp?' . $xmlfilename;
+                    if ($info = file_get_contents($URL)) {
+                        $info = explode("=", $info);
+                        $alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper ("true")) ? TRUE : FALSE;
+                        if (!$alive) {
+                            // Get list of devices in the experience that are not alive and see which ones are down
+                            $URL = $URI . 'pingExp' . $xmlfilename;
+                            if ($info = file_get_contents($URL)) {
+                                $devices = explode("Ping to ", $info);
+
+                                function get_string_between($string, $start, $end){
+                                    $string = " ".$string;
+                                    $ini = strpos($string,$start);
+                                    if ($ini == 0) return "";
+                                    $ini += strlen($start);
+                                    $len = strpos($string,$end,$ini) - $ini;
+                                    return substr($string,$ini,$len);
+                                }
+
+                                foreach ($devices as $device) {
+                                    $devices_info[]->name = get_string_between($device, ": ", "ping ");
+                                    $ip = get_string_between($device, "ping ", "Reply from ");
+                                    $devices_info[]->ip = $ip;
+                                    $URL = $URI . 'isAlive?' . $ip;
+                                    if ($info = file_get_contents($URL)) {
+                                        $devices_info[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? TRUE : FALSE;
+                                    }
+                                }
+                            }
+                        }
+                    } else $not_checkable = true;
+                } else $not_checkable = true;
+            } else $not_checkable = true;
+        }
+        if ($not_checkable) return 2;
+        if ($alive) return 1;
+        else return 0;
+    }
+
+    $ejsapp_remlabs_conf = $DB->get_records('ejsapp_remlab_conf');
+    foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
+        if ($ejsapp_remlab_conf->usingsarlab) {
+            $idExp = $DB->get_field('ejsapp_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
+        }
+        $devices_info = new stdClass();
+        $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $idExp);
+        // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive:
+        $rem_lab = $DB->get_record('ejsapp', array('id' => $ejsapp_remlab_conf->ejsappid));
+        $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        // TODO: Allow configuring which roles will receive the e-mails? (managers, non-editing teacher...) Use Moodle capabilities
+        $context = context_course::instance($rem_lab->course);
+        $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
+        $send_mail = false;
+        // Prepare e-mails' content and update lab state when checkable:
+        $subject = '';
+        $messagebody = '';
+        if ($lab_state == 2) {  // Not checkable:
+            $subject = get_string('mail_subject_lab_not_checkable', 'ejsapp');
+            $messagebody = get_string('mail_content1_lab_not_checkable', 'ejsapp') . $multilang->filter($rem_lab->name) .
+                get_string('mail_content2_lab_not_checkable', 'ejsapp') . $ejsapp_remlab_conf->ip .
+                get_string('mail_content3_lab_not_checkable', 'ejsapp');
+            $send_mail = true;
+        } else {                // Active or inactive:
+            if ($ejsapp_remlab_conf->active == 1 && $lab_state == 0) {  // Lab has passed from active to inactive
+                $subject = get_string('mail_subject_lab_down', 'ejsapp');
+                $messagebody = get_string('mail_content1_lab_down', 'ejsapp') . $multilang->filter($rem_lab->name) .
+                    get_string('mail_content2_lab_down', 'ejsapp') . $ejsapp_remlab_conf->ip .
+                    get_string('mail_content3_lab_down', 'ejsapp') . get_string('mail_content4_lab_down', 'ejsapp');
+                foreach ($devices_info as $device_info) {
+                    if (!$device_info->alive) $messagebody .= $device_info->name . ', ' . $device_info->ip . "\r\n";
+                }
+                $send_mail = true;
+            } else if ($ejsapp_remlab_conf->active == 0 && $lab_state == 1) { // Lab has passed from inactive to active
+                $subject = get_string('mail_subject_lab_up', 'ejsapp');
+                $messagebody = get_string('mail_content1_lab_up', 'ejsapp') . $multilang->filter($rem_lab->name) .
+                    get_string('mail_content2_lab_up', 'ejsapp') . $ejsapp_remlab_conf->ip .
+                    get_string('mail_content3_lab_up', 'ejsapp');
+                $send_mail = true;
+            }
+            $ejsapp_remlab_conf->active = $lab_state;
+            $DB->update_record('ejsapp_remlab_conf', $ejsapp_remlab_conf);
+        }
+        // Send e-mails:
+        if ($send_mail) {
+            $teachers = get_role_users($role->id, $context);
+            foreach ($teachers as $teacher) {
+                email_to_user($teacher, $teacher, $subject, $messagebody);
+            }
+        }
+    }
 
     return true;
 }
@@ -663,7 +783,8 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
       }
     }*/
 
-    $fullpath = '/' . $context->id . '/mod_ejsapp/' . $filearea . '/' . $fileid . '/' . $relativepath;
+    if ($filearea == 'private') $fullpath = '/' . $context->id . '/user/' . $filearea . '/' . $fileid . '/' . $relativepath;
+    else $fullpath = '/' . $context->id . '/mod_ejsapp/' . $filearea . '/' . $fileid . '/' . $relativepath;
 
     $fs = get_file_storage();
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {

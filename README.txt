@@ -60,12 +60,12 @@ file with relevant links.
  2) Change the owner of the jarfiles dir to apache.                                             
  For instance,                                                                                  
  2.a) in Linux CentOS, the apache user is "apache", so you should write                         
- $ chown -R apache jarfiles                                                                     
+ $ chown -R apache jarfiles
  2.b) in Linux OpenSuse, the apache user is "wwwrun", so you should write                       
- $ chown -R wwwrun jarfiles                                                                     
+ $ chown -R wwwrun jarfiles
                                                                                                 
  3) Change the permissions of the apache user:                                                  
- $ chmod -R 700 jarfiles                                                                        
+ $ chmod -R 700 jarfiles
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

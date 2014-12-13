@@ -48,6 +48,8 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         $userinfo = $this->get_setting_value('userinfo');
         if ($userinfo){
+            $paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');
+            $paths[] = new restore_path_element('ejsapp_sarlab_keys', '/activity/ejsapp/ejsapp_sarlab_keys');
             $paths[] = new restore_path_element('ejsappbooking_usersaccess', '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
             $paths[] = new restore_path_element('ejsappbooking_remlab_access', '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
         }
@@ -62,7 +64,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
      */
     protected function process_ejsapp($data)
     {
-        global $DB;
+        global $DB, $CFG;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -74,6 +76,57 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
+
+        // restore ejsapp files:
+        $ejsapp_record = $DB->get_record('ejsapp', array('id'=>$oldid));
+        // copy files
+        $sql = "select * from {$CFG->prefix}files where component = 'mod_ejsapp' and filename = '{$ejsapp_record->applet_name}.jar'";
+        $file_records = $DB->get_records_sql($sql);
+        if ($file_records) {
+            foreach ($file_records as $file_record) {
+                $fs = get_file_storage();
+                $fileinfo = array(
+                    'contextid' => $file_record->contextid, // ID of context
+                    'component' => 'mod_ejsapp',            // usually = table name
+                    'filearea' => 'jarfiles',               // usually = table name
+                    'itemid' => $file_record->itemid,       // usually = ID of row in table
+                    'filepath' => '/',                      // any path beginning and ending in /
+                    'filename' => $file_record->filename);  // any filename
+                $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'],
+                    $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'],
+                    $fileinfo['filename']);
+                if ($file) {
+                    // create directories
+                    if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/')) {
+                        mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/', 0700);
+                    }
+                    if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course)) {
+                        mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course, 0700);
+                    }
+                    if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid)) {
+                        mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid, 0700);
+                    }
+
+                    // copy file
+                    $file_content = $file->get_content();
+                    $fh = fopen($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/' . $file_record->filename, 'w+') or die("can't open file");
+                    fwrite($fh, $file_content);
+                    fclose($fh);
+
+                    // <update ejsapp table>
+                    $codebase = '';
+                    preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
+                    if (!empty($match_result) and $match_result[1]) {
+                        $codebase .= '/' . $match_result[1];
+                    }
+                    $codebase .= '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
+                    $record = new stdClass();
+                    $record->id = $newitemid;
+                    $record->codebase = $codebase;
+                    $DB->update_record('ejsapp', $record);
+                } //if ($file)
+            } //foreach
+        } //if ($file_records)
 
         // mapping old_ejsapp_id->new_old_ejsapp_id for xml state_files
         // (see after_execute)
@@ -127,6 +180,38 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         // insert the ejsapp record
         $DB->insert_record('ejsapp_remlab_conf', $data);
     }//process_ejsapp_remlab_conf
+
+    /**
+     * Process table ejsapp_remlab_conf
+     * @param stdClass $data
+     */
+    protected function process_ejsapp_log($data)
+    {
+        global $DB;
+
+        $data = (object)$data;
+
+        $data->ejsappid = $this->get_new_parentid('ejsapp_log');
+
+        // insert the ejsapp record
+        $DB->insert_record('ejsapp_log', $data);
+    }//process_ejsapp_log
+
+    /**
+     * Process table ejsapp_remlab_conf
+     * @param stdClass $data
+     */
+    protected function process_ejsapp_sarlab_keys($data)
+    {
+        global $DB;
+
+        $data = (object)$data;
+
+        $data->ejsappid = $this->get_new_parentid('ejsapp_sarlab_keys');
+
+        // insert the ejsapp record
+        $DB->insert_record('ejsapp_sarlab_keys', $data);
+    }//process_ejsapp_sarlab_keys
 
     /**
      * Process table ejsappbooking
@@ -190,67 +275,10 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     protected function after_execute()
     {
 
-        global $CFG, $DB;
-
         // Add ejsapp related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'expfiles', 'ejsapp');
-
-        // restore ejsapp files:
-        $sql = "select * from {$CFG->prefix}ejsapp";
-        $ejsapp_records = $DB->get_records_sql($sql);
-
-        foreach ($ejsapp_records as $ejsapp_record) {
-            // copy files
-            $sql = "select * from {$CFG->prefix}files where component = 'mod_ejsapp' and filename = '{$ejsapp_record->applet_name}.jar'";
-            $file_records = $DB->get_records_sql($sql);
-            if ($file_records) {
-                foreach ($file_records as $file_record) {
-                    $fs = get_file_storage();
-                    $fileinfo = array(
-                        'contextid' => $file_record->contextid, // ID of context
-                        'component' => 'mod_ejsapp', // usually = table name
-                        'filearea' => 'jarfiles', // usually = table name
-                        'itemid' => $file_record->itemid, // usually = ID of row in table
-                        'filepath' => '/', // any path beginning and ending in /
-                        'filename' => $file_record->filename); // any filename
-                    $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'],
-                        $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'],
-                        $fileinfo['filename']);
-                    if ($file) {
-                        // create directories
-                        if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/')) {
-                            mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/', 0777);
-                        }
-                        if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp_record->course)) {
-                            mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp_record->course, 0777);
-                        }
-                        if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp_record->course . '/' . $ejsapp_record->id)) {
-                            mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp_record->course . '/' . $ejsapp_record->id, 0777);
-                        }
-
-                        // copy file
-                        $file_content = $file->get_content();
-                        $fh = fopen($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp_record->course . '/' . $ejsapp_record->id . '/' . $file_record->filename, 'w+') or die("can't open file");
-                        fwrite($fh, $file_content);
-                        fclose($fh);
-
-                        // <update ejsapp table>
-                        $codebase = '';
-                        preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
-                        if (!empty($match_result) and $match_result[1]) {
-                            $codebase .= '/' . $match_result[1];
-                        }
-                        $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp_record->course . '/' . $ejsapp_record->id . '/';
-                        $record = new stdClass();
-                        $record->id = $ejsapp_record->id;
-                        $record->codebase = $codebase;
-                        $DB->update_record('ejsapp', $record);
-                    } //if ($file)
-                } //foreach
-            } //if ($file_records)
-        } //foreach
 
     } //after_execute
 

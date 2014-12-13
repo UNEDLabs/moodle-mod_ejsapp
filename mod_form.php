@@ -187,16 +187,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
 
         $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-        if(is_array($list_sarlab_IPs)) $sarlab_IP = $list_sarlab_IPs[0];
-        else  $sarlab_IP = $CFG->sarlab_IP;
-        $init_pos = strpos($sarlab_IP, "'");
-        $end_pos = strrpos($sarlab_IP, "'");
-        if(($init_pos === false) || ($init_pos === $end_pos)) {
-            $sarlab_instance_options = array('Sarlab server 1');
-        } else {
-            $sarlab_instance_options = array(substr($sarlab_IP,$init_pos+1,$end_pos-$init_pos-1));
-        }
-        for ($i = 1; $i < count($list_sarlab_IPs); $i++) {
+        $sarlab_instance_options = array();
+        for ($i = 0; $i < count($list_sarlab_IPs); $i++) {
             $sarlab_instance_options_temp = $list_sarlab_IPs[$i];
             $init_pos = strpos($sarlab_instance_options_temp, "'");
             $end_pos = strrpos($sarlab_instance_options_temp, "'");
@@ -393,14 +385,14 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
             // Create folders to store the .jar file
             if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/')) {
-                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/', 0777);
+                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/', 0700);
             }
             if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course)) {
-                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course, 0777);
+                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course, 0700);
             }
             $name = delete_non_alphanumeric_symbols($form_data->name);
             if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course . '/' . $name)) {
-                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course . '/' . $name, 0777);
+                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course . '/' . $name, 0700);
             }
 
             $applet_name = $this->get_new_filename('appletfile');
@@ -410,35 +402,42 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $filename = $path . $applet_name;
             $this->save_file('appletfile', $filename, true);
 
+            // <Set the mod_form elements>
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
             $manifest = 'EJsS';
             $metadata = '';
             if ($ext == 'jar') {
                 // Extract the manifest.mf file from the .jar
                 $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
+                // Prepare pattern for getting the filename
+                $pattern = '/(\w+)[.]jar/';
+                // Get list of public variables: their names, values and types
+                // TODO
             } else {
-                // Extract the _metadata.txt file from the .jar
+                // Extract the _metadata.txt file from the .zip
                 $metadata = file_get_contents('zip://' . $filename . '#' . '_metadata.txt');
+                // Prepare pattern for getting the filename
+                $pattern = '/(\w+)[.]zip/';
             }
+
             $mform->addElement('hidden', 'manifest', null);
             $mform->setType('manifest', PARAM_TEXT);
             $mform->setDefault('manifest', $manifest);
+
             $mform->addElement('hidden', 'metadata', null);
             $mform->setType('metadata', PARAM_TEXT);
             $mform->setDefault('metadata', $metadata);
 
-            // Set the mod_form element
-            if ($ext == 'jar') {
-                $pattern = '/(\w+)[.]jar/';
-            } else {
-                $pattern = '/(\w+)[.]zip/';
-            }
             preg_match($pattern, $applet_name, $matches, PREG_OFFSET_CAPTURE);
             $applet_name = $matches[1][0];
             $mform->addElement('hidden', 'applet_name', null);
             $mform->setType('applet_name', PARAM_TEXT);
             $mform->setDefault('applet_name', $applet_name);
             $default_values['applet_name'] = $applet_name;
+
+            // Element listing EJS public variables
+            // TODO
+            // </Set the mod_form elements>
         } //if ($content)
     } // data_preprocessing
 
