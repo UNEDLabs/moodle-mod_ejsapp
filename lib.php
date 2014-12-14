@@ -699,6 +699,57 @@ function ejsapp_get_participants($ejsappid)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Navigation API                                                             //
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Extends the global navigation tree by adding ejsapp nodes if there is a relevant content
+ *
+ * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
+ *
+ * @param navigation_node $navref An object representing the navigation tree node of the ejsappbooking module instance
+ * @param stdClass $course
+ * @param stdClass $module
+ * @param cm_info $cm
+ */
+function ejsapp_extend_navigation($navref, $course, $module, $cm) {
+}
+
+/**
+ * This function extends the settings navigation block for the site.
+ *
+ * It is safe to rely on PAGE here as we will only ever be within the module
+ * context when this is called
+ *
+ * @param settings_navigation $settings
+ * @param navigation_node $ejsappnode
+ * @return void
+ */
+function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
+    global $PAGE;
+
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $ejsappnode->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false and array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
+    if (has_capability('mod/ejsapp:addinstance', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/ejsapp/personalized_vars_values.php', array('id'=>$PAGE->cm->id, 'courseid'=>$PAGE->course->id));
+        $node = navigation_node::create(get_string('personal_vars_button', 'ejsapp'),
+            $url, navigation_node::TYPE_SETTING, null, 'mod_ejsapp_personal_vars');
+        $ejsappnode->add_node($node, $beforekey);
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // File API //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -715,7 +766,9 @@ function ejsapp_get_participants($ejsappid)
  */
 function ejsapp_get_file_areas($course, $cm, $context)
 {
-    return array();
+    return array('jarfiles' => 'Applets and Javascript files with the virtual or remote labs',
+                 'xmlfile'  => 'Text files containing all the information to define the state of a lab',
+                 'expfiles' => 'Text files containing a script recording the interaction of a user with a lab');
 }
 
 /**
@@ -770,28 +823,20 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
     }
 
     $relativepath = implode('/', $args);
-    //The previous line of code works for the saved xml, txt and experiment files but not with the embedded EJS jar files that use DefaultState.out (and, probably, other stuff)
-    /*$extension = pathinfo($relativepath, PATHINFO_EXTENSION);
-    if ($extension != 'xml' && $extension != 'ejs' && $extension != 'txt' && $extension != 'gif' && $extension != 'jpg' && $extension != 'bmp') { //not an .xml state file, an experiment, a .txt file or an image
-      if (count($submissions) == 2) { //EJS jar files have two registers in the files table
-        foreach ($submissions as $submission) {
-          if ($submission->source == null && $submission->filename != '.') { //jar file
-            //$relativepath = $submission->filename;
-            //return true;
-          }
-        }
-      }
-    }*/
 
-    if ($filearea == 'private') $fullpath = '/' . $context->id . '/user/' . $filearea . '/' . $fileid . '/' . $relativepath;
-    else $fullpath = '/' . $context->id . '/mod_ejsapp/' . $filearea . '/' . $fileid . '/' . $relativepath;
+    if ($filearea == 'private') {
+        $fullpath = '/' . $context->id . '/user/' . $filearea . '/' . $fileid . '/' . $relativepath;
+        $forcedownload = true;
+    } else {
+        $fullpath = '/' . $context->id . '/mod_ejsapp/' . $filearea . '/' . $fileid . '/' . $relativepath;
+        $forcedownload = false;
+    }
 
     $fs = get_file_storage();
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
         return false;
     }
 
-    return send_stored_file($file, 0, 0, true);
-    //return send_stored_file($file, 604800, 0, true); // download MUST be forced - security! I CAN ONLY SET CACHE != 0 if WE USE DIFFERENT APPLETS FOR COLLAB THAN FOR INDIVIDUAL SESSIONS
-
+    return send_stored_file($file, 0, 0, $forcedownload);
+    //return send_stored_file($file, 604800, 0, $forcedownload); // I CAN ONLY SET CACHE != 0 if WE USE DIFFERENT APPLETS FOR COLLAB THAN FOR INDIVIDUAL SESSIONS
 }

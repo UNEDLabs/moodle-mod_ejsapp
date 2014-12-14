@@ -171,10 +171,10 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         if ($collabinfo && !isset($collabinfo->director)) { // Invited users to collaborative sessions
             $class_file = $ejsapp->class_file;
             $class_file = str_replace(".class", "Student.class", $class_file);
-            $code .= "document.write('<applet code=\"$class_file\"');";
         } else { // Rest of cases
-            $code .= "document.write('<applet code=\"{$ejsapp->class_file}\"');";
+            $class_file = $ejsapp->class_file;
         }
+        $code .= "document.write('<applet code=\"{$class_file}\"');";
 
         $context = context_user::instance($USER->id);
         $language = current_language();

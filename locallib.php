@@ -237,9 +237,9 @@ function update_db($ejsapp, $contextid) {
                 $code = $code1 . $code2;
                 $code = update_links($codebase, $ejsapp, $code, 'old', false);
             } else { //New EJS version with an external .js file for the Javascript
-                $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . substr($ejsapp->applet_name, 0, -4) .'js"></script></body></html>';
-                $code = $code1 . $code2;
                 $exploded_file_name = explode(".", $ejsapp->applet_name);
+                $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
+                $code = $code1 . $code2;
                 $codeJS = file_get_contents($new_path . $exploded_file_name[0] .'.js');
                 $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
                 file_put_contents($new_path . $exploded_file_name[0] .'.js', $codeJS);

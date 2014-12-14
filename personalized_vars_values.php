@@ -30,8 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//http://localhost/mod/ejsapp/personalized_vars_values.php?id=2&courseid=2
-
 require_once('../../config.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/filelib.php');

@@ -214,14 +214,6 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     } //</Remote lab>
 } //if(($ejsapp->is_rem_lab == 0)... else
 
-// Check whether the user can add EJSApp activities. If so, let him list the personalized variables
-if (has_capability('mod/ejsapp:addinstance', $modulecontext, $USER->id, true) && ($ejsapp->personalvars == 1)) {
-    $set_permissions = $CFG->wwwroot . '/mod/ejsapp/personalized_vars_values.php';
-    echo html_writer::start_tag('div', array('id' => 'personal_vars_button', 'align' => 'center'));
-    echo $OUTPUT->heading('<form action="' . $set_permissions . '" method="get"><input type="hidden" name="id" value="' . $cm->id . '"><input type="hidden" name="courseid" value="' . $course->id . '"><input type=submit id="personal_vars" value="' . get_string('personal_vars_button', 'ejsapp') . '"></form>');
-    echo html_writer::end_tag('div');
-}
-
 // Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not:
 if ($CFG->version < 2013111899) { //Moodle 2.6 or inferior
     add_to_log($course->id, 'ejsapp', $action, "view.php?id=$cm->id", $ejsapp->name, $cm->id);
