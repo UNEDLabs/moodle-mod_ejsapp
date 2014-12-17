@@ -37,8 +37,11 @@ global $USER, $DB, $CFG, $PAGE, $OUTPUT;
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $state_file = optional_param('state_file', null, PARAM_TEXT);
-$exp_file = optional_param('exp_file', null, PARAM_TEXT);
+$cnt_file = optional_param('cnt_file', null, PARAM_TEXT);
+$rec_file = optional_param('rec_file', null, PARAM_TEXT);
 $session_id = optional_param('colsession', null, PARAM_INT);
+
+$data_files = array($state_file, $cnt_file, $rec_file);
 
 if (!is_null($session_id)) {
     $collab_session = $DB->get_record('ejsapp_collab_sessions',array('id'=>$session_id));
@@ -116,7 +119,7 @@ $accessed = false;
 $sarlabinfo = null;
 if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $accessed = true;
-    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
+    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
 } else { //<Remote lab>
     //<Check if the remote lab is operative>
     $allow_access = true;
@@ -176,7 +179,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 }
             }
             $accessed = true;
-            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
+            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
         } else {
             echo $OUTPUT->heading(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
             $action = 'need_to_wait';
@@ -196,13 +199,13 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlab_conf, $labmanager);
                 if (!is_null($sarlabinfo)) { //The user has an active booking -> he can access the lab
                     $accessed = true;
-                    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
+                    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
                 } else { //No active booking
                     echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
                     if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) { //Student can still access in collaborative mode
                         echo $OUTPUT->heading(get_string('collab_access', 'ejsapp'));
                         $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL', $labmanager);
-                        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, null));
+                        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
                         $action = 'collab_view';
                     } else { //No access
                         echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));

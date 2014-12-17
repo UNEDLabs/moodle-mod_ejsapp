@@ -124,7 +124,8 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // Define file annotations
         $ejsapp->annotate_files('mod_ejsapp', 'jarfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'xmlfiles', null);
-        $ejsapp->annotate_files('mod_ejsapp', 'expfiles', null);
+        $ejsapp->annotate_files('mod_ejsapp', 'cntfiles', null);
+        $ejsapp->annotate_files('mod_ejsapp', 'recfiles', null);
 
         // Return the root element (ejsapp), wrapped into standard activity structure
         return $this->prepare_activity_structure($ejsapp);

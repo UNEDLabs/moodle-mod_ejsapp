@@ -95,7 +95,7 @@ function get_ejsapp_states($ejsapp_id) {
 
 }//get_ejsapp_states
 
-function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height=null) {
+function draw_ejsapp_instance($ejsapp_id, $data_files=null, $width=null, $height=null) {
     global $DB, $CFG;
     
     if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
@@ -108,7 +108,7 @@ function draw_ejsapp_instance($ejsapp_id, $state_file=null, $width=null, $height
         $external_size = null;
       }
       require_once($CFG->dirroot . '/mod/ejsapp/generate_applet_embedding_code.php');
-      $code = generate_applet_embedding_code($ejsapp, null, $state_file, null, null, null, $external_size);
+      $code = generate_applet_embedding_code($ejsapp, null, $data_files, null, null, null, $external_size);
     }
     else {
       $code = get_string('ejsapp_error', 'ejsapp');

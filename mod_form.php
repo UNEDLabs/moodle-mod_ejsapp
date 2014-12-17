@@ -127,6 +127,18 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
+        // Adding an optional text file with a controller code to be load when the applet is run
+        $mform->addElement('header', 'controller_file', get_string('controller_file', 'ejsapp'));
+
+        $mform->addElement('filemanager', 'controllerfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.cnt'));
+        $mform->addHelpButton('controllerfile', 'controllerfile', 'ejsapp');
+        // -------------------------------------------------------------------------------
+        // Adding an optional text file with a recording to automatically run it when the applet loads
+        $mform->addElement('header', 'recording_file', get_string('recording_file', 'ejsapp'));
+
+        $mform->addElement('filemanager', 'recordingfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.rec'));
+        $mform->addHelpButton('recordingfile', 'recordingfile', 'ejsapp');
+        // -------------------------------------------------------------------------------
         // Personalize variables from the EJS application
         $mform->addElement('header', 'personalize_vars', get_string('personalize_vars', 'ejsapp'));
 
@@ -163,12 +175,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
 
         $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats', 'option_add_vars', 2, null, true);
-        // -------------------------------------------------------------------------------
-        // Adding an optional text file with an experiment to automatically run it when the applet loads
-        $mform->addElement('header', 'experiment_file', get_string('experiment_file', 'ejsapp'));
-
-        $mform->addElement('filemanager', 'expfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.exp'));
-        $mform->addHelpButton('expfile', 'expfile', 'ejsapp');
         // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
@@ -359,9 +365,13 @@ class mod_ejsapp_mod_form extends moodleform_mod
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
             $default_values['statefile'] = $draftitemid;
 
-            $draftitemid = file_get_submitted_draft_itemid('expfile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'expfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $default_values['expfile'] = $draftitemid;
+            $draftitemid2 = file_get_submitted_draft_itemid('controllerfile');
+            file_prepare_draft_area($draftitemid2, $this->context->id, 'mod_ejsapp', 'cntfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $default_values['controllerfile'] = $draftitemid2;
+
+            $draftitemid3 = file_get_submitted_draft_itemid('recordingfile');
+            file_prepare_draft_area($draftitemid3, $this->context->id, 'mod_ejsapp', 'recfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $default_values['recordingfile'] = $draftitemid3;
 
             $personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
             $key = 0;

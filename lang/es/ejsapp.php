@@ -52,8 +52,11 @@ $string['noejsapps'] = 'No hay actividades EJSApp en este curso';
 $string['state_load_msg'] = 'Se va a actualizar el estado del laboratorio';
 $string['state_fail_msg'] = 'Error al intentar cargar el estado';
 
-$string['exp_load_msg'] = 'Se va a ejecutar un experimento para este laboratorio';
-$string['exp_fail_msg'] = 'Error al intentar ejecutar el experimento';
+$string['controller_load_msg'] = 'Se va a cargar un controlador para el laboratorio';
+$string['controller_fail_msg'] = 'Error al intentar cargar el controlador';
+
+$string['recording_load_msg'] = 'Se va a ejecutar una grabaci&oacute;n para este laboratorio';
+$string['recording_fail_msg'] = 'Error al intentar ejecutar la grabaci&oacute;n';
 
 $string['more_text'] = 'Texto optional tras el applet';
 
@@ -86,8 +89,18 @@ $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visu
 
 $string['state_file'] = 'Archivo .xml con el estado que este laboratorio EJS debe leer';
 
-$string['statefile'] = 'Estado del Easy Java Simulation';
+$string['statefile'] = 'Estado del Easy Java(script) Simulation';
 $string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicaci&oacute;n EJS debe cargar al ejecutarse.';
+
+$string['controller_file'] = 'Archivo .cnt con el controlador que la aplicaci&oacute;n EJS debe cargar al iniciarse';
+
+$string['controllerfile'] = 'Controlador para el Easy Java(script) Simulation';
+$string['controllerfile_help'] = 'Seleccione el archivo .cnt con el c&oacute;digo del controlador que la aplicaci&oacute;n EJS debe ejecutar al iniciarse.';
+
+$string['recording_file'] = 'Archivo .rec con la grabaci&oacute;n que la aplicaci&oacute;n EJS debe ejecutar al cargarse';
+
+$string['recordingfile'] = 'Grabaci&oacute;n del Easy Java(script) Simulation';
+$string['recordingfile_help'] = 'Seleccione el archivo .rec con la grabación de la interacción que la aplicaci&oacute;n EJS debe ejecutar al cargarse.';
 
 $string['personalize_vars'] = 'Personalizar variables del laboratorio EJS';
 
@@ -108,11 +121,6 @@ $string['max_value_help'] = 'M&aacute;ximo valor permitido para la variable.';
 
 $string['vars_required'] = 'ATENCI&Oacute;N: Si desea utilizar variables personalizadas, debe espeficificar al menos una.';
 $string['vars_incorrect_type'] = 'ATENCI&Oacute;N: El tipo y los valores especificados para esta variable no se corresponden entre s&iacute;.';
-
-$string['experiment_file'] = 'Archivo .exp con el experimento que la aplicaci&oacute;n EJS debe ejecutar al cargarse';
-
-$string['expfile'] = 'Experimento del Easy Java Simulation';
-$string['expfile_help'] = 'Seleccione el archivo .exp con el experimento que la aplicaci&oacute;n EJS debe ejecutar al cargarse.';
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 

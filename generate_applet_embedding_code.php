@@ -53,7 +53,10 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $sarlabinfo->collab:   int collab whether sarlab offers collab access to this remote lab (1) or not (0), 
  *                                  Null if sarlab is not used
  *                                  $sarlabinfo->labmanager: int laboratory manager (1) or student (0)
- * @param string|null $state_file if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
+ * @param array|null $data_files
+ *                                  $data_files[0]: state_file, if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
+ *                                  $data_files[1]: cnt_file, if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
+ *                                  $data_files[2]: rec_file, if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
  *                                  $collabinfo->session: int collaborative session id, 
  *                                  $collabinfo->ip: string collaborative session ip, 
@@ -66,17 +69,22 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $personalvarsinfo->value: double[] value(s) of the EJS variable(s),
  *                                  $personalvarsinfo->type: string[] type(s) of the EJS variable(s),
  *                                  Null if no personal variables were defined for this EJSApp
- * @param string|null $exp_file if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .exp file that stores the experiment of an EJS applet, elsewhere it is null
- * @param stdClass|null $external_size 
+ * @param stdClass|null $external_size
  *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
  *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
  *                                  Null if generate_applet_embedding_code is not called from the external interface (draw_ejsapp_instance() function)
 
  * @return string code that embeds an EJS applet into Moodle
  */
-function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $collabinfo, $personalvarsinfo, $exp_file, $external_size)
+function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, $external_size)
 {
     global $DB, $USER, $CFG;
+
+    if (!is_null($data_files)) {
+        $state_file = $data_files[0];
+        $cnt_file = $data_files[1];
+        $rec_file = $data_files[2];
+    }
 
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {    // Sarlab is used to access this remote lab or to establish communication between users
         $time = time();                                     // participating in a collaborative session
@@ -234,6 +242,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
 
         $code .= "document.write('</applet>');";
 
+        // <Loading state, controller and interaction files as well as personalized variables>
         // <Loading state files>
         $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'xmlfiles', 'itemid' => ($ejsapp->id)));
         $initial_state_file = new stdClass();
@@ -277,6 +286,84 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
         } //end of if ($state_file)
         // <\Loading state files>
 
+        // <Loading controller files>
+        $file_records2 = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'cntfiles', 'itemid' => ($ejsapp->id)));
+        $initial_cnt_file = new stdClass();
+        if (!empty($file_records2)) {
+            foreach($file_records2 as $initial_cnt_file){
+                if ($initial_cnt_file->filename != '.') {
+                    break;
+                }
+            }
+        }
+
+        if ($cnt_file || (isset($initial_cnt_file->filename) && $initial_cnt_file->filename != '.')) {
+            //<to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
+            if ($cnt_file) {
+                $cnt_file = $CFG->wwwroot . "/pluginfile.php/" . $cnt_file;
+            } else {
+                $cnt_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_cnt_file->contextid .
+                    "/" . $initial_cnt_file->component . "/" . $initial_cnt_file->filearea .
+                    "/" . $initial_cnt_file->itemid . "/" . $initial_cnt_file->filename;
+            }
+            $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
+            $load_cnt_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+              function loadExperiment(count) {
+                if (!applet._simulation && count > 0) {
+                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
+                }
+                else if (applet._simulation) {
+                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$cnt_file'); }, 100 );
+                }
+                else {
+                  alert('$cnt_fail_msg');
+                }
+              }
+              loadExperiment(10);";
+            //<\to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
+            $code .= $load_cnt_code;
+        } //end of if ($cnt_file)
+        // <\Loading controller files>
+
+        // <Loading interaction recording files>
+        $file_records3 = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'recfiles', 'itemid' => ($ejsapp->id)));
+        $initial_rec_file = new stdClass();
+        if (!empty($file_records3)) {
+            foreach($file_records3 as $initial_rec_file){
+                if ($initial_rec_file->filename != '.') {
+                    break;
+                }
+            }
+        }
+
+        if ($rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
+            //<to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
+            if ($rec_file) {
+                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $rec_file;
+            } else {
+                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_rec_file->contextid .
+                    "/" . $initial_rec_file->component . "/" . $initial_rec_file->filearea .
+                    "/" . $initial_rec_file->itemid . "/" . $initial_rec_file->filename;
+            }
+            $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
+            $load_rec_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+              function loadExperiment(count) {
+                if (!applet._simulation && count > 0) {
+                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
+                }
+                else if (applet._simulation) {
+                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
+                }
+                else {
+                  alert('$rec_fail_msg');
+                }
+              }
+              loadExperiment(10);";
+            //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
+            $code .= $load_rec_code;
+        } //end of if ($rec_file)
+        // <\Loading interaction recording files>
+
         // <Loading personalized variables>
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
             $js_vars_names = json_encode($personalvarsinfo->name);
@@ -307,45 +394,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $state_file, $coll
             $code .= $personalize_vars_code;
         }
         // <\Loading personalized variables>
-
-        // <Loading experiment files>
-        $file_records2 = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'expfiles', 'itemid' => ($ejsapp->id)));
-        $initial_exp_file = new stdClass();
-        if (!empty($file_records2)) {
-            foreach($file_records2 as $initial_exp_file){
-                if ($initial_exp_file->filename != '.') {
-                    break;
-                }
-            }
-        }
-
-        if ($exp_file || (isset($initial_exp_file->filename) && $initial_exp_file->filename != '.')) {
-            //<to allow the applet running the experiment, javascript must wait until the applet has been totally downloaded>
-            if ($exp_file) {
-                $exp_file = $CFG->wwwroot . "/pluginfile.php/" . $exp_file;
-            } else {
-                $exp_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_exp_file->contextid .
-                    "/" . $initial_exp_file->component . "/" . $initial_exp_file->filearea .
-                    "/" . $initial_exp_file->itemid . "/" . $initial_exp_file->filename;
-            }
-            $exp_fail_msg = get_string('exp_fail_msg', 'ejsapp');
-            $load_exp_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
-              function loadExperiment(count) {
-                if (!applet._simulation && count > 0) {
-                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
-                }
-                else if (applet._simulation) {
-                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$exp_file'); }, 100 );
-                }
-                else {
-                  alert('$exp_fail_msg');
-                }
-              }
-              loadExperiment(10);";
-            //<\to allow the applet running the experiment, javascript must wait until the applet has been totally downloaded>
-            $code .= $load_exp_code;
-        } //end of if ($experiment_file)
-        // <\Loading experiment files>
+        // <\Loading state, controller and interaction files as well as personalized variables>
 
         $code .= '</script></div>';
 

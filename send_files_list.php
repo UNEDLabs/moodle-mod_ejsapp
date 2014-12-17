@@ -48,7 +48,7 @@ $records = $DB->get_records('files',array('component'=>'user', 'filearea'=>'priv
 
 foreach ($records as $record) {
     $file_extension = pathinfo($record->filename, PATHINFO_EXTENSION);
-    if ( ($type == '.xml' && $file_extension == 'xml') || ($type == 'text' && $file_extension == 'txt') || ($type == '.exp' && $file_extension == 'exp') ) {
+    if ( ($type == '.xml' && $file_extension == 'xml') || ($type == 'text' && $file_extension == 'txt') || ($type == '.cnt' && $file_extension == 'cnt') || ($type == '.rec' && $file_extension == 'rec') ) {
         $ejsapp_file_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
         $info .= $record->filename . ';' . $ejsapp_file_path . $record->filename . ';';
     }

@@ -202,10 +202,16 @@ function ejsapp_add_instance($ejsapp, $mform = null)
             file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         }
 
-        // Creating the experiment file in dataroot and updating the files table in the database
-        $draftitemid = $ejsapp->expfile;
-        if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'expfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        // Creating the controller file in dataroot and updating the files table in the database
+        $draftitemid2 = $ejsapp->controllerfile;
+        if ($draftitemid2) {
+            file_save_draft_area_files($draftitemid2, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        }
+
+        // Creating the recording file in dataroot and updating the files table in the database
+        $draftitemid3 = $ejsapp->recordingfile;
+        if ($draftitemid3) {
+            file_save_draft_area_files($draftitemid3, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
     } else {
@@ -360,10 +366,16 @@ function ejsapp_update_instance($ejsapp, $mform=null)
             file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         }
 
-        // Creating the experiment file in dataroot and updating the files table in the database
-        $draftitemid = $ejsapp->expfile;
-        if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'expfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        // Creating the controller file in dataroot and updating the files table in the database
+        $draftitemid2 = $ejsapp->controllerfile;
+        if ($draftitemid2) {
+            file_save_draft_area_files($draftitemid2, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        }
+
+        // Creating the recording file in dataroot and updating the files table in the database
+        $draftitemid3 = $ejsapp->recordingfile;
+        if ($draftitemid3) {
+            file_save_draft_area_files($draftitemid3, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
     } else {
@@ -812,7 +824,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'expfiles') {
+    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'recfiles') {
         return false;
     }
 
