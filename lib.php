@@ -189,29 +189,29 @@ function ejsapp_add_instance($ejsapp, $mform = null)
         }
 
         if ($mform and !empty($ejsapp->ejsappwording['itemid'])) {
-            $draftitemid = $ejsapp->ejsappwording['itemid'];
-            $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
+            $draftitemid_wording = $ejsapp->ejsappwording['itemid'];
+            $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
             $DB->update_record('ejsapp', $ejsapp);
         }
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
 
         // Creating the state file in dataroot and updating the files table in the database
-        $draftitemid = $ejsapp->statefile;
-        if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        $draftitemid_state = $ejsapp->statefile;
+        if ($draftitemid_state) {
+            file_save_draft_area_files($draftitemid_state, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         }
 
         // Creating the controller file in dataroot and updating the files table in the database
-        $draftitemid2 = $ejsapp->controllerfile;
-        if ($draftitemid2) {
-            file_save_draft_area_files($draftitemid2, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        $draftitemid_controller = $ejsapp->controllerfile;
+        if ($draftitemid_controller) {
+            file_save_draft_area_files($draftitemid_controller, $context->id, 'mod_ejsapp', 'cntfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
         // Creating the recording file in dataroot and updating the files table in the database
-        $draftitemid3 = $ejsapp->recordingfile;
-        if ($draftitemid3) {
-            file_save_draft_area_files($draftitemid3, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        $draftitemid_recording = $ejsapp->recordingfile;
+        if ($draftitemid_recording) {
+            file_save_draft_area_files($draftitemid_recording, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
     } else {
@@ -307,8 +307,8 @@ function ejsapp_update_instance($ejsapp, $mform=null)
             // EJSApp booking system
             if ($rem_labs == null) {
                 if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-                    $context = context_course::instance($ejsapp->course);
-                    $users = get_enrolled_users($context);
+                    $course_context = context_course::instance($ejsapp->course);
+                    $users = get_enrolled_users($course_context);
                     $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
                     //ejsappbooking_usersaccess table:
                     $ejsappbooking_usersaccess = new stdClass();
@@ -327,7 +327,7 @@ function ejsapp_update_instance($ejsapp, $mform=null)
                     //Consider other enrolled users:
                     foreach ($users as $user) {
                       $ejsappbooking_usersaccess->userid = $user->id;
-                      if (!has_capability('mod/ejsapp:addinstance', $context, $user->id, true)) {
+                      if (!has_capability('mod/ejsapp:addinstance', $course_context, $user->id, true)) {
                         $ejsappbooking_usersaccess->allowremaccess = 0;
                       } else {
                         $ejsappbooking_usersaccess->allowremaccess = 1;
@@ -352,30 +352,30 @@ function ejsapp_update_instance($ejsapp, $mform=null)
             }
         }
 
-        $draftitemid = $ejsapp->ejsappwording['itemid'];
-        if ($draftitemid) {
-            $ejsapp->appwording = file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
+        $draftitemid_wording = $ejsapp->ejsappwording['itemid'];
+        if ($draftitemid_wording) {
+            $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
             $DB->update_record('ejsapp', $ejsapp);
         }
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
 
         // Creating the state file in dataroot and updating the files table in the database
-        $draftitemid = $ejsapp->statefile;
-        if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        $draftitemid_state = $ejsapp->statefile;
+        if ($draftitemid_state) {
+            file_save_draft_area_files($draftitemid_state, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
         }
 
         // Creating the controller file in dataroot and updating the files table in the database
-        $draftitemid2 = $ejsapp->controllerfile;
-        if ($draftitemid2) {
-            file_save_draft_area_files($draftitemid2, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        $draftitemid_controller = $ejsapp->controllerfile;
+        if ($draftitemid_controller) {
+            file_save_draft_area_files($draftitemid_controller, $context->id, 'mod_ejsapp', 'cntfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
         // Creating the recording file in dataroot and updating the files table in the database
-        $draftitemid3 = $ejsapp->recordingfile;
-        if ($draftitemid3) {
-            file_save_draft_area_files($draftitemid3, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        $draftitemid_recording = $ejsapp->recordingfile;
+        if ($draftitemid_recording) {
+            file_save_draft_area_files($draftitemid_recording, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
     } else {
@@ -780,7 +780,8 @@ function ejsapp_get_file_areas($course, $cm, $context)
 {
     return array('jarfiles' => 'Applets and Javascript files with the virtual or remote labs',
                  'xmlfile'  => 'Text files containing all the information to define the state of a lab',
-                 'expfiles' => 'Text files containing a script recording the interaction of a user with a lab');
+                 'cntfiles' => 'Text files containing a code (typically, a controller)',
+                 'recfiles' => 'Text files containing a script recording the interaction of a user with a lab',);
 }
 
 /**
@@ -824,7 +825,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'recfiles') {
+    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'cntfiles' && $filearea !== 'recfiles') {
         return false;
     }
 
@@ -850,5 +851,5 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
     }
 
     return send_stored_file($file, 0, 0, $forcedownload);
-    //return send_stored_file($file, 604800, 0, $forcedownload); // I CAN ONLY SET CACHE != 0 if WE USE DIFFERENT APPLETS FOR COLLAB THAN FOR INDIVIDUAL SESSIONS
+    //return send_stored_file($file, 604800, 0, $forcedownload); // I CAN ONLY SET CACHE != 0 IF WE USE DIFFERENT APPLETS FOR COLLAB THAN FOR INDIVIDUAL SESSIONS
 }

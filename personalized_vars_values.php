@@ -64,7 +64,7 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 // <Check whether the selected or other ejsapp in this course have personalized variables or not>
-$ejsapps = $DB->get_records_select('ejsapp', 'course = ? AND personalvars = ?', array($courseid,1));
+$ejsapps = $DB->get_records_select('ejsapp', 'course = ? AND personalvars = ?', array($courseid, 1));
 $i = 1;
 $multilang = new filter_multilang($context, array('filter_multilang_force_old'=>0));
 foreach ($ejsapps as $ejsapp) {
@@ -161,12 +161,6 @@ if (!$currentgroup) {      // To make some other functions work better later
 
 $isseparategroups = ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context));
 
-if ($course->id===SITEID) {
-  $PAGE->navbar->ignore_active();
-}
-
-echo $OUTPUT->header();
-
 /**
  *
  * Returns the course last access
@@ -205,14 +199,26 @@ function get_user_lastaccess_sql($accesssince='') {
 }
 
 if ($personalized) { // If there is at least one ejsapp activity with personalized variables
-    echo $OUTPUT->heading(get_string('users_ejsapp_selection','ejsapp'));
-    echo '<div class="userlist">';
-    
-    if ($isseparategroups and (!$currentgroup) ) {
-      // The user is not in the group so show message and exit
-      echo $OUTPUT->heading(get_string("notingroup"));
-      echo $OUTPUT->footer();
-      exit;
+    $download = optional_param('download', '', PARAM_ALPHA);
+    $exportfilename = get_string('personalized_values', 'ejsapp').$ejsapp_names[$ejsapp->id];
+    $table = new flexible_table('user-index-participants-'.$course->id);
+    if (!$table->is_downloading($download, $exportfilename)) {
+        $table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+
+        if ($course->id===SITEID) {
+            $PAGE->navbar->ignore_active();
+        }
+
+        echo $OUTPUT->header();
+        echo $OUTPUT->heading(get_string('users_ejsapp_selection', 'ejsapp'));
+        echo '<div class="userlist">';
+
+        if ($isseparategroups and (!$currentgroup)) {
+            // The user is not in the group so show message and exit
+            echo $OUTPUT->heading(get_string("notingroup"));
+            echo $OUTPUT->footer();
+            exit;
+        }
     }
 
 
@@ -252,7 +258,6 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
     /// Print settings and things in a table across the top
     $controlstable = new html_table();
     $controlstable->attributes['class'] = 'controls';
-    $controlstable->cellspacing = 0;
     $controlstable->data[] = new html_table_row();
     
     /// Print my course menus
@@ -298,66 +303,68 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
     
       // days
       for ($i = 1; $i < 7; $i++) {
-        if (strtotime('-'.$i.' days',$now) >= $minlastaccess) {
-          $timeoptions[strtotime('-'.$i.' days',$now)] = get_string('numdays','moodle',$i);
-        }
+          if (strtotime('-' . $i . ' days', $now) >= $minlastaccess) {
+              $timeoptions[strtotime('-' . $i . ' days', $now)] = get_string('numdays', 'moodle', $i);
+          }
       }
       // weeks
       for ($i = 1; $i < 10; $i++) {
-        if (strtotime('-'.$i.' weeks',$now) >= $minlastaccess) {
-          $timeoptions[strtotime('-'.$i.' weeks',$now)] = get_string('numweeks','moodle',$i);
-        }
+          if (strtotime('-' . $i . ' weeks', $now) >= $minlastaccess) {
+              $timeoptions[strtotime('-' . $i . ' weeks', $now)] = get_string('numweeks', 'moodle', $i);
+          }
       }
       // months
       for ($i = 2; $i < 12; $i++) {
-        if (strtotime('-'.$i.' months',$now) >= $minlastaccess) {
-          $timeoptions[strtotime('-'.$i.' months',$now)] = get_string('nummonths','moodle',$i);
-        }
+          if (strtotime('-' . $i . ' months', $now) >= $minlastaccess) {
+              $timeoptions[strtotime('-' . $i . ' months', $now)] = get_string('nummonths', 'moodle', $i);
+          }
       }
       // try a year
       if (strtotime('-1 year',$now) >= $minlastaccess) {
-        $timeoptions[strtotime('-1 year',$now)] = get_string('lastyear');
+          $timeoptions[strtotime('-1 year', $now)] = get_string('lastyear');
       }
     
       if (!empty($lastaccess0exists)) {
-        $timeoptions[-1] = get_string('never');
+          $timeoptions[-1] = get_string('never');
       }
     
       if (count($timeoptions) > 1) {
-        $select = new single_select($baseurl, 'accesssince', $timeoptions, $accesssince, null, 'timeoptions');
-        $select->set_label(get_string('usersnoaccesssince'));
-        $controlstable->data[0]->cells[] = $OUTPUT->render($select);
+          $select = new single_select($baseurl, 'accesssince', $timeoptions, $accesssince, null, 'timeoptions');
+          $select->set_label(get_string('usersnoaccesssince'));
+          $controlstable->data[0]->cells[] = $OUTPUT->render($select);
       }
     } // if (!isset($hiddenfields['lastaccess']))
     
     if ($currentgroup and (!$isseparategroups or has_capability('moodle/site:accessallgroups', $context))) {    /// Display info about the group
     	if ($group = groups_get_group($currentgroup)) {
-        if (!empty($group->description) or (!empty($group->picture) and empty($group->hidepicture))) {
-          $groupinfotable = new html_table();
-          $groupinfotable->attributes['class'] = 'groupinfobox';
-          $picturecell = new html_table_cell();
-          $picturecell->attributes['class'] = 'left side picture';
-          $picturecell->text = print_group_picture($group, $course->id, true, true, false);
-    
-          $contentcell = new html_table_cell();
-          $contentcell->attributes['class'] = 'content';
-    
-          $contentheading = $group->name;
-          if (has_capability('moodle/course:managegroups', $context)) {
-            $aurl = new moodle_url('/group/group.php', array('id' => $group->id, 'courseid' => $group->courseid));
-            $contentheading .= '&nbsp;' . $OUTPUT->action_icon($aurl, new pix_icon('t/edit', get_string('editgroupprofile')));
-          }
-    
-          $group->description = file_rewrite_pluginfile_urls($group->description, 'pluginfile.php', $context->id, 'group', 'description', $group->id);
-          if (!isset($group->descriptionformat)) {
-            $group->descriptionformat = FORMAT_MOODLE;
-          }
-          $options = array('overflowdiv'=>true);
-          $contentcell->text = $OUTPUT->heading($contentheading, 3) . format_text($group->description, $group->descriptionformat, $options);
-          $groupinfotable->data[] = new html_table_row(array($picturecell, $contentcell));
-          echo html_writer::table($groupinfotable);
+            if (!empty($group->description) or (!empty($group->picture) and empty($group->hidepicture))) {
+                $groupinfotable = new html_table();
+                $groupinfotable->attributes['class'] = 'groupinfobox';
+                $picturecell = new html_table_cell();
+                $picturecell->attributes['class'] = 'left side picture';
+                $picturecell->text = print_group_picture($group, $course->id, true, true, false);
+
+                $contentcell = new html_table_cell();
+                $contentcell->attributes['class'] = 'content';
+
+                $contentheading = $group->name;
+                if (has_capability('moodle/course:managegroups', $context)) {
+                    $aurl = new moodle_url('/group/group.php', array('id' => $group->id, 'courseid' => $group->courseid));
+                    $contentheading .= '&nbsp;' . $OUTPUT->action_icon($aurl, new pix_icon('t/edit', get_string('editgroupprofile')));
+                }
+
+                $group->description = file_rewrite_pluginfile_urls($group->description, 'pluginfile.php', $context->id, 'group', 'description', $group->id);
+                if (!isset($group->descriptionformat)) {
+                    $group->descriptionformat = FORMAT_MOODLE;
+                }
+                $options = array('overflowdiv' => true);
+                $contentcell->text = $OUTPUT->heading($contentheading, 3) . format_text($group->description, $group->descriptionformat, $options);
+                $groupinfotable->data[] = new html_table_row(array($picturecell, $contentcell));
+                if (!$table->is_downloading($download, $exportfilename)) {
+                    echo html_writer::table($groupinfotable);
+                }
+            }
         }
-      }
     }
 
     /// Define a table showing a list of users in the current role selection
@@ -387,8 +394,6 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
             $tableheaders[] = get_string('variable_value','ejsapp');
         }
     }
-
-    $table = new flexible_table('user-index-participants-'.$course->id);
 
     $table->define_columns($tablecolumns);
     $table->define_headers($tableheaders);
@@ -514,74 +519,74 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
     $userlist = $DB->get_recordset_sql("$select $from $where $sort", $params, $table->get_page_start(), $table->get_page_size());
 
     /// If there are multiple Roles in the course, then show a drop down menu for switching
-    if (count($rolenames) > 1) {
-        echo '<div class="rolesform">
-        <label for="rolesform_jump">'.get_string('currentrole', 'role').'&nbsp;</label>';
-        echo $OUTPUT->single_select($rolenamesurl, 'roleid', $rolenames, $roleid, null, 'rolesform');
-        echo '</div>';
+    if (!$table->is_downloading($download, $exportfilename)) {
+        if (count($rolenames) > 1) {
+            echo '<div class="rolesform">
+        <label for="rolesform_jump">' . get_string('currentrole', 'role') . '&nbsp;</label>';
+            echo $OUTPUT->single_select($rolenamesurl, 'roleid', $rolenames, $roleid, null, 'rolesform');
+            echo '</div>';
 
-    } else if (count($rolenames) == 1) {
-        // when all users with the same role - print its name
-        echo '<div class="rolesform">';
-        echo get_string('role').get_string('labelsep', 'langconfig');
-        $rolename = reset($rolenames);
-        echo $rolename . '</div>';
+        } else if (count($rolenames) == 1) {
+            // when all users with the same role - print its name
+            echo '<div class="rolesform">';
+            echo get_string('role') . get_string('labelsep', 'langconfig');
+            $rolename = reset($rolenames);
+            echo $rolename . '</div>';
+        }
+
+        // <Select ejsapp pulldown menu>
+        $select = new single_select($baseurl, 'ejsappid', $ejsapp_names, $ejsappid, null, 'formatmenu');
+        $select->set_label(get_string('ejsapp_activity_selection', 'ejsapp'));
+        $remlabslistcell = new html_table_cell();
+        $remlabslistcell->attributes['class'] = 'right';
+        $remlabslistcell->text = $OUTPUT->render($select);
+        $controlstable->data[0]->cells[] = $remlabslistcell;
+
+        echo html_writer::table($controlstable);
+        // </Select ejsapp pulldown menu>
+
+        if ($roleid > 0) {
+            $a = new stdClass();
+            $a->number = $totalcount;
+            $a->role = $rolenames[$roleid];
+            $heading = format_string(get_string('xuserswiththerole', 'role', $a));
+
+            if ($currentgroup and $group) {
+                $a->group = $group->name;
+                $heading .= ' ' . format_string(get_string('ingroup', 'role', $a));
+            }
+
+            if ($accesssince) {
+                $a->timeperiod = $timeoptions[$accesssince];
+                $heading .= ' ' . format_string(get_string('inactiveformorethan', 'role', $a));
+            }
+
+            $heading .= ": $a->number";
+            if (user_can_assign($context, $roleid)) {
+                $heading .= ' <a href="' . $CFG->wwwroot . '/' . $CFG->admin . '/roles/assign.php?roleid=' . $roleid . '&amp;contextid=' . $context->id . '">';
+                $heading .= '<img src="' . $OUTPUT->pix_url('i/edit') . '" class="icon" alt="" /></a>';
+            }
+            echo $OUTPUT->heading($heading, 3);
+        } else {
+            if ($course->id != SITEID && has_capability('moodle/course:enrolreview', $context)) {
+                $editlink = $OUTPUT->action_icon(new moodle_url('/enrol/users.php', array('id' => $course->id)), new pix_icon('i/edit', get_string('edit')));
+            } else {
+                $editlink = '';
+            }
+            if ($course->id == SITEID and $roleid < 0) {
+                $strallparticipants = get_string('allsiteusers', 'role');
+            } else {
+                $strallparticipants = get_string('allparticipants');
+            }
+            if ($matchcount < $totalcount) {
+                echo $OUTPUT->heading($strallparticipants . get_string('labelsep', 'langconfig') . $matchcount . '/' . $totalcount . $editlink, 3);
+            } else {
+                echo $OUTPUT->heading($strallparticipants . get_string('labelsep', 'langconfig') . $matchcount . $editlink, 3);
+            }
+        }
     }
-
-    // <Select ejsapp pulldown menu>
-    $select = new single_select($baseurl, 'ejsappid', $ejsapp_names, $ejsappid, null, 'formatmenu');
-    $select->set_label(get_string('ejsapp_activity_selection', 'ejsapp'));
-    $remlabslistcell = new html_table_cell();
-    $remlabslistcell->attributes['class'] = 'right';
-    $remlabslistcell->text = $OUTPUT->render($select);
-    $controlstable->data[0]->cells[] = $remlabslistcell;
-
-    echo html_writer::table($controlstable);
-    // </Select ejsapp pulldown menu>
-
-    if ($roleid > 0) {
-        $a = new stdClass();
-        $a->number = $totalcount;
-        $a->role = $rolenames[$roleid];
-        $heading = format_string(get_string('xuserswiththerole', 'role', $a));
-
-        if ($currentgroup and $group) {
-            $a->group = $group->name;
-            $heading .= ' ' . format_string(get_string('ingroup', 'role', $a));
-        }
-
-        if ($accesssince) {
-            $a->timeperiod = $timeoptions[$accesssince];
-            $heading .= ' ' . format_string(get_string('inactiveformorethan', 'role', $a));
-        }
-
-        $heading .= ": $a->number";
-        if (user_can_assign($context, $roleid)) {
-            $heading .= ' <a href="'.$CFG->wwwroot.'/'.$CFG->admin.'/roles/assign.php?roleid='.$roleid.'&amp;contextid='.$context->id.'">';
-            $heading .= '<img src="'.$OUTPUT->pix_url('i/edit') . '" class="icon" alt="" /></a>';
-        }
-        echo $OUTPUT->heading($heading, 3);
-    } else {
-        if ($course->id != SITEID && has_capability('moodle/course:enrolreview', $context)) {
-            $editlink = $OUTPUT->action_icon(new moodle_url('/enrol/users.php', array('id' => $course->id)), new pix_icon('i/edit', get_string('edit')));
-        } else {
-            $editlink = '';
-        }
-        if ($course->id == SITEID and $roleid < 0) {
-            $strallparticipants = get_string('allsiteusers', 'role');
-        } else {
-            $strallparticipants = get_string('allparticipants');
-        }
-        if ($matchcount < $totalcount) {
-            echo $OUTPUT->heading($strallparticipants.get_string('labelsep', 'langconfig').$matchcount.'/'.$totalcount . $editlink, 3);
-        } else {
-            echo $OUTPUT->heading($strallparticipants.get_string('labelsep', 'langconfig').$matchcount . $editlink, 3);
-        }
-    }
-
 
     $countrysort = (strpos($sort, 'country') !== false);
-    $timeformat = get_string('strftimedate');
 
     if ($userlist) {
         $usersprinted = array();
@@ -666,32 +671,32 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
         } // foreach ($userlist as $user)
     } // if ($userlist)
 
-    $table->print_html();
+    $table->finish_output();
 
-    echo '<br /><div class="buttons">
-    <input type="button" id="export_all_data" value="'. get_string('export_all_data', 'ejsapp'). '" />
-    <input type="submit" id="export_this_data" value="' . get_string('export_this_data', 'ejsapp') . '" /> </div></div> </form>';
+    if (!$table->is_downloading($download, $exportfilename)) {
+        $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
+        $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
 
-    $module = array('name'=>'core_user', 'fullpath'=>'/user/module.js');
-    $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
+        if (has_capability('moodle/site:viewparticipants', $context) && $totalcount > ($perpage * 3)) {
+            echo '<form action="collaborative_index.php" class="searchform"><div><input type="hidden" name="id" value="' . $course->id . '" />' . get_string('search') . ':&nbsp;' . "\n";
+            echo '<input type="text" name="search" value="' . s($search) . '" />&nbsp;<input type="submit" value="' . get_string('search') . '" /></div></form>' . "\n";
+        }
 
-    if (has_capability('moodle/site:viewparticipants', $context) && $totalcount > ($perpage*3)) {
-        echo '<form action="collaborative_index.php" class="searchform"><div><input type="hidden" name="id" value="'.$course->id.'" />'.get_string('search').':&nbsp;'."\n";
-        echo '<input type="text" name="search" value="'.s($search).'" />&nbsp;<input type="submit" value="'.get_string('search').'" /></div></form>'."\n";
+        $perpageurl = clone($baseurl);
+        $perpageurl->remove_params('perpage');
+        if ($perpage == SHOW_ALL_PAGE_SIZE) {
+            $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
+            echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
+        } else if ($matchcount > 0 && $perpage < $matchcount) {
+            $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
+            echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $matchcount)), array(), 'showall');
+        }
     }
 
-    $perpageurl = clone($baseurl);
-    $perpageurl->remove_params('perpage');
-    if ($perpage == SHOW_ALL_PAGE_SIZE) {
-        $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
-        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
-    } else if ($matchcount > 0 && $perpage < $matchcount) {
-        $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
-        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $matchcount)), array(), 'showall');
+    if (!$table->is_downloading()) {
+        echo $OUTPUT->footer();
     }
-    
-    echo $OUTPUT->footer();
-    
+
     if ($userlist) {
       $userlist->close();
     }

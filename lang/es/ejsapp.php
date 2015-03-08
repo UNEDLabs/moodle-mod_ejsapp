@@ -202,6 +202,7 @@ $string['variable_value'] = 'Valor';
 $string['export_all_data'] = 'Exportar datos para todas las actividades EJSApp en este curso';
 $string['export_this_data'] = 'Exportar datos para esta actividad EJSApp';
 $string['no_ejsapps'] = 'La actividad EJSApp seleccionada no tiene variables personalizadas';
+$string['personalized_values'] = 'valores_personalizdos_';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";

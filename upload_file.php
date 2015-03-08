@@ -94,12 +94,14 @@ if ($_FILES['user_file'] != null) { // as long as a file was selected...
 // <prepare the file info data>
 $fs = get_file_storage();
 // Prepare file record object
+if ($file_extension == 'cnt') $source_info = 'controller';
+else $source_info = 'ejsappid='.$ejsapp_id;
 $fileinfo = array(
     'contextid' => $context_id, // ID of context
     'component' => 'user', // usually = table name
     'filearea' => 'private', // usually = table name
     'itemid' => 0, // usually = ID of row in table
-    'source' => "ejsappid=$ejsapp_id",
+    'source' => $source_info,
     'userid' => $user_id,
     'filepath' => '/',
     'filename' => $file_name . '.' . $file_extension);

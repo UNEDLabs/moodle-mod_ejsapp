@@ -59,7 +59,7 @@ class backup_ejsapp_activity_task extends backup_activity_task
 
     /**
      * Code the transformations to perform in the activity in
-     *  order to get transportable (encoded) links
+     * order to get transportable (encoded) links
      *
      * @param string $content
      * @return string $content

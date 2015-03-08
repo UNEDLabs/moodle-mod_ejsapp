@@ -44,7 +44,9 @@ $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
 $type = optional_param('type', '.xml', PARAM_TEXT);
 
 $info = '';
-$records = $DB->get_records('files',array('component'=>'user', 'filearea'=>'private', 'userid'=>$USER->id, 'source'=>'ejsappid='.$ejsapp_id));
+if ($type == '.cnt') $source_info = 'controller';
+else $source_info = 'ejsappid='.$ejsapp_id;
+$records = $DB->get_records_select('files', "component='user' AND filearea='private' AND userid='$USER->id' AND source='$source_info'");
 
 foreach ($records as $record) {
     $file_extension = pathinfo($record->filename, PATHINFO_EXTENSION);

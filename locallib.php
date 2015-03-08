@@ -58,7 +58,6 @@ function update_db($ejsapp, $contextid) {
 
     $applet_name = $ejsapp->applet_name;
     $manifest = $ejsapp->manifest;
-    $metadata = $ejsapp->metadata;
 
     $class_file = '';
     $mainframe = '';
@@ -150,7 +149,7 @@ function update_db($ejsapp, $contextid) {
             $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
         }
 
-        //Sign the applet
+        // Sign the applet
         // Check whether a certificate is installed and in use
         if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
             // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
@@ -168,43 +167,12 @@ function update_db($ejsapp, $contextid) {
         }
     } else { //Javascript
         $ext = '.zip';
-        $uploaded_file = $new_path . $applet_name . $ext;
-
-        $zip = new ZipArchive;
-        if ($zip->open($new_path . $applet_name . '.zip') === TRUE) {
-            $zip->extractTo($new_path);
-            $zip->close();
-            $ejs_ok = true;
-        } else {
-            $ejs_ok = false;
-        }
-
-        // Search in _metadata for the name of the main Javascript file
-        $pattern = '/main-simulation\s*:\s*(.+)\s*/';
-        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
-        $sub_str = $matches[1][0];
-        if (strlen($matches[1][0]) == 59) {
-            $pattern = '/^\s(.+)\s*/m';
-            if ((preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE) > 0)) {
-                $sub_str = $sub_str . $matches[1][0];
-            }
-        }
-        $ejsapp->applet_name = $sub_str;
-
-        //Create/delete the css file to modify the visual aspect of the javascript application
-        $css_file_location = $CFG->dirroot . $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
-        if ($ejsapp->css == '' && file_exists($css_file_location)) {
-            unlink($css_file_location);
-        }
-        if ($ejsapp->css != '') {
-            $css_file_content = '#EJsS{' . $ejsapp->css . '}';
-            $file = fopen($css_file_location,"w");
-            fwrite($file,$css_file_content);
-            fclose($file);
-        }
+        $uploaded_file = $new_path . $applet_name .$ext;
+        $ejs_ok = modifications_for_javascript($new_path, $ejsapp, $applet_name, $ext, $codebase);
     }
 
-    // <update files table>
+    // <update the files table>
+    // Copy the jar/zip file to its destination folder in jarfiles
     $fs = get_file_storage();
     // Prepare file record object
     $fileinfo = array(
@@ -214,45 +182,9 @@ function update_db($ejsapp, $contextid) {
         'itemid' => $ejsapp->id,            // usually = ID of row in table
         'filepath' => '/',                  // any path beginning and ending in /
         'filename' => $applet_name . $ext); // any filename
-    // Create the stored file
     $fs->create_file_from_pathname($fileinfo, $uploaded_file);
-
-    if($manifest == 'EJsS') {  //TODO: Watch out with backups in this case!!!!!!
-        if (file_exists($new_path . $ejsapp->applet_name)) {
-            $code = file_get_contents($new_path . $ejsapp->applet_name);
-            //<get the whole code from </title> (not included) onwards>
-            $code = explode('</title>',$code);
-            $code = '<div id="EJsS">' . $code[1];
-            //</get the whole code from </title> (not included) onwards>
-            //<$code1 is $code till </head> (not included) and with the missing standard part>
-            $code1 = substr($code, 0, -strlen($code)+strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
-            //</$code1 is $code till </head> (not included) and with the missing standard part>
-            //<$code2 is $code from </head> to </body> tags, none of them included>
-            $code2 = substr($code, strpos($code, '</head>'));
-            $code2 = explode('</body>', $code2);
-            $code2 = $code2[0] . '</div>';
-            //</$code2 is $code from </head> to </body> tags, none of them included>
-            if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
-                $code2 = substr($code2, strpos($code2, '<script type'));
-                $code = $code1 . $code2;
-                $code = update_links($codebase, $ejsapp, $code, 'old', false);
-            } else { //New EJS version with an external .js file for the Javascript
-                $exploded_file_name = explode(".", $ejsapp->applet_name);
-                $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
-                $code = $code1 . $code2;
-                $codeJS = file_get_contents($new_path . $exploded_file_name[0] .'.js');
-                $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
-                file_put_contents($new_path . $exploded_file_name[0] .'.js', $codeJS);
-            }
-            file_put_contents($new_path . $ejsapp->applet_name, $code);
-            //TODO: Use Moodle files system
-            /*$fileinfo['filename'] = $ejsapp->applet_name;
-            $fs = get_file_storage();
-            $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
-            unlink($new_path . $applet_name . '.zip');
-        }
-    }
-    // </update files table>
+    if ($manifest == 'EJsS') unlink($new_path . $applet_name . $ext);
+    // </update the files table>
 
     // <update ejsapp_personal_vars table>
     //Personalizing EJS variables <update ejsapp_personal_vars table>
@@ -437,6 +369,7 @@ function update_links($codebase, $ejsapp, $code, $method, $use_css) {
  */
 function personalize_vars($ejsapp, $user) {
     global $DB;
+
     $personalvarsinfo = null;
     if ($ejsapp->personalvars == 1) {
         $personalvarsinfo = new stdClass();
@@ -468,6 +401,7 @@ function personalize_vars($ejsapp, $user) {
  */
 function users_personalized_vars($ejsapp) {
     global $DB;
+
     $courseid = $ejsapp->course;
     $enrolids = $DB->get_fieldset_select('enrol', 'id', 'courseid = :courseid', array('courseid'=>$courseid));
     $usersids = $DB->get_fieldset_sql('SELECT userid FROM {user_enrolments} WHERE enrolid IN (' . implode(',',$enrolids) . ')');
@@ -479,3 +413,91 @@ function users_personalized_vars($ejsapp) {
 
     return $userspersonalvarsinfo;
 } //users_personalized_vars
+
+
+/**
+ *
+ * Does all the modifications needed for making EjsS javascript applications work fine.
+ *
+ * @param string $new_path
+ * @param stdClass $ejsapp
+ * @param string $name
+ * @param string $ext
+ * @param string $codebase
+ * @return boolean ejs_ok
+ */
+function modifications_for_javascript($new_path, $ejsapp, $name, $ext, $codebase) {
+    global $CFG;
+
+    $zip = new ZipArchive;
+    if ($zip->open($new_path . $name . $ext) === TRUE) {
+        $zip->extractTo($new_path);
+        $zip->close();
+        $metadata = file_get_contents($new_path . '_metadata.txt');
+        $ejs_ok = true;
+    } else {
+        $ejs_ok = false;
+    }
+
+    if ($ejs_ok) {
+        // Search in _metadata for the name of the main Javascript file
+        $pattern = '/main-simulation\s*:\s*(.+)\s*/';
+        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
+        $sub_str = $matches[1][0];
+        if (strlen($matches[1][0]) == 59) {
+            $pattern = '/^\s(.+)\s*/m';
+            if ((preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE) > 0)) {
+                $sub_str = $sub_str . $matches[1][0];
+            }
+        }
+        $ejsapp->applet_name = $sub_str;
+
+        //Create/delete the css file to modify the visual aspect of the javascript application
+        $css_file_location = $CFG->dirroot . $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
+        if ($ejsapp->css == '' && file_exists($css_file_location)) {
+            unlink($css_file_location);
+        }
+        if ($ejsapp->css != '') {
+            $css_file_content = '#EJsS{' . $ejsapp->css . '}';
+            $file = fopen($css_file_location, "w");
+            fwrite($file, $css_file_content);
+            fclose($file);
+        }
+
+        // Change content of the html/js file to make them work
+        if (file_exists($new_path . $ejsapp->applet_name)) {
+            $code = file_get_contents($new_path . $ejsapp->applet_name);
+            //<get the whole code from </title> (not included) onwards>
+            $code = explode('</title>', $code);
+            $code = '<div id="EJsS">' . $code[1];
+            //</get the whole code from </title> (not included) onwards>
+            //<$code1 is $code till </head> (not included) and with the missing standard part>
+            $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
+            //</$code1 is $code till </head> (not included) and with the missing standard part>
+            //<$code2 is $code from </head> to </body> tags, none of them included>
+            $code2 = substr($code, strpos($code, '</head>'));
+            $code2 = explode('</body>', $code2);
+            $code2 = $code2[0] . '</div>';
+            //</$code2 is $code from </head> to </body> tags, none of them included>
+            if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
+                $code2 = substr($code2, strpos($code2, '<script type'));
+                $code = $code1 . $code2;
+                $code = update_links($codebase, $ejsapp, $code, 'old', false);
+            } else { //New EJS version with an external .js file for the Javascript
+                $exploded_file_name = explode(".", $ejsapp->applet_name);
+                $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
+                $code = $code1 . $code2;
+                $codeJS = file_get_contents($new_path . $exploded_file_name[0] . '.js');
+                $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
+                file_put_contents($new_path . $exploded_file_name[0] . '.js', $codeJS);
+            }
+            file_put_contents($new_path . $ejsapp->applet_name, $code);
+            //TODO: Use Moodle files system
+            /*$fileinfo['filename'] = $ejsapp->applet_name;
+            $fs = get_file_storage();
+            $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
+        }
+    }
+
+    return $ejs_ok;
+}

@@ -356,22 +356,22 @@ class mod_ejsapp_mod_form extends moodleform_mod
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
             $default_values['appletfile'] = $draftitemid;
 
-            $draftitemid = file_get_submitted_draft_itemid('appwording');
+            $draftitemid_wording = file_get_submitted_draft_itemid('appwording');
             $default_values['ejsappwording']['format'] = $default_values['appwordingformat'];
-            $default_values['ejsappwording']['text'] = file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
-            $default_values['ejsappwording']['itemid'] = $draftitemid;
+            $default_values['ejsappwording']['text'] = file_prepare_draft_area($draftitemid_wording, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
+            $default_values['ejsappwording']['itemid'] = $draftitemid_wording;
             
-            $draftitemid = file_get_submitted_draft_itemid('statefile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
-            $default_values['statefile'] = $draftitemid;
+            $draftitemid_state = file_get_submitted_draft_itemid('statefile');
+            file_prepare_draft_area($draftitemid_state, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+            $default_values['statefile'] = $draftitemid_state;
 
-            $draftitemid2 = file_get_submitted_draft_itemid('controllerfile');
-            file_prepare_draft_area($draftitemid2, $this->context->id, 'mod_ejsapp', 'cntfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $default_values['controllerfile'] = $draftitemid2;
+            $draftitemid_controller = file_get_submitted_draft_itemid('controllerfile');
+            file_prepare_draft_area($draftitemid_controller, $this->context->id, 'mod_ejsapp', 'cntfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $default_values['controllerfile'] = $draftitemid_controller;
 
-            $draftitemid3 = file_get_submitted_draft_itemid('recordingfile');
-            file_prepare_draft_area($draftitemid3, $this->context->id, 'mod_ejsapp', 'recfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $default_values['recordingfile'] = $draftitemid3;
+            $draftitemid_recording = file_get_submitted_draft_itemid('recordingfile');
+            file_prepare_draft_area($draftitemid_recording, $this->context->id, 'mod_ejsapp', 'recfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $default_values['recordingfile'] = $draftitemid_recording;
 
             $personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
             $key = 0;
@@ -415,17 +415,12 @@ class mod_ejsapp_mod_form extends moodleform_mod
             // <Set the mod_form elements>
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
             $manifest = 'EJsS';
-            $metadata = '';
             if ($ext == 'jar') {
                 // Extract the manifest.mf file from the .jar
                 $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
                 // Prepare pattern for getting the filename
                 $pattern = '/(\w+)[.]jar/';
-                // Get list of public variables: their names, values and types
-                // TODO
             } else {
-                // Extract the _metadata.txt file from the .zip
-                $metadata = file_get_contents('zip://' . $filename . '#' . '_metadata.txt');
                 // Prepare pattern for getting the filename
                 $pattern = '/(\w+)[.]zip/';
             }
@@ -433,10 +428,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $mform->addElement('hidden', 'manifest', null);
             $mform->setType('manifest', PARAM_TEXT);
             $mform->setDefault('manifest', $manifest);
-
-            $mform->addElement('hidden', 'metadata', null);
-            $mform->setType('metadata', PARAM_TEXT);
-            $mform->setDefault('metadata', $metadata);
 
             preg_match($pattern, $applet_name, $matches, PREG_OFFSET_CAPTURE);
             $applet_name = $matches[1][0];
@@ -446,7 +437,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $default_values['applet_name'] = $applet_name;
 
             // Element listing EJS public variables
-            // TODO
+            // TODO: Get list of public variables: their names, values and types
             // </Set the mod_form elements>
         } //if ($content)
     } // data_preprocessing
@@ -504,24 +495,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $i++;
             }
         }
-
-        // Check whether the manifest/metadata file has the necessary information
-        /*if (!empty($data['manifest'])) {
-            if ($data['manifest'] != 'EJsS') { //java
-                $pattern = '/Applet-Height\s*:\s*(\w+)/';
-                preg_match($pattern, $data['manifest'], $matches, PREG_OFFSET_CAPTURE);
-                if (count($matches) == 0) {
-                    $errors['appletfile'] = get_string('EJS_version', 'ejsapp');
-                }
-            } else { //javascript
-                $pattern = '/main-simulation\s*:\s*(\w+)/';
-                preg_match($pattern, $data['metadata'], $matches, PREG_OFFSET_CAPTURE);
-                if (count($matches) == 0) {
-                    $errors['appletfile'] = get_string('EJS_version', 'ejsapp');
-                }
-            }
-        }*/
-
 
         return $errors;
     } // validation

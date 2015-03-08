@@ -266,10 +266,10 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
             $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
             $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
               function loadState(count) {
-                if (!applet && count > 0) {
+                if (!applet._simulation && count > 0) {
                     window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if (applet) {
+                else if (applet._simulation) {
                   window.setTimeout( function() { applet._readState('url:$state_file'); }, 100 );
                   applet._view.resetTraces();
                   //applet._view.clearData();
@@ -308,18 +308,21 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
             }
             $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
             $load_cnt_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
-              function loadExperiment(count) {
-                if (!applet._simulation && count > 0) {
-                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
+              function loadController(count) {
+                if (!applet._model && count > 0) {
+                    window.setTimeout( function() { loadController( --count ); }, 1000 );
                 }
-                else if (applet._simulation) {
-                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$cnt_file'); }, 100 );
+                else if (applet._model) {
+                  window.setTimeout( function() {
+                  var element = applet._model.getUserData('_codeController');
+                  element.setController(applet._readText('url:$cnt_file')); }, 100 );
+                  //applet._model.codeEvaluator.setController(applet._readText('url:$cnt_file')); }, 100 );
                 }
                 else {
                   alert('$cnt_fail_msg');
                 }
               }
-              loadExperiment(10);";
+              loadController(10);";
             //<\to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
             $code .= $load_cnt_code;
         } //end of if ($cnt_file)
@@ -335,34 +338,6 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
                 }
             }
         }
-
-        if ($rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
-            //<to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
-            if ($rec_file) {
-                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $rec_file;
-            } else {
-                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_rec_file->contextid .
-                    "/" . $initial_rec_file->component . "/" . $initial_rec_file->filearea .
-                    "/" . $initial_rec_file->itemid . "/" . $initial_rec_file->filename;
-            }
-            $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
-            $load_rec_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
-              function loadExperiment(count) {
-                if (!applet._simulation && count > 0) {
-                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
-                }
-                else if (applet._simulation) {
-                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
-                }
-                else {
-                  alert('$rec_fail_msg');
-                }
-              }
-              loadExperiment(10);";
-            //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
-            $code .= $load_rec_code;
-        } //end of if ($rec_file)
-        // <\Loading interaction recording files>
 
         // <Loading personalized variables>
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
@@ -394,6 +369,34 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
             $code .= $personalize_vars_code;
         }
         // <\Loading personalized variables>
+
+        if ($rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
+            //<to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
+            if ($rec_file) {
+                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $rec_file;
+            } else {
+                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_rec_file->contextid .
+                    "/" . $initial_rec_file->component . "/" . $initial_rec_file->filearea .
+                    "/" . $initial_rec_file->itemid . "/" . $initial_rec_file->filename;
+            }
+            $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
+            $load_rec_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+              function loadExperiment(count) {
+                if (!applet._simulation && count > 0) {
+                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
+                }
+                else if (applet._simulation) {
+                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
+                }
+                else {
+                  alert('$rec_fail_msg');
+                }
+              }
+              loadExperiment(10);";
+            //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
+            $code .= $load_rec_code;
+        } //end of if ($rec_file)
+        // <\Loading interaction recording files>
         // <\Loading state, controller and interaction files as well as personalized variables>
 
         $code .= '</script></div>';

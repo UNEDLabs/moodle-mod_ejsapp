@@ -36,7 +36,7 @@ require_once ('../../config.php');
 
 global $DB;
 
-$key = $_GET["key"];
+$key = required_param('key', PARAM_TEXT);
 echo "key=$key\n";
 
 if ($DB->record_exists('ejsapp_sarlab_keys', array('sarlabpass' => $key))) {
