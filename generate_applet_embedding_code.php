@@ -172,8 +172,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
         /////////////////////////////////////////////////////////////
         /*$file_record = $DB->get_record('files', array('filename' => $ejsapp->applet_name.'.jar', 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsapp->id));
         $app_codebase = $CFG->wwwroot . "/pluginfile.php/" . $file_record->contextid . "/" . $file_record->component . "/" . $file_record->filearea . "/" . $file_record->itemid . $file_record->filepath;
-        //$fullpath = '/'.$file_record->contextid.$file_record->component.$file_record->filearea.'/'.$file_record->itemid.'/'.$file_record->filename;
-        $archive = $app_codebase . $file_record->filename;*/
+        $ejsapp->codebase = $app_codebase;// . $file_record->filename;*/
         /////////////////////////////////////////////////////////////
 
         if ($collabinfo && !isset($collabinfo->director)) { // Invited users to collaborative sessions
@@ -188,7 +187,6 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
         $language = current_language();
         $username = fullname($USER); //For collab
 
-        //$code .= "document.write('archive=\"$archive\"');
         $permissions = 'sandbox';
         if ($ejsapp->is_rem_lab == 1) $permissions = 'all-permissions';
         $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');

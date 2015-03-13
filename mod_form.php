@@ -209,21 +209,16 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('sarlab_instance', 'sarlab_instance', 'ejsapp');
         $mform->disabledIf('sarlab_instance', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('sarlab_instance', 'sarlab', 'eq', 0);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $mform->setDefault('sarlab_instance', $rem_lab_data->sarlabinstance);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('sarlab_instance', $rem_lab_data->sarlabinstance);
         }
         
         $mform->addElement('selectyesno', 'sarlab_collab', get_string('sarlab_collab', 'ejsapp'));
         $mform->addHelpButton('sarlab_collab', 'sarlab_collab', 'ejsapp');
         $mform->disabledIf('sarlab_instance', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('sarlab_collab', 'sarlab', 'eq', 0);
-        if ($this->current->instance) {
-            $rem_lab_data = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $this->current->instance));
-            if ($rem_lab_data) {
-                $mform->setDefault('sarlab_collab', $rem_lab_data->sarlabcollab);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('sarlab_collab', $rem_lab_data->sarlabcollab);
         }
 
         // Obtain the list of Sarlab experiences the current user can configure and add them to the form
@@ -261,10 +256,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('ip_lab', 'ip_lab', 'ejsapp');
         $mform->disabledIf('ip_lab', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('ip_lab', 'sarlab', 'eq', 1);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $mform->setDefault('ip_lab', $rem_lab_data->ip);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('ip_lab', $rem_lab_data->ip);
         }
 
         $mform->addElement('text', 'port', get_string('port', 'ejsapp'), array('size' => '2'));
@@ -273,10 +266,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('port', 'port', 'ejsapp');
         $mform->disabledIf('port', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('port', 'sarlab', 'eq', 1);
-        if ($this->current->instance) {
-            if ($rem_lab_data) {
-                $mform->setDefault('port', $rem_lab_data->port);
-            }
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('port', $rem_lab_data->port);
         }
 
         $mform->addElement('selectyesno', 'active', get_string('active', 'ejsapp'));
@@ -437,6 +428,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $default_values['applet_name'] = $applet_name;
 
             // Element listing EJS public variables
+            // $PAGE->requires->js_init_call;
             // TODO: Get list of public variables: their names, values and types
             // </Set the mod_form elements>
         } //if ($content)

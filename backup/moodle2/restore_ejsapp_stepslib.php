@@ -79,11 +79,11 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         // copy files
         if (!empty($data->class_file)) { //JAR applet
-            $sql = "select * from {$CFG->prefix}files where component = 'mod_ejsapp' and itemid = {$data->id} and filename = '{$data->applet_name}.jar'";
+            $sql = "select * from {files} where component = 'mod_ejsapp' and itemid = {$data->id} and filename = '{$data->applet_name}.jar'";
         } else { //Zip file with Javascript
             $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->applet_name);
             $without_Simulation = substr($withoutExt, 0, strrpos($withoutExt, '_Simulation'));
-            $sql = "select * from {$CFG->prefix}files where component = 'mod_ejsapp' and itemid = {$data->id} and filename like '%$without_Simulation%'";
+            $sql = "select * from {files} where component = 'mod_ejsapp' and itemid = {$data->id} and filename like '%$without_Simulation%'";
         }
         $file_record = $DB->get_record_sql($sql);
         if ($file_record) {
