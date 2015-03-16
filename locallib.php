@@ -49,6 +49,12 @@ function update_db($ejsapp, $context) {
 
     $maxbytes = get_max_upload_file_size($CFG->maxbytes);
 
+    // Creating the .jar or .zip file in dataroot and updating the files table in the database
+    $draftitemid_applet = $ejsapp->appletfile;
+    if ($draftitemid_applet) {
+        file_save_draft_area_files($draftitemid_applet, $context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
+    }
+
     // Creating the state file in dataroot and updating the files table in the database
     $draftitemid_state = $ejsapp->statefile;
     if ($draftitemid_state) {
@@ -73,16 +79,12 @@ function update_db($ejsapp, $context) {
         $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
     }
 
-    // Obtain the uploaded .zip or .jar file
-    $draftitemid_applet = $ejsapp->appletfile;
-    $file_records = $DB->get_records('files', array('component' => 'user', 'filearea' => 'draft', 'itemid' => $draftitemid_applet));
+    // Obtain the uploaded .zip or .jar file from the draftarea
+    $file_records = $DB->get_records('files', array('component' => 'user', 'filearea' => 'draft', 'itemid' => $draftitemid_applet), 'filesize DESC');
+    $file_record = reset($file_records);
     $fs = get_file_storage();
-    foreach ($file_records as $file_record) {
-        if ($file_record->filename != '.') {
-            $applet_name = $file_record->filename;
-            $file = $fs->get_file_instance($file_record);
-        }
-    }
+    $applet_name = $file_record->filename;
+    $file = $fs->get_file_instance($file_record);
 
     // Create folders to store the .jar or .zip file
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
@@ -109,7 +111,7 @@ function update_db($ejsapp, $context) {
         $fileinfo = array(                      // Prepare file record object
             'contextid' => $context->id,        // ID of context
             'component' => 'mod_ejsapp',        // usually = table name
-            'filearea' => 'jarfiles',           // usually = table name
+            'filearea' => 'tmp_jarfiles',       // usually = table name
             'itemid' => $ejsapp->id,            // usually = ID of row in table
             'filepath' => '/',                  // any path beginning and ending in /
             'filename' => $applet_name);        // any filename
@@ -124,9 +126,6 @@ function update_db($ejsapp, $context) {
     // We need to delete the record of the file we previously unlinked
     if ($referencefileid) {
         $file->delete();
-    }
-    if ($draftitemid_applet) {
-        file_save_draft_area_files($draftitemid_applet, $context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
     }
 
     // codebase
