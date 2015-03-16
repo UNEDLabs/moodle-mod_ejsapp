@@ -89,8 +89,16 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->setType('is_collaborative', PARAM_TEXT);
         $mform->setDefault('is_collaborative', 0);
 
+        $mform->addElement('hidden', 'manifest', null);
+        $mform->setType('manifest', PARAM_TEXT);
+        $mform->setDefault('manifest', '');
+
+        $mform->addElement('hidden', 'applet_name', null);
+        $mform->setType('applet_name', PARAM_TEXT);
+        $mform->setDefault('applet_name', '');
+
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-        $mform->addElement('filepicker', 'appletfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
+        $mform->addElement('filemanager', 'appletfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
         $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
@@ -337,7 +345,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
     function data_preprocessing(&$default_values)
     {
         global $CFG, $DB;
-        $mform = $this->_form;
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
 
@@ -380,58 +387,10 @@ class mod_ejsapp_mod_form extends moodleform_mod
             }
         }
 
-        $content = $this->get_file_content('appletfile');
-        if ($content) {
-            $form_data = $this->get_data();
-
-            // Create folders to store the .jar file
-            if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/')) {
-                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/', 0700);
-            }
-            if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course)) {
-                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course, 0700);
-            }
-            $name = delete_non_alphanumeric_symbols($form_data->name);
-            if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course . '/' . $name)) {
-                mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course . '/' . $name, 0700);
-            }
-
-            $applet_name = $this->get_new_filename('appletfile');
-
-            // Store the .jar file in the proper folder
-            $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $form_data->course . '/' . $name . '/';
-            $filename = $path . $applet_name;
-            $this->save_file('appletfile', $filename, true);
-
-            // <Set the mod_form elements>
-            $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            $manifest = 'EJsS';
-            if ($ext == 'jar') {
-                // Extract the manifest.mf file from the .jar
-                $manifest = file_get_contents('zip://' . $filename . '#' . 'META-INF/MANIFEST.MF');
-                // Prepare pattern for getting the filename
-                $pattern = '/(\w+)[.]jar/';
-            } else {
-                // Prepare pattern for getting the filename
-                $pattern = '/(\w+)[.]zip/';
-            }
-
-            $mform->addElement('hidden', 'manifest', null);
-            $mform->setType('manifest', PARAM_TEXT);
-            $mform->setDefault('manifest', $manifest);
-
-            preg_match($pattern, $applet_name, $matches, PREG_OFFSET_CAPTURE);
-            $applet_name = $matches[1][0];
-            $mform->addElement('hidden', 'applet_name', null);
-            $mform->setType('applet_name', PARAM_TEXT);
-            $mform->setDefault('applet_name', $applet_name);
-            $default_values['applet_name'] = $applet_name;
-
-            // Element listing EJS public variables
-            // $PAGE->requires->js_init_call;
-            // TODO: Get list of public variables: their names, values and types
-            // </Set the mod_form elements>
-        } //if ($content)
+        // Element listing EJS public variables
+        // $PAGE->requires->js_init_call;
+        // TODO: Get list of public variables: their names, values and types
+        // </Set the mod_form elements>
     } // data_preprocessing
 
 

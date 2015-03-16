@@ -116,7 +116,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 
     $cmid = $ejsapp->coursemodule;
     $context = context_module::instance($cmid);
-    $ejs_ok = update_db($ejsapp, $context->id);
+    $ejs_ok = update_db($ejsapp, $context, $context->id);
 
     if ($ejs_ok) {
         // Remote labs
@@ -188,32 +188,6 @@ function ejsapp_add_instance($ejsapp, $mform = null)
             }
         }
 
-        if ($mform and !empty($ejsapp->ejsappwording['itemid'])) {
-            $draftitemid_wording = $ejsapp->ejsappwording['itemid'];
-            $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
-            $DB->update_record('ejsapp', $ejsapp);
-        }
-
-        $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-
-        // Creating the state file in dataroot and updating the files table in the database
-        $draftitemid_state = $ejsapp->statefile;
-        if ($draftitemid_state) {
-            file_save_draft_area_files($draftitemid_state, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
-        }
-
-        // Creating the controller file in dataroot and updating the files table in the database
-        $draftitemid_controller = $ejsapp->controllerfile;
-        if ($draftitemid_controller) {
-            file_save_draft_area_files($draftitemid_controller, $context->id, 'mod_ejsapp', 'cntfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-        }
-
-        // Creating the recording file in dataroot and updating the files table in the database
-        $draftitemid_recording = $ejsapp->recordingfile;
-        if ($draftitemid_recording) {
-            file_save_draft_area_files($draftitemid_recording, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-        }
-
     } else {
         ejsapp_delete_instance($ejsapp->id);
     }
@@ -245,10 +219,9 @@ function ejsapp_update_instance($ejsapp, $mform=null)
     $cmid = $ejsapp->coursemodule;
     $context = context_module::instance($cmid);
 
-    require_once($CFG->libdir . '/filelib.php');
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $ejs_ok = update_db($ejsapp, $context->id);
+    $ejs_ok = update_db($ejsapp, $context);
 
     if ($ejs_ok) {
         $rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
@@ -350,32 +323,6 @@ function ejsapp_update_instance($ejsapp, $mform=null)
               $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
               $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
             }
-        }
-
-        $draftitemid_wording = $ejsapp->ejsappwording['itemid'];
-        if ($draftitemid_wording) {
-            $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
-            $DB->update_record('ejsapp', $ejsapp);
-        }
-
-        $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-
-        // Creating the state file in dataroot and updating the files table in the database
-        $draftitemid_state = $ejsapp->statefile;
-        if ($draftitemid_state) {
-            file_save_draft_area_files($draftitemid_state, $context->id, 'mod_ejsapp', 'xmlfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
-        }
-
-        // Creating the controller file in dataroot and updating the files table in the database
-        $draftitemid_controller = $ejsapp->controllerfile;
-        if ($draftitemid_controller) {
-            file_save_draft_area_files($draftitemid_controller, $context->id, 'mod_ejsapp', 'cntfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-        }
-
-        // Creating the recording file in dataroot and updating the files table in the database
-        $draftitemid_recording = $ejsapp->recordingfile;
-        if ($draftitemid_recording) {
-            file_save_draft_area_files($draftitemid_recording, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
         }
 
     } else {
@@ -813,7 +760,7 @@ function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $fileare
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
- * @return file served file
+ * @return null
  */
 function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, $options=null)
 {
@@ -839,10 +786,8 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     if ($filearea == 'private') {
         $fullpath = '/' . $context->id . '/user/' . $filearea . '/' . $fileid . '/' . $relativepath;
-        $forcedownload = true;
     } else {
         $fullpath = '/' . $context->id . '/mod_ejsapp/' . $filearea . '/' . $fileid . '/' . $relativepath;
-        $forcedownload = false;
     }
 
     $fs = get_file_storage();
@@ -850,6 +795,5 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
         return false;
     }
 
-    return send_stored_file($file, 0, 0, $forcedownload);
-    //return send_stored_file($file, 604800, 0, $forcedownload); // I CAN ONLY SET CACHE != 0 IF WE USE DIFFERENT APPLETS FOR COLLAB THAN FOR INDIVIDUAL SESSIONS
+    return send_stored_file($file, 604800, 0, $forcedownload, $options);
 }

@@ -23,10 +23,10 @@
 
 /**
  *
- * This file generates the code that embeds the EJS applet into Moodle. It is
- * used for three different cases: 1) when only the EJSApp activity is being
- * used, 2) when the EJSApp File Browser is used to load a state file, and
- * 3) when the EJSApp Collab Session is used.
+ * This file generates the code that embeds the EJS application into Moodle.
+ * It is used for three different cases: 1) when only the EJSApp activity is
+ * being used, 2) when the EJSApp File Browser is used to load a state or rec
+ * file, and 3) when the EJSApp Collab Session is used.
  *
  * @package    mod
  * @subpackage ejsapp
@@ -189,12 +189,13 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
 
         $permissions = 'sandbox';
         if ($ejsapp->is_rem_lab == 1) $permissions = 'all-permissions';
+        $ext = '.jar';
+        if (pathinfo($ejsapp->applet_name, PATHINFO_EXTENSION) == 'jar') $ext = '';
         $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');
-                  document.write(' archive=\"{$ejsapp->applet_name}.jar\"');
-                  document.write(' name=\"{$ejsapp->applet_name}\"');
                   document.write(' id=\"{$ejsapp->applet_name}\"');
                   document.write(' width=\"'+w+'\"');
                   document.write(' height=\"'+h+'\">');
+                  document.write('<param name=\"cache_archive\" value=\"{$ejsapp->applet_name}.$ext\">');
                   document.write('<param name=\"permissions\" value=\"{$permissions}\"/>');
                   document.write('<param name=\"codebase_lookup\" value=\"false\"/>');
                   document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
@@ -262,17 +263,17 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
                     "/" . $initial_state_file->itemid . "/" . $initial_state_file->filename;
             }
             $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
-            $load_state_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+            $load_state_code = "
               function loadState(count) {
-                if (!applet._simulation && count > 0) {
+                if (!{$ejsapp->applet_name}._simulation && count > 0) {
                     window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if (applet._simulation) {
-                  window.setTimeout( function() { applet._readState('url:$state_file'); }, 100 );
-                  applet._view.resetTraces();
-                  //applet._view.clearData();
-                  //applet._view.clearElements();
-                  //applet._view.resetElements();
+                else if ({$ejsapp->applet_name}._simulation) {
+                  window.setTimeout( function() { {$ejsapp->applet_name}._readState('url:$state_file'); }, 100 );
+                  {$ejsapp->applet_name}._view.resetTraces();
+                  //{$ejsapp->applet_name}._view.clearData();
+                  //{$ejsapp->applet_name}._view.clearElements();
+                  //{$ejsapp->applet_name}._view.resetElements();
                 }
                 else {
                   alert('$state_fail_msg');
@@ -305,16 +306,16 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
                     "/" . $initial_cnt_file->itemid . "/" . $initial_cnt_file->filename;
             }
             $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
-            $load_cnt_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+            $load_cnt_code = "
               function loadController(count) {
-                if (!applet._model && count > 0) {
+                if (!{$ejsapp->applet_name}._model && count > 0) {
                     window.setTimeout( function() { loadController( --count ); }, 1000 );
                 }
-                else if (applet._model) {
+                else if ({$ejsapp->applet_name}._model) {
                   window.setTimeout( function() {
-                  var element = applet._model.getUserData('_codeController');
-                  element.setController(applet._readText('url:$cnt_file')); }, 100 );
-                  //applet._model.codeEvaluator.setController(applet._readText('url:$cnt_file')); }, 100 );
+                  var element = {$ejsapp->applet_name}._model.getUserData('_codeController');
+                  element.setController({$ejsapp->applet_name}._readText('url:$cnt_file')); }, 100 );
+                  //{$ejsapp->applet_name}._model.codeEvaluator.setController(applet._readText('url:$cnt_file')); }, 100 );
                 }
                 else {
                   alert('$cnt_fail_msg');
@@ -342,25 +343,25 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
             $js_vars_names = json_encode($personalvarsinfo->name);
             $js_vars_values = json_encode($personalvarsinfo->value);
             $js_vars_types = json_encode($personalvarsinfo->type);
-            $personalize_vars_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+            $personalize_vars_code = "
               var js_vars_names = ". $js_vars_names . ";
               var js_vars_values = ". $js_vars_values . ";
               var js_vars_types = ". $js_vars_types . ";
               function personalizeVars(count) {
-                if (!applet._simulation && count > 0) {
+                if (!{$ejsapp->applet_name}._simulation && count > 0) {
                     window.setTimeout( function() { personalizeVars( --count ); }, 1000 );
                 }
-                else if (applet._simulation) {
+                else if ({$ejsapp->applet_name}._simulation) {
                     for (var i=0; i<js_vars_names.length; i++) {
                         if (js_vars_types[i] != \"Boolean\") {
-                            applet._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
+                            {$ejsapp->applet_name}._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
                         } else {
                             var bool = (js_vars_values[i] == 1);
-                            applet._simulation.setVariable(js_vars_names[i],bool);
+                            {$ejsapp->applet_name}._simulation.setVariable(js_vars_names[i],bool);
                         }
                     }
-                    applet._simulation.update();
-                    //applet._initialize();
+                    {$ejsapp->applet_name}._simulation.update();
+                    //{$ejsapp->applet_name}._initialize();
                 }
               }
               personalizeVars(10);";
@@ -378,13 +379,13 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
                     "/" . $initial_rec_file->itemid . "/" . $initial_rec_file->filename;
             }
             $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
-            $load_rec_code = "var applet = document.getElementById('{$ejsapp->applet_name}');
+            $load_rec_code = "
               function loadExperiment(count) {
-                if (!applet._simulation && count > 0) {
+                if (!{$ejsapp->applet_name}._simulation && count > 0) {
                     window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
                 }
-                else if (applet._simulation) {
-                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
+                else if ({$ejsapp->applet_name}._simulation) {
+                  window.setTimeout( function() { {$ejsapp->applet_name}._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
                 }
                 else {
                   alert('$rec_fail_msg');

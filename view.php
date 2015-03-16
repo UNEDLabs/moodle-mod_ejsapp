@@ -119,7 +119,8 @@ $accessed = false;
 $sarlabinfo = null;
 if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $accessed = true;
-    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+    prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+    echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
 } else { //<Remote lab>
     //<Check if the remote lab is operative>
     $allow_access = true;
@@ -179,36 +180,39 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 }
             }
             $accessed = true;
-            echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+            prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+            echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
         } else {
-            echo $OUTPUT->heading(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
+            echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
             $action = 'need_to_wait';
             /*$url = $CFG->wwwroot . '/mod/ejsapp/countdown.php';
             $PAGE->requires->js_init_call('M.mod_ejsapp.countdown', array($url, $CFG->version));*/
         }
     } else { //Students trying to access a remote lab with restricted access OR remote lab not operative
         if (!$allow_access) { //Remote lab not operative
-            echo $OUTPUT->heading(get_string('inactive_lab', 'ejsapp'));
+            echo $OUTPUT->box(get_string('inactive_lab', 'ejsapp'));
             $action = 'inactive_lab';
         } else {    //Students trying to access a remote lab with restricted access
             if ($anyones_active_booking) { //Remote lab freely accessible from one course but with an active booking made by anyone in a different course
-                echo $OUTPUT->heading(get_string('booked_lab', 'ejsapp'));
+                echo $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
                 $action = 'booked_lab';
             } else { //Other cases
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
                 $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlab_conf, $labmanager);
                 if (!is_null($sarlabinfo)) { //The user has an active booking -> he can access the lab
                     $accessed = true;
-                    echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+                    prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+                    echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
                 } else { //No active booking
-                    echo $OUTPUT->heading(get_string('no_booking', 'ejsapp'));
+                    echo $OUTPUT->box(get_string('no_booking', 'ejsapp'));
                     if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) { //Student can still access in collaborative mode
-                        echo $OUTPUT->heading(get_string('collab_access', 'ejsapp'));
+                        echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                         $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL', $labmanager);
-                        echo $OUTPUT->heading(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+                        prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+                        echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
                         $action = 'collab_view';
                     } else { //No access
-                        echo $OUTPUT->heading(get_string('check_bookings', 'ejsapp'));
+                        echo $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
                         $action = 'need_to_book';
                     }
                 }
@@ -286,7 +290,7 @@ if ($ejsapp->appwording) {
 
 // Buttons to close or leave collab sessions:
 if (isset($collab_session)) {
-    if (isset($collab_session->master_user)) {
+    /*if (isset($collab_session->master_user)) {
         $close_url = $CFG->wwwroot .
             "/blocks/ejsapp_collab_session/close_collaborative_session.php?session=" .
             $session_id . "&courseid=" . $course->id;
@@ -303,7 +307,17 @@ if (isset($collab_session)) {
     </center>
 EOD;
         echo $button;
+    }*/
+
+    $form = new html_form();
+    $form->url = new moodle_url($CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collaborative_session.php",
+                                array('session' => $session_id, 'courseid' => $course->id));
+    if ($USER->id == $collab_session->master_user) {
+        $form->button->text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
+    } else {
+        $form->button->text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
     }
+    echo $OUTPUT->button($form);
 }
 
 // Finish the page
@@ -496,4 +510,31 @@ function define_sarlab($instance, $collab, $practice, $labmanager) {
     $sarlabinfo->labmanager = $labmanager;
 
     return $sarlabinfo;
+}
+
+
+/**
+ * Gets the required EJS .jar or .zip file for this activity from Moodle's File System and places it
+ * in the required directory.
+ *
+ * @param int $ejsappcourse id of the course in which the ejsapp activity is
+ * @param int $ejsappid id of the ejsapp activity
+ * @param string $filename name of the EJS .jar or .zip file
+ * @return void
+ */
+function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
+    /*global $DB, $CFG;
+    $file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsappid));
+    if ($file_record) {
+        $fs = get_file_storage();
+        $file = $fs->get_file_instance($file_record);
+    }
+
+    // Create folders to store the .jar file
+    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
+    if (!file_exists($path)) mkdir($path, 0700);
+    $path .= $ejsappcourse . '/';
+    if (!file_exists($path)) mkdir($path, 0700);
+    $path .= $ejsappid;
+    if (!file_exists($path)) mkdir($path, 0700);*/
 }

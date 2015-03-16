@@ -79,11 +79,14 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         // copy files
         if (!empty($data->class_file)) { //JAR applet
-            $sql = "select * from {files} where component = 'mod_ejsapp' and itemid = {$data->id} and filename = '{$data->applet_name}.jar'";
+            $ext = '.jar';
+            if (pathinfo($data->applet_name, PATHINFO_EXTENSION) == 'jar') $ext = '';
+            $name = $data->applet_name . $ext;
+            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and itemid = {$data->id} and filename = '{$name}'";
         } else { //Zip file with Javascript
             $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->applet_name);
             $without_Simulation = substr($withoutExt, 0, strrpos($withoutExt, '_Simulation'));
-            $sql = "select * from {files} where component = 'mod_ejsapp' and itemid = {$data->id} and filename like '%$without_Simulation%'";
+            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and itemid = {$data->id} and filename like '%$without_Simulation%'";
         }
         $file_record = $DB->get_record_sql($sql);
         if ($file_record) {
@@ -100,35 +103,25 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
                 $fileinfo['filename']);
             if ($file) {
                 // create directories
-                if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/')) {
-                    mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/', 0700);
-                }
-                if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course)) {
-                    mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course, 0700);
-                }
-                if (!file_exists($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid)) {
-                    mkdir($CFG->dirroot . '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid, 0700);
-                }
+                $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
+                if (!file_exists($path)) mkdir($path, 0700);
+                $path .= $data->course . '/';
+                if (!file_exists($path)) mkdir($path, 0700);
+                $path .= $newitemid;
+                if (!file_exists($path)) mkdir($path, 0700);
 
                 // copy file .jar or .zip file
-                $file_content = $file->get_content();
                 $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
-                $new_path = $CFG->dirroot . $codebase;
-                $fh = fopen($new_path . $file_record->filename, 'w+') or die("can't open file");
-                fwrite($fh, $file_content);
-                fclose($fh);
+                $folderpath = $CFG->dirroot . $codebase;
+                $filepath = $folderpath . $file_record->filename;
+                $file->copy_content_to($filepath);
                 if (empty($data->class_file)) { //Zip file with Javascript
-                    modifications_for_javascript($new_path, $data, $file_record->filename, '', $codebase);
-                    unlink($new_path . $file_record->filename);
+                    modifications_for_javascript($folderpath, $filepath, $data, $codebase);
+                    unlink($filepath);
                 }
 
                 // <update ejsapp table>
-                $codebase = '';
-                preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
-                if (!empty($match_result) and $match_result[1]) {
-                    $codebase .= '/' . $match_result[1];
-                }
-                $codebase .= '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
+                $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
                 $record = new stdClass();
                 $record->id = $newitemid;
                 $record->codebase = $codebase;
