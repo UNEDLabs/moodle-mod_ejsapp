@@ -104,7 +104,7 @@ function ejsapp_get_post_actions() {
  */
 function ejsapp_add_instance($ejsapp, $mform = null)
 {
-    global $DB, $CFG;
+    global $DB;
 
     $ejsapp->timecreated = time();
     $ejsapp->id = $DB->insert_record('ejsapp', $ejsapp);
@@ -116,52 +116,16 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 
     $cmid = $ejsapp->coursemodule;
     $context = context_module::instance($cmid);
-    $ejs_ok = update_db($ejsapp, $context, $context->id);
+    $ejs_ok = update_ejsapp_and_files_tables($ejsapp, $context, $context->id);
 
     if ($ejs_ok) {
         // Remote labs
         if ($ejsapp->is_rem_lab == 1) {
-            $ejsapp_rem_lab = new stdClass();
-            $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-            $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
-            $ejsapp_rem_lab->active = $ejsapp->active;
-            if ($ejsapp_rem_lab->usingsarlab == 1) {
-                $sarlabinstance = $ejsapp->sarlab_instance;
-                $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
-                $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
-                $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-                $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-                $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'");
-                if ($init_char != 0) $init_char++;
-                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],$init_char);
-                $ejsapp_rem_lab->ip = $ip;
-                $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
-            } else {
-                $ejsapp_rem_lab->sarlabinstance = '0';
-                $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
-                $ejsapp_rem_lab->port = $ejsapp->port;
-            }
-            $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
-            $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
-            $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+            $ejsapp_rem_lab = ejsapp_rem_lab_conf($ejsapp);
             $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
 
-            $ejsapp_expsyst2pract = new stdClass();
-            $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-            if ($ejsapp_rem_lab->usingsarlab == 1) {
-                $expsyst2pract_list = $ejsapp->list_practices;
-                $expsyst2pract_list = explode(";", $expsyst2pract_list);
-                $selected_practices = $ejsapp->practiceintro;
-                for ($i = 0; $i < count($selected_practices); $i++) {
-                    $ejsapp_expsyst2pract->practiceid = $i + 1;
-                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
-                    $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
-                }
-            } else {
-                $ejsapp_expsyst2pract->practiceid = 1;
-                $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
-                $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
-            }
+            ejsapp_expsyst2pract($ejsapp);
+
             // EJSApp booking system
             if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
                 $context = context_course::instance($ejsapp->course);
@@ -206,7 +170,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
  */
 function ejsapp_update_instance($ejsapp, $mform=null)
 {
-    global $DB, $CFG;
+    global $DB;
 
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
@@ -221,37 +185,14 @@ function ejsapp_update_instance($ejsapp, $mform=null)
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $ejs_ok = update_db($ejsapp, $context);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
+    $ejs_ok = update_ejsapp_and_files_tables($ejsapp, $context);
 
     if ($ejs_ok) {
         $rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
         // Remote labs
         if ($ejsapp->is_rem_lab == 1) {
-            $ejsapp_rem_lab = new stdClass();
-            $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-            $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
-            $ejsapp_rem_lab->active = $ejsapp->active;
-            if ($ejsapp_rem_lab->usingsarlab == 1) {
-                $sarlabinstance = $ejsapp->sarlab_instance;
-                $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
-                $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
-                $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-                $list_sarlab_ports = explode(";", $CFG->sarlab_port);
-                $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)],"'");
-                if ($init_char != 0) $init_char++;
-                $ip = substr($list_sarlab_IPs[intval($sarlabinstance)],$init_char);
-                $ejsapp_rem_lab->ip = $ip;
-                $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
-            } else {
-                $ejsapp_rem_lab->sarlabinstance = '0';
-                $ejsapp_rem_lab->sarlabcollab = '0';
-                $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
-                $ejsapp_rem_lab->port = $ejsapp->port;
-            }
-            $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
-            $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
-            $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
-
+            $ejsapp_rem_lab = ejsapp_rem_lab_conf($ejsapp);
             $rem_lab = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
             if ($rem_lab != null) {
                 $ejsapp_rem_lab->id = $rem_lab->id;
@@ -261,22 +202,8 @@ function ejsapp_update_instance($ejsapp, $mform=null)
             }
 
             $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
-            $ejsapp_expsyst2pract = new stdClass();
-            $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-            if ($ejsapp->sarlab == 1) {
-                $expsyst2pract_list = $ejsapp->list_practices;
-                $expsyst2pract_list = explode(";", $expsyst2pract_list);
-                $selected_practices = $ejsapp->practiceintro;
-                for ($i = 0; $i < count($selected_practices); $i++) {
-                    $ejsapp_expsyst2pract->practiceid = $i + 1;
-                    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
-                    $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
-                }
-            } else {
-                $ejsapp_expsyst2pract->practiceid = 1;
-                $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
-                $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
-            }
+            ejsapp_expsyst2pract($ejsapp);
+
             // EJSApp booking system
             if ($rem_labs == null) {
                 if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
@@ -353,6 +280,9 @@ function ejsapp_delete_instance($id)
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
 
     $DB->delete_records('ejsapp', array('id' => $ejsapp->id));
     if ($ejsapp->is_rem_lab == 1) {
@@ -422,7 +352,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
  */
 function ejsapp_user_complete($course, $user, $mod, $ejsapp)
 {
-    global $CFG, $DB;
+    global $DB;
 
     if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
         'info'=>$ejsapp->name), 'time ASC')) {
@@ -507,73 +437,7 @@ function ejsapp_cron()
     $params = array(strtotime(date('Y-m-d H:i:s'))-900);
     $DB->delete_records_select('ejsapp_log', "time < ?", $params);
 
-    //CHECKING WHETHER REMOTE LABS ARE OPERATIVE OR NOT:
-    function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
-        global $devices_info;
-
-        $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
-        $not_checkable = false;
-        if ($alive && $usingsarlab) {
-            //Obtain the xml filename from idExp
-            $URI = 'http://' . $host . '/';
-            $file_headers = @get_headers($URI);
-            if (substr($file_headers[0], 9, 3) == 200) { // Valid file
-                $dom = new DOMDocument;
-                $dom->validateOnParse = true;
-                if ($dom->load($URI)) {
-                    $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
-                    $xmlfilename = 'null';
-                    foreach ($experiences as $experience) {
-                        $idExperiences = $experience->getElementsByTagName('idExperience'); //Get the name of the experience
-                        foreach ($idExperiences as $idExperience) {
-                            if ($idExperience->nodeValue == $idExp) {
-                                $file_experiences = $experience->getElementsByTagName('fileName'); //Get the name of the xml file
-                                foreach ($file_experiences as $file_experience) {
-                                    $xmlfilename = $file_experience->nodeValue;
-                                }
-                                break 2;
-                            }
-                        }
-                    }
-                    $URL = $URI . 'isAliveExp?' . $xmlfilename;
-                    if ($info = file_get_contents($URL)) {
-                        $info = explode("=", $info);
-                        $alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper ("true")) ? TRUE : FALSE;
-                        if (!$alive) {
-                            // Get list of devices in the experience that are not alive and see which ones are down
-                            $URL = $URI . 'pingExp' . $xmlfilename;
-                            if ($info = file_get_contents($URL)) {
-                                $devices = explode("Ping to ", $info);
-
-                                function get_string_between($string, $start, $end){
-                                    $string = " ".$string;
-                                    $ini = strpos($string,$start);
-                                    if ($ini == 0) return "";
-                                    $ini += strlen($start);
-                                    $len = strpos($string,$end,$ini) - $ini;
-                                    return substr($string,$ini,$len);
-                                }
-
-                                foreach ($devices as $device) {
-                                    $devices_info[]->name = get_string_between($device, ": ", "ping ");
-                                    $ip = get_string_between($device, "ping ", "Reply from ");
-                                    $devices_info[]->ip = $ip;
-                                    $URL = $URI . 'isAlive?' . $ip;
-                                    if ($info = file_get_contents($URL)) {
-                                        $devices_info[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? TRUE : FALSE;
-                                    }
-                                }
-                            }
-                        }
-                    } else $not_checkable = true;
-                } else $not_checkable = true;
-            } else $not_checkable = true;
-        }
-        if ($not_checkable) return 2;
-        if ($alive) return 1;
-        else return 0;
-    }
-
+    //Checking whether remote labs are operative or not:
     $ejsapp_remlabs_conf = $DB->get_records('ejsapp_remlab_conf');
     foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
         if ($ejsapp_remlab_conf->usingsarlab) {
@@ -637,7 +501,9 @@ function ejsapp_cron()
  */
 function ejsapp_get_extra_capabilities()
 {
-    return array();
+    return array('moodle/role:assign', 'moodle/site:accessallgroups', 'moodle/course:viewhiddenuserfields',
+                 'moodle/site:viewparticipants', 'moodle/course:managegroups', 'moodle/course:enrolreview',
+                 'moodle/user:viewdetails');
 }
 
 /**

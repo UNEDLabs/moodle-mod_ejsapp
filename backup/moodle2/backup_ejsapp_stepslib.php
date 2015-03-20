@@ -123,6 +123,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         // Define file annotations
         $ejsapp->annotate_files('mod_ejsapp', 'jarfiles', null);
+        $ejsapp->annotate_files('mod_ejsapp', 'tmp_jarfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'xmlfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'cntfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'recfiles', null);

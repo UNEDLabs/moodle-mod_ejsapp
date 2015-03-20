@@ -356,7 +356,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
             $draftitemid_wording = file_get_submitted_draft_itemid('appwording');
             $default_values['ejsappwording']['format'] = $default_values['appwordingformat'];
-            $default_values['ejsappwording']['text'] = file_prepare_draft_area($draftitemid_wording, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
+            $default_values['ejsappwording']['text'] = file_prepare_draft_area($draftitemid_wording, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
             $default_values['ejsappwording']['itemid'] = $draftitemid_wording;
             
             $draftitemid_state = file_get_submitted_draft_itemid('statefile');

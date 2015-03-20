@@ -37,14 +37,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Updates the EJSApp tables according to the .jar information
+ * Updates the ejsapp, ejsapp_personal_vars, and files tables according to the .jar/.zip information
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param object $context context module
  *
  * @return boolean ejs_ok
  */
-function update_db($ejsapp, $context) {
+function update_ejsapp_and_files_tables($ejsapp, $context) {
     global $CFG, $DB;
 
     $maxbytes = get_max_upload_file_size($CFG->maxbytes);
@@ -76,14 +76,15 @@ function update_db($ejsapp, $context) {
     // Same with the content of the wording element
     $draftitemid_wording = $ejsapp->ejsappwording['itemid'];
     if ($draftitemid_wording) {
-        $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
+        $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
     }
 
-    // Obtain the uploaded .zip or .jar file from the draftarea
-    $file_records = $DB->get_records('files', array('component' => 'user', 'filearea' => 'draft', 'itemid' => $draftitemid_applet), 'filesize DESC');
+    // Obtain the uploaded .zip or .jar file from dataroot
+    //$file_records = $DB->get_records('files', array('component' => 'user', 'filearea' => 'draft', 'itemid' => $draftitemid_applet), 'filesize DESC');
+    $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
     $file_record = reset($file_records);
-    $fs = get_file_storage();
     $applet_name = $file_record->filename;
+    $fs = get_file_storage();
     $file = $fs->get_file_instance($file_record);
 
     // Create folders to store the .jar or .zip file
@@ -96,7 +97,7 @@ function update_db($ejsapp, $context) {
         mkdir($path, 0700);
     }
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id;
-    if (file_exists($path)) { // the ejsapp activity has been renamed or updated
+    if (file_exists($path)) { // the ejsapp activity has been updated
         delete_recursively($path);
     } if (!file_exists($path)) {
         mkdir($path, 0700);
@@ -104,29 +105,7 @@ function update_db($ejsapp, $context) {
 
     // Copy the jar/zip file to its destination folder in jarfiles
     $filepath = $path . '/' . $applet_name;
-    $referencefileid = $file->get_referencefileid();
-    if ($referencefileid) { // Alias to a jar/zip file -> we need to create a real file before copying its content
-        $file_ref_record = $DB->get_record('files_reference', array('id' => $referencefileid));
-        // First we create another alias
-        $fileinfo = array(                      // Prepare file record object
-            'contextid' => $context->id,        // ID of context
-            'component' => 'mod_ejsapp',        // usually = table name
-            'filearea' => 'tmp_jarfiles',       // usually = table name
-            'itemid' => $ejsapp->id,            // usually = ID of row in table
-            'filepath' => '/',                  // any path beginning and ending in /
-            'filename' => $applet_name);        // any filename
-        $file = $fs->create_file_from_reference($fileinfo, $file_ref_record->repositoryid, $file_ref_record->reference);
-        $file->sync_external_file();
-        // Now we unlink this copy so that it becomes a real file
-        $file = $fs->import_external_file($file);
-    }
     $file->copy_content_to($filepath);
-
-    $ext = pathinfo($filepath, PATHINFO_EXTENSION);
-    // We need to delete the record of the file we previously unlinked
-    if ($referencefileid) {
-        $file->delete();
-    }
 
     // codebase
     $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
@@ -141,17 +120,29 @@ function update_db($ejsapp, $context) {
     $ejsapp->height = 0;
     $ejsapp->width = 0;
 
-    // Get params and set their corresponding values in the mod_form elements
+    $ext = pathinfo($filepath, PATHINFO_EXTENSION);
+    // Get params and set their corresponding values in the mod_form elements and update the ejsapp table
     if ($ext == 'jar') { //Java Applet
         // Extract the manifest.mf file from the .jar
         $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
         $ejsapp->applet_name = $applet_name;
-        $ejs_ok = modifications_for_java($manifest, $filepath, $ejsapp);
+        $ejs_ok = modifications_for_java($manifest, $filepath, $ejsapp, $file, $file_record);
     } else { //Javascript
         $ejs_ok = modifications_for_javascript($path . '/', $filepath, $ejsapp, $codebase);
     }
 
-    if ($ext != 'jar') unlink($filepath); //For Javascript, we delete the zip file, which is of no use
+    // We add an entry in Moodle's file table for the .zip or .jar file in the jarfiles directory
+    $fileinfo = array(                      // Prepare file record object
+        'contextid' => $context->id,        // ID of context
+        'component' => 'mod_ejsapp',        // usually = table name
+        'filearea' => 'tmp_jarfiles',       // usually = table name
+        'itemid' => $ejsapp->id,            // usually = ID of row in table
+        'filepath' => '/',                  // any path beginning and ending in /
+        'filename' => $applet_name);        // any filename
+    $fs->create_file_from_pathname($fileinfo, $filepath);
+
+    //if ($ext != 'jar') unlink($filepath); //For Javascript, we delete the zip file, which is of no use
+    // Update: actually, we may use it for comparing its contenthash with the one in a repository when using aliases
 
     // <update ejsapp_personal_vars table>
     //Personalizing EJS variables <update ejsapp_personal_vars table>
@@ -184,7 +175,7 @@ function update_db($ejsapp, $context) {
             }
         }
     }
-    // </update ejsapp_personal_vars table>
+    // </update ejsapp_personal_vars table> // TODO: Only update personal variables that were set new when updating an ejsapp activity
 
     $DB->update_record('ejsapp', $ejsapp);
 
@@ -371,9 +362,11 @@ function users_personalized_vars($ejsapp) {
  * @param string $manifest
  * @param string $filepath
  * @param stdClass $ejsapp
+ * @param stored_file $file
+ * @param stdClass $file_record
  * @return boolean $ejs_ok
  */
-function modifications_for_java($manifest, $filepath, $ejsapp) {
+function modifications_for_java($manifest, $filepath, $ejsapp, $file, $file_record) {
     global $CFG;
 
     // class_file
@@ -455,14 +448,20 @@ function modifications_for_java($manifest, $filepath, $ejsapp) {
         $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
         if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
-            // Sign the applet
-            shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
-                $filepath . ' ' .                                       // parameter 1
-                get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
-                get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
-                get_config('ejsapp', 'certificate_alias')               // parameter 4
-            );
-        }
+            if (is_null($file->get_referencefileid())) { // linked files must be already signed!
+                // Sign the applet
+                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
+                    $filepath . ' ' .                                       // parameter 1
+                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
+                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
+                    get_config('ejsapp', 'certificate_alias')               // parameter 4
+                );
+                // We replace the file stored in Moodle's filesystem and its table with the signed version:
+                $file->delete();
+                $fs = get_file_storage();
+                $fs->create_file_from_pathname($file_record, $filepath);
+            } // TODO: Check if the applet file the alias points to is signed and print an alert if it's not?
+        } // TODO: Files which do not include the codebase parameter with the Moodle server direction are not signed --> alert
     }
 
     return $ejs_ok;
@@ -546,12 +545,155 @@ function modifications_for_javascript($folderpath, $filepath, $ejsapp, $codebase
                 file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
             }
             file_put_contents($folderpath . $ejsapp->applet_name, $code);
-            //TODO: Use Moodle files system
-            /*$fileinfo['filename'] = $ejsapp->applet_name;
-            $fs = get_file_storage();
-            $fs->create_file_from_pathname($fileinfo, $new_path . $ejsapp->applet_name);*/
         }
     }
 
     return $ejs_ok;
+}
+
+
+/**
+ *
+ * Checks if a remote lab equipment is alive or not, either directly when it has a public IP or by asking Sarlab.
+ *
+ * @param string $host
+ * @param string $port
+ * @param stdClass $usignsarlab
+ * @param string $idExp
+ * @param string $timeout
+ * @return int 0, not alive; 1, alive; 2, not checkable
+ */
+function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
+    global $devices_info;
+
+    $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
+    $not_checkable = false;
+    if ($alive && $usingsarlab) {
+        //Obtain the xml filename from idExp
+        $URI = 'http://' . $host . '/';
+        $file_headers = @get_headers($URI);
+        if (substr($file_headers[0], 9, 3) == 200) { // Valid file
+            $dom = new DOMDocument;
+            $dom->validateOnParse = true;
+            if ($dom->load($URI)) {
+                $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
+                $xmlfilename = 'null';
+                foreach ($experiences as $experience) {
+                    $idExperiences = $experience->getElementsByTagName('idExperience'); //Get the name of the experience
+                    foreach ($idExperiences as $idExperience) {
+                        if ($idExperience->nodeValue == $idExp) {
+                            $file_experiences = $experience->getElementsByTagName('fileName'); //Get the name of the xml file
+                            foreach ($file_experiences as $file_experience) {
+                                $xmlfilename = $file_experience->nodeValue;
+                            }
+                            break 2;
+                        }
+                    }
+                }
+                $URL = $URI . 'isAliveExp?' . $xmlfilename;
+                if ($info = file_get_contents($URL)) {
+                    $info = explode("=", $info);
+                    $alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper ("true")) ? TRUE : FALSE;
+                    if (!$alive) {
+                        // Get list of devices in the experience that are not alive and see which ones are down
+                        $URL = $URI . 'pingExp' . $xmlfilename;
+                        if ($info = file_get_contents($URL)) {
+                            $devices = explode("Ping to ", $info);
+
+                            function get_string_between($string, $start, $end){
+                                $string = " ".$string;
+                                $ini = strpos($string,$start);
+                                if ($ini == 0) return "";
+                                $ini += strlen($start);
+                                $len = strpos($string,$end,$ini) - $ini;
+                                return substr($string,$ini,$len);
+                            }
+
+                            foreach ($devices as $device) {
+                                $devices_info[]->name = get_string_between($device, ": ", "ping ");
+                                $ip = get_string_between($device, "ping ", "Reply from ");
+                                $devices_info[]->ip = $ip;
+                                $URL = $URI . 'isAlive?' . $ip;
+                                if ($info = file_get_contents($URL)) {
+                                    $devices_info[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? TRUE : FALSE;
+                                }
+                            }
+                        }
+                    }
+                } else $not_checkable = true;
+            } else $not_checkable = true;
+        } else $not_checkable = true;
+    }
+    if ($not_checkable) return 2;
+    if ($alive) return 1;
+    else return 0;
+}
+
+
+/**
+ *
+ * Creates the record for the ejsapp_rem_lab table
+ *
+ * @param stdClass $ejsapp
+ * @return stdClass $ejsapp_rem_lab
+ */
+function ejsapp_rem_lab_conf($ejsapp) {
+    global $CFG;
+
+    $ejsapp_rem_lab = new stdClass();
+    $ejsapp_rem_lab->ejsappid = $ejsapp->id;
+    $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
+    $ejsapp_rem_lab->active = $ejsapp->active;
+    if ($ejsapp_rem_lab->usingsarlab == 1) {
+        $sarlabinstance = $ejsapp->sarlab_instance;
+        $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
+        $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
+        $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+        $list_sarlab_ports = explode(";", $CFG->sarlab_port);
+        $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)], "'");
+        if ($init_char != 0) $init_char++;
+        $ip = substr($list_sarlab_IPs[intval($sarlabinstance)], $init_char);
+        $ejsapp_rem_lab->ip = $ip;
+        $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
+    } else {
+        $ejsapp_rem_lab->sarlabinstance = '0';
+        $ejsapp_rem_lab->sarlabcollab = '0';
+        $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
+        $ejsapp_rem_lab->port = $ejsapp->port;
+    }
+    $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
+    $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
+    $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+
+    return $ejsapp_rem_lab;
+}
+
+
+/**
+ *
+ * Creates the record for the ejsapp_expsyst2pract table
+ *
+ * @param stdClass $ejsapp
+ * @return void
+ */
+function ejsapp_expsyst2pract($ejsapp) {
+    global $DB;
+
+    $ejsapp_expsyst2pract = new stdClass();
+    $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+    if ($ejsapp->sarlab == 1) {
+        $expsyst2pract_list = $ejsapp->list_practices;
+        $expsyst2pract_list = explode(";", $expsyst2pract_list);
+        $selected_practices = $ejsapp->practiceintro;
+        for ($i = 0; $i < count($selected_practices); $i++) {
+            $ejsapp_expsyst2pract->practiceid = $i + 1;
+            $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
+            $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
+        }
+    } else {
+        $ejsapp_expsyst2pract->practiceid = 1;
+        $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
+        $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
+    }
+
 }

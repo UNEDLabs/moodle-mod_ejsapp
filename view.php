@@ -515,7 +515,9 @@ function define_sarlab($instance, $collab, $practice, $labmanager) {
 
 /**
  * Gets the required EJS .jar or .zip file for this activity from Moodle's File System and places it
- * in the required directory.
+ * in the required directory (inside jarfiles) when the file there doesn't exist or it is not synchronized with
+ * the file in Moodle's File System (whether because its an alias to a file that has been modified or because
+ * the activity has been edited and the original .jar or .zip file has been replaced by a new one).
  *
  * @param int $ejsappcourse id of the course in which the ejsapp activity is
  * @param int $ejsappid id of the ejsapp activity
@@ -523,18 +525,60 @@ function define_sarlab($instance, $collab, $practice, $labmanager) {
  * @return void
  */
 function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
-    /*global $DB, $CFG;
+    global $DB,$CFG;
+
+    function delete_outdated_file($storedfile, $temp_file, $filepath) {
+        //We compare the content of the linked file with the content of the file in the jarfiles folder:
+        if ($storedfile->get_contenthash() != $temp_file->get_contenthash()) { //if they are not the same...
+            // Delete the file in jarfiles directory in order to replace it with the content of $storedfile
+            unlink($filepath);
+            // Delete $temp_file from Moodle filesystem
+            $temp_file->delete();
+            return true;
+        } else { // If the file exists and matches the one configured in the ejsapp activity, do nothing
+            return false;
+        }
+    }
+
+    function create_temp_file($contextid, $ejsappid, $filename, $fs, $temp_filepath) {
+        $fileinfo = array(
+            'contextid' => $contextid,
+            'component' => 'mod_ejsapp',
+            'filearea' => 'tmp_jarfiles',
+            'itemid' => $ejsappid,
+            'filepath' => '/',
+            'filename' => $filename);
+        return $temp_file = $fs->create_file_from_pathname($fileinfo, $temp_filepath);
+    }
+
+    // We first get the jar/zip file configured in the ejsapp activity and stored in the filesystem
     $file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsappid));
     if ($file_record) {
         $fs = get_file_storage();
-        $file = $fs->get_file_instance($file_record);
+        $storedfile = $fs->get_file_instance($file_record);
+        $folderpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsappcourse . '/' . $ejsappid . '/';
+        $filepath = $folderpath . $filename;
+        if (file_exists($filepath)) { // if file in jarfiles exists...
+            // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
+            $tmp_file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsappid));
+            if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
+                $temp_file = $fs->get_file_instance($tmp_file_record);
+                $delete = delete_outdated_file($storedfile, $temp_file, $filepath);
+            } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
+                $temp_file = create_temp_file($file_record->contextid, $ejsappid, $filename, $fs, $filepath);
+                $delete = delete_outdated_file($storedfile, $temp_file, $filepath);
+            }
+            if (!$delete) return; //If files are the same, we have finished
+        } else { // if file in jarfiles doesn't exists... (this should never happen actually, but just in case...)
+            // We create the directories in jarfiles to put inside $storedfile
+            $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
+            if (!file_exists($path)) mkdir($path, 0700);
+            $path .= $ejsappcourse . '/';
+            if (!file_exists($path)) mkdir($path, 0700);
+            if (!file_exists($folderpath)) mkdir($folderpath, 0700);
+        }
+        // Finally, we copy the content of storedfile to jarfiles and add it to the file storage
+        $storedfile->copy_content_to($filepath);
+        create_temp_file($file_record->contextid, $ejsappid, $filename, $fs, $filepath);
     }
-
-    // Create folders to store the .jar file
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
-    if (!file_exists($path)) mkdir($path, 0700);
-    $path .= $ejsappcourse . '/';
-    if (!file_exists($path)) mkdir($path, 0700);
-    $path .= $ejsappid;
-    if (!file_exists($path)) mkdir($path, 0700);*/
 }

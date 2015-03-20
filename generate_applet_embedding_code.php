@@ -169,11 +169,11 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
         }
         // <\set the applet size on the screen>
 
-        /////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*$file_record = $DB->get_record('files', array('filename' => $ejsapp->applet_name.'.jar', 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsapp->id));
         $app_codebase = $CFG->wwwroot . "/pluginfile.php/" . $file_record->contextid . "/" . $file_record->component . "/" . $file_record->filearea . "/" . $file_record->itemid . $file_record->filepath;
         $ejsapp->codebase = $app_codebase;// . $file_record->filename;*/
-        /////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if ($collabinfo && !isset($collabinfo->director)) { // Invited users to collaborative sessions
             $class_file = $ejsapp->class_file;
@@ -195,7 +195,7 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
                   document.write(' id=\"{$ejsapp->applet_name}\"');
                   document.write(' width=\"'+w+'\"');
                   document.write(' height=\"'+h+'\">');
-                  document.write('<param name=\"cache_archive\" value=\"{$ejsapp->applet_name}.$ext\">');
+                  document.write('<param name=\"cache_archive\" value=\"{$ejsapp->applet_name}$ext\">');
                   document.write('<param name=\"permissions\" value=\"{$permissions}\"/>');
                   document.write('<param name=\"codebase_lookup\" value=\"false\"/>');
                   document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
@@ -205,7 +205,8 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
                   document.write('<param name=\"username\" value=\"$username\"/>');
                   document.write('<param name=\"user_moodle\" value=\"{$USER->username}\"/>');
                   document.write('<param name=\"password_moodle\" value=\"DEPRECATED\"/>');
-                  document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');";
+                  document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');
+                  document.write('<param name=\"lookandfeel\" value=\"NIMBUS\"/>');";
 
         if ($collabinfo) {
                 $code .= "document.write('<param name=\"is_collaborative\" value=\"true\"/>');";
