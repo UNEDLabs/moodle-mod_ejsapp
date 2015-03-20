@@ -528,7 +528,7 @@ function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
     global $DB,$CFG;
 
     function delete_outdated_file($storedfile, $temp_file, $filepath) {
-        //We compare the content of the linked file with the content of the file in the jarfiles folder:
+        // We compare the content of the linked file with the content of the file in the jarfiles folder:
         if ($storedfile->get_contenthash() != $temp_file->get_contenthash()) { //if they are not the same...
             // Delete the file in jarfiles directory in order to replace it with the content of $storedfile
             unlink($filepath);
