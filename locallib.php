@@ -79,11 +79,10 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
         $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
     }
 
-    // Obtain the uploaded .zip or .jar file from dataroot
-    //$file_records = $DB->get_records('files', array('component' => 'user', 'filearea' => 'draft', 'itemid' => $draftitemid_applet), 'filesize DESC');
-    $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
+    // Obtain the uploaded .zip or .jar file from the filepicker in the ejsapp moodle form
+    //$file_records = $DB->get_records('files', array('component'=>'user', 'filearea'=>'draft', 'itemid'=>$draftitemid_applet), 'filesize DESC');
+    $file_records = $DB->get_records('files', array('contextid'=>$context->id, 'component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
     $file_record = reset($file_records);
-    $applet_name = $file_record->filename;
     $fs = get_file_storage();
     $file = $fs->get_file_instance($file_record);
 
@@ -97,52 +96,46 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
         mkdir($path, 0700);
     }
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id;
-    if (file_exists($path)) { // the ejsapp activity has been updated
+    if (file_exists($path)) { // updating, not creating, the ejsapp activity
         delete_recursively($path);
-    } if (!file_exists($path)) {
-        mkdir($path, 0700);
     }
+    mkdir($path, 0700);
 
     // Copy the jar/zip file to its destination folder in jarfiles
-    $filepath = $path . '/' . $applet_name;
+    $filepath = $path . '/' . $file_record->filename;
     $file->copy_content_to($filepath);
 
     // codebase
     $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
     // <Initialize the mod_form elements>
-    $manifest = 'EJsS';
     $ejsapp->class_file = '';
     $ejsapp->codebase = $codebase;
     $ejsapp->mainframe = '';
     $ejsapp->is_collaborative = 0;
-    $ejsapp->manifest = $manifest;
+    $ejsapp->manifest = 'EJsS';
     $ejsapp->height = 0;
     $ejsapp->width = 0;
 
     $ext = pathinfo($filepath, PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table
     if ($ext == 'jar') { //Java Applet
-        // Extract the manifest.mf file from the .jar
-        $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
-        $ejsapp->applet_name = $applet_name;
-        $ejs_ok = modifications_for_java($manifest, $filepath, $ejsapp, $file, $file_record);
+        $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record);
     } else { //Javascript
         $ejs_ok = modifications_for_javascript($path . '/', $filepath, $ejsapp, $codebase);
     }
 
-    // We add an entry in Moodle's file table for the .zip or .jar file in the jarfiles directory
-    $fileinfo = array(                      // Prepare file record object
-        'contextid' => $context->id,        // ID of context
-        'component' => 'mod_ejsapp',        // usually = table name
-        'filearea' => 'tmp_jarfiles',       // usually = table name
-        'itemid' => $ejsapp->id,            // usually = ID of row in table
-        'filepath' => '/',                  // any path beginning and ending in /
-        'filename' => $applet_name);        // any filename
-    $fs->create_file_from_pathname($fileinfo, $filepath);
+    $DB->update_record('ejsapp', $ejsapp);
 
-    //if ($ext != 'jar') unlink($filepath); //For Javascript, we delete the zip file, which is of no use
-    // Update: actually, we may use it for comparing its contenthash with the one in a repository when using aliases
+    // We add an entry in Moodle's file table for the .zip or .jar file in the jarfiles directory
+    $fileinfo = array(                          // Prepare file record object
+        'contextid' => $context->id,            // ID of context
+        'component' => 'mod_ejsapp',            // usually = table name
+        'filearea' => 'tmp_jarfiles',           // usually = table name
+        'itemid' => $ejsapp->id,                // usually = ID of row in table
+        'filepath' => '/',                      // any path beginning and ending in /
+        'filename' => $file_record->filename);  // any filename
+    $fs->create_file_from_pathname($fileinfo, $filepath);
 
     // <update ejsapp_personal_vars table>
     //Personalizing EJS variables <update ejsapp_personal_vars table>
@@ -176,8 +169,6 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
         }
     }
     // </update ejsapp_personal_vars table> // TODO: Only update personal variables that were set new when updating an ejsapp activity
-
-    $DB->update_record('ejsapp', $ejsapp);
 
     return $ejs_ok;
  } //update_db
@@ -359,109 +350,116 @@ function users_personalized_vars($ejsapp) {
  *
  * For EjsS java applications.
  *
- * @param string $manifest
  * @param string $filepath
  * @param stdClass $ejsapp
  * @param stored_file $file
  * @param stdClass $file_record
  * @return boolean $ejs_ok
  */
-function modifications_for_java($manifest, $filepath, $ejsapp, $file, $file_record) {
+function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
     global $CFG;
 
-    // class_file
-    $pattern = '/Main-Class\s*:\s*(.+)\s*/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    $sub_str = $matches[1][0];
-    if (strlen($matches[1][0]) == 59) {
-        $pattern = '/^\s(.+)\s*/m';
-        if (preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
-            if (preg_match('/\s*:\s*/', $matches[1][0], $matches2, PREG_OFFSET_CAPTURE) == 0) {
-                $sub_str = $sub_str . $matches[1][0];
+    $ejs_ok = false;
+
+    $ejsapp->applet_name = $file_record->filename;
+
+    if (file_exists($filepath)) {
+        // Extract the manifest.mf file from the .jar
+        $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
+
+        // class_file
+        $pattern = '/Main-Class\s*:\s*(.+)\s*/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        $sub_str = $matches[1][0];
+        if (strlen($matches[1][0]) == 59) {
+            $pattern = '/^\s(.+)\s*/m';
+            if (preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
+                if (preg_match('/\s*:\s*/', $matches[1][0], $matches2, PREG_OFFSET_CAPTURE) == 0) {
+                    $sub_str = $sub_str . $matches[1][0];
+                }
             }
         }
-    }
-    $class_file = $sub_str . 'Applet.class';
-    $ejsapp->class_file = preg_replace('/\s+/', "", $class_file); // delete all white-spaces and the first newline
+        $class_file = $sub_str . 'Applet.class';
+        $ejsapp->class_file = preg_replace('/\s+/', "", $class_file); // delete all white-spaces and the first newline
 
-    // mainframe
-    $pattern = '/Main-Frame\s*:\s*(.+)\s*/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    if (count($matches) == 0) {
-        $mainframe = '';
-    } else {
-        $mainframe = $matches[1][0];
-        $mainframe = preg_replace('/\s+/', "", $mainframe); // delete all white-spaces
-    }
-    $ejsapp->mainframe = $mainframe;
-
-    // is_collaborative
-    $pattern = '/Is-Collaborative\s*:\s*(\w+)/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    if (count($matches) == 0) {
-        $is_collaborative = 0;
-    } else {
-        $is_collaborative = trim($matches[1][0]);
-        if ($is_collaborative == 'true') {
-            $is_collaborative = 1;
+        // mainframe
+        $pattern = '/Main-Frame\s*:\s*(.+)\s*/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        if (count($matches) == 0) {
+            $mainframe = '';
         } else {
-            $is_collaborative = 0;
+            $mainframe = $matches[1][0];
+            $mainframe = preg_replace('/\s+/', "", $mainframe); // delete all white-spaces
         }
-    }
-    $ejsapp->is_collaborative = $is_collaborative;
+        $ejsapp->mainframe = $mainframe;
 
-    // height
-    $pattern = '/Applet-Height\s*:\s*(\w+)/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    $ejs_ok = false;
-    if (count($matches) == 0) {
-        $height = 0;
-        // If this field does not exist in the manifest, it means the version of
-        // EJS used to compile the jar does not support Moodle.
-        $message = get_string('EJS_version', 'ejsapp');
-        $code = "<script type=\"text/javascript\">
+        // is_collaborative
+        $pattern = '/Is-Collaborative\s*:\s*(\w+)/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        if (count($matches) == 0) {
+            $is_collaborative = 0;
+        } else {
+            $is_collaborative = trim($matches[1][0]);
+            if ($is_collaborative == 'true') {
+                $is_collaborative = 1;
+            } else {
+                $is_collaborative = 0;
+            }
+        }
+        $ejsapp->is_collaborative = $is_collaborative;
+
+        // height
+        $pattern = '/Applet-Height\s*:\s*(\w+)/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        if (count($matches) == 0) {
+            $height = 0;
+            // If this field does not exist in the manifest, it means the version of
+            // EJS used to compile the jar does not support Moodle.
+            $message = get_string('EJS_version', 'ejsapp');
+            $code = "<script type=\"text/javascript\">
             window.alert(\"$message\")
             </script>";
-        echo $code;
-    } else {
-        $ejs_ok = true;
-        $height = $matches[1][0];
-        $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
-    }
-    $ejsapp->height = $height;
+            echo $code;
+        } else {
+            $ejs_ok = true;
+            $height = $matches[1][0];
+            $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
+        }
+        $ejsapp->height = $height;
 
-    // width
-    $pattern = '/Applet-Width\s*:\s*(\w+)/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    if (count($matches) == 0) {
-        $width = 0;
-    } else {
-        $width = $matches[1][0];
-        $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
-    }
-    $ejsapp->width = $width;
-
-    // Sign the applet
-    // Check whether a certificate is installed and in use
-    if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
-        // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
-        $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
+        // width
+        $pattern = '/Applet-Width\s*:\s*(\w+)/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-        if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
-            if (is_null($file->get_referencefileid())) { // linked files must be already signed!
-                // Sign the applet
-                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
-                    $filepath . ' ' .                                       // parameter 1
-                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
-                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
-                    get_config('ejsapp', 'certificate_alias')               // parameter 4
-                );
-                // We replace the file stored in Moodle's filesystem and its table with the signed version:
-                $file->delete();
-                $fs = get_file_storage();
-                $fs->create_file_from_pathname($file_record, $filepath);
-            } // TODO: Check if the applet file the alias points to is signed and print an alert if it's not?
-        } // TODO: Files which do not include the codebase parameter with the Moodle server direction are not signed --> alert
+        if (count($matches) == 0) {
+            $width = 0;
+        } else {
+            $width = $matches[1][0];
+            $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
+        }
+        $ejsapp->width = $width;
+
+        // Sign the applet
+        // Check whether a certificate is installed and in use
+        if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
+            // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
+            $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
+            preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+            if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
+                if (is_null($file->get_referencefileid())) { // linked files must be already signed!
+                    // Sign the applet
+                    shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
+                        $filepath . ' ' .                                       // parameter 1
+                        get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
+                        get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
+                        get_config('ejsapp', 'certificate_alias')               // parameter 4
+                    );
+                    // We replace the file stored in Moodle's filesystem and its table with the signed version:
+                    $file->delete();
+                    $fs = get_file_storage();
+                    $fs->create_file_from_pathname($file_record, $filepath);
+                } // TODO: Check if the applet file the alias points to is signed and print an alert if it's not?
+            } // TODO: Files which do not include the codebase parameter with the Moodle server direction are not signed --> alert
+        }
     }
 
     return $ejs_ok;
