@@ -555,14 +555,15 @@ function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
     $file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsappid));
     if ($file_record) {
         $fs = get_file_storage();
-        $storedfile = $fs->get_file_instance($file_record);
+        $storedfile = $fs->get_file_by_id($file_record->id);
+        $storedfile->sync_external_file(); // In case it is an alias to an external repository
         $folderpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsappcourse . '/' . $ejsappid . '/';
         $filepath = $folderpath . $filename;
         if (file_exists($filepath)) { // if file in jarfiles exists...
             // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
             $tmp_file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsappid));
             if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
-                $temp_file = $fs->get_file_instance($tmp_file_record);
+                $temp_file = $fs->get_file_by_id($tmp_file_record->id);
                 $delete = delete_outdated_file($storedfile, $temp_file, $filepath);
             } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
                 $temp_file = create_temp_file($file_record->contextid, $ejsappid, $filename, $fs, $filepath);

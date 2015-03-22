@@ -79,12 +79,13 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
         $ejsapp->appwording = file_save_draft_area_files($draftitemid_wording, $context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'changeformat' => 1, 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
     }
 
-    // Obtain the uploaded .zip or .jar file from the filepicker in the ejsapp moodle form
+    // Obtain the uploaded .zip or .jar file from moodledata using the information in the files table
     //$file_records = $DB->get_records('files', array('component'=>'user', 'filearea'=>'draft', 'itemid'=>$draftitemid_applet), 'filesize DESC');
     $file_records = $DB->get_records('files', array('contextid'=>$context->id, 'component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
     $file_record = reset($file_records);
     $fs = get_file_storage();
-    $file = $fs->get_file_instance($file_record);
+    $file = $fs->get_file_by_id($file_record->id);
+    $file->sync_external_file(); // In case it is an alias to an external repository
 
     // Create folders to store the .jar or .zip file
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
@@ -413,13 +414,12 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
         if (count($matches) == 0) {
             $height = 0;
-            // If this field does not exist in the manifest, it means the version of
-            // EJS used to compile the jar does not support Moodle.
+            // If this field does not exist in the manifest, it means the version of EJS used to compile the jar does not support Moodle.
             $message = get_string('EJS_version', 'ejsapp');
-            $code = "<script type=\"text/javascript\">
-            window.alert(\"$message\")
-            </script>";
-            echo $code;
+            $alert = "<script type=\"text/javascript\">
+                      window.alert(\"$message\")
+                      </script>";
+            echo $alert;
         } else {
             $ejs_ok = true;
             $height = $matches[1][0];
@@ -457,8 +457,14 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
                     $file->delete();
                     $fs = get_file_storage();
                     $fs->create_file_from_pathname($file_record, $filepath);
-                } // TODO: Check if the applet file the alias points to is signed and print an alert if it's not?
-            } // TODO: Files which do not include the codebase parameter with the Moodle server direction are not signed --> alert
+                }
+            } else { // Files which do not include the codebase parameter with the Moodle server direction are not signed --> alert
+                $message = get_string('EJS_codebase', 'ejsapp');
+                $alert = "<script type=\"text/javascript\">
+                          window.alert(\"$message\")
+                          </script>";
+                echo $alert;
+            }
         }
     }
 

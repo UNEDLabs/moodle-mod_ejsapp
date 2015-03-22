@@ -115,7 +115,7 @@ When installing ejsapp for the first time, you will need to set a few variables:
                   	system(s). If left empty, the plugin understands that SARLAB is not used.
 
    sarlab_enc_key:	This 16 characters long variable must be configure to match exactly the key set
-		  	in the SARLAB system(s).
+		  	        in the SARLAB system(s).
                                               
 5. Testing
 ==========

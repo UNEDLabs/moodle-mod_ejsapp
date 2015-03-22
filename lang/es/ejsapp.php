@@ -163,7 +163,8 @@ $string['dailyslots_help'] = 'Cantidad diaria de horas m&aacute;ximas que se le 
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
-$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lalo con una versi&oacute;n m&aacute;s moderna de EJS.";
+$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lelo con una versi&oacute;n m&aacute;s moderna de EJS.";
+$string['EJS_codebase'] = "ATENCI&Oacute;N: El manifest del applet que ha subido no especifica este servidor Moodle en el par&aacute;metro 'codebase', de modo que no ha sido firmado.";
 
 $string['inactive_lab'] = 'El laboratorio remoto es&aacute; inactivo en este momento.';
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
