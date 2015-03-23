@@ -33,8 +33,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'ejsapp';
-$string['modulenameplural'] = 'ejsapps';
+$string['modulename'] = 'EJSApp';
+$string['modulenameplural'] = 'EJSApps';
 $string['modulename_help'] = 'The EJSApp activity module enables teachers to add a java applets created with Easy Java Simulations (EJS) into their Moodle courses.
 
 EJS applets will be embedded into Moodle courses. The teacher can select to keep the orginal applet size or let Moodle to resize it according to the available space. If the EJS applet was compiled using the "Add language facilities" option in EJS, the applet embedded into Moodle with the EJSApp activity will automatically set its language to the one selected by the user in Moodle, if possible. This activity supports configuring conditional access restrictions.

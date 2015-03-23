@@ -85,7 +85,22 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     $file_record = reset($file_records);
     $fs = get_file_storage();
     $file = $fs->get_file_by_id($file_record->id);
-    $file->sync_external_file(); // In case it is an alias to an external repository
+
+    // <In case it is an alias to an external repository>
+    //$file->sync_external_file(); // Not doing what we expect for non-image files
+    $repositoryid = $DB->get_field('files_reference', 'repositoryid', array('id' => $file_record->referencefileid));
+    $repository = repository_filesystem::get_instance($repositoryid);
+    $filepath = $repository->get_rootpath() . ltrim($file->get_reference(), '/');
+    $contenthash = sha1_file($filepath);
+    if ($file->get_contenthash() == $contenthash) {
+        // File did not change since the last synchronisation.
+        $filesize = filesize($filepath);
+    } else {
+        // Copy file into moodle filepool (used to generate an image thumbnail).
+        list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
+    }
+    $file->set_synchronized($contenthash, $filesize);
+    // </In case it is an alias to an external repository>
 
     // Create folders to store the .jar or .zip file
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';

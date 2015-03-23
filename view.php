@@ -93,7 +93,7 @@ $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $cm->id));
 $PAGE->set_title($ejsapp->name);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, get_string('modulename', 'ejsapp')));
+$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'ejsapp'));
 
 //Set CSS style
 $cssfilename = $ejsapp->codebase.'_ejs_library/css/ejsapp.css';
@@ -556,7 +556,23 @@ function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
     if ($file_record) {
         $fs = get_file_storage();
         $storedfile = $fs->get_file_by_id($file_record->id);
-        $storedfile->sync_external_file(); // In case it is an alias to an external repository
+
+        // <In case it is an alias to an external repository>
+        //$storedfile->sync_external_file(); // Not doing what we expect for non-image files
+        $repositoryid = $DB->get_field('files_reference', 'repositoryid', array('id' => $file_record->referencefileid));
+        $repository = repository_filesystem::get_instance($repositoryid);
+        $filepath = $repository->get_rootpath() . ltrim($storedfile->get_reference(), '/');
+        $contenthash = sha1_file($filepath);
+        if ($storedfile->get_contenthash() == $contenthash) {
+            // File did not change since the last synchronisation.
+            $filesize = filesize($filepath);
+        } else {
+            // Copy file into moodle filepool (used to generate an image thumbnail).
+            list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
+        }
+        $storedfile->set_synchronized($contenthash, $filesize);
+        // <In case it is an alias to an external repository>
+
         $folderpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsappcourse . '/' . $ejsappid . '/';
         $filepath = $folderpath . $filename;
         if (file_exists($filepath)) { // if file in jarfiles exists...
@@ -578,6 +594,7 @@ function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
             if (!file_exists($path)) mkdir($path, 0700);
             if (!file_exists($folderpath)) mkdir($folderpath, 0700);
         }
+
         // Finally, we copy the content of storedfile to jarfiles and add it to the file storage
         $storedfile->copy_content_to($filepath);
         create_temp_file($file_record->contextid, $ejsappid, $filename, $fs, $filepath);
