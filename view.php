@@ -583,15 +583,16 @@ function prepare_ejs_file($ejsapp) {
         $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $folderpath = $CFG->dirroot . $codebase;
         $ext = pathinfo($file_record->filename, PATHINFO_EXTENSION);
-        if ($ext == 'jar') $filepath = $folderpath . $ejsapp->applet_name; // Java
-        else $filepath = $folderpath . $file_record->filename;             // Javascript
+        if ($ext == 'jar') $filename = $ejsapp->applet_name;    // Java
+        else  $filename = $file_record->filename;               // Javascript
+        $filepath = $folderpath . $filename;
         if (file_exists($filepath)) { // if file in jarfiles exists...
             // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
-            $tmp_file_record = $DB->get_record('files', array('filename' => $ejsapp->applet_name, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id));
+            $tmp_file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id));
             if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
                 $temp_file = $fs->get_file_by_id($tmp_file_record->id);
             } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
-                $temp_file = create_temp_file($file_record->contextid, $ejsapp->id, $ejsapp->applet_name, $fs, $filepath);
+                $temp_file = create_temp_file($file_record->contextid, $ejsapp->id, $filename, $fs, $filepath);
             }
             $delete = delete_outdated_file($storedfile, $temp_file, $folderpath);
             if (!$delete) return; //If files are the same, we have finished
@@ -604,14 +605,16 @@ function prepare_ejs_file($ejsapp) {
             if (!file_exists($folderpath)) mkdir($folderpath, 0700);
         }
 
-        // Finally, we copy the content of storedfile to jarfiles and add it to the file storage
+        // We copy the content of storedfile to jarfiles and add it to the file storage
         $storedfile->copy_content_to($filepath);
         create_temp_file($file_record->contextid, $ejsapp->id, $ejsapp->applet_name, $fs, $filepath);
 
-        // If it is a zip file (Javascript), we need to do a few more things:
-        if ($ext != 'jar') {
-            modifications_for_javascript($folderpath, $filepath, $ejsapp, $codebase);
-            $DB->update_record('ejsapp', $ejsapp);
+        // We need to do a few more things depending on whether it is a Java applet or Javascript:
+        if ($ext == 'jar') {
+            modifications_for_java($filepath, $ejsapp, $storedfile, $file_record, false);
+        } else {
+            modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase);
         }
+        $DB->update_record('ejsapp', $ejsapp);
     }
 }

@@ -143,9 +143,9 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     $ext = pathinfo($filepath, PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table
     if ($ext == 'jar') { //Java Applet
-        $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record);
+        $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record, true);
     } else { //Javascript
-        $ejs_ok = modifications_for_javascript($path, $filepath, $ejsapp, $codebase);
+        $ejs_ok = modifications_for_javascript($filepath, $ejsapp, $path, $codebase);
     }
 
     $DB->update_record('ejsapp', $ejsapp);
@@ -379,9 +379,10 @@ function users_personalized_vars($ejsapp) {
  * @param stdClass $ejsapp
  * @param stored_file $file
  * @param stdClass $file_record
+ * @param boolean $alert
  * @return boolean $ejs_ok
  */
-function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
+function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert) {
     global $CFG;
 
     $ejs_ok = false;
@@ -439,11 +440,13 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
         if (count($matches) == 0) {
             $height = 0;
             // If this field does not exist in the manifest, it means the version of EJS used to compile the jar does not support Moodle.
-            $message = get_string('EJS_version', 'ejsapp');
-            $alert = "<script type=\"text/javascript\">
+            if ($alert) {
+                $message = get_string('EJS_version', 'ejsapp');
+                $alert = "<script type=\"text/javascript\">
                       window.alert(\"$message\")
                       </script>";
-            echo $alert;
+                echo $alert;
+            }
         } else {
             $ejs_ok = true;
             $height = $matches[1][0];
@@ -468,7 +471,8 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
             // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
             $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
             preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-            if (substr($matches[1][0], 0, -1) == substr($CFG->wwwroot, 7)) {
+            $host = exploded("://", $CFG->wwwroot);
+            if (substr($matches[1][0], 0, -1) == $host[1]) {
                 if (is_null($file->get_referencefileid())) { // linked files must be already signed!
                     // Sign the applet
                     shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
@@ -482,7 +486,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
                     $fs = get_file_storage();
                     $fs->create_file_from_pathname($file_record, $filepath);
                 }
-            } else { // Files which do not include the codebase parameter with the Moodle server direction are not signed --> alert
+            } else if ($alert) { // Files which do not include the codebase parameter with the Moodle server direction are not signed
                 $message = get_string('EJS_codebase', 'ejsapp');
                 $alert = "<script type=\"text/javascript\">
                           window.alert(\"$message\")
@@ -501,12 +505,12 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
  * For EjsS javascript applications.
  *
  * @param string $folderpath
+  * @param stdClass $ejsapp
  * @param string $filepath
- * @param stdClass $ejsapp
  * @param string $codebase
  * @return boolean $ejs_ok
  */
-function modifications_for_javascript($folderpath, $filepath, $ejsapp, $codebase) {
+function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase) {
     global $CFG;
 
     $zip = new ZipArchive;
