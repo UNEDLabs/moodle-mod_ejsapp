@@ -87,19 +87,26 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     $file = $fs->get_file_by_id($file_record->id);
 
     // <In case it is an alias to an external repository>
-    //$file->sync_external_file(); // Not doing what we expect for non-image files
-    $repositoryid = $DB->get_field('files_reference', 'repositoryid', array('id' => $file_record->referencefileid));
-    $repository = repository_filesystem::get_instance($repositoryid);
-    $filepath = $repository->get_rootpath() . ltrim($file->get_reference(), '/');
-    $contenthash = sha1_file($filepath);
-    if ($file->get_contenthash() == $contenthash) {
-        // File did not change since the last synchronisation.
-        $filesize = filesize($filepath);
-    } else {
-        // Copy file into moodle filepool (used to generate an image thumbnail).
-        list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
+    //$file->sync_external_file(); // Not doing what we expect for non-image files... we need a workaround
+    if (class_exists('repository_filesystem')) {
+        if (!is_null($file_record->referencefileid)) {
+            $repository_instance_id = $DB->get_field('files_reference', 'repositoryid', array('id' => $file_record->referencefileid));
+            $repository_type_id = $DB->get_field('repository_instances', 'typeid', array('id' => $repository_instance_id));
+            if ($DB->get_field('repository', 'type', array('id' => $repository_type_id)) == 'filesystem') {
+                $repository = repository_filesystem::get_instance($repository_instance_id);
+                $filepath = $repository->get_rootpath() . ltrim($file->get_reference(), '/');
+                $contenthash = sha1_file($filepath);
+                if ($file->get_contenthash() == $contenthash) {
+                    // File did not change since the last synchronisation.
+                    $filesize = filesize($filepath);
+                } else {
+                    // Copy file into moodle filepool (used to generate an image thumbnail).
+                    list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
+                }
+                $file->set_synchronized($contenthash, $filesize);
+            }
+        }
     }
-    $file->set_synchronized($contenthash, $filesize);
     // </In case it is an alias to an external repository>
 
     // Create folders to store the .jar or .zip file
