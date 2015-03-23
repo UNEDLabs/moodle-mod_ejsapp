@@ -119,7 +119,7 @@ $accessed = false;
 $sarlabinfo = null;
 if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $accessed = true;
-    prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+    prepare_ejs_file($ejsapp);
     echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
 } else { //<Remote lab>
     //<Check if the remote lab is operative>
@@ -180,7 +180,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 }
             }
             $accessed = true;
-            prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+            prepare_ejs_file($ejsapp);
             echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
         } else {
             echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
@@ -201,14 +201,14 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlab_conf, $labmanager);
                 if (!is_null($sarlabinfo)) { //The user has an active booking -> he can access the lab
                     $accessed = true;
-                    prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+                    prepare_ejs_file($ejsapp);
                     echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
                 } else { //No active booking
                     echo $OUTPUT->box(get_string('no_booking', 'ejsapp'));
                     if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) { //Student can still access in collaborative mode
                         echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                         $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL', $labmanager);
-                        prepare_ejs_file($ejsapp->course, $ejsapp->id, $ejsapp->applet_name);
+                        prepare_ejs_file($ejsapp);
                         echo $OUTPUT->box(generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
                         $action = 'collab_view';
                     } else { //No access
@@ -519,19 +519,18 @@ function define_sarlab($instance, $collab, $practice, $labmanager) {
  * the file in Moodle's File System (whether because its an alias to a file that has been modified or because
  * the activity has been edited and the original .jar or .zip file has been replaced by a new one).
  *
- * @param int $ejsappcourse id of the course in which the ejsapp activity is
- * @param int $ejsappid id of the ejsapp activity
- * @param string $filename name of the EJS .jar or .zip file
+ * @param stdClass $ejsapp
  * @return void
  */
-function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
+function prepare_ejs_file($ejsapp) {
     global $DB,$CFG;
 
-    function delete_outdated_file($storedfile, $temp_file, $filepath) {
+    function delete_outdated_file($storedfile, $temp_file, $folderpath) {
         // We compare the content of the linked file with the content of the file in the jarfiles folder:
         if ($storedfile->get_contenthash() != $temp_file->get_contenthash()) { //if they are not the same...
-            // Delete the file in jarfiles directory in order to replace it with the content of $storedfile
-            unlink($filepath);
+            // Delete the files in jarfiles directory in order to replace them with the content of $storedfile
+            delete_recursively($folderpath);
+            if (!file_exists($folderpath)) mkdir($folderpath, 0700);
             // Delete $temp_file from Moodle filesystem
             $temp_file->delete();
             return true;
@@ -552,7 +551,8 @@ function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
     }
 
     // We first get the jar/zip file configured in the ejsapp activity and stored in the filesystem
-    $file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsappid));
+    $file_records = $DB->get_records('files', array('component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
+    $file_record = reset($file_records);
     if ($file_record) {
         $fs = get_file_storage();
         $storedfile = $fs->get_file_by_id($file_record->id);
@@ -580,30 +580,38 @@ function prepare_ejs_file($ejsappcourse, $ejsappid, $filename) {
         }
         // </In case it is an alias to an external repository>
 
-        $folderpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsappcourse . '/' . $ejsappid . '/';
-        $filepath = $folderpath . $filename;
+        $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+        $folderpath = $CFG->dirroot . $codebase;
+        $ext = pathinfo($file_record->filename, PATHINFO_EXTENSION);
+        if ($ext == 'jar') $filepath = $folderpath . $ejsapp->applet_name; // Java
+        else $filepath = $folderpath . $file_record->filename;             // Javascript
         if (file_exists($filepath)) { // if file in jarfiles exists...
             // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
-            $tmp_file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsappid));
+            $tmp_file_record = $DB->get_record('files', array('filename' => $ejsapp->applet_name, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id));
             if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
                 $temp_file = $fs->get_file_by_id($tmp_file_record->id);
-                $delete = delete_outdated_file($storedfile, $temp_file, $filepath);
             } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
-                $temp_file = create_temp_file($file_record->contextid, $ejsappid, $filename, $fs, $filepath);
-                $delete = delete_outdated_file($storedfile, $temp_file, $filepath);
+                $temp_file = create_temp_file($file_record->contextid, $ejsapp->id, $ejsapp->applet_name, $fs, $filepath);
             }
+            $delete = delete_outdated_file($storedfile, $temp_file, $folderpath);
             if (!$delete) return; //If files are the same, we have finished
         } else { // if file in jarfiles doesn't exists... (this should never happen actually, but just in case...)
             // We create the directories in jarfiles to put inside $storedfile
             $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
             if (!file_exists($path)) mkdir($path, 0700);
-            $path .= $ejsappcourse . '/';
+            $path .= $ejsapp->course . '/';
             if (!file_exists($path)) mkdir($path, 0700);
             if (!file_exists($folderpath)) mkdir($folderpath, 0700);
         }
 
         // Finally, we copy the content of storedfile to jarfiles and add it to the file storage
         $storedfile->copy_content_to($filepath);
-        create_temp_file($file_record->contextid, $ejsappid, $filename, $fs, $filepath);
+        create_temp_file($file_record->contextid, $ejsapp->id, $ejsapp->applet_name, $fs, $filepath);
+
+        // If it is a zip file (Javascript), we need to do a few more things:
+        if ($ext != 'jar') {
+            modifications_for_javascript($folderpath, $filepath, $ejsapp, $codebase);
+            $DB->update_record('ejsapp', $ejsapp);
+        }
     }
 }

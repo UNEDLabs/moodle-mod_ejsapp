@@ -118,14 +118,14 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     if (!file_exists($path)) {
         mkdir($path, 0700);
     }
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id;
+    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     if (file_exists($path)) { // updating, not creating, the ejsapp activity
         delete_recursively($path);
     }
     mkdir($path, 0700);
 
     // Copy the jar/zip file to its destination folder in jarfiles
-    $filepath = $path . '/' . $file_record->filename;
+    $filepath = $path . $file_record->filename;
     $file->copy_content_to($filepath);
 
     // codebase
@@ -145,7 +145,7 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     if ($ext == 'jar') { //Java Applet
         $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record);
     } else { //Javascript
-        $ejs_ok = modifications_for_javascript($path . '/', $filepath, $ejsapp, $codebase);
+        $ejs_ok = modifications_for_javascript($path, $filepath, $ejsapp, $codebase);
     }
 
     $DB->update_record('ejsapp', $ejsapp);
@@ -330,11 +330,13 @@ function personalize_vars($ejsapp, $user) {
         $personalvars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
         $i = 0;
         foreach ($personalvars as $personalvar) {
-            $uniqueval = filter_var(md5($user->firstname . $i . $user->username . $user->lastname . $user->id . $personalvar->id . $personalvar->name . $personalvar->type . $user->email . $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
+            $uniqueval = filter_var(md5($user->firstname . $i . $user->username . $user->lastname . $user->id .
+                                    $personalvar->id . $personalvar->name . $personalvar->type . $user->email .
+                                    $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
             mt_srand($uniqueval/(pow(10,strlen($user->username))));
             $personalvarsinfo->name[$i] = $personalvar->name;
             $factor = 1;
-            if ($personalvar->type == 'Double')  $factor = 1000;
+            if ($personalvar->type == 'Double') $factor = 1000;
             $personalvarsinfo->value[$i] = mt_rand($factor*$personalvar->minval, $factor*$personalvar->maxval)/$factor;
             $personalvarsinfo->type[$i] = $personalvar->type;
             $i++;
@@ -491,7 +493,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record) {
     }
 
     return $ejs_ok;
-}
+} // modifications_for_java
 
 
 /**
@@ -565,7 +567,6 @@ function modifications_for_javascript($folderpath, $filepath, $ejsapp, $codebase
                 $exploded_file_name = explode(".", $ejsapp->applet_name);
                 $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
                 $code = $code1 . $code2;
-                $textfile = fopen('test2.txt','w');
                 $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
                 $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
                 file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
@@ -575,7 +576,7 @@ function modifications_for_javascript($folderpath, $filepath, $ejsapp, $codebase
     }
 
     return $ejs_ok;
-}
+} // modifications_for_javascript
 
 
 /**
@@ -653,7 +654,7 @@ function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
     if ($not_checkable) return 2;
     if ($alive) return 1;
     else return 0;
-}
+} // ping
 
 
 /**
@@ -692,7 +693,7 @@ function ejsapp_rem_lab_conf($ejsapp) {
     $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
 
     return $ejsapp_rem_lab;
-}
+} // ejsapp_rem_lab_conf
 
 
 /**
@@ -722,4 +723,4 @@ function ejsapp_expsyst2pract($ejsapp) {
         $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
     }
 
-}
+} // ejsapp_expsyst2pract
