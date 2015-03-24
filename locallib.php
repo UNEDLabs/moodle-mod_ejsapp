@@ -467,11 +467,11 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
 
         // Sign the applet
         // Check whether a certificate is installed and in use
-        if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
+        //if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
             // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
             $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
             preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-            $host = exploded("://", $CFG->wwwroot);
+            $host = explode("://", $CFG->wwwroot);
             if (substr($matches[1][0], 0, -1) == $host[1]) {
                 if (is_null($file->get_referencefileid())) { // linked files must be already signed!
                     // Sign the applet
@@ -493,7 +493,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
                           </script>";
                 echo $alert;
             }
-        }
+        //}
     }
 
     return $ejs_ok;
