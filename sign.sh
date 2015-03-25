@@ -1,4 +1,5 @@
-#!/bin/sh
+
+#!/bin/bash
 #Signs the applets uploaded with EJSApp
 # sh sign.sh jarToSign certificate passwd alias
 

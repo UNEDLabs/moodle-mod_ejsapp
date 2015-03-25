@@ -53,7 +53,7 @@ if ($ADMIN->fulltree) {
         'ejsapp/certificate_path',
         get_string('certificate_path', 'ejsapp'),
         get_string('certificate_path_description', 'ejsapp'),
-        dirname(__FILE__) . '/firmadia.pfx',
+        $CFG->dataroot . '/firmadia.pfx',
         PARAM_TEXT,
         '20'
     ));

@@ -475,7 +475,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         if (substr($matches[1][0], 0, -1) == $host[1]) {
             if (is_null($file->get_referencefileid())) { // linked files must be already signed!
                 // Sign the applet
-                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
+                shell_exec(dirname(__FILE__) . DIRECTORY_SEPARATOR . './sign.sh ' .
                     $filepath . ' ' .                                       // parameter 1
                     get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
                     get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
