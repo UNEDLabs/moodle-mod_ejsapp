@@ -540,6 +540,7 @@ function prepare_ejs_file($ejsapp) {
     }
 
     function create_temp_file($contextid, $ejsappid, $filename, $fs, $temp_filepath) {
+        global $DB;
         $fileinfo = array(
             'contextid' => $contextid,
             'component' => 'mod_ejsapp',
@@ -584,9 +585,10 @@ function prepare_ejs_file($ejsapp) {
         $folderpath = $CFG->dirroot . $codebase;
         $ext = pathinfo($file_record->filename, PATHINFO_EXTENSION);
         $filepath = $folderpath . $file_record->filename;
+        // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
+        $tmp_file_records = $DB->get_records('files', array('contextid' => $file_record->contextid, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
+        $tmp_file_record = reset($tmp_file_records);
         if (file_exists($filepath)) { // if file in jarfiles exists...
-            // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
-            $tmp_file_record = $DB->get_record('files', array('filename' => $file_record->filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id));
             if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
                 $temp_file = $fs->get_file_by_id($tmp_file_record->id);
             } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
@@ -601,6 +603,10 @@ function prepare_ejs_file($ejsapp) {
             $path .= $ejsapp->course . '/';
             if (!file_exists($path)) mkdir($path, 0700);
             if (!file_exists($folderpath)) mkdir($folderpath, 0700);
+            if ($tmp_file_record) { // the file does not exist in jarfiles but it does in Moodle filesystem
+                $temp_file = $fs->get_file_by_id($tmp_file_record->id);
+                $temp_file->delete();
+            }
         }
 
         // We copy the content of storedfile to jarfiles and add it to the file storage
