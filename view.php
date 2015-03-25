@@ -583,16 +583,14 @@ function prepare_ejs_file($ejsapp) {
         $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $folderpath = $CFG->dirroot . $codebase;
         $ext = pathinfo($file_record->filename, PATHINFO_EXTENSION);
-        if ($ext == 'jar') $filename = $ejsapp->applet_name;    // Java
-        else  $filename = $file_record->filename;               // Javascript
-        $filepath = $folderpath . $filename;
+        $filepath = $folderpath . $file_record->filename;
         if (file_exists($filepath)) { // if file in jarfiles exists...
             // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
-            $tmp_file_record = $DB->get_record('files', array('filename' => $filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id));
+            $tmp_file_record = $DB->get_record('files', array('filename' => $file_record->filename, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id));
             if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
                 $temp_file = $fs->get_file_by_id($tmp_file_record->id);
             } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
-                $temp_file = create_temp_file($file_record->contextid, $ejsapp->id, $filename, $fs, $filepath);
+                $temp_file = create_temp_file($file_record->contextid, $ejsapp->id, $file_record->filename, $fs, $filepath);
             }
             $delete = delete_outdated_file($storedfile, $temp_file, $folderpath);
             if (!$delete) return; //If files are the same, we have finished
