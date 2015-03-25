@@ -468,32 +468,31 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         // Sign the applet
         // Check whether a certificate is installed and in use
         //if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
-            // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
-            $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
-            preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-            $host = explode("://", $CFG->wwwroot);
-            if (substr($matches[1][0], 0, -1) == $host[1]) {
-                if (is_null($file->get_referencefileid())) { // linked files must be already signed!
-                    // Sign the applet
-                    shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
-                        $filepath . ' ' .                                       // parameter 1
-                        get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
-                        get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
-                        get_config('ejsapp', 'certificate_alias')               // parameter 4
-                    );
-                    // We replace the file stored in Moodle's filesystem and its table with the signed version:
-                    $file->delete();
-                    $fs = get_file_storage();
-                    $fs->create_file_from_pathname($file_record, $filepath);
-                }
-            } else if ($alert) { // Files which do not include the codebase parameter with the Moodle server direction are not signed
-                $message = get_string('EJS_codebase', 'ejsapp');
-                $alert = "<script type=\"text/javascript\">
-                          window.alert(\"$message\")
-                          </script>";
-                echo $alert;
+        // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
+        $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
+        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+        $host = explode("://", $CFG->wwwroot);
+        if (substr($matches[1][0], 0, -1) == $host[1]) {
+            if (is_null($file->get_referencefileid())) { // linked files must be already signed!
+                // Sign the applet
+                shell_exec('sh ' . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sign.sh ' .
+                    $filepath . ' ' .                                       // parameter 1
+                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
+                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
+                    get_config('ejsapp', 'certificate_alias')               // parameter 4
+                );
+                // We replace the file stored in Moodle's filesystem and its table with the signed version:
+                $file->delete();
+                $fs = get_file_storage();
+                $fs->create_file_from_pathname($file_record, $filepath);
             }
-        //}
+        } else if ($alert) { // Files which do not include the codebase parameter with the Moodle server direction are not signed
+            $message = get_string('EJS_codebase', 'ejsapp');
+            $alert = "<script type=\"text/javascript\">
+                      window.alert(\"$message\")
+                      </script>";
+            echo $alert;
+        }
     }
 
     return $ejs_ok;
