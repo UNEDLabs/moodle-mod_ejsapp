@@ -143,5 +143,20 @@ function xmldb_ejsapp_upgrade($oldversion)
         $dbman->add_field($table, $field);
     }
 
+    if ($oldversion < '2015040406') {
+        // Change max length for username in ejsapp_sarlab_keys table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_sarlab_keys');
+        $old_field = new xmldb_field('user', XMLDB_TYPE_CHAR, '20', true, true, false, null, 'id', 'sarlabpass');
+        $new_field = new xmldb_field('user', XMLDB_TYPE_CHAR, '100', true, true, false, null, 'id', 'sarlabpass');
+        $index = new xmldb_index('user', XMLDB_INDEX_NOTUNIQUE, array('user'));
+        $dbman->drop_index($table, $index);
+        $dbman->drop_field($table, $old_field);
+        if (!$dbman->field_exists($table, $new_field)) {
+            $dbman->add_field($table, $new_field);
+        }
+        $dbman->add_index($table, $index);
+    }
+
     return true;
 }

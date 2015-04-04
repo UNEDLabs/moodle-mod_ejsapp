@@ -124,7 +124,7 @@
                PREVIOUS="ejsapp_expsyst2pract" NEXT="ejsapp_personal_vars">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="user"/>
-                <FIELD NAME="user" TYPE="char" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
+                <FIELD NAME="user" TYPE="char" LENGTH="100" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
                        NEXT="sarlabpass"/>
                 <FIELD NAME="sarlabpass" TYPE="char" LENGTH="40" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="user" NEXT="labmanager"/>
