@@ -154,12 +154,16 @@ $string['active_help'] = 'Si este laboratorio remoto se encuentra operativo en e
 $string['free_access'] = 'Acceso libre';
 $string['free_access_help'] = 'Habilitar el acceso libre (sin necesidad de realizar reservas) a este laboratorio remoto.';
 
-$string['totalslots'] = 'Horas de trabajo totales';
-$string['totalslots_help'] = 'Cantidad total de horas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
-$string['weeklyslots'] = 'Horas de trabajo semanales';
-$string['weeklyslots_help'] = 'Cantidad semanal de horas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
-$string['dailyslots'] = 'Horas de trabajo diarias';
-$string['dailyslots_help'] = 'Cantidad diaria de horas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
+$string['slotsduration'] = 'Duraci&oacute;n de las franjas (minutos)';
+$string['slotsduration_help'] = 'Duraci&oacute;n de las franjas de tiempo (en minutos) en las que los usuarios podr&aacute;n trabajar con el laboratorio.';
+$string['totalslots'] = 'Franjas de trabajo totales';
+$string['totalslots_help'] = 'Cantidad total de franjas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
+$string['weeklyslots'] = 'Franjas de trabajo semanales';
+$string['weeklyslots_help'] = 'Cantidad semanal de franjas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
+$string['dailyslots'] = 'Franjas de trabajo diarias';
+$string['dailyslots_help'] = 'Cantidad diaria de franjas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio. Adem&aacute;s, si el laboratorio es abierto, determina el n&uacute;mero m&aacute;ximo de franjas de tiempo consecutivas que se permite trabajar con el mismo.';
+$string['reboottime'] = 'Tiempo de inactividad (minutos)';
+$string['reboottime_help'] = 'Espacio m&iacute;nimo de tiempo (en minutos) desde que alguien deja de usar el laboratorio remoto hasta que otra persona puede empezar a usarlo. &Uacute;til para darle tiempo al laboratorio remoto de resetearse o volver a su estado inicial.';
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
@@ -204,6 +208,9 @@ $string['export_all_data'] = 'Exportar datos para todas las actividades EJSApp e
 $string['export_this_data'] = 'Exportar datos para esta actividad EJSApp';
 $string['no_ejsapps'] = 'La actividad EJSApp seleccionada no tiene variables personalizadas';
 $string['personalized_values'] = 'valores_personalizdos_';
+
+//kick_out.php
+$string['time_is_up'] = 'Se ha agotado su tiempo con el laboratorio remoto. Si desea seguir trabajando con &eacute;l, haga una nueva reserva y/o refresque esta p&aacute;gina.';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";

@@ -155,12 +155,16 @@ $string['active_help'] = 'Whether this remote lab is operative at the moment or 
 $string['free_access'] = 'Free access';
 $string['free_access_help'] = 'Enable free access mode (no need to make a booking) for this remote lab.';
 
-$string['totalslots'] = 'Total hours of work';
-$string['totalslots_help'] = 'Total amount of maximum hours each student will be allowed to work with this lab.';
-$string['weeklyslots'] = 'Weekly hours of work';
-$string['weeklyslots_help'] = 'Weekly amount of maximum hours each student will be allowed to work with this lab.';
-$string['dailyslots'] = 'Daily hours of work';
-$string['dailyslots_help'] = 'Daily amount of maximum hours each student will be allowed to work with this lab.';
+$string['slotsduration'] = 'Slots duration (minutes)';
+$string['slotsduration_help'] = 'Duration of the time slots (in minutes) in which users will be able to work with this lab.';
+$string['totalslots'] = 'Total slots of work';
+$string['totalslots_help'] = 'Total amount of maximum slots each student will be allowed to work with this lab.';
+$string['weeklyslots'] = 'Weekly slots of work';
+$string['weeklyslots_help'] = 'Weekly amount of maximum slots each student will be allowed to work with this lab.';
+$string['dailyslots'] = 'Daily slots of work';
+$string['dailyslots_help'] = 'Daily amount of maximum slots each student will be allowed to work with this lab. Also, if the lab is in free access mode, it determines the maximum number of consecutive time slots in which tha lab can be used.';
+$string['reboottime'] = 'Idle time (minutes)';
+$string['reboottime_help'] = 'Minimum elapsed time (in minutes) between someone stops using a remote lab and somebody else can start using it. Useful for giving time to the remote lab to reboot and/or turn back to its initial state.';
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
@@ -205,6 +209,9 @@ $string['export_all_data'] = 'Export data for all EJSApp activities in this cour
 $string['export_this_data'] = 'Export data for this EJSAppp activity';
 $string['no_ejsapps'] = 'The selected EJSApp activity doesn\'t have personalized variables';
 $string['personalized_values'] = 'personalized_values_';
+
+//kick_out.php
+$string['time_is_up'] = 'Your time with the remote lab has ended. If you want to keep working with it, make a new booking and/or refresh this page.';;
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Access to all the remote laboratories";

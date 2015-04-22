@@ -51,19 +51,20 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $sarlabinfo->instance: int sarlab id, 
  *                                  $sarlabinfo->practice: int practice id, 
  *                                  $sarlabinfo->collab:   int collab whether sarlab offers collab access to this remote lab (1) or not (0), 
- *                                  Null if sarlab is not used
  *                                  $sarlabinfo->labmanager: int laboratory manager (1) or student (0)
+ *                                  $sarlabinfo->max_use_time: int maximum time the remote lab can be connected (in seconds)
+ *                                  Null if sarlab is not used
  * @param array|null $data_files
- *                                  $data_files[0]: state_file, if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
- *                                  $data_files[1]: cnt_file, if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
- *                                  $data_files[2]: rec_file, if generate_applet_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
+ *                                  $data_files[0]: state_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
+ *                                  $data_files[1]: cnt_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
+ *                                  $data_files[2]: rec_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
  *                                  $collabinfo->session: int collaborative session id, 
  *                                  $collabinfo->ip: string collaborative session ip, 
  *                                  $collabinfo->localport: int collaborative session local port,
  *                                  $collabinfo->sarlabport: int|null sarlab port,
  *                                  $collabinfo->director: int|null id of the collaborative session master user, `
- *                                  Null if generate_applet_embedding_code is not called from block ejsapp_collab_session
+ *                                  Null if generate_embedding_code is not called from block ejsapp_collab_session
  * @param stdClass|null $personalvarsinfo
  *                                  $personalvarsinfo->name: string[] name(s) of the EJS variable(s),
  *                                  $personalvarsinfo->value: double[] value(s) of the EJS variable(s),
@@ -72,11 +73,11 @@ defined('MOODLE_INTERNAL') || die();
  * @param stdClass|null $external_size
  *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
  *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
- *                                  Null if generate_applet_embedding_code is not called from the external interface (draw_ejsapp_instance() function)
+ *                                  Null if generate_embedding_code is not called from the external interface (draw_ejsapp_instance() function)
 
  * @return string code that embeds an EJS applet into Moodle
  */
-function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, $external_size)
+function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, $external_size)
 {
     global $DB, $USER, $CFG;
 
@@ -233,7 +234,8 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
         if ($sarlabinfo){
             $code .= "document.write('<param name=\"ipserver\" value=\"{$sarlab_IP}\"/>');
                       document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
-                      document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>');";
+                      document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>')
+                      document.write('<param name=\"max_time\" value=\"$sarlabinfo->max_use_time\"/>');";
             if ($sarlabinfo->collab == 0) {
                   $code .= "document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
                             document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
@@ -405,4 +407,4 @@ function generate_applet_embedding_code($ejsapp, $sarlabinfo, $data_files, $coll
 
     return $code;
 
-} //end of generate_applet_embedding_code
+} //end of generate_embedding_code

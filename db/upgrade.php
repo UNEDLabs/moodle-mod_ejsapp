@@ -158,5 +158,15 @@ function xmldb_ejsapp_upgrade($oldversion)
         $dbman->add_index($table, $index);
     }
 
+    if  ($oldversion < '2015041903') {
+        // Create "slotsduration" and "reboottime" fields in ejsapp_remlab_conf table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_remlab_conf');
+        $slotsduration = new xmldb_field('slotsduration', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '60', 'port', 'totalslots');
+        $reboottime= new xmldb_field('reboottime', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '2', 'dailyslots', 'active');
+        $dbman->add_field($table, $slotsduration);
+        $dbman->add_field($table, $reboottime);
+    }
+
     return true;
 }

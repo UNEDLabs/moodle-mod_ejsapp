@@ -107,8 +107,8 @@ function draw_ejsapp_instance($ejsapp_id, $data_files=null, $width=null, $height
       } else {
         $external_size = null;
       }
-      require_once($CFG->dirroot . '/mod/ejsapp/generate_applet_embedding_code.php');
-      $code = generate_applet_embedding_code($ejsapp, null, $data_files, null, null, null, $external_size);
+      require_once($CFG->dirroot . '/mod/ejsapp/generate_embedding_code.php');
+      $code = generate_embedding_code($ejsapp, null, $data_files, null, null, null, $external_size);
     }
     else {
       $code = get_string('ejsapp_error', 'ejsapp');

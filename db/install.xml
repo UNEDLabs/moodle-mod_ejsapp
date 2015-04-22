@@ -85,15 +85,19 @@
                        COMMENT="IP direction of the computer that controls the access to the remote equipment"
                        PREVIOUS="sarlabcollab" NEXT="port"/>
                 <FIELD NAME="port" TYPE="int" LENGTH="6" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ip"
-                       NEXT="totalslots"/>
-                <FIELD NAME="totalslots" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       NEXT="slotsduration"/>
+                <FIELD NAME="slotsduration" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="port" NEXT="totalslots"/>
+                <FIELD NAME="slotsduration" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="port" NEXT="weeklyslots"/>
                 <FIELD NAME="weeklyslots" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="totalslots" NEXT="dailyslots"/>
                 <FIELD NAME="dailyslots" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="weeklyslots" NEXT="active"/>
+                       SEQUENCE="false" PREVIOUS="weeklyslots" NEXT="reboottime"/>
+                <FIELD NAME="reboottime" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="2"
+                       SEQUENCE="false" PREVIOUS="dailyslots" NEXT="active"/>
                 <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
-                       SEQUENCE="false" PREVIOUS="dailyslots"/>       
+                       SEQUENCE="false" PREVIOUS="reboottime"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

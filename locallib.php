@@ -143,7 +143,7 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     $ext = pathinfo($filepath, PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table
     if ($ext == 'jar') { //Java Applet
-        $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record, true);
+        $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record, false);
     } else { //Javascript
         $ejs_ok = modifications_for_javascript($filepath, $ejsapp, $path, $codebase);
     }
@@ -691,9 +691,11 @@ function ejsapp_rem_lab_conf($ejsapp) {
         $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
         $ejsapp_rem_lab->port = $ejsapp->port;
     }
+    $ejsapp_rem_lab->slotsduration = $ejsapp->slotsduration;
     $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
     $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
     $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
+    $ejsapp_rem_lab->reboottime = $ejsapp->reboottime;
 
     return $ejsapp_rem_lab;
 } // ejsapp_rem_lab_conf

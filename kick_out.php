@@ -21,9 +21,8 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-
 /**
- * Version file for the ejsapp module
+ * Ajax update for the EJSApp view.php when a user needs to be kicked out from a remote lab
  *
  * @package    mod
  * @subpackage ejsapp
@@ -31,11 +30,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require_once(dirname(__FILE__) . '/../../config.php');
 
-$plugin->version  = 2015042200;         // The current module version (Date: YYYYMMDDXX)
-$plugin->requires = 2013111800;
-$plugin->cron     = 8640000;            // Period for cron to check this module (secs)
-$plugin->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.0 (Build: 2015042200)';
+require_login(0, false);
+
+global $PAGE;
+
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url('/mod/ejsapp/kick_out.php');
+
+echo get_string('time_is_up', 'ejsapp');

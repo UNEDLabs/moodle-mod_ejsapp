@@ -291,6 +291,13 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('free_access', 'free_access', 'ejsapp');
         $mform->disabledIf('free_access', 'is_rem_lab', 'eq', 0);
 
+        $mform->addElement('select', 'slotsduration', get_string('slotsduration', 'ejsapp'), array('60', '30', '15', '5', '2'));
+        $mform->addHelpButton('slotsduration', 'slotsduration', 'ejsapp');
+        $mform->disabledIf('slotsduration', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('slotsduration', $rem_lab_data->slotsduration);
+        }
+
         $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'), array('size' => '2'));
         $mform->setType('totalslots', PARAM_INT);
         $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
@@ -325,6 +332,17 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
         } else {
             $mform->setDefault('dailyslots', 3);
+        }
+
+        $mform->addElement('text', 'reboottime', get_string('reboottime', 'ejsapp'), array('size' => '2'));
+        $mform->setType('reboottime', PARAM_INT);
+        $mform->addRule('reboottime', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
+        $mform->addHelpButton('reboottime', 'reboottime', 'ejsapp');
+        $mform->disabledIf('reboottime', 'is_rem_lab', 'eq', 0);
+        if ($this->current->instance && $rem_lab_data) {
+            $mform->setDefault('reboottime', $rem_lab_data->reboottime);
+        } else {
+            $mform->setDefault('reboottime', 2);
         }
 
         $mform->setAdvanced('rem_lab');
