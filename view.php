@@ -139,10 +139,10 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $labmanager = has_capability('mod/ejsapp:accessremotelabs', $coursecontext, $USER->id, true);
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
     $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf, $ejsapp);
-    $anyones_active_booking = check_active_booking($repeated_ejsapp_labs, $course->id);
+    $booking_info = check_active_booking($repeated_ejsapp_labs, $course->id);
     if ( (($ejsapp->free_access != 1) && (!$labmanager)) && check_booking_system($ejsapp) ){ //Not free access and the user does not have special privileges and the booking system is in use
         $allow_free_access = false;
-    } else if ( (($ejsapp->free_access == 1) && !$labmanager && $anyones_active_booking) ) { //Free access, the user does not have special privileges and there is an active booking for this remote lab made by anyone in a different course
+    } else if ( (($ejsapp->free_access == 1) && !$labmanager && $booking_info['active_booking']) ) { //Free access, the user does not have special privileges and there is an active booking for this remote lab made by anyone in a different course
         $allow_free_access = false;
     }
     //</Check if we should grant free access to the user for this remote lab>
@@ -153,7 +153,8 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
         $maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $ejsapp->id));
         $slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $ejsapp->id));
         $slotsduration = array(60, 30, 15, 5, 2);
-        $max_use_time = $maxslots*60*$slotsduration[$slotsduration_conf]; //in seconds
+        if ($slotsduration[$slotsduration_conf] == 0) $max_use_time = $maxslots*60*60;
+        else $max_use_time = $maxslots*60*$slotsduration[$slotsduration_conf]; //in seconds
         //</Getting the maximum time the user is allowed to use the remote lab>
         //<Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
         $time_last_access = 0;
@@ -176,10 +177,9 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             }
         }
         //</Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
-        $currenttime = date('Y-m-d H:i:s');
-        $currenttime_UNIX = strtotime($currenttime);
+        $currenttime = time();
         $lab_in_use = true;
-        if ($currenttime_UNIX - $time_last_access > 60*$idle_time) $lab_in_use = false;
+        if ($currenttime - $time_last_access > 60*$idle_time) $lab_in_use = false;
         if (!$lab_in_use) {
             if ($usingsarlab == 1) {
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
@@ -193,27 +193,24 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             prepare_ejs_file($ejsapp);
             echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
         } else {
-            echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp')); //TODO: Add countdown with the time remaining till the lab becomes available
+            echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
             $action = 'need_to_wait';
-            /*$url = $CFG->wwwroot . '/mod/ejsapp/countdown.php';
-            $PAGE->requires->js_init_call('M.mod_ejsapp.countdown', array($url, $CFG->version));*/
         }
     } else { //Students trying to access a remote lab with restricted access OR remote lab not operative
         if (!$allow_access) { //Remote lab not operative
             echo $OUTPUT->box(get_string('inactive_lab', 'ejsapp'));
             $action = 'inactive_lab';
         } else {    //Students trying to access a remote lab with restricted access
-            //<Getting the maximum time the user is allowed to use the remote lab>
-            $booking_end_time = check_last_valid_booking($DB, $USER, $ejsapp->id);
-            $booking_end_time_UNIX = strtotime($booking_end_time);
-            $currenttime = date('Y-m-d H:i:s');
-            $currenttime_UNIX = strtotime($currenttime);
-            $max_use_time = $booking_end_time_UNIX - $currenttime_UNIX; //in seconds
-            //</Getting the maximum time the user is allowed to use the remote lab>
-            if ($anyones_active_booking) { //Remote lab freely accessible from one course but with an active booking made by anyone in a different course
+            if ($booking_info['active_booking']) { //Remote lab freely accessible from one course but with an active booking made by anyone in a different course
                 echo $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
                 $action = 'booked_lab';
             } else { //Other cases
+                //<Getting the maximum time the user is allowed to use the remote lab>
+                $booking_end_time = check_last_valid_booking($DB, $USER->username, $ejsapp->id);
+                $booking_end_time_UNIX = strtotime($booking_end_time);
+                $currenttime = time();
+                $max_use_time = $booking_end_time_UNIX - $currenttime; //in seconds
+                //</Getting the maximum time the user is allowed to use the remote lab>
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
                 $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlab_conf, $labmanager, $max_use_time);
                 if (!is_null($sarlabinfo)) { //The user has an active booking -> he can access the lab
@@ -336,9 +333,22 @@ if ($accessed) {
     } else {
         $url_log = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsapp->name.'&method=1&userid='.$USER->id;
     }
-    $htmlid = 'EJsS';
+    $htmlid = "EJsS";
     $url_view = $CFG->wwwroot . '/mod/ejsapp/kick_out.php';
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $CFG->version, $htmlid, $check_activity, $max_use_time));
+} else if ($action == 'need_to_wait' || $action == 'booked_lab') {
+    if ($action == 'booked_lab') {
+        $ending_time = check_last_valid_booking($DB, $booking_info['username_with_booking'], $booking_info['ejsappid']);
+        $ending_time = strtotime($ending_time);
+    }
+    else {
+        $ending_time = strtotime(date('Y-m-d H:i:s'));
+    }
+    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php';
+    $htmlid = "timecountdown";
+    $remaining_time = 60*$idle_time + $ending_time - strtotime(date('Y-m-d H:i:s'));
+    echo $OUTPUT->box(html_writer::div('', '', array('id'=>$htmlid)));
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $CFG->version, $htmlid, $remaining_time));
 }
 
 // Finish the page
@@ -405,16 +415,16 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $l
  * Checks if there is an active booking made by the current user and if there is, it gets the ending time of the farest consecutive booking
  *
  * @param object $DB
- * @param object $USER
+ * @param string $username
  * @param int $ejsappid
  * @return boolean $active_booking
  */
-function check_last_valid_booking($DB, $USER, $ejsappid) {
+function check_last_valid_booking($DB, $username, $ejsappid) {
     $endtime = 0;
     $currenttime = date('Y-m-d H:i:s');
 
-    if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsappid, 'valid' => 1))) {
-        $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsappid, 'valid' => 1));
+    if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $username, 'ejsappid' => $ejsappid, 'valid' => 1))) {
+        $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $username, 'ejsappid' => $ejsappid, 'valid' => 1));
         function cmp($a, $b) {
             return strtotime($a->starttime) - strtotime($b->starttime);
         }
@@ -433,26 +443,26 @@ function check_last_valid_booking($DB, $USER, $ejsappid) {
 
 
 /**
- * Checks if there is an active booking made by any user
+ * Checks if there is an active booking made by any user and if it is, it returns the username.
  *
  * @param object $DB
  * @param stdClass $ejsapp
  * @param string $currenttime
- * @return boolean $active_booking
+ * @return string $username_with_active_booking
  */
 function check_anyones_booking($DB, $ejsapp, $currenttime) {
-    $active_booking = false;
+    $username_with_active_booking = '';
 
     if ($DB->record_exists('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id, 'valid' => 1))) {
         $bookings = $DB->get_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id, 'valid' => 1));
         foreach ($bookings as $booking) { // If the user has an active booking, use that info
             if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
-                $active_booking = true;
+                $username_with_active_booking = $booking->username;
             }
         }
     }
 
-    return $active_booking;
+    return $username_with_active_booking;
 }
 
 
@@ -518,23 +528,28 @@ function get_repeated_remlabs_with_bs($repeated_ejsapp_labs) {
 
 /**
  *
- * Tells if there is at least one different course in which the same remote lab has been booked for this hour.
+ * Tells if there is at least one different course in which the same remote lab has been booked for this hour and if it is,
+ * it returns an array with the name of the user with the booking and the id of that ejsapp activity.
  *
  * @param array $repeated_ejsapp_labs
  * @param int $courseid
- * @return boolean $active_booking
+ * @return array $book_info
  *
  */
 function check_active_booking($repeated_ejsapp_labs, $courseid) {
     global $DB;
 
-    $active_booking = false;
+    $book_info = array();
+    $book_info['active_booking'] = false;
     if (count($repeated_ejsapp_labs) > 1) {
         $repeated_ejsapp_labs_with_bs = get_repeated_remlabs_with_bs($repeated_ejsapp_labs);
         if (count($repeated_ejsapp_labs_with_bs) > 0) {
             foreach ($repeated_ejsapp_labs_with_bs as $repeated_ejsapp_lab_with_bs) {
                 if ($repeated_ejsapp_lab_with_bs->course != $courseid) {
-                    if ($active_booking = check_anyones_booking($DB, $repeated_ejsapp_lab_with_bs, date('Y-m-d H:i:s'))) {
+                    $book_info['username_with_booking'] = check_anyones_booking($DB, $repeated_ejsapp_lab_with_bs, date('Y-m-d H:i:s'));
+                    if (!empty($book_info['username_with_booking'])) {
+                        $book_info['active_booking'] = true;
+                        $book_info['ejsappid'] = $repeated_ejsapp_lab_with_bs->id;
                         break;
                     }
                 }
@@ -542,7 +557,7 @@ function check_active_booking($repeated_ejsapp_labs, $courseid) {
         }
     }
 
-    return $active_booking;
+    return $book_info;
 }
 
 

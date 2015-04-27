@@ -162,7 +162,7 @@ $string['totalslots_help'] = 'Total amount of maximum slots each student will be
 $string['weeklyslots'] = 'Weekly slots of work';
 $string['weeklyslots_help'] = 'Weekly amount of maximum slots each student will be allowed to work with this lab.';
 $string['dailyslots'] = 'Daily slots of work';
-$string['dailyslots_help'] = 'Daily amount of maximum slots each student will be allowed to work with this lab. Also, if the lab is in free access mode, it determines the maximum number of consecutive time slots in which tha lab can be used.';
+$string['dailyslots_help'] = 'Daily amount of maximum slots each student will be allowed to work with this lab. Also, if the lab is in free access mode, it determines the maximum number of consecutive time slots in which the lab can be used.';
 $string['reboottime'] = 'Idle time (minutes)';
 $string['reboottime_help'] = 'Minimum elapsed time (in minutes) between someone stops using a remote lab and somebody else can start using it. Useful for giving time to the remote lab to reboot and/or turn back to its initial state.';
 
@@ -212,6 +212,10 @@ $string['personalized_values'] = 'personalized_values_';
 
 //kick_out.php
 $string['time_is_up'] = 'Your time with the remote lab has ended. If you want to keep working with it, make a new booking and/or refresh this page.';;
+
+//countdown.php
+$string['seconds'] = 'seconds left.';
+$string['refresh'] = 'Try refreshing your window now.';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Access to all the remote laboratories";

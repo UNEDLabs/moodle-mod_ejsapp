@@ -327,7 +327,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('dailyslots', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
         $mform->addHelpButton('dailyslots', 'dailyslots', 'ejsapp');
         $mform->disabledIf('dailyslots', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('dailyslots', 'free_access', 'eq', 1);
         if ($this->current->instance && $rem_lab_data) {
             $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
         } else {

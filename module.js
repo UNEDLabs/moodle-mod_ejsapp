@@ -52,10 +52,10 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
         success:handleSuccessKickOut,
         failure:handleFailureKickOut
     };
-    var max_times = Math.round(max_time/frequency); //A user can occupy a lab just for max_time seconds
+    var max_times = Math.round(max_time/frequency); //A user can occupy a lab just for max_times seconds
     var counter = 0;
     var checkActivity = function() {
-        Y.use('yui2-connection', function(Y) {
+        Y.use('yui2-connection', 'yui2-dom', function(Y) {
             if (moodle_version >= 2012120300) { //Moodle 2.4 or higher
                 YAHOO = Y.YUI2;
             }
@@ -69,37 +69,42 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
                 clearInterval(checkActivity);
             }
         });
-    }
+    };
     //Call a first time:
     checkActivity();
     //Call periodically:
     setInterval(checkActivity,1000*frequency);
 };
 
-/*M.mod_ejsapp.countdown = function(Y, url, moodle_version){
- var handleSuccess = function(o) {
- /*success handler code*/
-/*};
- var handleFailure = function(o) {
- /*failure handler code*/
-/*};
- var callback = {
- success:handleSuccess,
- failure:handleFailure
- };
- var max_times = 3600;
- var counter = 1;
- var checkActivity = function() {
- if (counter < max_times) {
- //Call php code to insert log in Moodle table
- Y.use('yui2-connection', function(Y) {
- if (moodle_version >= 2012120300) { //Moodle 2.4 or higher
- YAHOO = Y.YUI2;
- }
- YAHOO.util.Connect.asyncRequest('GET', url, callback);
- counter++;
- });
- } else clearInterval(checkActivity);
- }
- setInterval(checkActivity,1000);
- };*/
+M.mod_ejsapp.init_countdown = function(Y, url, moodle_version, htmlid, initial_remaining_time){
+    var handleSuccess = function(o) {
+        var div = YAHOO.util.Dom.get(htmlid);
+        div.innerHTML = o.responseText;
+    };
+    var handleFailure = function(o) {
+        /*failure handler code*/
+    };
+    var callback = {
+        success:handleSuccess,
+        failure:handleFailure
+    };
+    var counter = 0;
+    var remaining_time_param =  initial_remaining_time;
+    var updateRemainingTime = function() {
+        Y.use('yui2-connection', 'yui2-dom', function(Y) {
+            if (moodle_version >= 2012120300) { //Moodle 2.4 or higher
+                YAHOO = Y.YUI2;
+            }
+            //Call php code to update the remaining time till the remote lab is free again
+            if (counter <= initial_remaining_time) { //still counting
+                remaining_time_param = initial_remaining_time - counter;
+                counter++;
+            } else { //end, user can try refreshing the window
+                clearInterval(interval);
+            }
+            var final_url = url + '?remaining_time=' + remaining_time_param;
+            YAHOO.util.Connect.asyncRequest('GET', final_url, callback);
+        });
+    };
+    var interval = setInterval(updateRemainingTime,1000);
+};

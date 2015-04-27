@@ -212,6 +212,10 @@ $string['personalized_values'] = 'valores_personalizdos_';
 //kick_out.php
 $string['time_is_up'] = 'Se ha agotado su tiempo con el laboratorio remoto. Si desea seguir trabajando con &eacute;l, haga una nueva reserva y/o refresque esta p&aacute;gina.';
 
+//countdown.php
+$string['seconds'] = 'segundos restantes.';
+$string['refresh'] = 'Pruebe a refrescar su ventana ahora.';
+
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";
 $string['ejsapp:addinstance'] = "Añadir una nueva actividad EJSApp";

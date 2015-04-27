@@ -57,9 +57,10 @@ if ($method == 0) { //Moodle 2.6 or inferior
     ));
     /*$event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('ejsapp', $ejsapp);*/
+    echo $alert;
     $record = new stdClass();
     $record->id = $cm_id;
-    $record->time = strtotime(date('Y-m-d H:i:s'));
+    $record->time = time();
     $record->userid = $user_id;
     $record->action = 'working';
     $record->info = $ejsapp_name;
