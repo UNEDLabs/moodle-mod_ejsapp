@@ -190,10 +190,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
 
         $permissions = 'sandbox';
         if ($ejsapp->is_rem_lab == 1) $permissions = 'all-permissions';
+        $ejsapp_id = $ejsapp->applet_name;
         $ext = '.jar';
-        if (pathinfo($ejsapp->applet_name, PATHINFO_EXTENSION) == 'jar') $ext = '';
+        if (pathinfo($ejsapp->applet_name, PATHINFO_EXTENSION) == 'jar') {
+            $ejsapp_id = substr($ejsapp_id, 0, -4);
+            $ext = '';
+        }
         $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');
-                  document.write(' id=\"{$ejsapp->applet_name}\"');
+                  document.write(' id=\"$ejsapp_id\"');
                   document.write(' width=\"'+w+'\"');
                   document.write(' height=\"'+h+'\">');
                   document.write('<param name=\"cache_archive\" value=\"{$ejsapp->applet_name}$ext\">');
@@ -268,15 +272,15 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
             $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
             $load_state_code = "
               function loadState(count) {
-                if (!{$ejsapp->applet_name}._simulation && count > 0) {
+                if (!$ejsapp_id._simulation && count > 0) {
                     window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if ({$ejsapp->applet_name}._simulation) {
-                  window.setTimeout( function() { {$ejsapp->applet_name}._readState('url:$state_file'); }, 100 );
-                  {$ejsapp->applet_name}._view.resetTraces();
-                  //{$ejsapp->applet_name}._view.clearData();
-                  //{$ejsapp->applet_name}._view.clearElements();
-                  //{$ejsapp->applet_name}._view.resetElements();
+                else if ($ejsapp_id._simulation) {
+                  window.setTimeout( function() { $ejsapp_id._readState('url:$state_file'); }, 100 );
+                  $ejsapp_id._view.resetTraces();
+                  //$ejsapp_id._view.clearData();
+                  //$ejsapp_id._view.clearElements();
+                  //$ejsapp_id._view.resetElements();
                 }
                 else {
                   alert('$state_fail_msg');
@@ -311,14 +315,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
             $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
             $load_cnt_code = "
               function loadController(count) {
-                if (!{$ejsapp->applet_name}._model && count > 0) {
+                if (!$ejsapp_id._model && count > 0) {
                     window.setTimeout( function() { loadController( --count ); }, 1000 );
                 }
-                else if ({$ejsapp->applet_name}._model) {
+                else if ($ejsapp_id._model) {
                   window.setTimeout( function() {
-                  var element = {$ejsapp->applet_name}._model.getUserData('_codeController');
-                  element.setController({$ejsapp->applet_name}._readText('url:$cnt_file')); }, 100 );
-                  //{$ejsapp->applet_name}._model.codeEvaluator.setController(applet._readText('url:$cnt_file')); }, 100 );
+                  var element = $ejsapp_id._model.getUserData('_codeController');
+                  element.setController($ejsapp_id._readText('url:$cnt_file')); }, 100 );
+                  //$ejsapp_id._model.codeEvaluator.setController(applet._readText('url:$cnt_file')); }, 100 );
                 }
                 else {
                   alert('$cnt_fail_msg');
@@ -351,20 +355,20 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
               var js_vars_values = ". $js_vars_values . ";
               var js_vars_types = ". $js_vars_types . ";
               function personalizeVars(count) {
-                if (!{$ejsapp->applet_name}._simulation && count > 0) {
+                if (!$ejsapp_id._simulation && count > 0) {
                     window.setTimeout( function() { personalizeVars( --count ); }, 1000 );
                 }
-                else if ({$ejsapp->applet_name}._simulation) {
+                else if ($ejsapp_id._simulation) {
                     for (var i=0; i<js_vars_names.length; i++) {
                         if (js_vars_types[i] != \"Boolean\") {
-                            {$ejsapp->applet_name}._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
+                            $ejsapp_id._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
                         } else {
                             var bool = (js_vars_values[i] == 1);
-                            {$ejsapp->applet_name}._simulation.setVariable(js_vars_names[i],bool);
+                            $ejsapp_id._simulation.setVariable(js_vars_names[i],bool);
                         }
                     }
-                    {$ejsapp->applet_name}._simulation.update();
-                    //{$ejsapp->applet_name}._initialize();
+                    $ejsapp_id._simulation.update();
+                    //$ejsapp_id._initialize();
                 }
               }
               personalizeVars(10);";
@@ -384,11 +388,11 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
             $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
             $load_rec_code = "
               function loadExperiment(count) {
-                if (!{$ejsapp->applet_name}._simulation && count > 0) {
+                if (!$ejsapp_id._simulation && count > 0) {
                     window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
                 }
-                else if ({$ejsapp->applet_name}._simulation) {
-                  window.setTimeout( function() { {$ejsapp->applet_name}._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
+                else if ($ejsapp_id._simulation) {
+                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
                 }
                 else {
                   alert('$rec_fail_msg');

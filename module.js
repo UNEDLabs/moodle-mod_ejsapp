@@ -30,7 +30,7 @@
 
 M.mod_ejsapp = {};
 
-M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_version, htmlid, frequency, max_time){
+M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_version, is_rem_lab, htmlid, frequency, max_time){
     var handleSuccessAddLog = function(o) {
         /*success handler code*/
     };
@@ -52,7 +52,8 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
         success:handleSuccessKickOut,
         failure:handleFailureKickOut
     };
-    var max_times = Math.round(max_time/frequency); //A user can occupy a lab just for max_times seconds
+    var max_times = 7200;
+    if (is_rem_lab == 1) max_times = Math.round(max_time/frequency); //A user can occupy a remote lab just for max_times seconds
     var counter = 0;
     var checkActivity = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
@@ -64,8 +65,10 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
                 YAHOO.util.Connect.asyncRequest('GET', url_add_log, callbackAddLog);
                 counter++;
             } else { // time is up
-                //Call php code to refresh view.php and kick the user from the remote lab
-                YAHOO.util.Connect.asyncRequest('GET', url_max_time, callbackKickOut);
+                if (is_rem_lab == 1) {
+                    //Call php code to refresh view.php and kick the user from the remote lab
+                    YAHOO.util.Connect.asyncRequest('GET', url_max_time, callbackKickOut);
+                }
                 clearInterval(checkActivity);
             }
         });

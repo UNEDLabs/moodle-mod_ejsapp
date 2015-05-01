@@ -113,10 +113,6 @@ $personalvarsinfo = personalize_vars($ejsapp, $USER);
 //For logging purposes:
 $action = 'view';
 $check_activity = 120;   //register whether the user is still in the activity or not every 120 seconds (2 min)
-$idle_time = $DB->get_field('ejsapp_remlab_conf', 'reboottime', array('ejsappid'=>$ejsapp->id)); //minimum elapsed time between someone stops using a remote lab and somebody else can start using it
-if (60*$idle_time < $check_activity) $idle_time = $check_activity/60;
-$idle_time = $idle_time + $check_activity/60; // because the last check doesn't get recorded
-$max_use_time = 3600;
 $accessed = false;
 
 //Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not.
@@ -126,6 +122,8 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     prepare_ejs_file($ejsapp);
     echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
 } else { //<Remote lab>
+    $idle_time = $DB->get_field('ejsapp_remlab_conf', 'reboottime', array('ejsappid'=>$ejsapp->id)); //minimum elapsed time between someone stops using a remote lab and somebody else can start using it
+
     //<Check if the remote lab is operative>
     $allow_access = true;
     $ejsapp_lab_active = $DB->get_field('ejsapp_remlab_conf', 'active', array('ejsappid'=>$ejsapp->id));
@@ -140,7 +138,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsapp->id));
     $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf, $ejsapp);
     $booking_info = check_active_booking($repeated_ejsapp_labs, $course->id);
-    if ( (($ejsapp->free_access != 1) && (!$labmanager)) && check_booking_system($ejsapp) ){ //Not free access and the user does not have special privileges and the booking system is in use
+    if ( (($ejsapp->free_access != 1) && (!$labmanager)) && check_booking_system($ejsapp) ){ //Not free access, the user does not have special privileges and the booking system is in use
         $allow_free_access = false;
     } else if ( (($ejsapp->free_access == 1) && !$labmanager && $booking_info['active_booking']) ) { //Free access, the user does not have special privileges and there is an active booking for this remote lab made by anyone in a different course
         $allow_free_access = false;
@@ -150,36 +148,26 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $usingsarlab = $remlab_conf->usingsarlab;
     if ($allow_free_access && $allow_access) { //Admins and teachers, not using ejsappbooking or free access remote lab, AND the remote lab is operative
         //<Getting the maximum time the user is allowed to use the remote lab>
-        $maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $ejsapp->id));
-        $slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $ejsapp->id));
+        $maxslots = $remlab_conf->dailyslots;
+        $slotsduration_conf = $remlab_conf->slotsduration;
         $slotsduration = array(60, 30, 15, 5, 2);
         if ($slotsduration[$slotsduration_conf] == 0) $max_use_time = $maxslots*60*60;
         else $max_use_time = $maxslots*60*$slotsduration[$slotsduration_conf]; //in seconds
         //</Getting the maximum time the user is allowed to use the remote lab>
-        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
-        $time_last_access = 0;
-        foreach($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
-            if (isset($repeated_ejsapp_lab->ejsappid)) {
-                $repeated_ejsapp = $DB->get_record('ejsapp', array('id'=>$repeated_ejsapp_lab->ejsappid));
-                if (isset($repeated_ejsapp->name)) {
-                    if ($CFG->version < 2013111899) { //Moodle 2.6 or inferior
-                        $log_records = $DB->get_records('log', array('module'=>'ejsapp', 'info'=>$repeated_ejsapp->name, 'action'=>'working'));
-                    } else {
-                        // Retrieve information from ejsapp's logging table
-                        $log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'working'));
-                    }
-                    foreach ($log_records as $log_record) {
-                        if ($log_record->userid != $USER->id) {
-                            $time_last_access = max($time_last_access, $log_record->time);
-                        }
-                    }
-                }
-            }
-        }
-        //</Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
         $currenttime = time();
+        //<Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
+        $time_information = get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $ejsapp->id, $slotsduration, $currenttime);
+        $time_first_access = $time_information['time_first_access'];
+        $time_last_access = $time_information['time_last_access'];
+        $occupied_ejsapp_max_use_time = $time_information['occupied_ejsapp_max_use_time'];
+        //</Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course>
         $lab_in_use = true;
-        if ($currenttime - $time_last_access > 60*$idle_time) $lab_in_use = false;
+        $lab_rebooting = false;
+        if ($currenttime - $time_last_access - 60*$idle_time - $check_activity > 0) { //-$check_activity because the last 'working' log doesn't get recorded
+            $lab_in_use = false;
+        } else if ($currenttime - $time_last_access - $check_activity > 0) {
+            $lab_rebooting = true;
+        }
         if (!$lab_in_use) {
             if ($usingsarlab == 1) {
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
@@ -243,37 +231,43 @@ if ($CFG->version < 2013111899) { //Moodle 2.6 or inferior
         case 'view':
             $event = \mod_ejsapp\event\course_module_viewed::create(array(
                 'objectid' => $ejsapp->id,
-                'context' => $modulecontext
+                'context' => $modulecontext,
+                'other' => $ejsapp->name,
             ));
             break;
         case 'need_to_wait':
             $event = \mod_ejsapp\event\course_module_wait::create(array(
                 'objectid' => $ejsapp->id,
-                'context' => $modulecontext
+                'context' => $modulecontext,
+                'other' => $ejsapp->name,
             ));
             break;
         case 'need_to_book':
             $event = \mod_ejsapp\event\course_module_book::create(array(
                 'objectid' => $ejsapp->id,
-                'context' => $modulecontext
+                'context' => $modulecontext,
+                'other' => $ejsapp->name,
             ));
             break;
         case 'collab_view':
             $event = \mod_ejsapp\event\course_module_collab::create(array(
                 'objectid' => $ejsapp->id,
-                'context' => $modulecontext
+                'context' => $modulecontext,
+                'other' => $ejsapp->name,
             ));
             break;
         case 'inactive_lab':
             $event = \mod_ejsapp\event\course_module_inactive::create(array(
                 'objectid' => $ejsapp->id,
                 'context' => $modulecontext,
+                'other' => $ejsapp->name,
             ));
             break;
         case 'booked_lab':
             $event = \mod_ejsapp\event\course_module_booked::create(array(
                 'objectid' => $ejsapp->id,
                 'context' => $modulecontext,
+                'other' => $ejsapp->name,
             ));
             break;
     }
@@ -335,18 +329,25 @@ if ($accessed) {
     }
     $htmlid = "EJsS";
     $url_view = $CFG->wwwroot . '/mod/ejsapp/kick_out.php';
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $CFG->version, $htmlid, $check_activity, $max_use_time));
-} else if ($action == 'need_to_wait' || $action == 'booked_lab') {
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $CFG->version, $ejsapp->is_rem_lab, $htmlid, $check_activity, $max_use_time));
+} else if ($action == 'booked_lab' || $action == 'need_to_wait') {
     if ($action == 'booked_lab') {
         $ending_time = check_last_valid_booking($DB, $booking_info['username_with_booking'], $booking_info['ejsappid']);
         $ending_time = strtotime($ending_time);
+        $remaining_time = 60*$idle_time + $ending_time - strtotime(date('Y-m-d H:i:s'));
     }
     else {
-        $ending_time = strtotime(date('Y-m-d H:i:s'));
+        $currenttime = time();
+        if ($lab_rebooting) {
+            $remaining_time = 60*$idle_time + $check_activity - ($currenttime - $time_last_access);
+        }
+        else {
+            if ($time_first_access == INF) $time_first_access = time();
+            $remaining_time = 60*$idle_time + $occupied_ejsapp_max_use_time - ($currenttime - $time_first_access);
+        }
     }
     $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php';
     $htmlid = "timecountdown";
-    $remaining_time = 60*$idle_time + $ending_time - strtotime(date('Y-m-d H:i:s'));
     echo $OUTPUT->box(html_writer::div('', '', array('id'=>$htmlid)));
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $CFG->version, $htmlid, $remaining_time));
 }
@@ -463,6 +464,57 @@ function check_anyones_booking($DB, $ejsapp, $currenttime) {
     }
 
     return $username_with_active_booking;
+}
+
+
+/**
+ *
+ * Gets information about the first and last access a user made to the remote lab. It also retrieves the maximum time of use allowed for that lab.
+ *
+ * @param array stdClass $repeated_ejsapp_labs
+ * @param int $ejsappid
+ * @param array int $slotsduration
+ * @param int $currenttime
+ * @return array int $time_information
+ *
+ */
+function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $ejsappid, $slotsduration, $currenttime) {
+    global $DB, $USER, $CFG;
+
+    $time_first_access = INF;
+    $time_last_access = 0;
+    $occupied_ejsapp_max_use_time = 3600;
+    foreach($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
+        if (isset($repeated_ejsapp_lab->ejsappid)) {
+            $repeated_ejsapp = $DB->get_record('ejsapp', array('id'=>$repeated_ejsapp_lab->ejsappid));
+            if (isset($repeated_ejsapp->name)) {
+                if ($CFG->version < 2013111899) { //Moodle 2.6 or inferior
+                    $log_records = $DB->get_records('log', array('module'=>'ejsapp', 'info'=>$repeated_ejsapp->name, 'action'=>'working'));
+                } else {
+                    // Retrieve information from ejsapp's logging table
+                    $log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'working'));
+                }
+                foreach ($log_records as $log_record) {
+                    if ($log_record->userid != $USER->id) {
+                        $time_last_access = max($time_last_access, $log_record->time);
+                        if (($log_record->time > $currenttime - 3600) && ($repeated_ejsapp_lab->ejsappid != $ejsappid)) { // we restrict the search in a window time of the last hour and only for the same rem lab in different ejsapp activities
+                            $occupied_ejsapp_slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $repeated_ejsapp->id));
+                            $occupied_ejsapp_maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $repeated_ejsapp->id));
+                            $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
+                            if ($log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
+                                $time_first_access = min($time_first_access, $log_record->time);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $time_information['time_first_access'] = $time_first_access;
+    $time_information['time_last_access'] = $time_last_access;
+    $time_information['occupied_ejsapp_max_use_time'] = $occupied_ejsapp_max_use_time;
+
+    return $time_information;
 }
 
 
