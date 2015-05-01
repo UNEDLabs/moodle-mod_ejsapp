@@ -496,13 +496,18 @@ function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $ejsappid, 
                 }
                 foreach ($log_records as $log_record) {
                     if ($log_record->userid != $USER->id) {
-                        $time_last_access = max($time_last_access, $log_record->time);
+                        if ($log_record->time > $time_last_access) {
+                            $time_last_access = $log_record->time;
+                            $user_occupying_lab_id = $log_record->userid;
+                        }
                         if (($log_record->time > $currenttime - 3600) && ($repeated_ejsapp_lab->ejsappid != $ejsappid)) { // we restrict the search in a window time of the last hour and only for the same rem lab in different ejsapp activities
-                            $occupied_ejsapp_slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $repeated_ejsapp->id));
-                            $occupied_ejsapp_maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $repeated_ejsapp->id));
-                            $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
-                            if ($log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
-                                $time_first_access = min($time_first_access, $log_record->time);
+                            if ($user_occupying_lab_id == $log_record->userid) {
+                                $occupied_ejsapp_slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $repeated_ejsapp->id));
+                                $occupied_ejsapp_maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $repeated_ejsapp->id));
+                                $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
+                                if ($log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
+                                    $time_first_access = min($time_first_access, $log_record->time);
+                                }
                             }
                         }
                     }
