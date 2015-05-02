@@ -729,3 +729,397 @@ function ejsapp_expsyst2pract($ejsapp) {
     }
 
 } // ejsapp_expsyst2pract
+
+
+/**
+ *
+ * Checks whether a the booking system is being used in the course of a particular ejsapp activity or not.
+ *
+ * @param stdClass $ejsapp
+ * @return bool $using_bs
+ *
+ */
+function check_booking_system($ejsapp) {
+    global $DB;
+
+    $using_bs = false;
+    if ($DB->record_exists('modules', array('name' => 'ejsappbooking'))) { //Is EJSApp Booking System plugins installed?
+        $module = $DB->get_record('modules', array('name' => 'ejsappbooking'));
+        if ($DB->record_exists('course_modules', array('course' => $ejsapp->course, 'module' => $module->id))) { //Is there an ejsappbooking instance in the course?
+            if ($DB->get_field('course_modules', 'visible',  array('course' => $ejsapp->course, 'module' => $module->id))) { //Is it visible?
+                $using_bs = true;
+            }
+        }
+    }
+
+    return $using_bs;
+}
+
+
+/**
+ * Checks if there is an active booking made by the current user and gets the information needed by sarlab
+ *
+ * @param object $DB
+ * @param object $USER
+ * @param stdClass $ejsapp
+ * @param string $currenttime
+ * @param stdClass $remlab_conf
+ * @param int $labmanager
+ * param int $max_use_time
+ * @return stdClass $sarlabinfo
+ */
+function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $labmanager, $max_use_time) {
+    $sarlabinfo = null;
+
+    if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1))) {
+        $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1));
+        foreach ($bookings as $booking) { // If the user has an active booking, use that info
+            if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
+                $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
+                $practice = $expsyst2pract->practiceintro;
+                $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $practice, $labmanager, $max_use_time);
+                break;
+            }
+        }
+    }
+
+    return $sarlabinfo;
+}
+
+
+/**
+ * Checks if there is an active booking made by the current user and if there is, it gets the ending time of the farest consecutive booking
+ *
+ * @param object $DB
+ * @param string $username
+ * @param int $ejsappid
+ * @return boolean $active_booking
+ */
+function check_last_valid_booking($DB, $username, $ejsappid) {
+    $endtime = 0;
+    $currenttime = date('Y-m-d H:i:s');
+
+    if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $username, 'ejsappid' => $ejsappid, 'valid' => 1))) {
+        $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $username, 'ejsappid' => $ejsappid, 'valid' => 1));
+        function cmp($a, $b) {
+            return strtotime($a->starttime) - strtotime($b->starttime);
+        }
+        usort($bookings, "cmp");
+        foreach ($bookings as $booking) { // If the user has an active booking, check the time
+            if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
+                $endtime = $booking->endtime;
+                $currenttime = strtotime($endtime) + 1;
+                $currenttime = date("Y-m-d H:i:s", $currenttime);
+            }
+        }
+    }
+
+    return $endtime;
+}
+
+
+/**
+ * Checks if there is an active booking made by any user and if it is, it returns the username.
+ *
+ * @param object $DB
+ * @param stdClass $ejsapp
+ * @param string $currenttime
+ * @return string $username_with_active_booking
+ */
+function check_anyones_booking($DB, $ejsapp, $currenttime) {
+    $username_with_active_booking = '';
+
+    if ($DB->record_exists('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id, 'valid' => 1))) {
+        $bookings = $DB->get_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id, 'valid' => 1));
+        foreach ($bookings as $booking) { // If the user has an active booking, use that info
+            if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
+                $username_with_active_booking = $booking->username;
+            }
+        }
+    }
+
+    return $username_with_active_booking;
+}
+
+
+/**
+ *
+ * Gets information about the first and last access a user made to the remote lab. It also retrieves the maximum time of use allowed for that lab.
+ *
+ * @param array stdClass $repeated_ejsapp_labs
+ * @param array int $slotsduration
+ * @param int $currenttime
+ * @return array int $time_information
+ *
+ */
+function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, $currenttime) {
+    global $DB, $USER;
+
+    $time_first_access = 0; //TODO: Change to INF when we stop reseting time when a user connected to a remote lab refreshes the page
+    $time_last_access = 0;
+    $occupied_ejsapp_max_use_time = 3600;
+    foreach($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
+        if (isset($repeated_ejsapp_lab->ejsappid)) {
+            $repeated_ejsapp = $DB->get_record('ejsapp', array('id'=>$repeated_ejsapp_lab->ejsappid));
+            if (isset($repeated_ejsapp->name)) {
+                // Retrieve information from ejsapp's logging table
+                $working_log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'working'));
+                $viewed_log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'viewed'));
+                $user_occupying_lab_id = $USER->id;
+                foreach ($working_log_records as $working_log_record) {
+                    if ($working_log_record->userid != $USER->id) {
+                        if ($working_log_record->time > $time_last_access) {
+                            $time_last_access = $working_log_record->time;
+                            $user_occupying_lab_id = $working_log_record->userid;
+                        }
+                    }
+                }
+                foreach ($viewed_log_records as $viewed_log_record) {
+                    if ($viewed_log_record->userid != $USER->id) {
+                        if ($viewed_log_record->userid == $user_occupying_lab_id) { // accesses of the user that is currently working with the rem lab
+                            $occupied_ejsapp_slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $repeated_ejsapp->id));
+                            $occupied_ejsapp_maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $repeated_ejsapp->id));
+                            $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
+                            if ($viewed_log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
+                                $time_first_access = max($time_first_access, $viewed_log_record->time); // TODO: Change to min when we stop reseting time when a user connected to a remote lab refreshes the page
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if ($time_first_access == 0) $time_first_access = INF;
+    $time_information['time_first_access'] = $time_first_access;
+    $time_information['time_last_access'] = $time_last_access;
+    $time_information['occupied_ejsapp_max_use_time'] = $occupied_ejsapp_max_use_time;
+
+    return $time_information;
+}
+
+
+/**
+ *
+ * Checks whether a particular remote lab is also present in other courses or not and gives the list of repeated labs.
+ *
+ * @param stdClass $remlab_conf
+ * @param stdClass $ejsapp
+ * @return array $repeated_ejsapp_labs
+ *
+ */
+function get_repeated_remlabs($remlab_conf, $ejsapp) {
+    global $DB;
+
+    if ($remlab_conf->usingsarlab == 0) {
+        $ejsapp_lab_ip = $DB->get_field('ejsapp_remlab_conf', 'ip', array('ejsappid'=>$ejsapp->id));
+        $ejsapp_lab_port = $DB->get_field('ejsapp_remlab_conf', 'port', array('ejsappid'=>$ejsapp->id));
+        $repeated_ejsapp_labs = $DB->get_records('ejsapp_remlab_conf', array('ip'=>$ejsapp_lab_ip, 'port'=>$ejsapp_lab_port));
+    } else {
+        $ejsapp_lab_conf = $DB->get_field('ejsapp_expsyst2pract', 'practiceintro', array('ejsappid'=>$ejsapp->id));
+        $repeated_practices = $DB->get_records('ejsapp_expsyst2pract', array('practiceintro'=>$ejsapp_lab_conf));
+        $ejsappids = array();
+        foreach ($repeated_practices as $repeated_practice) {
+            array_push($ejsappids, $repeated_practice->ejsappid);
+        }
+        $repeated_practices = $DB->get_records_list('ejsapp_remlab_conf', 'ejsappid', $ejsappids);
+        //Previous queries may identify two different remote labs in two different SARLAB systems as only one, so we need to do something more:
+        $sarlab_instance = $DB->get_field('ejsapp_remlab_conf', 'sarlabinstance', array('ejsappid'=>$ejsapp->id));
+        $repeated_ejsapp_labs = array();
+        foreach ($repeated_practices as $repeated_practice) { //check whether the remote lab is in the same SARLAB instance or not
+            if ($repeated_practice->usingsarlab == 1 && $repeated_practice->sarlabinstance == $sarlab_instance){
+                array_push($repeated_ejsapp_labs, $repeated_practice);
+            }
+        }
+    }
+
+    return $repeated_ejsapp_labs;
+}
+
+
+/**
+ *
+ * Gives the list of repeated remote labs in courses with a booking system.
+ *
+ * @param array $repeated_ejsapp_labs
+ * @return array $repeated_ejsapp_labs_with_bs
+ *
+ */
+function get_repeated_remlabs_with_bs($repeated_ejsapp_labs) {
+    global $DB;
+
+    $repeated_ejsapp_labs_with_bs = array();
+    foreach ($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
+        $ejsappid = $DB->get_field('ejsapp_remlab_conf', 'ejsappid', array('id'=>$repeated_ejsapp_lab->id));
+        $ejsapp = $DB->get_record('ejsapp', array('id'=>$ejsappid));
+        if (check_booking_system($ejsapp)) array_push($repeated_ejsapp_labs_with_bs, $ejsapp);
+    }
+
+    return $repeated_ejsapp_labs_with_bs;
+}
+
+
+/**
+ *
+ * Tells if there is at least one different course in which the same remote lab has been booked for this hour and if it is,
+ * it returns an array with the name of the user with the booking and the id of that ejsapp activity.
+ *
+ * @param array $repeated_ejsapp_labs
+ * @param int $courseid
+ * @return array $book_info
+ *
+ */
+function check_active_booking($repeated_ejsapp_labs, $courseid) {
+    global $DB;
+
+    $book_info = array();
+    $book_info['active_booking'] = false;
+    if (count($repeated_ejsapp_labs) > 1) {
+        $repeated_ejsapp_labs_with_bs = get_repeated_remlabs_with_bs($repeated_ejsapp_labs);
+        if (count($repeated_ejsapp_labs_with_bs) > 0) {
+            foreach ($repeated_ejsapp_labs_with_bs as $repeated_ejsapp_lab_with_bs) {
+                if ($repeated_ejsapp_lab_with_bs->course != $courseid) {
+                    $book_info['username_with_booking'] = check_anyones_booking($DB, $repeated_ejsapp_lab_with_bs, date('Y-m-d H:i:s'));
+                    if (!empty($book_info['username_with_booking'])) {
+                        $book_info['active_booking'] = true;
+                        $book_info['ejsappid'] = $repeated_ejsapp_lab_with_bs->id;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return $book_info;
+}
+
+
+/**
+ * Defines a new sarlab object with all the needed information
+ *
+ * @param int $instance sarlab instance
+ * @param int $collab 0 if not a collab session, 1 if collaborative
+ * @param string $practice the practice identifier in sarlab
+ * @param int $labmanager whether the user is a laboratory manager or not
+ * @param int $max_use_time maximum time for using the remote lab
+ * @return stdClass $sarlabinfo
+ */
+function define_sarlab($instance, $collab, $practice, $labmanager, $max_use_time) {
+    $sarlabinfo = new stdClass();
+    $sarlabinfo->instance = $instance;
+    $sarlabinfo->collab = $collab;
+    $sarlabinfo->practice = $practice;
+    $sarlabinfo->labmanager = $labmanager;
+    $sarlabinfo->max_use_time = $max_use_time;
+
+    return $sarlabinfo;
+}
+
+
+/**
+ * Gets the required EJS .jar or .zip file for this activity from Moodle's File System and places it
+ * in the required directory (inside jarfiles) when the file there doesn't exist or it is not synchronized with
+ * the file in Moodle's File System (whether because its an alias to a file that has been modified or because
+ * the activity has been edited and the original .jar or .zip file has been replaced by a new one).
+ *
+ * @param stdClass $ejsapp
+ * @return void
+ */
+function prepare_ejs_file($ejsapp) {
+    global $DB, $CFG;
+
+    function delete_outdated_file($storedfile, $temp_file, $folderpath) {
+        // We compare the content of the linked file with the content of the file in the jarfiles folder:
+        if ($storedfile->get_contenthash() != $temp_file->get_contenthash()) { //if they are not the same...
+            // Delete the files in jarfiles directory in order to replace them with the content of $storedfile
+            delete_recursively($folderpath);
+            if (!file_exists($folderpath)) mkdir($folderpath, 0700);
+            // Delete $temp_file from Moodle filesystem
+            $temp_file->delete();
+            return true;
+        } else { // If the file exists and matches the one configured in the ejsapp activity, do nothing
+            return false;
+        }
+    }
+
+    function create_temp_file($contextid, $ejsappid, $filename, $fs, $temp_filepath) {
+        $fileinfo = array(
+            'contextid' => $contextid,
+            'component' => 'mod_ejsapp',
+            'filearea' => 'tmp_jarfiles',
+            'itemid' => $ejsappid,
+            'filepath' => '/',
+            'filename' => $filename);
+        return $temp_file = $fs->create_file_from_pathname($fileinfo, $temp_filepath);
+    }
+
+    // We first get the jar/zip file configured in the ejsapp activity and stored in the filesystem
+    $file_records = $DB->get_records('files', array('component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
+    $file_record = reset($file_records);
+    if ($file_record) {
+        $fs = get_file_storage();
+        $storedfile = $fs->get_file_by_id($file_record->id);
+
+        // <In case it is an alias to an external repository>
+        //$storedfile->sync_external_file(); // Not doing what we expect for non-image files... we need a workaround
+        if (class_exists('repository_filesystem')) {
+            if (!is_null($file_record->referencefileid)) {
+                $repository_instance_id = $DB->get_field('files_reference', 'repositoryid', array('id' => $file_record->referencefileid));
+                $repository_type_id = $DB->get_field('repository_instances', 'typeid', array('id' => $repository_instance_id));
+                if ($DB->get_field('repository', 'type', array('id' => $repository_type_id)) == 'filesystem') {
+                    $repository = repository_filesystem::get_instance($repository_instance_id);
+                    $filepath = $repository->get_rootpath() . ltrim($storedfile->get_reference(), '/');
+                    $contenthash = sha1_file($filepath);
+                    if ($storedfile->get_contenthash() == $contenthash) {
+                        // File did not change since the last synchronisation.
+                        $filesize = filesize($filepath);
+                    } else {
+                        // Copy file into moodle filepool (used to generate an image thumbnail).
+                        list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
+                    }
+                    $storedfile->set_synchronized($contenthash, $filesize);
+                }
+            }
+        }
+        // </In case it is an alias to an external repository>
+
+        $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+        $folderpath = $CFG->dirroot . $codebase;
+        $ext = pathinfo($file_record->filename, PATHINFO_EXTENSION);
+        $filepath = $folderpath . $file_record->filename;
+        // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
+        $tmp_file_records = $DB->get_records('files', array('contextid' => $file_record->contextid, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
+        $tmp_file_record = reset($tmp_file_records);
+        if (file_exists($filepath)) { // if file in jarfiles exists...
+            if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
+                $temp_file = $fs->get_file_by_id($tmp_file_record->id);
+            } else { // the file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp plugins that have been updated recently or after duplicating or restoring an ejsapp activity)
+                $temp_file = create_temp_file($file_record->contextid, $ejsapp->id, $file_record->filename, $fs, $filepath);
+            }
+            $delete = delete_outdated_file($storedfile, $temp_file, $folderpath);
+            if (!$delete) return; //If files are the same, we have finished
+        } else { // if file in jarfiles doesn't exists... (this should never happen actually, but just in case...)
+            // We create the directories in jarfiles to put inside $storedfile
+            $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
+            if (!file_exists($path)) mkdir($path, 0700);
+            $path .= $ejsapp->course . '/';
+            if (!file_exists($path)) mkdir($path, 0700);
+            if (!file_exists($folderpath)) mkdir($folderpath, 0700);
+            if ($tmp_file_record) { // the file does not exist in jarfiles but it does in Moodle filesystem
+                $temp_file = $fs->get_file_by_id($tmp_file_record->id);
+                $temp_file->delete();
+            }
+        }
+
+        // We copy the content of storedfile to jarfiles and add it to the file storage
+        $storedfile->copy_content_to($filepath);
+        create_temp_file($file_record->contextid, $ejsapp->id, $ejsapp->applet_name, $fs, $filepath);
+
+        // We need to do a few more things depending on whether it is a Java applet or Javascript:
+        if ($ext == 'jar') {
+            modifications_for_java($filepath, $ejsapp, $storedfile, $file_record, false);
+        } else {
+            modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase);
+        }
+        $DB->update_record('ejsapp', $ejsapp);
+    }
+}
