@@ -224,6 +224,7 @@ $string['ejsapp:view'] = "View an EJSApp activity";
 $string['ejsapp:requestinformation'] = "Request information for third parties plugins";
 
 //Events
+$string['event_viewed'] = "Accessed the EJSApp activity";
 $string['event_working'] = "Working with the EJSApp activity";
 $string['event_wait'] = "Waiting for the lab to be free";
 $string['event_book'] = "Need to make a booking";

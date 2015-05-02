@@ -38,7 +38,20 @@ defined('MOODLE_INTERNAL') || die();
 class observers {
 
     /**
-     * A user is working with an EJSApp remote lab.
+     * A user accessed an EJSApp virtual or remote lab.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_viewed($event) {
+        //Write info in the db
+        global $DB;
+        $record =  $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+    /**
+     * A user is working with an EJSApp virtual or remote lab.
      *
      * @param \core\event\base $event The event.
      * @return void

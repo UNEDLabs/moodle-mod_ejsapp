@@ -34,10 +34,19 @@ namespace mod_ejsapp\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class course_module_viewed extends \core\event\course_module_viewed {
+class course_module_viewed extends \core\event\base {
     protected function init() {
+        $this->data['crud'] = 'c'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'ejsapp';
-        parent::init();
+    }
+
+    public static function get_name() {
+        return get_string('event_working', 'ejsapp');
+    }
+
+    public function get_description() {
+        return "User {$this->userid} accessed the EJSApp activity with id {$this->objectid}.";
     }
 
     /**

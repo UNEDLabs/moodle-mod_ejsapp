@@ -39,31 +39,25 @@ global $PAGE;
 $course_id = required_param('courseid', PARAM_INT);
 $cm_id = required_param('activityid', PARAM_INT);
 $ejsapp_name = required_param('ejsappname', PARAM_TEXT);
-$method = required_param('method', PARAM_INT);
+$user_id = required_param('userid', PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/add_to_log.php');
 
-if ($method == 0) { //Moodle 2.6 or inferior
-    add_to_log($course_id, 'ejsapp', 'working', "view.php?id=$cm_id", $ejsapp_name, $cm_id);
-} else {
-    $user_id = required_param('userid', PARAM_INT);
-    $modulecontext = context_module::instance($cm_id);
-    //$ejsapp = $DB->get_record('ejsapp', array('id' => $cm->instance), '*', MUST_EXIST);
-    $event = \mod_ejsapp\event\course_module_working::create(array(
-        'objectid' => $cm_id,
-        'context' => $modulecontext,
-        'other' => $ejsapp_name,
-    ));
-    /*$event->add_record_snapshot('course_modules', $cm);
-    $event->add_record_snapshot('ejsapp', $ejsapp);*/
-    echo $alert;
-    $record = new stdClass();
-    $record->id = $cm_id;
-    $record->time = time();
-    $record->userid = $user_id;
-    $record->action = 'working';
-    $record->info = $ejsapp_name;
-    $event->add_record_snapshot('record', $record);
-    $event->trigger();
-}
+$modulecontext = context_module::instance($cm_id);
+//$ejsapp = $DB->get_record('ejsapp', array('id' => $cm->instance), '*', MUST_EXIST);
+$event = \mod_ejsapp\event\course_module_working::create(array(
+    'objectid' => $cm_id,
+    'context' => $modulecontext,
+    'other' => $ejsapp_name,
+));
+/*$event->add_record_snapshot('course_modules', $cm);
+$event->add_record_snapshot('ejsapp', $ejsapp);*/
+$record = new stdClass();
+$record->id = $cm_id;
+$record->time = time();
+$record->userid = $user_id;
+$record->action = 'working';
+$record->info = $ejsapp_name;
+$event->add_record_snapshot('record', $record);
+$event->trigger();

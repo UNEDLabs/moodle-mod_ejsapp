@@ -42,7 +42,7 @@ class course_module_working extends \core\event\base {
     }
 
     public static function get_name() {
-        return get_string('event_working', 'ejsapp');
+        return get_string('event_viewed', 'ejsapp');
     }
 
     public function get_description() {

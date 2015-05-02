@@ -30,7 +30,7 @@
 
 M.mod_ejsapp = {};
 
-M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_version, is_rem_lab, htmlid, frequency, max_time){
+M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, htmlid, frequency, max_time){
     var handleSuccessAddLog = function(o) {
         /*success handler code*/
     };
@@ -42,7 +42,7 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
         failure:handleFailureAddLog
     };
     var handleSuccessKickOut = function(o) {
-        var div = YAHOO.util.Dom.get(htmlid);
+        var div = Y.YUI2.util.Dom.get(htmlid);
         div.innerHTML = o.responseText;
     };
     var handleFailureKickOut = function(o) {
@@ -57,17 +57,14 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
     var counter = 0;
     var checkActivity = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
-            if (moodle_version >= 2012120300) { //Moodle 2.4 or higher
-                YAHOO = Y.YUI2;
-            }
             if (counter < max_times) { // on time
                 //Call php code to insert log in Moodle table
-                YAHOO.util.Connect.asyncRequest('GET', url_add_log, callbackAddLog);
+                Y.YUI2.util.Connect.asyncRequest('GET', url_add_log, callbackAddLog);
                 counter++;
             } else { // time is up
                 if (is_rem_lab == 1) {
                     //Call php code to refresh view.php and kick the user from the remote lab
-                    YAHOO.util.Connect.asyncRequest('GET', url_max_time, callbackKickOut);
+                    Y.YUI2.util.Connect.asyncRequest('GET', url_max_time, callbackKickOut);
                 }
                 clearInterval(checkActivity);
             }
@@ -79,9 +76,9 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, moodle_versio
     setInterval(checkActivity,1000*frequency);
 };
 
-M.mod_ejsapp.init_countdown = function(Y, url, moodle_version, htmlid, initial_remaining_time){
+M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time){
     var handleSuccess = function(o) {
-        var div = YAHOO.util.Dom.get(htmlid);
+        var div = Y.YUI2.util.Dom.get(htmlid);
         div.innerHTML = o.responseText;
     };
     var handleFailure = function(o) {
@@ -95,9 +92,6 @@ M.mod_ejsapp.init_countdown = function(Y, url, moodle_version, htmlid, initial_r
     var remaining_time_param =  initial_remaining_time;
     var updateRemainingTime = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
-            if (moodle_version >= 2012120300) { //Moodle 2.4 or higher
-                YAHOO = Y.YUI2;
-            }
             //Call php code to update the remaining time till the remote lab is free again
             if (counter <= initial_remaining_time) { //still counting
                 remaining_time_param = initial_remaining_time - counter;
@@ -106,7 +100,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, moodle_version, htmlid, initial_r
                 clearInterval(interval);
             }
             var final_url = url + '?remaining_time=' + remaining_time_param;
-            YAHOO.util.Connect.asyncRequest('GET', final_url, callback);
+            Y.YUI2.util.Connect.asyncRequest('GET', final_url, callback);
         });
     };
     var interval = setInterval(updateRemainingTime,1000);
