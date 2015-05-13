@@ -80,29 +80,24 @@ M.mod_ejsapp.init_countdown = function(Y, url, action, htmlid, initial_remaining
     var handleSuccess = function(o) {
         var div = Y.YUI2.util.Dom.get(htmlid);
         div.innerHTML = o.responseText;
-        /*if (skip == 0) {
-            var index = (div.innerHTML).indexOf(" ");
-            remaining_time = parseInt((div.innerHTML).substring(0, index));
-        }*/
     };
     var handleFailure = function(o) {
         /*failure handler code*/
     };
     var callback = {
         success:handleSuccess,
-        failure:handleFailure
+        failure:handleFailure,
+        timeout:1000
     };
     var counter = 0;
     var skip = 1;
+    if(action != "booked_lab") { //we only check with the server every ten seconds and when the lab is not booked
+        skip = 0;
+    }
     var remaining_time =  initial_remaining_time;
     var updateRemainingTime = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
             //Call php code to update the remaining time till the remote lab is free again
-            if(((counter % 10) == 0) && (action != "booked_lab")) { //we only check with the server every ten seconds and when the lab is not booked
-                skip = 0;
-            } else {
-                skip = 1;
-            }
             var final_url = url + '&remaining_time=' + remaining_time + '&skip=' + skip;
             Y.YUI2.util.Connect.asyncRequest('GET', final_url, callback);
             if (remaining_time > 0) { //still counting
@@ -113,5 +108,6 @@ M.mod_ejsapp.init_countdown = function(Y, url, action, htmlid, initial_remaining
             }
         });
     };
+    updateRemainingTime();
     var interval = setInterval(updateRemainingTime,1000);
 };

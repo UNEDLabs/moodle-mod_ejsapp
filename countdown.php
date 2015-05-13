@@ -46,7 +46,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/countdown.php');
 
 if ($remaining_time > 0) {
-    /*if ($skip == 0) { // check whether there has been any change in the state of the remote lab (i.e. it is not used anymore)
+    if ($skip == 0) { // check whether there has been any change in the state of the remote lab (i.e. it is not used anymore)
         $slotsduration = array(60, 30, 15, 5, 2);
         $currenttime = time();
         $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
@@ -67,7 +67,7 @@ if ($remaining_time > 0) {
             if ($time_first_access == INF) $time_first_access = time();
             $remaining_time = 60 * $idle_time + $occupied_ejsapp_max_use_time - ($currenttime - $time_first_access);
         }
-    }*/
+    }
     echo $remaining_time . ' ' . get_string('seconds', 'ejsapp');
 } else {
     echo get_string('refresh', 'ejsapp');

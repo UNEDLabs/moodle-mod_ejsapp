@@ -129,7 +129,13 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     $file->copy_content_to($filepath);
 
     // codebase
-    $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+    $codebase = '';
+    preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
+    if (!empty($match_result) and $match_result[1]) {
+        $codebase .= '/' . $match_result[1];
+    }
+    $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+
 
     // <Initialize the mod_form elements>
     $ejsapp->class_file = '';
