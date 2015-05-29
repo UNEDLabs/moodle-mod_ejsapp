@@ -76,38 +76,49 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
     setInterval(checkActivity,1000*frequency);
 };
 
-M.mod_ejsapp.init_countdown = function(Y, url, action, htmlid, initial_remaining_time){
+M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, seconds_label){
     var handleSuccess = function(o) {
-        var div = Y.YUI2.util.Dom.get(htmlid);
-        div.innerHTML = o.responseText;
+        var response = o.responseText;
+        div.innerHTML = response;
+        remaining_time = response.substring(0,response.indexOf(' '));
     };
     var handleFailure = function(o) {
         /*failure handler code*/
     };
     var callback = {
         success:handleSuccess,
-        failure:handleFailure,
-        timeout:1000
+        failure:handleFailure
     };
+    var div = Y.YUI2.util.Dom.get(htmlid);
     var counter = 0;
-    var skip = 1;
-    if(action != "booked_lab") { //we only check with the server every ten seconds and when the lab is not booked
-        skip = 0;
-    }
     var remaining_time =  initial_remaining_time;
-    var updateRemainingTime = function() {
+    var updateRemainingTimeServer = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
             //Call php code to update the remaining time till the remote lab is free again
-            var final_url = url + '&remaining_time=' + remaining_time + '&skip=' + skip;
+            var final_url = url + '&remaining_time=' + remaining_time;
             Y.YUI2.util.Connect.asyncRequest('GET', final_url, callback);
             if (remaining_time > 0) { //still counting
-                remaining_time = remaining_time - 1;
                 counter++;
             } else { //end, user can try refreshing the window
-                clearInterval(interval);
+                clearInterval(intervalServer);
             }
         });
     };
-    updateRemainingTime();
-    var interval = setInterval(updateRemainingTime,1000);
+    updateRemainingTimeServer();
+    var intervalServer = setInterval(updateRemainingTimeServer,25000);
+
+    var counter_client = 0;
+    var remaining_time_client = 0;
+    var updateRemainingTimeClient = function() {
+        if (counter_client == 0) remaining_time_client = remaining_time;
+        if (remaining_time_client > 0) { //still counting
+            counter_client++;
+            remaining_time_client--;
+            div.innerHTML = remaining_time_client + seconds_label;
+        } else { //end, user can try refreshing the window
+            clearInterval(intervalClient);
+        }
+    };
+    updateRemainingTimeClient();
+    var intervalClient = setInterval(updateRemainingTimeClient,1000);
 };

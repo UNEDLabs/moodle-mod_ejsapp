@@ -132,7 +132,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         // Adding an optional state file to be read when the applet loads
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
 
-        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
+        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/xml', 'application/json')));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
         // Adding an optional text file with a controller code to be load when the applet is run

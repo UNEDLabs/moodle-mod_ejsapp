@@ -90,7 +90,7 @@ $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visu
 $string['state_file'] = 'Archivo .xml con el estado que este laboratorio EJS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java(script) Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml con el estado que la aplicaci&oacute;n EJS debe cargar al ejecutarse.';
+$string['statefile_help'] = 'Seleccione el archivo .xml o .json con el estado que la aplicaci&oacute;n EJS debe cargar al ejecutarse.';
 
 $string['controller_file'] = 'Archivo .cnt con el controlador que la aplicaci&oacute;n EJS debe cargar al iniciarse';
 

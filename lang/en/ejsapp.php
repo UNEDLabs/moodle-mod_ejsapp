@@ -91,7 +91,7 @@ $string['css_rules'] = 'Create your own css rules to change the visual aspect of
 $string['state_file'] = '.xml file with the state to be read when this EJS lab loads';
 
 $string['statefile'] = 'Easy Java(script) Simulation State';
-$string['statefile_help'] = 'Select the .xml file with the state the Easy Java Simulation (EJS) application should load.';
+$string['statefile_help'] = 'Select the .xml or .json file with the state the Easy Java Simulation (EJS) application should load.';
 
 $string['controller_file'] = '.cnt file with the controller to be load when the EJS is initialized';
 

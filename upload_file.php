@@ -42,12 +42,29 @@ require_once("$CFG->libdir/dml/moodle_database.php");
 require_once("$CFG->libdir/blocklib.php");
 
 // user_file has the following format:
-// filename_context_id_879_ejsapp_id_87.extension
+// filename_context_id_879_user_id_5_ejsapp_id_87.extension
+
+// Distinguish between a file sent by EJS and EjsS
+$original_file_name = null;
+if ($_FILES['user_file']['name'] != null) { //receiving from EJS
+    $method = true;
+    $original_file_name = $_FILES['user_file']['name'];
+}
+else { //receiving from EjsS
+    $method = false;
+    $original_file_name = $_POST['user_file'];
+    $extension = pathinfo($original_file_name, PATHINFO_EXTENSION);
+    if (!$extension) {
+        if ($_POST['type'] == 'json') $extension = '.json';
+        if ($_POST['type'] == 'txt') $extension = '.txt';
+        if ($_POST['type'] == 'png') $extension = '.png';
+        $original_file_name = $original_file_name . $extension;
+    }
+}
 
 // To avoid problems with the file names
-$safe_file = $_FILES['user_file']['name'];
-$aux_array = explode('\\', $safe_file);
-$aux_array = explode('/', $safe_file);
+$aux_array = explode('\\', $original_file_name);
+$aux_array = explode('/', $original_file_name);
 $safe_file = $aux_array[count($aux_array) - 1];
 $safe_file = str_replace(" ", "_", $safe_file);
 $safe_file = str_replace("#", "", $safe_file);
@@ -70,23 +87,27 @@ $ejsapp_id = $match[1];
 $file_extension = pathinfo($safe_file, PATHINFO_EXTENSION);
 
 // <upload the file to a temporal folder>
-$upload_dir = $CFG->dataroot . "/tmp/";
-if (!file_exists($upload_dir)) {
-    mkdir($upload_dir, 0700);
-}
-
-$path = $upload_dir . $file_name . '.' . $file_extension;
-
-if ($_FILES['user_file'] != null) { // as long as a file was selected...
-
-    if (copy($_FILES['user_file']['tmp_name'], $path)) {
-        // if the file has been successfully copied do nothing
-    } else {
-        // print and error message
-        $theFileName = $_FILES['user_file']['name'];
-        echo "File $theFileName could not be uploaded";
+if ($method) { // from EJS
+    $upload_dir = $CFG->dataroot . "/tmp/";
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0700);
     }
 
+    //if (!$method && !$file_extension) $file_extension = '.txt';
+
+    $path = $upload_dir . $file_name . '.' . $file_extension;
+
+    if ($original_safe_file != null) { // as long as a file was selected...
+
+        if (copy($_FILES['user_file']['tmp_name'], $path)) {
+            // if the file has been successfully copied do nothing
+        } else {
+            // print and error message
+            $theFileName = $original_safe_file;
+            echo "File $theFileName could not be uploaded";
+        }
+
+    }
 }
 // </upload the file to a temporal folder>
 
@@ -109,13 +130,21 @@ $fileinfo = array(
 
 // <if there is an old file in the user repository with the same name, then delete it>
 $old_file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
-if ($old_file) {
-    $old_file->delete();
-}
+if ($old_file) $old_file->delete();
 // </if there is an old file in the user repository with the same name, then delete it>
 
-$fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
+if ($method) { // from EJS
+    $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
+    // remove the temporal file from the temporal folder
+    unlink("$path");
+} else { // from EjsS
+    if ($_POST['type'] != 'png') $fs->create_file_from_string($fileinfo, rawurldecode($_POST['file']));
+    else {
+        $data = rawurldecode($_POST['file']);
+        list($type,$data) = explode(';', $data);
+        list(, $data) = explode(',', $data);
+        $data = base64_decode($data);
+        $fs->create_file_from_string($fileinfo, $data);
+    }
+}
 // </store the file in the user repository>
-
-// remove the temporal file from the temporal folder
-unlink("$path");

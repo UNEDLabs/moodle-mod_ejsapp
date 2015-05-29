@@ -314,6 +314,16 @@ function update_links($codebase, $ejsapp, $code, $method, $use_css) {
     }
     $code = str_replace($search,$replace,$code);
 
+    // Replace link for common_script
+    $search = '<script src="_ejs_library/scripts/common_script.js"></script>';
+    $replace = '<script src="' . $path .'_ejs_library/scripts/common_script.js"></script>';
+    $code = str_replace($search,$replace,$code);
+
+    // Replace call for main function so we can later pass parameters to it
+    $search = "window.addEventListener('load', function () {  new " . $exploded_name[0];
+    $replace = "window.addEventListener('load', function () {  var __model = new " . $exploded_name[0];
+    $code = str_replace($search,$replace,$code);
+
     return $code;
 } //update_links
 
@@ -578,6 +588,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 $code = $code1 . $code2;
                 $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
                 $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
+
                 file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
             }
             file_put_contents($folderpath . $ejsapp->applet_name, $code);
@@ -861,7 +872,7 @@ function check_anyones_booking($DB, $ejsapp, $currenttime) {
 function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, $currenttime) {
     global $DB, $USER;
 
-    $time_first_access = 0; //TODO: Change to INF when we stop reseting time when a user connected to a remote lab refreshes the page
+    $time_first_access = 0; //TODO: Change to INF when we stop resetting time when a user connected to a remote lab refreshes the page
     $time_last_access = 0;
     $occupied_ejsapp_max_use_time = 3600;
     foreach($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
@@ -884,10 +895,11 @@ function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsdurat
                     if ($viewed_log_record->userid != $USER->id) {
                         if ($viewed_log_record->userid == $user_occupying_lab_id) { // accesses of the user that is currently working with the rem lab
                             $occupied_ejsapp_slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $repeated_ejsapp->id));
+                            if ($occupied_ejsapp_slotsduration_conf > 4) $occupied_ejsapp_slotsduration_conf = 0;
                             $occupied_ejsapp_maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $repeated_ejsapp->id));
                             $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
                             if ($viewed_log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
-                                $time_first_access = max($time_first_access, $viewed_log_record->time); // TODO: Change to min when we stop reseting time when a user connected to a remote lab refreshes the page
+                                $time_first_access = max($time_first_access, $viewed_log_record->time); // TODO: Change to min when we stop resetting time when a user connected to a remote lab refreshes the page
                             }
                         }
                     }
@@ -901,6 +913,63 @@ function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsdurat
     $time_information['occupied_ejsapp_max_use_time'] = $occupied_ejsapp_max_use_time;
 
     return $time_information;
+}
+
+
+/**
+ *
+ * Checks whether a remote lab is available, in use or rebooting.
+ *
+ * @param array $time_information
+ * @param int $idle_time
+ * @param int $check_activity
+ * @return string $status
+ *
+ */
+function get_lab_status($time_information, $idle_time, $check_activity) {
+    $status = 'in_use';
+    $currenttime = time();
+    if ($currenttime - $time_information['time_last_access'] - 60*$idle_time - $check_activity > 0) { //-$check_activity because the last 'working' log doesn't get recorded
+        $status = 'available';
+    } else if ($currenttime - $time_information['time_last_access'] - $check_activity > 0) { //-$check_activity because the last 'working' log doesn't get recorded
+        $status = 'rebooting';
+    }
+    return $status;
+}
+
+
+/**
+ *
+ * Gets the remaining time till the lab is available again.
+ *
+ * @param array $booking_info
+ * @param array $status
+ * @param array $time_information
+ * @param int $idle_time
+ * @param int $check_activity
+ * @return string $remaining_time
+ *
+ */
+function get_remaining_time($booking_info, $status, $time_information, $idle_time, $check_activity) {
+    global $DB;
+    $currenttime = time();
+    if ($booking_info["active_booking"]) {
+        if (array_key_exists('username_with_booking', $booking_info) && array_key_exists('ejsappid', $booking_info)) {
+            $ending_time = check_last_valid_booking($DB, $booking_info['username_with_booking'], $booking_info['ejsappid']);
+            $ending_time = strtotime($ending_time);
+            $remaining_time = 60 * $idle_time + $ending_time - $currenttime;
+        }
+    } else {
+        if ($status == 'available') {
+            $remaining_time = 0;
+        } else if ($status == 'rebooting') {
+            $remaining_time = 60 * $idle_time + $check_activity - ($currenttime - $time_information['time_last_access']);
+        } else { // in_use
+            if ($time_information['time_first_access'] == INF) $time_information['time_first_access'] = time();
+            $remaining_time = 60 * $idle_time + $time_information['occupied_ejsapp_max_use_time'] - ($currenttime - $time_information['time_first_access']);
+        }
+    }
+    return $remaining_time;
 }
 
 

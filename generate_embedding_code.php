@@ -55,7 +55,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $sarlabinfo->max_use_time: int maximum time the remote lab can be connected (in seconds)
  *                                  Null if sarlab is not used
  * @param array|null $data_files
- *                                  $data_files[0]: state_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml file that stores the state of an EJS applet, elsewhere it is null
+ *                                  $data_files[0]: state_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml or .json file that stores the state of an EJS applet, elsewhere it is null
  *                                  $data_files[1]: cnt_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
  *                                  $data_files[2]: rec_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
@@ -126,10 +126,19 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
         }
     }
 
+    $context = context_user::instance($USER->id);
+
     if ($ejsapp->class_file == '') { //EJS Javascript
 
         $path = $CFG->wwwroot . $ejsapp->codebase;
         $code = file_get_contents($path . $ejsapp->applet_name);
+
+        // Pass the needed parameters to the javascript application
+        $search = "}, false);";
+        $replace = '__model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});
+        __model._userUnserialize({y:1});
+        }, false);';
+        $code = str_replace($search,$replace,$code);
 
     } else { //EJS Applet
 
@@ -170,12 +179,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
         }
         // <\set the applet size on the screen>
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /*$file_record = $DB->get_record('files', array('filename' => $ejsapp->applet_name.'.jar', 'component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => $ejsapp->id));
-        $app_codebase = $CFG->wwwroot . "/pluginfile.php/" . $file_record->contextid . "/" . $file_record->component . "/" . $file_record->filearea . "/" . $file_record->itemid . $file_record->filepath;
-        $ejsapp->codebase = $app_codebase;// . $file_record->filename;*/
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         if ($collabinfo && !isset($collabinfo->director)) { // Invited users to collaborative sessions
             $class_file = $ejsapp->class_file;
             $class_file = str_replace(".class", "Student.class", $class_file);
@@ -184,7 +187,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
         }
         $code .= "document.write('<applet code=\"{$class_file}\"');";
 
-        $context = context_user::instance($USER->id);
         $language = current_language();
         $username = fullname($USER); //For collab
 
