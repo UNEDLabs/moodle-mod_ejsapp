@@ -81,6 +81,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, s
         var response = o.responseText;
         div.innerHTML = response;
         remaining_time = response.substring(0,response.indexOf(' '));
+        remaining_time_client = remaining_time;
     };
     var handleFailure = function(o) {
         /*failure handler code*/
@@ -108,9 +109,8 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, s
     var intervalServer = setInterval(updateRemainingTimeServer,25000);
 
     var counter_client = 0;
-    var remaining_time_client = 0;
+    var remaining_time_client = remaining_time;
     var updateRemainingTimeClient = function() {
-        if (counter_client == 0) remaining_time_client = remaining_time;
         if (remaining_time_client > 0) { //still counting
             counter_client++;
             remaining_time_client--;
