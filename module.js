@@ -76,7 +76,7 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
     setInterval(checkActivity,1000*frequency);
 };
 
-M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, seconds_label){
+M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, check_activity, seconds_label, refresh_label){
     var handleSuccess = function(o) {
         var response = o.responseText;
         div.innerHTML = response;
@@ -107,7 +107,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, s
         });
     };
     updateRemainingTimeServer();
-    var intervalServer = setInterval(updateRemainingTimeServer,25000);
+    var intervalServer = setInterval(updateRemainingTimeServer,1000*check_activity);
 
     var counter_client = 0;
     var updateRemainingTimeClient = function() {
@@ -116,6 +116,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, s
             remaining_time_client--;
             div.innerHTML = remaining_time_client + seconds_label;
         } else { //end, user can try refreshing the window
+            div.innerHTML = refresh_label;
             clearInterval(intervalClient);
         }
     };

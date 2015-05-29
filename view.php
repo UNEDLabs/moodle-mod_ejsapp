@@ -339,7 +339,7 @@ if ($accessed) {
     $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&check_activity='.$check_activity;
     $htmlid = "timecountdown";
     echo $OUTPUT->box(html_writer::div('', '', array('id'=>$htmlid)));
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, ' ' . get_string('seconds', 'ejsapp')));
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, $check_activity, ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
 }
 // </Javascript features>
 

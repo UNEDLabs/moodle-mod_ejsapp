@@ -44,7 +44,7 @@ global $PAGE, $DB;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/countdown.php');
 
-if ($remaining_time > 1) {
+if ($remaining_time > 0) {
     $slotsduration = array(60, 30, 15, 5, 2);
     $currenttime = time();
     $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
