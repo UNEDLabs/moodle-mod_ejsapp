@@ -36,6 +36,7 @@ require_once('locallib.php');
 require_login(0, false);
 
 $ejsappid = required_param('ejsappid', 'int');
+$courseid = required_param('courseid', 'int');
 $check_activity = required_param('check_activity', 'int');
 $remaining_time = required_param('remaining_time', 'int');
 
@@ -53,8 +54,9 @@ if ($remaining_time > 0) {
     $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf, $ejsapp);
     $time_information = get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, $currenttime);
     $lab_status = get_lab_status($time_information, $idle_time, $check_activity);
-    $booking_info = array();
-    $booking_info["active_booking"] = false;
+    $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsappid));
+    $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf, $ejsapp);
+    $booking_info = check_active_booking($repeated_ejsapp_labs, $courseid);
     $remaining_time = get_remaining_time($booking_info, $lab_status, $time_information, $idle_time, $check_activity);
     echo $remaining_time . ' ' . get_string('seconds', 'ejsapp');
 } else {

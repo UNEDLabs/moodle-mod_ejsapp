@@ -336,7 +336,7 @@ if ($accessed) {
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $ejsapp->is_rem_lab, $htmlid, $check_activity, $max_use_time));
 } else if ($action == 'booked_lab' || $action == 'need_to_wait') {
     $remaining_time = get_remaining_time($booking_info, $lab_status, $time_information, $idle_time, $check_activity);
-    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&check_activity='.$check_activity;
+    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&courseid='.$course->id.'&check_activity='.$check_activity;
     $htmlid = "timecountdown";
     echo $OUTPUT->box(html_writer::div('', '', array('id'=>$htmlid)));
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, $check_activity, ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));

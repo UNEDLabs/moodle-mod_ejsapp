@@ -79,9 +79,9 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
 M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, check_activity, seconds_label, refresh_label){
     var handleSuccess = function(o) {
         var response = o.responseText;
-        div.innerHTML = response;
         remaining_time = response.substring(0,response.indexOf(' '));
         remaining_time_client = remaining_time;
+        if (remaining_time > 0) div.innerHTML = response;
     };
     var handleFailure = function(o) {
         /*failure handler code*/
@@ -90,7 +90,6 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
         success:handleSuccess,
         failure:handleFailure
     };
-    var div = Y.YUI2.util.Dom.get(htmlid);
     var counter = 0;
     var remaining_time =  initial_remaining_time;
     var remaining_time_client = remaining_time;
@@ -111,14 +110,17 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
 
     var counter_client = 0;
     var updateRemainingTimeClient = function() {
-        if (remaining_time_client > 0) { //still counting
-            counter_client++;
-            remaining_time_client--;
-            div.innerHTML = remaining_time_client + seconds_label;
-        } else { //end, user can try refreshing the window
-            div.innerHTML = refresh_label;
-            clearInterval(intervalClient);
-        }
+        Y.use('yui2-connection', 'yui2-dom', function(Y) {
+            var div = Y.YUI2.util.Dom.get(htmlid);
+            if (remaining_time_client > 0) { //still counting
+                counter_client++;
+                remaining_time_client--;
+                div.innerHTML = remaining_time_client + seconds_label;
+            } else { //end, user can try refreshing the window
+                div.innerHTML = refresh_label;
+                clearInterval(intervalClient);
+            }
+        });
     };
     updateRemainingTimeClient();
     var intervalClient = setInterval(updateRemainingTimeClient,1000);
