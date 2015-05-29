@@ -93,6 +93,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, s
     var div = Y.YUI2.util.Dom.get(htmlid);
     var counter = 0;
     var remaining_time =  initial_remaining_time;
+    var remaining_time_client = remaining_time;
     var updateRemainingTimeServer = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
             //Call php code to update the remaining time till the remote lab is free again
@@ -109,7 +110,6 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, s
     var intervalServer = setInterval(updateRemainingTimeServer,25000);
 
     var counter_client = 0;
-    var remaining_time_client = remaining_time;
     var updateRemainingTimeClient = function() {
         if (remaining_time_client > 0) { //still counting
             counter_client++;
