@@ -39,7 +39,7 @@ $string['modulename_help'] = 'The EJSApp activity module enables teachers to add
 
 EJS applets will be embedded into Moodle courses. The teacher can select to keep the orginal applet size or let Moodle to resize it according to the available space. If the EJS applet was compiled using the "Add language facilities" option in EJS, the applet embedded into Moodle with the EJSApp activity will automatically set its language to the one selected by the user in Moodle, if possible. This activity supports configuring conditional access restrictions.
 
-When used along with the EJSApp File Browser block, students can save the state of the EJS applet, when it is running, by just right-clicking on it and selecting the proper option in the menu. The information of these states is saved into an .xml file which is stored in the private files area (EJSApp File Browser). These states can be recovered by an EJS applet in two different ways: clicking on the .xml files in the EJSApp File Browser block or right-clicking on the EJS applet and selecting the proper option in the menu. If the EJS applet is prepared to do so, it can also save text or image files and store them in the private files area.
+When used along with the EJSApp File Browser block, students can save the state of the EJS applet, when it is running, by just right-clicking on it and selecting the proper option in the menu. The information of these states is saved into an .xml (for Java) or .json (for Javascript) file which is stored in the private files area (EJSApp File Browser). These states can be recovered by an EJS applet in two different ways: clicking on the .xml or .json files in the EJSApp File Browser block or right-clicking on the EJS applet and selecting the proper option in the menu. If the EJS applet is prepared to do so, it can also save text or image files and store them in the private files area.
 
 When used along with the EJSApp Collab Sessions block, Moodle users can work with the same EJS applet in a synchronous way, meaning the applet will show the same state for all the users in the collaborative session. Thanks to this block, users can create sessions, invite other users and work together with the same EJSApp activity.';
 $string['ejsappfieldset'] = 'Custom example fieldset';
@@ -88,10 +88,10 @@ $string['appwording'] = 'Wording';
 
 $string['css_rules'] = 'Create your own css rules to change the visual aspect of the javascript application';
 
-$string['state_file'] = '.xml file with the state to be read when this EJS lab loads';
+$string['state_file'] = '.xml or .json file with the state to be read when this EJS lab loads';
 
 $string['statefile'] = 'Easy Java(script) Simulation State';
-$string['statefile_help'] = 'Select the .xml or .json file with the state the Easy Java Simulation (EJS) application should load.';
+$string['statefile_help'] = 'Select the .xml (for Java) or .json (for Javascript) file with the state the Easy Java Simulation (EJS) application should load.';
 
 $string['controller_file'] = '.cnt file with the controller to be load when the EJS is initialized';
 

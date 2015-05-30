@@ -54,10 +54,10 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $sarlabinfo->labmanager: int laboratory manager (1) or student (0)
  *                                  $sarlabinfo->max_use_time: int maximum time the remote lab can be connected (in seconds)
  *                                  Null if sarlab is not used
- * @param array|null $data_files
- *                                  $data_files[0]: state_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml or .json file that stores the state of an EJS applet, elsewhere it is null
- *                                  $data_files[1]: cnt_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
- *                                  $data_files[2]: rec_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
+ * @param array|null $user_data_files
+ *                                  $user_data_files[0]: user_state_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml or .json file that stores the state of an EJS applet, elsewhere it is null
+ *                                  $user_data_files[1]: user_cnt_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
+ *                                  $user_data_files[2]: user_rec_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
  * @param stdClass|null $collabinfo 
  *                                  $collabinfo->session: int collaborative session id, 
  *                                  $collabinfo->ip: string collaborative session ip, 
@@ -77,14 +77,54 @@ defined('MOODLE_INTERNAL') || die();
 
  * @return string code that embeds an EJS applet into Moodle
  */
-function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, $external_size)
+function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo, $external_size)
 {
     global $DB, $USER, $CFG;
 
-    if (!is_null($data_files)) {
-        $state_file = $data_files[0];
-        $cnt_file = $data_files[1];
-        $rec_file = $data_files[2];
+    /**
+     * If a state, controller or recording file has been configured in the ejsapp activity, this function returns the information of such file
+     *
+     * @param stdCall $ejsapp
+     * @param string $data_type
+     * @return stdClass $initial_data_file
+     */
+    function initial_data_file($ejsapp, $data_type) {
+        global $DB;
+        $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => $data_type, 'itemid' => ($ejsapp->id)));
+        $initial_data_file = new stdClass();
+        if (!empty($file_records)) {
+            foreach ($file_records as $initial_data_file) {
+                if ($initial_data_file->filename != '.') {
+                    break;
+                }
+            }
+        }
+        return $initial_data_file;
+    }
+
+    /**
+     * Return either the initial or the user-saved data file (state, controller or interaction recording)
+     *
+     * @param string $user_data_file
+     * @param stdClass $initial_data_file
+     * @return stdClass $data_file
+     */
+    function get_data_file($user_data_file, $initial_data_file) {
+        global $CFG;
+        if ($user_data_file) {
+            $data_file = $CFG->wwwroot . "/pluginfile.php/" . $user_data_file;
+        } else {
+            $data_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_data_file->contextid .
+                "/" . $initial_data_file->component . "/" . $initial_data_file->filearea .
+                "/" . $initial_data_file->itemid . "/" . $initial_data_file->filename;
+        }
+        return $data_file;
+    }
+
+    if (!is_null($user_data_files)) {
+        $user_state_file = $user_data_files[0];
+        $user_cnt_file = $user_data_files[1];
+        $user_rec_file = $user_data_files[2];
     }
 
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {    // Sarlab is used to access this remote lab or to establish communication between users
@@ -136,9 +176,48 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
         // Pass the needed parameters to the javascript application
         $search = "}, false);";
         $replace = '__model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});
-        __model._userUnserialize({y:1});
         }, false);';
         $code = str_replace($search,$replace,$code);
+
+        // <Loading state, controller and interaction files as well as personalized variables>
+        // <Loading state files>
+        $initial_state_file = initial_data_file($ejsapp, 'xmlfiles');
+        if ($user_state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
+            $state_file = get_data_file($user_state_file, $initial_state_file);
+            //TODO
+        }
+        // <\Loading state files>
+
+        // <Loading controller files>
+        $initial_cnt_file = initial_data_file($ejsapp, 'cntfiles');
+        if ($user_cnt_file || (isset($initial_cnt_file->filename) && $initial_cnt_file->filename != '.')) {
+            $cnt_file = get_data_file($user_cnt_file, $initial_cnt_file);
+            //TODO
+        }
+        // <\Loading controller files>
+
+        // <Loading interaction recording files>
+        $initial_rec_file = initial_data_file($ejsapp, 'recfiles');
+        if ($user_rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
+            $rec_file = get_data_file($user_rec_file, $initial_rec_file);
+            //TODO
+        }
+        // <\Loading interaction recording files>
+
+        // <Loading personalized variables>
+        if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
+            $personalize_vars_code = "__model._userUnserialize({";
+            for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
+                $personalize_vars_code .= $personalvarsinfo->name[$i] . ":" . $personalvarsinfo->value[$i];
+                if ($i < count($personalvarsinfo->name) - 1) $personalize_vars_code .= ",";
+            }
+            $personalize_vars_code .= "});";
+            $search = '__model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});';
+            $replace = $search . $personalize_vars_code;
+            $code = str_replace($search,$replace,$code);
+        }
+        // <\Loading personalized variables>
+        // <\Loading state, controller and interaction files as well as personalized variables>
 
     } else { //EJS Applet
 
@@ -252,25 +331,10 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
 
         // <Loading state, controller and interaction files as well as personalized variables>
         // <Loading state files>
-        $file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'xmlfiles', 'itemid' => ($ejsapp->id)));
-        $initial_state_file = new stdClass();
-        if (!empty($file_records)) {
-            foreach($file_records as $initial_state_file){
-                if ($initial_state_file->filename != '.') {
-                    break;
-                }
-            }
-        }
-
-        if ($state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
+        $initial_state_file = initial_data_file($ejsapp, 'xmlfiles');
+        if ($user_state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
+            $state_file = get_data_file($user_state_file, $initial_state_file);
             //<to read the applet state, javascript must wait until the applet has been totally downloaded>
-            if ($state_file) {
-              $state_file = $CFG->wwwroot . "/pluginfile.php/" . $state_file;
-            } else {
-                $state_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_state_file->contextid .
-                    "/" . $initial_state_file->component . "/" . $initial_state_file->filearea .
-                    "/" . $initial_state_file->itemid . "/" . $initial_state_file->filename;
-            }
             $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
             $load_state_code = "
               function loadState(count) {
@@ -291,29 +355,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
               loadState(10);";
             //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
             $code .= $load_state_code;
-        } //end of if ($state_file)
+        } //end of if ($user_state_file)
         // <\Loading state files>
 
         // <Loading controller files>
-        $file_records2 = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'cntfiles', 'itemid' => ($ejsapp->id)));
-        $initial_cnt_file = new stdClass();
-        if (!empty($file_records2)) {
-            foreach($file_records2 as $initial_cnt_file){
-                if ($initial_cnt_file->filename != '.') {
-                    break;
-                }
-            }
-        }
-
-        if ($cnt_file || (isset($initial_cnt_file->filename) && $initial_cnt_file->filename != '.')) {
+        $initial_cnt_file = initial_data_file($ejsapp, 'cntfiles');
+        if ($user_cnt_file || (isset($initial_cnt_file->filename) && $initial_cnt_file->filename != '.')) {
+            $cnt_file = get_data_file($user_cnt_file, $initial_cnt_file);
             //<to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
-            if ($cnt_file) {
-                $cnt_file = $CFG->wwwroot . "/pluginfile.php/" . $cnt_file;
-            } else {
-                $cnt_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_cnt_file->contextid .
-                    "/" . $initial_cnt_file->component . "/" . $initial_cnt_file->filearea .
-                    "/" . $initial_cnt_file->itemid . "/" . $initial_cnt_file->filename;
-            }
             $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
             $load_cnt_code = "
               function loadController(count) {
@@ -333,19 +382,32 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
               loadController(10);";
             //<\to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
             $code .= $load_cnt_code;
-        } //end of if ($cnt_file)
+        } //end of if ($user_cnt_file)
         // <\Loading controller files>
 
         // <Loading interaction recording files>
-        $file_records3 = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'recfiles', 'itemid' => ($ejsapp->id)));
-        $initial_rec_file = new stdClass();
-        if (!empty($file_records3)) {
-            foreach($file_records3 as $initial_rec_file){
-                if ($initial_rec_file->filename != '.') {
-                    break;
+        $initial_rec_file = initial_data_file($ejsapp, 'recfiles');
+        if ($user_rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
+            $rec_file = get_data_file($user_rec_file, $initial_rec_file);
+            //<to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
+            $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
+            $load_rec_code = "
+              function loadExperiment(count) {
+                if (!$ejsapp_id._simulation && count > 0) {
+                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
                 }
-            }
-        }
+                else if ($ejsapp_id._simulation) {
+                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
+                }
+                else {
+                  alert('$rec_fail_msg');
+                }
+              }
+              loadExperiment(10);";
+            //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
+            $code .= $load_rec_code;
+        } //end of if ($user_rec_file)
+        // <\Loading interaction recording files>
 
         // <Loading personalized variables>
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
@@ -377,34 +439,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo,
             $code .= $personalize_vars_code;
         }
         // <\Loading personalized variables>
-
-        if ($rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
-            //<to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
-            if ($rec_file) {
-                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $rec_file;
-            } else {
-                $rec_file = $CFG->wwwroot . "/pluginfile.php/" . $initial_rec_file->contextid .
-                    "/" . $initial_rec_file->component . "/" . $initial_rec_file->filearea .
-                    "/" . $initial_rec_file->itemid . "/" . $initial_rec_file->filename;
-            }
-            $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
-            $load_rec_code = "
-              function loadExperiment(count) {
-                if (!$ejsapp_id._simulation && count > 0) {
-                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
-                }
-                else if ($ejsapp_id._simulation) {
-                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
-                }
-                else {
-                  alert('$rec_fail_msg');
-                }
-              }
-              loadExperiment(10);";
-            //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
-            $code .= $load_rec_code;
-        } //end of if ($rec_file)
-        // <\Loading interaction recording files>
         // <\Loading state, controller and interaction files as well as personalized variables>
 
         $code .= '</script></div>';

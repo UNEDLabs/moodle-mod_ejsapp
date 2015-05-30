@@ -88,8 +88,8 @@
                        NEXT="slotsduration"/>
                 <FIELD NAME="slotsduration" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="port" NEXT="totalslots"/>
-                <FIELD NAME="slotsduration" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="port" NEXT="weeklyslots"/>
+                <FIELD NAME="totalslots" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
+                       SEQUENCE="false" PREVIOUS="slotsduration" NEXT="weeklyslots"/>
                 <FIELD NAME="weeklyslots" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
                        SEQUENCE="false" PREVIOUS="totalslots" NEXT="dailyslots"/>
                 <FIELD NAME="dailyslots" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
