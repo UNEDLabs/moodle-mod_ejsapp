@@ -37,12 +37,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ *
  * Updates the ejsapp, ejsapp_personal_vars, and files tables according to the .jar/.zip information
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param object $context context module
  *
  * @return boolean ejs_ok
+ *
  */
 function update_ejsapp_and_files_tables($ejsapp, $context) {
     global $CFG, $DB;
@@ -204,10 +206,12 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
 
 
 /**
+ *
  * Deletes a directory from the server
  *
  * @param string $dir directory to delete
  * @return bool TRUE on success or FALSE on failure
+ *
  */
 function delete_recursively($dir) {
     if (file_exists($dir)) {
@@ -397,6 +401,7 @@ function users_personalized_vars($ejsapp) {
  * @param stdClass $file_record
  * @param boolean $alert
  * @return boolean $ejs_ok
+ *
  */
 function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert) {
     global $CFG;
@@ -520,10 +525,11 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
  * For EjsS javascript applications.
  *
  * @param string $folderpath
-  * @param stdClass $ejsapp
+ * @param stdClass $ejsapp
  * @param string $filepath
  * @param string $codebase
  * @return boolean $ejs_ok
+ *
  */
 function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase) {
     global $CFG;
@@ -604,11 +610,12 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
  * Checks if a remote lab equipment is alive or not, either directly when it has a public IP or by asking Sarlab.
  *
  * @param string $host
- * @param string $port
- * @param stdClass $usignsarlab
+ * @param int $port
+ * @param int $usingsarlab
  * @param string $idExp
- * @param string $timeout
+ * @param int $timeout
  * @return int 0, not alive; 1, alive; 2, not checkable
+ *
  */
 function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
     global $devices_info;
@@ -683,6 +690,7 @@ function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
  *
  * @param stdClass $ejsapp
  * @return stdClass $ejsapp_rem_lab
+ *
  */
 function ejsapp_rem_lab_conf($ejsapp) {
     global $CFG;
@@ -724,6 +732,7 @@ function ejsapp_rem_lab_conf($ejsapp) {
  *
  * @param stdClass $ejsapp
  * @return void
+ *
  */
 function ejsapp_expsyst2pract($ejsapp) {
     global $DB;
@@ -784,6 +793,7 @@ function check_booking_system($ejsapp) {
  * @param int $labmanager
  * param int $max_use_time
  * @return stdClass $sarlabinfo
+ *
  */
 function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $labmanager, $max_use_time) {
     $sarlabinfo = null;
@@ -811,6 +821,7 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $l
  * @param string $username
  * @param int $ejsappid
  * @return boolean $active_booking
+ *
  */
 function check_last_valid_booking($DB, $username, $ejsappid) {
     $endtime = 0;
@@ -842,6 +853,7 @@ function check_last_valid_booking($DB, $username, $ejsappid) {
  * @param stdClass $ejsapp
  * @param string $currenttime
  * @return string $username_with_active_booking
+ *
  */
 function check_anyones_booking($DB, $ejsapp, $currenttime) {
     $username_with_active_booking = '';
@@ -1077,6 +1089,7 @@ function check_active_booking($repeated_ejsapp_labs, $courseid) {
  * @param int $labmanager whether the user is a laboratory manager or not
  * @param int $max_use_time maximum time for using the remote lab
  * @return stdClass $sarlabinfo
+ *
  */
 function define_sarlab($instance, $collab, $practice, $labmanager, $max_use_time) {
     $sarlabinfo = new stdClass();
@@ -1098,6 +1111,7 @@ function define_sarlab($instance, $collab, $practice, $labmanager, $max_use_time
  *
  * @param stdClass $ejsapp
  * @return void
+ *
  */
 function prepare_ejs_file($ejsapp) {
     global $DB, $CFG;

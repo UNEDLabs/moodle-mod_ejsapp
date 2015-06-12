@@ -39,10 +39,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once('locallib.php');
 
 /**
+ *
  * Supported features by EJSApp
  *
  * @param constant $feature feature to be supported
  * @return boolean true if EJSApp supports the feature, false elsewhere
+ *
  */
 function ejsapp_supports($feature)
 {
@@ -68,31 +70,38 @@ function ejsapp_supports($feature)
 }
 
 /**
+ *
  * This function is used by the reset_course_userdata function in moodlelib.
  * @param string $data the data submitted from the reset course.
  * @return array status array
+ *
  */
 function ejsapp_reset_userdata($data) {
     return array();
 }
 
 /**
+ *
  * List of view style log actions
  * @return array
+ *
  */
 function ejsapp_get_view_actions() {
     return array('view', 'view all');
 }
 
 /**
+ *
  * List of update style log actions
  * @return array
+ *
  */
 function ejsapp_get_post_actions() {
     return array('update', 'add');
 }
 
 /**
+ *
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -101,7 +110,9 @@ function ejsapp_get_post_actions() {
  * @param object $ejsapp An object from the form in mod_form.php
  * @param object $mform
  * @return int The id of the newly inserted ejsapp record
+ *
  */
+
 function ejsapp_add_instance($ejsapp, $mform = null)
 {
     global $DB;
@@ -160,6 +171,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 }
 
 /**
+ *
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
@@ -167,6 +179,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
  * @param object $ejsapp An object from the form in mod_form.php
  * @param object $mform
  * @return boolean Success/Fail
+ *
  */
 function ejsapp_update_instance($ejsapp, $mform=null)
 {
@@ -260,12 +273,14 @@ function ejsapp_update_instance($ejsapp, $mform=null)
 }
 
 /**
+ *
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
  * and any data that depends on it.
  *
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
+ *
  */
 function ejsapp_delete_instance($id)
 {
@@ -306,6 +321,7 @@ function ejsapp_delete_instance($id)
 }
 
 /**
+ *
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
@@ -319,6 +335,7 @@ function ejsapp_delete_instance($id)
  *
  * $return->time = the time they did it
  * $return->info = a short text description
+ *
  */
 function ejsapp_user_outline($course, $user, $mod, $ejsapp)
 {
@@ -340,6 +357,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
 }
 
 /**
+ *
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
@@ -349,6 +367,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
  * @param object $ejsapp
  *
  * @return boolean
+ *
  */
 function ejsapp_user_complete($course, $user, $mod, $ejsapp)
 {
@@ -370,6 +389,7 @@ function ejsapp_user_complete($course, $user, $mod, $ejsapp)
 }
 
 /**
+ *
  * Given a course and a time, this module should find recent activity
  * that has occurred in ejsapp activities and print it out.
  * Return true if there was output, or false is there was none.
@@ -378,6 +398,7 @@ function ejsapp_user_complete($course, $user, $mod, $ejsapp)
  * @param $viewfullnames
  * @param $timestart
  * @return boolean false
+ *
  */
 function ejsapp_print_recent_activity($course, $viewfullnames, $timestart)
 {
@@ -385,6 +406,7 @@ function ejsapp_print_recent_activity($course, $viewfullnames, $timestart)
 }
 
 /**
+ *
  * Prepares the recent activity data
  *
  * This callback function is supposed to populate the passed array with
@@ -399,12 +421,14 @@ function ejsapp_print_recent_activity($course, $viewfullnames, $timestart)
  * @param int $userid check for a particular user's activity only, defaults to 0 (all users)
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  * @return void adds items into $activities and increases $index
+ *
  */
 function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0)
 {
 }
 
 /**
+ *
  * Prints single activity item prepared by {@see newmodule_get_recent_mod_activity()}
  *
  * @param $activity
@@ -413,17 +437,20 @@ function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
  * @param $modnames
  * @param $viewfullnames
  * @return void
+ *
  */
 function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames)
 {
 }
 
 /**
+ *
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
  * as sending out mail, toggling flags etc ...
  *
  * @return boolean
+ *
  **/
 function ejsapp_cron()
 {
@@ -440,6 +467,7 @@ function ejsapp_cron()
     //Checking whether remote labs are operative or not:
     $ejsapp_remlabs_conf = $DB->get_records('ejsapp_remlab_conf');
     foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
+        $idExp = null;
         if ($ejsapp_remlab_conf->usingsarlab) {
             $idExp = $DB->get_field('ejsapp_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
         }
@@ -494,10 +522,12 @@ function ejsapp_cron()
 }
 
 /**
+ *
  * Returns all other caps used in the module
  *
  * @example return array('moodle/site:accessallgroups');
  * @return array
+ *
  */
 function ejsapp_get_extra_capabilities()
 {
@@ -507,6 +537,7 @@ function ejsapp_get_extra_capabilities()
 }
 
 /**
+ *
  * Must return an array of users who are participants for a given instance
  * of ejsapp. Must include every user involved in the instance,
  * independent of his role (student, teacher, admin...). The returned
@@ -515,6 +546,7 @@ function ejsapp_get_extra_capabilities()
  *
  * @param int $ejsappid ID of an instance of this module
  * @return boolean|array false if no participants, array of objects otherwise
+ *
  */
 function ejsapp_get_participants($ejsappid)
 {
@@ -528,19 +560,21 @@ function ejsapp_get_participants($ejsappid)
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Extends the global navigation tree by adding ejsapp nodes if there is a relevant content
  *
+ * Extends the global navigation tree by adding ejsapp nodes if there is a relevant content.
  * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
  *
  * @param navigation_node $navref An object representing the navigation tree node of the ejsappbooking module instance
  * @param stdClass $course
  * @param stdClass $module
  * @param cm_info $cm
+ *
  */
 function ejsapp_extend_navigation($navref, $course, $module, $cm) {
 }
 
 /**
+ *
  * This function extends the settings navigation block for the site.
  *
  * It is safe to rely on PAGE here as we will only ever be within the module
@@ -549,6 +583,7 @@ function ejsapp_extend_navigation($navref, $course, $module, $cm) {
  * @param settings_navigation $settings
  * @param navigation_node $ejsappnode
  * @return void
+ *
  */
 function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
     global $PAGE;
@@ -579,6 +614,7 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ *
  * Returns the lists of all browsable file areas within the given module context
  *
  * The file area 'intro' for the activity introduction field is added automatically
@@ -588,6 +624,7 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
  * @param stdClass $cm
  * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
+ *
  */
 function ejsapp_get_file_areas($course, $cm, $context)
 {
@@ -598,6 +635,7 @@ function ejsapp_get_file_areas($course, $cm, $context)
 }
 
 /**
+ *
  * File browsing support for ejsapp file areas
  *
  * @param file_browser $browser
@@ -610,6 +648,7 @@ function ejsapp_get_file_areas($course, $cm, $context)
  * @param string $filepath
  * @param string $filename
  * @return file_info instance or null if not found
+ *
  */
 function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename)
 {
@@ -617,6 +656,7 @@ function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $fileare
 }
 
 /**
+ *
  * Serves the files from the ejsapp file areas
  *
  * @param stdClass $course the course object
@@ -627,6 +667,7 @@ function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $fileare
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  * @return null
+ *
  */
 function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, $options=null)
 {

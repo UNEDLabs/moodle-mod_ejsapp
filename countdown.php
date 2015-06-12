@@ -22,12 +22,14 @@
 //  (UNED), Madrid, Spain
 
 /**
+ *
  * Ajax update for the EJSApp view.php when a user needs to wait for a remote lab to be available
  *
  * @package    mod
  * @subpackage ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');

@@ -37,6 +37,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ *
  * Returns the code that embeds an EJS applet into Moodle
  *
  * This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
@@ -76,6 +77,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  Null if generate_embedding_code is not called from the external interface (draw_ejsapp_instance() function)
 
  * @return string code that embeds an EJS applet into Moodle
+ *
  */
 function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo, $external_size)
 {

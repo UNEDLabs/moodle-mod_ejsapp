@@ -65,7 +65,7 @@ if (!is_null($session_id)) {
             $collab_record->collaborative_session = $session_id;
             $DB->insert_record('ejsapp_collab_acceptances', $collab_record);
         }
-    } else print_error(get_string('cantJoinSessionErr2', 'block_ejsapp_collab_session'));
+    } else print_error('cantJoinSessionErr2', 'block_ejsapp_collab_session');
 } else {
     $n = optional_param('n', null, PARAM_INT);
     $collabinfo = null;
@@ -84,7 +84,7 @@ if ($id) {
 }
 
 require_login($course, true, $cm);
- 
+
 $modulecontext = context_module::instance($cm->id);
 $coursecontext = context_course::instance($course->id);
 
@@ -296,34 +296,14 @@ if ($ejsapp->appwording) {
 
 // <Buttons to close or leave collab sessions>
 if (isset($collab_session)) {
-    /*if (isset($collab_session->master_user)) {
-        $close_url = $CFG->wwwroot .
-            "/blocks/ejsapp_collab_session/close_collaborative_session.php?session=" .
-            $session_id . "&courseid=" . $course->id;
-        if ($USER->id == $collab_session->master_user) {
-            $close_button = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
-        } else {
-            $close_button = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
-        }
-        $button = <<<EOD
-    <center>
-    <form>
-    <input type="button" value="$close_button" onClick="window.location.href = '  $close_url'">
-    </form>
-    </center>
-EOD;
-        echo $button;
-    }*/
-
-    $form = new html_form();
-    $form->url = new moodle_url($CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collaborative_session.php",
-                                array('session' => $session_id, 'courseid' => $course->id));
+    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collaborative_session.php?session=$session_id&courseid={$course->id}";
     if ($USER->id == $collab_session->master_user) {
-        $form->button->text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
+        $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
     } else {
-        $form->button->text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
+        $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
     }
-    echo $OUTPUT->button($form);
+    $button = html_writer::empty_tag('input', array('type'=>'button', 'name'=>'close_session', 'value'=>$text, 'onClick'=>"window.location.href = '$url'"));
+    echo $button;
 }
 // </Buttons to close or leave collab sessions>
 
