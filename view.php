@@ -46,7 +46,7 @@ $data_files = array($state_file, $cnt_file, $rec_file);
 if (!is_null($session_id)) {
     $collab_session = $DB->get_record('ejsapp_collab_sessions',array('id'=>$session_id));
     if (isset($collab_session->localport)) {
-        require_once(dirname(__FILE__) . '/../../blocks/ejsapp_collab_session/manage_collaborative_db.php');
+        require_once(dirname(__FILE__) . '/../../blocks/ejsapp_collab_session/manage_collab_db.php');
 
         $n = $collab_session->ejsapp;
 
