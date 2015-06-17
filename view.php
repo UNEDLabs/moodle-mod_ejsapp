@@ -112,7 +112,7 @@ $personalvarsinfo = personalize_vars($ejsapp, $USER);
 
 // For logging purposes:
 $action = 'view';
-$check_activity = 30;   //register whether the user is still in the activity or not every 120 seconds (2 min)
+$check_activity = 30;   //register whether the user is still in the activity or not every 30 seconds
 $accessed = false;
 
 // <Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not>
@@ -296,7 +296,7 @@ if ($ejsapp->appwording) {
 
 // <Buttons to close or leave collab sessions>
 if (isset($collab_session)) {
-    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collaborative_session.php?session=$session_id&courseid={$course->id}";
+    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$session_id&courseid={$course->id}";
     if ($USER->id == $collab_session->master_user) {
         $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
     } else {
