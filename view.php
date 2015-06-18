@@ -161,9 +161,9 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
         //<Getting the maximum time the user is allowed to use the remote lab>
         $maxslots = $remlab_conf->dailyslots;
         $slotsduration_conf = $remlab_conf->slotsduration;
+        if ($slotsduration_conf > 4) $slotsduration_conf = 1;
         $slotsduration = array(60, 30, 15, 5, 2);
-        if ($slotsduration[$slotsduration_conf] == 0) $max_use_time = $maxslots*60*60;
-        else $max_use_time = $maxslots*60*$slotsduration[$slotsduration_conf]; //in seconds
+        $max_use_time = $maxslots*60*$slotsduration[$slotsduration_conf]; //in seconds
         //</Getting the maximum time the user is allowed to use the remote lab>
         //Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course
         $time_information = get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, time());

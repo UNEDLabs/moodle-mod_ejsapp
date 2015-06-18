@@ -303,7 +303,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                               document.write('<param name=\"Port_Teacher\" value=\"" . get_config('ejsapp_collab_session', 'collaborative_port') . "\"/>');";
                 } else {
                     insert_collaborative_user($USER->id, null, $collabinfo->session);
-                    $code .= "document.write('<param name=\"IP_Teacher\" value=\"{$collabinfo->ip}\"/>');//127.0.0.1\"/>');
+                    //127.0.0.1\"/>');
+                    $code .= "document.write('<param name=\"IP_Teacher\" value=\"{$collabinfo->ip}\"/>');
                               document.write('<param name=\"MainFrame_Teacher\" value=\"{$ejsapp->mainframe}\"/>');
                               document.write('<param name=\"Port_Teacher\" value=\"{$collabinfo->localport}\"/>');";
                 }
