@@ -1,0 +1,15 @@
+EJSApp Moodle plugin webpage: https://moodle.org/plugins/view.php?plugin=mod_ejsapp
+
+EJSApp UNEDLabs github repository: https://github.com/organizations/UNEDLabs
+
+EJSApp Moodle doc: http://docs.moodle.org/26/en/EJSApp
+
+EJSApp Moodle forum discussion: https://moodle.org/mod/forum/discuss.php?d=217163
+
+EJSApp video-tutorials: http://www.youtube.com/user/UNEDLabs
+
+EJSApp tutorial: http://www.um.es/fem/EjsWiki/Main/UsingEJSWithMoodle
+
+EJS webpage: http://www.um.es/fem/EjsWiki/
+
+UNILabs webpage: http://unilabs.dia.uned.es/
