@@ -56,7 +56,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             'course', 'name', 'intro', 'introformat', 'appwording', 'appwordingformat', 'timecreated',
             'timemodified', 'applet_name', 'class_file', 'codebase',
             'mainframe', 'is_collaborative', 'applet_size_conf', 'preserve_aspect_ratio',
-            'custom_width', 'custom_height', 'is_rem_lab', 'height', 'width', 'personalvars', 'free_access'));
+            'custom_width', 'custom_height', 'is_rem_lab', 'height', 'width', 'personalvars'));
 
         $ejsapp_expsyst2practs = new backup_nested_element('ejsapp_expsyst2practs');
         $ejsapp_expsyst2pract = new backup_nested_element('ejsapp_expsyst2pract', array('id'),
@@ -67,7 +67,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         $ejsapp_remlab_conf = new backup_nested_element('ejsapp_remlab_conf', array('id'),
             array('usingsarlab', 'sarlabinstance', 'sarlabcollab', 'ip', 'port', 'totalslots',
-                  'weeklyslots', 'dailyslots', 'active'));
+                  'weeklyslots', 'dailyslots', 'active', 'free_access'));
 
         $ejsapp_log = new backup_nested_element('ejsapp_log', array('id'),
             array('time', 'userid', 'action', 'info'));

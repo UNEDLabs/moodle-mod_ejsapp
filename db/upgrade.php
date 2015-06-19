@@ -168,5 +168,17 @@ function xmldb_ejsapp_upgrade($oldversion)
         $dbman->add_field($table, $reboottime);
     }
 
+    if  ($oldversion < '2015061901') {
+        // Create "free_access" field in ejsapp_remlab_conf table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_remlab_conf');
+        $field = new xmldb_field('free_access', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'active');
+        $dbman->add_field($table, $field);
+        // Delete the "free_access" field from the ejsapp table
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('free_access', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'personalvars');
+        $dbman->drop_field($table, $field, $continue=true, $feedback=true);
+    }
+
     return true;
 }

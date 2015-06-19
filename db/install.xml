@@ -58,9 +58,7 @@
                 <FIELD NAME="width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="height" NEXT="personalvars"/>
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="width" NEXT="free_access"/>
-                <FIELD NAME="free_access" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="personalvars"/>
+                       PREVIOUS="width"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -97,7 +95,9 @@
                 <FIELD NAME="reboottime" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="2"
                        SEQUENCE="false" PREVIOUS="dailyslots" NEXT="active"/>
                 <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
-                       SEQUENCE="false" PREVIOUS="reboottime"/>
+                       SEQUENCE="false" PREVIOUS="reboottime" NEXT="free_access"/>
+                <FIELD NAME="free_access" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="active"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

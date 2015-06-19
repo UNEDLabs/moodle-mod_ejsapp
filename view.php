@@ -146,11 +146,11 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $booking_info = check_active_booking($repeated_ejsapp_labs, $course->id);
     $booking_system_in_use = check_booking_system($ejsapp);
     if (!$labmanager) { // The user does not have special privileges and...
-        if (($ejsapp->free_access != 1) && $booking_system_in_use) { //Not free access and the booking system is in use
+        if (($remlab_conf->free_access != 1) && $booking_system_in_use) { //Not free access and the booking system is in use
             $allow_free_access = false;
-        } else if (($ejsapp->free_access == 1) && $booking_info['active_booking']) { //Free access and there is an active booking for this remote lab made by anyone in a different course
+        } else if (($remlab_conf->free_access == 1) && $booking_info['active_booking']) { //Free access and there is an active booking for this remote lab made by anyone in a different course
             $allow_free_access = false;
-        } else if (($ejsapp->free_access != 1) && !$booking_system_in_use && $booking_info['active_booking']) { //Not free access, the booking system is not in use and there is an active booking for this remote lab made by anyone in a different course
+        } else if (($remlab_conf->free_access != 1) && !$booking_system_in_use && $booking_info['active_booking']) { //Not free access, the booking system is not in use and there is an active booking for this remote lab made by anyone in a different course
             $allow_free_access = false;
         }
     }
