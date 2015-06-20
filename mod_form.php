@@ -68,7 +68,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'ejsappname', 'ejsapp');
         // Adding the standard "intro" and "introformat" fields
-        $this->add_intro_editor();
+        if ($CFG->version < 2015051100) $this->add_intro_editor();
+        else $this->standard_intro_elements();
         // -------------------------------------------------------------------------------
         // Adding other ejsapp settings by adding more fieldsets
         $mform->addElement('header', 'conf_parameters', get_string('jar_file', 'ejsapp'));

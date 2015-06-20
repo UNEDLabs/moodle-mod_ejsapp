@@ -23,8 +23,8 @@
 
 
 /**
- * This file is used to receive any .xml, .exp, text or image file saved by an EJS
- * applet.
+ * This file is used to receive any .xml, .rec, .cnt, text or image file saved by
+ * an EJS applet or an EjsS javascript application.
  *
  * @package    mod
  * @subpackage ejsapp
@@ -49,8 +49,7 @@ $original_file_name = null;
 if ($_FILES['user_file']['name'] != null) { //receiving from EJS
     $method = true;
     $original_file_name = $_FILES['user_file']['name'];
-}
-else { //receiving from EjsS
+} else { //receiving from EjsS
     $method = false;
     $original_file_name = $_POST['user_file'];
     $extension = pathinfo($original_file_name, PATHINFO_EXTENSION);

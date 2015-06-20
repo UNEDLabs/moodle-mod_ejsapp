@@ -251,27 +251,29 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
         $last_quote_mark = strrpos($sarlab_IP, "'");
         if ($last_quote_mark != 0) $last_quote_mark++;
         $ip = substr($sarlab_IP, $last_quote_mark);
-        if($fp = @fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
-            $URI = 'http://' . $ip .'/';
-            $file_headers = @get_headers($URI);
-            if (substr($file_headers[0], 9, 3) == 200) { //Valid file
-                if ($dom->load($URI)) {
-                    $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
-                    foreach ($experiences as $experience) {
-                        $owneUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
-                        foreach ($owneUsers as $owneUser) {
-                            if ($username == $owneUser->nodeValue || $username == 'admin') { //Check whether the required user has access to the experience
-                                $idExperiences = $experience->getElementsByTagName('idExperience');
-                                foreach ($idExperiences as $idExperience) {
-                                    $listExperiences .= $idExperience->nodeValue . ';' ; //Add the experience to the user's list of accessible experiences
+        if ($ip != '127.0.0.1' && $ip != '') {
+            if ($fp = @fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
+                $URI = 'http://' . $ip . '/';
+                $file_headers = @get_headers($URI);
+                if (substr($file_headers[0], 9, 3) == 200) { //Valid file
+                    if ($dom->load($URI)) {
+                        $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
+                        foreach ($experiences as $experience) {
+                            $owneUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
+                            foreach ($owneUsers as $owneUser) {
+                                if ($username == $owneUser->nodeValue || $username == 'admin') { //Check whether the required user has access to the experience
+                                    $idExperiences = $experience->getElementsByTagName('idExperience');
+                                    foreach ($idExperiences as $idExperience) {
+                                        $listExperiences .= $idExperience->nodeValue . ';'; //Add the experience to the user's list of accessible experiences
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                         }
                     }
                 }
+                fclose($fp);
             }
-            fclose($fp);
         }
     }
 
@@ -297,10 +299,10 @@ function update_links($codebase, $ejsapp, $code, $method, $use_css) {
     global $CFG;
 
     $path = $CFG->wwwroot . $codebase;
+    $exploded_name = explode("_Simulation",$ejsapp->applet_name);
 
     // Replace links for images
     if ($method == 'old') {
-        $exploded_name = explode("_Simulation",$ejsapp->applet_name);
         $search = "window.addEventListener('load', function () {  new " . $exploded_name[0] . '("_topFrame","_ejs_library/",null);';
         $replace = "window.addEventListener('load', function () {  new " . $exploded_name[0] . '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
     } else {
@@ -494,7 +496,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
         $host = explode("://", $CFG->wwwroot);
         if (substr($matches[1][0], 0, -1) == $host[1]) {
-            if (is_null($file->get_referencefileid())) { // linked files must be already signed!
+            if (is_null($file->get_referencefileid())) { // linked files won't get signed!
                 // Sign the applet
                 shell_exec(dirname(__FILE__) . DIRECTORY_SEPARATOR . './sign.sh ' .
                     $filepath . ' ' .                                       // parameter 1

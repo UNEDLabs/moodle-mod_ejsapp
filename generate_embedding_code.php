@@ -172,7 +172,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
     if ($ejsapp->class_file == '') { //EJS Javascript
 
-        $path = $CFG->wwwroot . $ejsapp->codebase;
+        if (count(explode('/', $CFG->wwwroot)) <= 3) $path = $CFG->wwwroot . $ejsapp->codebase;
+        else $path = substr($CFG->wwwroot, 0, strrpos( $CFG->wwwroot, '/') ) . $ejsapp->codebase;
         $code = file_get_contents($path . $ejsapp->applet_name);
 
         // Pass the needed parameters to the javascript application
