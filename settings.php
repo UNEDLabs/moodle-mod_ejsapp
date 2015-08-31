@@ -38,9 +38,6 @@ defined('MOODLE_INTERNAL') || die;
 //certificate_path,     The path to your trust certificate for signing the java applets.
 //certificate_password, The password for using your trust certificate.
 //certificate_alia,     The alias of your trust certificate.
-//sarlab_IP,            If one or more SARLAB systems are used for accessing the remote laboratories, the list of their IPs directions must be written here.
-//sarlab_port,          If one or more SARLAB systems are used for accessing the remote laboratories, the list of the ports used to connect with them must be written here.
-//sarlab_enc_key        If one or more SARLAB systems are used for accessing the remote laboratories, the list of their encoding keys must be written here.
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
@@ -74,38 +71,5 @@ if ($ADMIN->fulltree) {
         '',
         PARAM_TEXT,
         '40'
-    ));
-
-    $settings->add(new admin_setting_heading(
-        'ejsapp/communicationsettings',
-        get_string('default_communication_set', 'ejsapp'),
-        ''
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'sarlab_IP',
-        get_string('sarlab_IP', 'ejsapp'),
-        get_string('sarlab_IP_description', 'ejsapp'),
-        '127.0.0.1',
-        PARAM_TEXT,
-        '13'
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'sarlab_port',
-        get_string('sarlab_port', 'ejsapp'),
-        get_string('sarlab_port_description', 'ejsapp'),
-        443,
-        PARAM_TEXT,
-        '4'
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'sarlab_enc_key',
-        get_string('sarlab_enc_key', 'ejsapp'),
-        get_string('sarlab_enc_key_description', 'ejsapp'),
-        '1234567890123456',
-        PARAM_TEXT,
-        '30'
     ));
 }

@@ -127,42 +127,20 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 
     $cmid = $ejsapp->coursemodule;
     $context = context_module::instance($cmid);
-    $ejs_ok = update_ejsapp_and_files_tables($ejsapp, $context, $context->id);
+    $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context, $context->id);
 
     if ($ejs_ok) {
-        // Remote labs
-        if ($ejsapp->is_rem_lab == 1) {
-            $ejsapp_rem_lab = ejsapp_rem_lab_conf($ejsapp);
-            $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
-
-            ejsapp_expsyst2pract($ejsapp);
-
-            // EJSApp booking system
-            if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-                $context = context_course::instance($ejsapp->course);
-                $users = get_enrolled_users($context);
-                $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
-                //ejsappbooking_usersaccess table:
-                $ejsappbooking_usersaccess = new stdClass();
-                $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
-                $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
-                //Grant remote access to admin user:
-                $ejsappbooking_usersaccess->userid = 2;
-                $ejsappbooking_usersaccess->allowremaccess = 1;
-                $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-                //Consider other enrolled users:
-                foreach ($users as $user) {
-                  $ejsappbooking_usersaccess->userid = $user->id;
-                  if (!has_capability('mod/ejsapp:addinstance', $context, $user->id, true)) {
-                    $ejsappbooking_usersaccess->allowremaccess = 0;
-                  } else {
-                    $ejsappbooking_usersaccess->allowremaccess = 1;
-                  }
-                  $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-                }
+        if ($ejsapp->is_rem_lab == 1) { // Remote lab
+            if (is_array($ejsapp->practiceintro)) $practices = $ejsapp->practiceintro;
+            else $practices = array($ejsapp->practiceintro);
+            foreach($practices as $practiceintro) {
+                $ejsapp->practiceintro = $practiceintro;
+                $remlab_info = default_rem_lab_conf($ejsapp);
+                $DB->insert_record('remlab_manager_conf', $remlab_info);
+                ejsapp_expsyst2pract($ejsapp, $remlab_info);
             }
+            update_booking_table($ejsapp);
         }
-
     } else {
         ejsapp_delete_instance($ejsapp->id);
     }
@@ -187,6 +165,7 @@ function ejsapp_update_instance($ejsapp, $mform=null)
 
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
+    $ejsapp->practiceintro = $ejsapp->practiceintro[0]; //TODO: Several experiences
 
     if ($mform) {
         $ejsapp->appwording = $ejsapp->ejsappwording['text'];
@@ -199,72 +178,26 @@ function ejsapp_update_instance($ejsapp, $mform=null)
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
-    $ejs_ok = update_ejsapp_and_files_tables($ejsapp, $context);
-
+    $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejs_ok) {
-        $rem_labs = $DB->get_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
-        // Remote labs
-        if ($ejsapp->is_rem_lab == 1) {
-            $ejsapp_rem_lab = ejsapp_rem_lab_conf($ejsapp);
-            $rem_lab = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
-            if ($rem_lab != null) {
-                $ejsapp_rem_lab->id = $rem_lab->id;
-                $DB->update_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
-            } else {
-                $DB->insert_record('ejsapp_remlab_conf', $ejsapp_rem_lab);
+        if ($ejsapp->is_rem_lab == 1) { // Remote lab
+            if (is_array($ejsapp->practiceintro)) $practices = $ejsapp->practiceintro;
+            else $practices = array($ejsapp->practiceintro);
+            foreach($practices as $practiceintro) {
+                $ejsapp->practiceintro = $practiceintro;
+                $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp->practiceintro));
+                if ($remlab_info == null) $remlab_info = default_rem_lab_conf($ejsapp);
+                $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
+                ejsapp_expsyst2pract($ejsapp, $remlab_info);
             }
-
-            $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
-            ejsapp_expsyst2pract($ejsapp);
-
-            // EJSApp booking system
-            if ($rem_labs == null) {
-                if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-                    $course_context = context_course::instance($ejsapp->course);
-                    $users = get_enrolled_users($course_context);
-                    $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
-                    //ejsappbooking_usersaccess table:
-                    $ejsappbooking_usersaccess = new stdClass();
-                    $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
-                    $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
-                    //Grant remote access to admin user:
-                    $ejsappbooking_usersaccess->userid = 2;
-                    $ejsappbooking_usersaccess->allowremaccess = 1;
-                    if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id))) {
-                      $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-                    } else {
-                      $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
-                      $ejsappbooking_usersaccess->id = $record->id;
-                      $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-                    }
-                    //Consider other enrolled users:
-                    foreach ($users as $user) {
-                      $ejsappbooking_usersaccess->userid = $user->id;
-                      if (!has_capability('mod/ejsapp:addinstance', $course_context, $user->id, true)) {
-                        $ejsappbooking_usersaccess->allowremaccess = 0;
-                      } else {
-                        $ejsappbooking_usersaccess->allowremaccess = 1;
-                      }
-                      if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id, 'userid'=>$user->id))) {
-                        $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-                      } else {
-                        $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbooking->id, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsapp->id));
-                        $ejsappbooking_usersaccess->id = $record->id;
-                        $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
-                      }
-                    }
-                }
-            }
-        } elseif ($rem_labs != null) {
-            $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
-            $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
-            // EJSApp booking system
+            update_booking_table($ejsapp);
+        } else {
+            $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
             if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
               $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
               $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
             }
         }
-
     } else {
         ejsapp_delete_instance($ejsapp->id);
     }
@@ -301,8 +234,8 @@ function ejsapp_delete_instance($id)
 
     $DB->delete_records('ejsapp', array('id' => $ejsapp->id));
     if ($ejsapp->is_rem_lab == 1) {
-        $DB->delete_records('ejsapp_remlab_conf', array('ejsappid' => $ejsapp->id));
-        $DB->delete_records('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id));
+        $DB->delete_records('remlab_manager_conf', array('ejsappid' => $ejsapp->id));
+        $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
         // EJSApp booking system
         if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
           $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
@@ -458,18 +391,18 @@ function ejsapp_cron()
     require_once($CFG->dirroot . '/filter/multilang/filter.php');
 
     //Delete all stored Sarlab keys:
-    $DB->delete_records('ejsapp_sarlab_keys');
+    $DB->delete_records('remlab_manager_sarlab_keys');
 
     //Delete all 'working' logs for EJSApp activities older than 15 min:
     $params = array(strtotime(date('Y-m-d H:i:s'))-900);
     $DB->delete_records_select('ejsapp_log', "time < ?", $params);
 
     //Checking whether remote labs are operative or not:
-    $ejsapp_remlabs_conf = $DB->get_records('ejsapp_remlab_conf');
+    $ejsapp_remlabs_conf = $DB->get_records('remlab_manager_conf');
     foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
         $idExp = null;
         if ($ejsapp_remlab_conf->usingsarlab) {
-            $idExp = $DB->get_field('ejsapp_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
+            $idExp = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
         }
         $devices_info = new stdClass();
         $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $idExp);
@@ -507,7 +440,7 @@ function ejsapp_cron()
                 $send_mail = true;
             }
             $ejsapp_remlab_conf->active = $lab_state;
-            $DB->update_record('ejsapp_remlab_conf', $ejsapp_remlab_conf);
+            $DB->update_record('remlab_manager_conf', $ejsapp_remlab_conf);
         }
         // Send e-mails:
         if ($send_mail) {

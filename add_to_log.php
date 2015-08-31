@@ -44,6 +44,7 @@ $user_id = required_param('userid', PARAM_INT);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/add_to_log.php');
 
+$ejsapp_name = urldecode($ejsapp_name);
 $modulecontext = context_module::instance($cm_id);
 //$ejsapp = $DB->get_record('ejsapp', array('id' => $cm->instance), '*', MUST_EXIST);
 $event = \mod_ejsapp\event\course_module_working::create(array(

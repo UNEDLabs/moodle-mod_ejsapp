@@ -4,8 +4,8 @@
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
         >
     <TABLES>
-        <TABLE NAME="ejsapp" COMMENT="Defines the Easy Java Simulations Applications instances in Moodle"
-               NEXT="ejsapp_remlab_conf">
+        <TABLE NAME="ejsapp" COMMENT="Defines the Easy Java/Javascript Simulations Applications instances in Moodle"
+               NEXT="ejsapp_personal_vars">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
                 <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
@@ -67,85 +67,8 @@
                 <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
             </INDEXES>
         </TABLE>
-        <TABLE NAME="ejsapp_remlab_conf" COMMENT="Contains all the configuration parameters a remote EJSApp needs"
-               PREVIOUS="ejsapp" NEXT="ejsapp_expsyst2pract">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
-                <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       COMMENT="The EJSApp id" PREVIOUS="id" NEXT="usingsarlab"/>
-                <FIELD NAME="usingsarlab" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="ejsappid" NEXT="sarlabinstance"/>
-                <FIELD NAME="sarlabinstance" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="usingsarlab" NEXT="sarlabcollab"/>
-                <FIELD NAME="sarlabcollab" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="sarlabinstance" NEXT="ip"/>
-                <FIELD NAME="ip" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       COMMENT="IP direction of the computer that controls the access to the remote equipment"
-                       PREVIOUS="sarlabcollab" NEXT="port"/>
-                <FIELD NAME="port" TYPE="int" LENGTH="6" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ip"
-                       NEXT="slotsduration"/>
-                <FIELD NAME="slotsduration" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="port" NEXT="totalslots"/>
-                <FIELD NAME="totalslots" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="slotsduration" NEXT="weeklyslots"/>
-                <FIELD NAME="weeklyslots" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="totalslots" NEXT="dailyslots"/>
-                <FIELD NAME="dailyslots" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="weeklyslots" NEXT="reboottime"/>
-                <FIELD NAME="reboottime" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="2"
-                       SEQUENCE="false" PREVIOUS="dailyslots" NEXT="active"/>
-                <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1"
-                       SEQUENCE="false" PREVIOUS="reboottime" NEXT="free_access"/>
-                <FIELD NAME="free_access" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="active"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            </KEYS>
-            <INDEXES>
-                <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
-            </INDEXES>
-        </TABLE>
-        <TABLE NAME="ejsapp_expsyst2pract" COMMENT="Relates the experimental systems with the experimental practices"
-               PREVIOUS="ejsapp_remlab_conf" NEXT="ejsapp_sarlab_keys">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
-                <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       COMMENT="The EJSApp (experimental system) id" PREVIOUS="id" NEXT="practiceid"/>
-                <FIELD NAME="practiceid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       COMMENT="The practice id" PREVIOUS="ejsappid" NEXT="practiceintro"/>
-                <FIELD NAME="practiceintro" TYPE="char" LENGTH="255" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       COMMENT="A description of the practice" PREVIOUS="practiceid"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            </KEYS>
-            <INDEXES>
-                <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
-            </INDEXES>
-        </TABLE>
-        <TABLE NAME="ejsapp_sarlab_keys" COMMENT="Stores a temporal key to check authentication when using Sarlab"
-               PREVIOUS="ejsapp_expsyst2pract" NEXT="ejsapp_personal_vars">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="user"/>
-                <FIELD NAME="user" TYPE="char" LENGTH="100" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
-                       NEXT="sarlabpass"/>
-                <FIELD NAME="sarlabpass" TYPE="char" LENGTH="40" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="user" NEXT="labmanager"/>
-                <FIELD NAME="labmanager" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="sarlabpass" NEXT="creationtime"/>
-                <FIELD NAME="creationtime" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"
-                       PREVIOUS="labmanager"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            </KEYS>
-            <INDEXES>
-                <INDEX NAME="user" UNIQUE="false" FIELDS="user"/>
-            </INDEXES>
-        </TABLE>
         <TABLE NAME="ejsapp_personal_vars" COMMENT="Contains information for generating personalized values for EJS variables"
-               PREVIOUS="ejsapp_sarlab_keys" NEXT="ejsapp_log">
+               PREVIOUS="ejsapp" NEXT="ejsapp_log">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
                 <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"

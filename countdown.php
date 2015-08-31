@@ -51,12 +51,12 @@ if ($remaining_time > 0) {
     $slotsduration = array(60, 30, 15, 5, 2);
     $currenttime = time();
     $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
-    $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $ejsappid));
+    $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsappid));
+    $remlab_conf = $DB->get_record('remlab_manager_conf', array('practiceintro' => $practiceintro));
     $idle_time = $remlab_conf->reboottime;
     $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf, $ejsapp);
     $time_information = get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, $currenttime);
     $lab_status = get_lab_status($time_information, $idle_time, $check_activity);
-    $remlab_conf = $DB->get_record('ejsapp_remlab_conf', array('ejsappid'=>$ejsappid));
     $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf, $ejsapp);
     $booking_info = check_active_booking($repeated_ejsapp_labs, $courseid);
     $remaining_time = get_remaining_time($booking_info, $lab_status, $time_information, $idle_time, $check_activity);

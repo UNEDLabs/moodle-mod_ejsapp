@@ -127,43 +127,9 @@ $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 $string['is_rem_lab'] = 'Sistema experimental remoto?';
 $string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota Y quieres que el Sistema de Reservas EJSApp controle su acceso, selecciona "s&iacute;". En caso contrario, selecciona "no".';
 
-$string['sarlab'] = "Usar Sarlab?";
-$string['sarlab_help'] = "Seleccionar 'ss&iacute;' unicamente si se esta usando Sarlab; un sistema que gestiona las conexiones a recursos de laboratorios remotos";
-
-$string['sarlab_instance'] = "Servidor Sarlab para este laboratorio";
-$string['sarlab_instance_help'] = "El orden se corresponde con aquel usado para los valores en las variables sarlab_IP y sarlab_port fijados en la p&aacute;gina de configuraci&oacute;n de ejsapp";
-
-$string['sarlab_collab'] = "Usar acceso colaborativo de Sarlab?";
-$string['sarlab_collab_help'] = "Si deseas que Sarlab ofrezca la opci&oacute;n de acceso colaborativo a este laboratorio remoto o no";
-
-$string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica en Sarlab';
-$string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), tal y como est&aacute; configurado en Sarlab, que desea usar con este sistema experimental.';
+$string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica';
+$string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), que desea usar con este sistema experimental.';
 $string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
-
-$string['ip_lab'] = 'Direcci&oacute;n IP';
-$string['ip_lab_help'] = 'Direcci&oacute;n IP del sistema experimental.  Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
-$string['ip_lab_required'] = 'ATENCI&Oacute;N: Debe proporcionar una direcci&oacute;n IP valida.';
-
-$string['port'] = 'Puerto';
-$string['port_help'] = 'El puerto a usar para establecer la comunicaci&oacute;n. Si est&aacute; usando Sarlab, no tiene que preocuparse de este par&aacute;metro.';
-$string['port_required'] = 'ATENCI&Oacute;N: Debe proporcionar un puerto v&aacute;lido.';
-
-$string['active'] = 'Disponible';
-$string['active_help'] = 'Si este laboratorio remoto se encuentra operativo en este momento o no.';
-
-$string['free_access'] = 'Acceso libre';
-$string['free_access_help'] = 'Habilitar el acceso libre (sin necesidad de realizar reservas) a este laboratorio remoto.';
-
-$string['slotsduration'] = 'Duraci&oacute;n de las franjas (minutos)';
-$string['slotsduration_help'] = 'Duraci&oacute;n de las franjas de tiempo (en minutos) en las que los usuarios podr&aacute;n trabajar con el laboratorio.';
-$string['totalslots'] = 'Franjas de trabajo totales';
-$string['totalslots_help'] = 'Cantidad total de franjas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
-$string['weeklyslots'] = 'Franjas de trabajo semanales';
-$string['weeklyslots_help'] = 'Cantidad semanal de franjas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio.';
-$string['dailyslots'] = 'Franjas de trabajo diarias';
-$string['dailyslots_help'] = 'Cantidad diaria de franjas m&aacute;ximas que se le permitir&aacute; usar a cada alumno para trabajar con este laboratorio. Adem&aacute;s, si el laboratorio es abierto, determina el n&uacute;mero m&aacute;ximo de franjas de tiempo consecutivas que se permite trabajar con el mismo.';
-$string['reboottime'] = 'Tiempo de inactividad (minutos)';
-$string['reboottime_help'] = 'Espacio m&iacute;nimo de tiempo (en minutos) desde que alguien deja de usar el laboratorio remoto hasta que otra persona puede empezar a usarlo. &Uacute;til para darle tiempo al laboratorio remoto de resetearse o volver a su estado inicial.';
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
@@ -239,10 +205,3 @@ $string['certificate_password'] = "Contraseña del certificado de confianza";
 $string['certificate_password_description'] = "La contraseña requerida para usar el certificado de confianza";
 $string['certificate_alias'] = "Alias del certificado de confianza";
 $string['certificate_alias_description'] = "El alias asignado al certificado de confianza";
-$string['default_communication_set'] = "Opciones de comunicaci&oacute;n. (Importante s&oacute;lo si tambi&eacute;n usa Sarlab";
-$string['sarlab_IP'] = "Nombre y direcci&aacute;n IP del servidor Sarlab";
-$string['sarlab_IP_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la direcci&oacute;n IP del servidor que ejecuta el sistema Sarlab que desea utilizar. En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto. Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno en 127.0.0.1 y otro en 127.0.0.2), inserte las direcciones IP separadas por puntos y comas: 127.0.0.1;127.0.0.2. Adem&aacute;s, puede proporcionar un nombre para identificar cada servidor Sarlab: 'Sarlab Madrid'127.0.0.1;'Sarlab Huelva'127.0.0.2";
-$string['sarlab_port'] = "Puerto(s) de comunicaci&oacute; con Sarlab";
-$string['sarlab_port_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar un puerto v&aacute;lido para establecer las comunicaciones necesarias con el servidor de Sarlab. En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto. Si tiene m&aacute;s de un servidor Sarlab (por ejemplo, uno usando el puerto 443 y un segundo usando tambi&eacute;n el puerto 443), inserte los valores separados por puntos y comas: 443;443";
-$string['sarlab_enc_key'] = "Clave de encriptaci&oacute;n para comunicarse con Sarlab";
-$string['sarlab_enc_key_description'] = "Si usa Sarlab (un sistema que gestiona las conexiones a recursos de laboratorios remotos), debe proporcionar la clave de 16 caracteres para encriptar/desencriptar las comunicaciones con el servidor Sarlab (esta clave debe ser la misma que la configurada en el servidor Sarlab). En caso contrario, esta variable no se usa, de modo que puede dejar el valor por defecto.";

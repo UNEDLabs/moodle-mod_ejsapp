@@ -191,60 +191,19 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
         $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');
 
-        $mform->addElement('selectyesno', 'sarlab', get_string('sarlab', 'ejsapp'));
-        $mform->addHelpButton('sarlab', 'sarlab', 'ejsapp');
-        $mform->disabledIf('sarlab', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance) {
-            $rem_lab_data = $DB->get_record('ejsapp_remlab_conf', array('ejsappid' => $this->current->instance));
-            if ($rem_lab_data) {
-                $mform->setDefault('sarlab', $rem_lab_data->usingsarlab);
-            }
-        }
-
-        $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-        $sarlab_instance_options = array();
-        for ($i = 0; $i < count($list_sarlab_IPs); $i++) {
-            $sarlab_instance_options_temp = $list_sarlab_IPs[$i];
-            $init_pos = strpos($sarlab_instance_options_temp, "'");
-            $end_pos = strrpos($sarlab_instance_options_temp, "'");
-            if(($init_pos === false) || ($init_pos === $end_pos)) {
-                array_push($sarlab_instance_options, 'Sarlab server ' . ($i+1));
-            } else {
-                array_push($sarlab_instance_options, substr($sarlab_instance_options_temp,$init_pos+1,$end_pos-$init_pos-1));
-            }
-        }
-
-        $mform->addElement('select', 'sarlab_instance', get_string('sarlab_instance', 'ejsapp'), $sarlab_instance_options);
-        $mform->addHelpButton('sarlab_instance', 'sarlab_instance', 'ejsapp');
-        $mform->disabledIf('sarlab_instance', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('sarlab_instance', 'sarlab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('sarlab_instance', $rem_lab_data->sarlabinstance);
-        }
-        
-        $mform->addElement('selectyesno', 'sarlab_collab', get_string('sarlab_collab', 'ejsapp'));
-        $mform->addHelpButton('sarlab_collab', 'sarlab_collab', 'ejsapp');
-        $mform->disabledIf('sarlab_instance', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('sarlab_collab', 'sarlab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('sarlab_collab', $rem_lab_data->sarlabcollab);
-        }
-
-        // Obtain the list of Sarlab experiences the current user can configure and add them to the form
-        $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
-        $list_sarlab_experiences = explode(";", $listExperiences);
-        $select_practice = $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_sarlab_experiences);
+        $list_showable_experiences = get_showable_experiences();
+        $select_practice = $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_showable_experiences);
         $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
         $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('practiceintro', 'sarlab', 'eq', 0);
         $select_practice->setMultiple(true);
         if ($this->current->instance) {
-            $practices_data = $DB->get_records('ejsapp_expsyst2pract', array('ejsappid' => $this->current->instance));
+            $practices_data = $DB->get_records('remlab_manager_expsyst2pract', array('ejsappid' => $this->current->instance));
             if ($practices_data) {
                 $selected_practice_index = array();
                 foreach ($practices_data as $practice_data) {
                     $i = 0;
-                    foreach ($list_sarlab_experiences as $sarlab_experience) {
+                    foreach ($list_showable_experiences as $sarlab_experience) {
                         if ($practice_data->practiceintro == $sarlab_experience) {
                             array_push($selected_practice_index, $i);
                             break;
@@ -257,100 +216,11 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
         $mform->addElement('hidden', 'list_practices', null);
         $mform->setType('list_practices', PARAM_TEXT);
-        $mform->setDefault('list_practices', $listExperiences);
-
-        $mform->addElement('text', 'ip_lab', get_string('ip_lab', 'ejsapp'), array('size' => '12'));
-        $mform->setType('ip_lab', PARAM_TEXT);
-        $mform->addRule('ip_lab', get_string('maximumchars', '', 15), 'maxlength', 15, 'client');
-        $mform->addHelpButton('ip_lab', 'ip_lab', 'ejsapp');
-        $mform->disabledIf('ip_lab', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('ip_lab', 'sarlab', 'eq', 1);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('ip_lab', $rem_lab_data->ip);
+        $string_showable_experiences = '';
+        foreach ($list_showable_experiences as $experience) {
+            $string_showable_experiences .= $experience . ';';
         }
-
-        $mform->addElement('text', 'port', get_string('port', 'ejsapp'), array('size' => '2'));
-        $mform->setType('port', PARAM_INT);
-        $mform->addRule('port', get_string('maximumchars', '', 6), 'maxlength', 6, 'client');
-        $mform->addHelpButton('port', 'port', 'ejsapp');
-        $mform->disabledIf('port', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('port', 'sarlab', 'eq', 1);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('port', $rem_lab_data->port);
-        }
-
-        $mform->addElement('selectyesno', 'active', get_string('active', 'ejsapp'));
-        $mform->addHelpButton('active', 'active', 'ejsapp');
-        $mform->disabledIf('active', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('active', $rem_lab_data->active);
-        } else {
-            $mform->setDefault('active', '1');
-        }
-
-        $mform->addElement('selectyesno', 'free_access', get_string('free_access', 'ejsapp'));
-        $mform->addHelpButton('free_access', 'free_access', 'ejsapp');
-        $mform->disabledIf('free_access', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('free_access', $rem_lab_data->free_access);
-        } else {
-            $mform->setDefault('free_access', '0');
-        }
-
-        $mform->addElement('select', 'slotsduration', get_string('slotsduration', 'ejsapp'), array('60', '30', '15', '5', '2'));
-        $mform->addHelpButton('slotsduration', 'slotsduration', 'ejsapp');
-        $mform->disabledIf('slotsduration', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('slotsduration', $rem_lab_data->slotsduration);
-        }
-
-        $mform->addElement('text', 'totalslots', get_string('totalslots', 'ejsapp'), array('size' => '2'));
-        $mform->setType('totalslots', PARAM_INT);
-        $mform->addRule('totalslots', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
-        $mform->addHelpButton('totalslots', 'totalslots', 'ejsapp');
-        $mform->disabledIf('totalslots', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('totalslots', 'free_access', 'eq', 1);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('totalslots', $rem_lab_data->totalslots);
-        } else {
-            $mform->setDefault('totalslots', 18);
-        }
-
-        $mform->addElement('text', 'weeklyslots', get_string('weeklyslots', 'ejsapp'), array('size' => '2'));
-        $mform->setType('weeklyslots', PARAM_INT);
-        $mform->addRule('weeklyslots', get_string('maximumchars', '', 3), 'maxlength', 3, 'client');
-        $mform->addHelpButton('weeklyslots', 'weeklyslots', 'ejsapp');
-        $mform->disabledIf('weeklyslots', 'is_rem_lab', 'eq', 0);
-        $mform->disabledIf('weeklyslots', 'free_access', 'eq', 1);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('weeklyslots', $rem_lab_data->weeklyslots);
-        } else {
-            $mform->setDefault('weeklyslots', 9);
-        }
-
-        $mform->addElement('text', 'dailyslots', get_string('dailyslots', 'ejsapp'), array('size' => '2'));
-        $mform->setType('dailyslots', PARAM_INT);
-        $mform->addRule('dailyslots', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
-        $mform->addHelpButton('dailyslots', 'dailyslots', 'ejsapp');
-        $mform->disabledIf('dailyslots', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('dailyslots', $rem_lab_data->dailyslots);
-        } else {
-            $mform->setDefault('dailyslots', 3);
-        }
-
-        $mform->addElement('text', 'reboottime', get_string('reboottime', 'ejsapp'), array('size' => '2'));
-        $mform->setType('reboottime', PARAM_INT);
-        $mform->addRule('reboottime', get_string('maximumchars', '', 2), 'maxlength', 2, 'client');
-        $mform->addHelpButton('reboottime', 'reboottime', 'ejsapp');
-        $mform->disabledIf('reboottime', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $rem_lab_data) {
-            $mform->setDefault('reboottime', $rem_lab_data->reboottime);
-        } else {
-            $mform->setDefault('reboottime', 2);
-        }
-
-        $mform->setAdvanced('rem_lab');
+        $mform->setDefault('list_practices', $string_showable_experiences);
         // -------------------------------------------------------------------------------
         // Add standard elements, common to all modules
         $this->standard_coursemodule_elements();
@@ -438,16 +308,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
             }
         }
 
-        if ($data['is_rem_lab'] == 1 and $data['sarlab'] == 0) {
-            if (empty($data['ip_lab'])) {
-                $errors['ip_lab'] = get_string('ip_lab_required', 'ejsapp');
-            }
-            if (empty($data['port'])) {
-                $errors['port'] = get_string('port_required', 'ejsapp');
-            }
-        }
 
-        if ($data['is_rem_lab'] == 1 and $data['sarlab'] == 1) {
+        if ($data['is_rem_lab'] == 1) {
             if (empty($data['practiceintro'])) {
                 $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
             }

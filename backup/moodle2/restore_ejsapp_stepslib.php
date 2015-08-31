@@ -42,16 +42,12 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     {
         $paths = array();
         $paths[] = new restore_path_element('ejsapp', '/activity/ejsapp');
-        $paths[] = new restore_path_element('ejsapp_expsyst2pract', '/activity/ejsapp/ejsapp_expsyst2practs/ejsapp_expsyst2pract');
         $paths[] = new restore_path_element('ejsapp_personal_vars', '/activity/ejsapp/ejsapp_personal_vars/personal_vars');
-        $paths[] = new restore_path_element('ejsapp_remlab_conf', '/activity/ejsapp/ejsapp_remlab_conf');
 
         $userinfo = $this->get_setting_value('userinfo');
         if ($userinfo){
             $paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');
-            $paths[] = new restore_path_element('ejsapp_sarlab_keys', '/activity/ejsapp/ejsapp_sarlab_keys');
             $paths[] = new restore_path_element('ejsappbooking_usersaccess', '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
-            $paths[] = new restore_path_element('ejsappbooking_remlab_access', '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
         }
 
         // Return the paths wrapped into standard activity structure
@@ -135,22 +131,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     }//process_ejsapp
 
     /**
-     * Process table ejsapp_expsyst2pract
-     * @param stdClass $data
-     */
-    protected function process_ejsapp_expsyst2pract($data)
-    {
-        global $DB;
-
-        $data = (object)$data;
-
-        $data->ejsappid = $this->get_new_parentid('ejsapp');
-
-        // insert the ejsapp record
-        $DB->insert_record('ejsapp_expsyst2pract', $data);
-    }//process_ejsapp_expsyst2pract
-
-    /**
      * Process table ejsapp_personal_vars
      * @param stdClass $data
      */
@@ -167,23 +147,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     }//process_ejsapp_personal_vars
 
     /**
-     * Process table ejsapp_remlab_conf
-     * @param stdClass $data
-     */
-    protected function process_ejsapp_remlab_conf($data)
-    {
-        global $DB;
-
-        $data = (object)$data;
-
-        $data->ejsappid = $this->get_new_parentid('ejsapp');
-
-        // insert the ejsapp record
-        $DB->insert_record('ejsapp_remlab_conf', $data);
-    }//process_ejsapp_remlab_conf
-
-    /**
-     * Process table ejsapp_remlab_conf
+     * Process table ejsapp_log
      * @param stdClass $data
      */
     protected function process_ejsapp_log($data)
@@ -197,22 +161,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         // insert the ejsapp record
         $DB->insert_record('ejsapp_log', $data);
     }//process_ejsapp_log
-
-    /**
-     * Process table ejsapp_remlab_conf
-     * @param stdClass $data
-     */
-    protected function process_ejsapp_sarlab_keys($data)
-    {
-        global $DB;
-
-        $data = (object)$data;
-
-        $data->ejsappid = $this->get_new_parentid('ejsapp_sarlab_keys');
-
-        // insert the ejsapp record
-        $DB->insert_record('ejsapp_sarlab_keys', $data);
-    }//process_ejsapp_sarlab_keys
 
     /**
      * Process table ejsappbooking

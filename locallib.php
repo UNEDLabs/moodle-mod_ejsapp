@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  *
- * Updates the ejsapp, ejsapp_personal_vars, and files tables according to the .jar/.zip information
+ * Updates the ejsapp, ejsapp_personal_vars, tables and files according to the .jar/.zip information
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param object $context context module
@@ -46,7 +46,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return boolean ejs_ok
  *
  */
-function update_ejsapp_and_files_tables($ejsapp, $context) {
+function update_ejsapp_files_and_tables($ejsapp, $context) {
     global $CFG, $DB;
 
     $maxbytes = get_max_upload_file_size($CFG->maxbytes);
@@ -114,17 +114,17 @@ function update_ejsapp_and_files_tables($ejsapp, $context) {
     // Create folders to store the .jar or .zip file
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
     if (!file_exists($path)) {
-        mkdir($path, 0700);
+        mkdir($path, 0770);
     }
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course;
     if (!file_exists($path)) {
-        mkdir($path, 0700);
+        mkdir($path, 0770);
     }
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     if (file_exists($path)) { // updating, not creating, the ejsapp activity
         delete_recursively($path);
     }
-    mkdir($path, 0700);
+    mkdir($path, 0770);
 
     // Copy the jar/zip file to its destination folder in jarfiles
     $filepath = $path . $file_record->filename;
@@ -239,7 +239,7 @@ function delete_recursively($dir) {
  *
  * @param string $username
  * @param array $list_sarlab_IPs
- * @return array $listExperiences
+ * @return string $listExperiences
  *
  */
 function get_experiences_sarlab($username, $list_sarlab_IPs) {
@@ -259,9 +259,9 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
                     if ($dom->load($URI)) {
                         $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
                         foreach ($experiences as $experience) {
-                            $owneUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
-                            foreach ($owneUsers as $owneUser) {
-                                if ($username == $owneUser->nodeValue || $username == 'admin') { //Check whether the required user has access to the experience
+                            $ownerUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
+                            foreach ($ownerUsers as $ownerUser) {
+                                if ($username == $ownerUser->nodeValue || is_siteadmin()) { //Check whether the required user has access to the experience
                                     $idExperiences = $experience->getElementsByTagName('idExperience');
                                     foreach ($idExperiences as $idExperience) {
                                         $listExperiences .= $idExperience->nodeValue . ';'; //Add the experience to the user's list of accessible experiences
@@ -281,6 +281,49 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
 
     return $listExperiences;
 } //get_experiences_sarlab
+
+
+/**
+ *
+ * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
+ *
+ * @param array $list_sarlab_experiences
+ * @return array $list_combined_experiences
+ *
+ */
+function combine_experiences($list_sarlab_experiences) {
+    global $DB;
+    $list_remlab_experiences_without_sarlab = $DB->get_records('remlab_manager_conf', array('usingsarlab' => '0'));
+    $list_combined_experiences = array();
+    if ($list_sarlab_experiences[0] != '') $list_combined_experiences = $list_sarlab_experiences;
+    foreach ($list_remlab_experiences_without_sarlab as $remlab_experiences_without_sarlab) {
+        $list_combined_experiences[] = $remlab_experiences_without_sarlab->practiceintro;
+    }
+    //Order the list alphabetically
+    sort($list_combined_experiences);
+
+    return $list_combined_experiences;
+} //get_showable_experiences
+
+
+/**
+ *
+ * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
+ *
+ * @return array $list_showable_experiences
+ *
+ */
+function get_showable_experiences() {
+    global $CFG, $USER;
+    $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+    //Get experiences from Sarlab
+    $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
+    $list_sarlab_experiences = explode(";", $listExperiences);
+    //Also get experiences NOT in Sarlab and add them to the list
+    $list_showable_experiences = combine_experiences($list_sarlab_experiences);
+
+    return $list_showable_experiences;
+}
 
 
 /**
@@ -571,35 +614,50 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
             fclose($file);
         }
 
-        // Change content of the html/js file to make them work
-        if (file_exists($folderpath . $ejsapp->applet_name)) {
-            $code = file_get_contents($folderpath . $ejsapp->applet_name);
-            //<get the whole code from </title> (not included) onwards>
-            $code = explode('</title>', $code);
-            $code = '<div id="EJsS">' . $code[1];
-            //</get the whole code from </title> (not included) onwards>
-            //<$code1 is $code till </head> (not included) and with the missing standard part>
-            $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
-            //</$code1 is $code till </head> (not included) and with the missing standard part>
-            //<$code2 is $code from </head> to </body> tags, none of them included>
-            $code2 = substr($code, strpos($code, '</head>'));
-            $code2 = explode('</body>', $code2);
-            $code2 = $code2[0] . '</div>';
-            //</$code2 is $code from </head> to </body> tags, none of them included>
-            if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
-                $code2 = substr($code2, strpos($code2, '<script type'));
-                $code = $code1 . $code2;
-                $code = update_links($codebase, $ejsapp, $code, 'old', false);
-            } else { //New EJS version with an external .js file for the Javascript
-                $exploded_file_name = explode(".", $ejsapp->applet_name);
-                $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
-                $code = $code1 . $code2;
-                $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
-                $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
+        // Languages
+        $pattern = '/available-languages\s*:\s*(.+)\s*/';
+        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
+        $sub_str = $matches[1][0];
+        $languages = explode(',', $sub_str);
 
-                file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
+        // Change content of the html/js file to make them work
+        foreach ($languages as $language) {
+            if ($language == '') $filepath = $folderpath . $ejsapp->applet_name;
+            else {
+                $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
+                $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
+                $filepath = $folderpath . $filename . '_' . $language . '.' . $extension;
             }
-            file_put_contents($folderpath . $ejsapp->applet_name, $code);
+            if (file_exists($filepath)) {
+                $code = file_get_contents($filepath);
+                //<get the whole code from </title> (not included) onwards>
+                $code = explode('</title>', $code);
+                $code = '<div id="EJsS">' . $code[1];
+                //</get the whole code from </title> (not included) onwards>
+                //<$code1 is $code till </head> (not included) and with the missing standard part>
+                $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
+                //</$code1 is $code till </head> (not included) and with the missing standard part>
+                //<$code2 is $code from </head> to </body> tags, none of them included>
+                $code2 = substr($code, strpos($code, '</head>'));
+                $code2 = explode('</body>', $code2);
+                $code2 = $code2[0] . '</div>';
+                //</$code2 is $code from </head> to </body> tags, none of them included>
+                if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
+                    $code2 = substr($code2, strpos($code2, '<script type'));
+                    $code = $code1 . $code2;
+                    $code = update_links($codebase, $ejsapp, $code, 'old', false);
+                } else { //New EJS version with an external .js file for the Javascript
+                    $exploded_file_name = explode(".", $ejsapp->applet_name);
+                    if (file_exists($folderpath . $exploded_file_name[0] . '.js')) {
+                        $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
+                        $code = $code1 . $code2;
+                        $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
+                        $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
+                        file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
+                    }
+                }
+                file_put_contents($filepath, $code);
+            }
         }
     }
 
@@ -688,75 +746,129 @@ function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
 
 /**
  *
- * Creates the record for the ejsapp_rem_lab table
+ * Creates a default record for the remlab_manager_conf table
  *
  * @param stdClass $ejsapp
- * @return stdClass $ejsapp_rem_lab
+ * @return stdClass $default_rem_lab_conf
  *
  */
-function ejsapp_rem_lab_conf($ejsapp) {
-    global $CFG;
+function default_rem_lab_conf($ejsapp) {
+    global $USER, $CFG;
 
-    $ejsapp_rem_lab = new stdClass();
-    $ejsapp_rem_lab->ejsappid = $ejsapp->id;
-    $ejsapp_rem_lab->usingsarlab = $ejsapp->sarlab;
-    $ejsapp_rem_lab->active = $ejsapp->active;
-    if ($ejsapp_rem_lab->usingsarlab == 1) {
-        $sarlabinstance = $ejsapp->sarlab_instance;
-        $ejsapp_rem_lab->sarlabinstance = $sarlabinstance;
-        $ejsapp_rem_lab->sarlabcollab = $ejsapp->sarlab_collab;
+    $default_rem_lab_conf = new stdClass();
+    //Get experiences from Sarlab and check whether this practice is is a Sarlab server or not
+    $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+    $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
+    $list_sarlab_experiences = explode(";", $listExperiences);
+    $default_rem_lab_conf->practiceintro = $ejsapp->practiceintro;
+    $default_rem_lab_conf->usingsarlab = 0;
+    if(in_array($ejsapp->practiceintro, $list_sarlab_experiences)) $default_rem_lab_conf->usingsarlab = 1;
+    $default_rem_lab_conf->active = 1;
+    if ($default_rem_lab_conf->usingsarlab == 1) {
+        $sarlabinstance = 0; //TODO
+        $default_rem_lab_conf->sarlabinstance = $sarlabinstance;
+        $default_rem_lab_conf->sarlabcollab = 0;
         $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
         $list_sarlab_ports = explode(";", $CFG->sarlab_port);
         $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)], "'");
         if ($init_char != 0) $init_char++;
         $ip = substr($list_sarlab_IPs[intval($sarlabinstance)], $init_char);
-        $ejsapp_rem_lab->ip = $ip;
-        $ejsapp_rem_lab->port = $list_sarlab_ports[intval($sarlabinstance)];
+        $default_rem_lab_conf->ip = $ip;
+        $default_rem_lab_conf->port = $list_sarlab_ports[intval($sarlabinstance)];
     } else {
-        $ejsapp_rem_lab->sarlabinstance = '0';
-        $ejsapp_rem_lab->sarlabcollab = '0';
-        $ejsapp_rem_lab->ip = $ejsapp->ip_lab;
-        $ejsapp_rem_lab->port = $ejsapp->port;
+        $default_rem_lab_conf->sarlabinstance = 0;
+        $default_rem_lab_conf->sarlabcollab = 0;
+        $default_rem_lab_conf->ip = '127.0.0.1';
+        $default_rem_lab_conf->port = 443;
     }
-    $ejsapp_rem_lab->slotsduration = $ejsapp->slotsduration;
-    $ejsapp_rem_lab->totalslots = $ejsapp->totalslots;
-    $ejsapp_rem_lab->weeklyslots = $ejsapp->weeklyslots;
-    $ejsapp_rem_lab->dailyslots = $ejsapp->dailyslots;
-    $ejsapp_rem_lab->reboottime = $ejsapp->reboottime;
+    $default_rem_lab_conf->slotsduration = 60;
+    $default_rem_lab_conf->totalslots = 18;
+    $default_rem_lab_conf->weeklyslots = 9;
+    $default_rem_lab_conf->dailyslots = 3;
+    $default_rem_lab_conf->reboottime = 2;
 
-    return $ejsapp_rem_lab;
+    return $default_rem_lab_conf;
 } // ejsapp_rem_lab_conf
 
 
 /**
  *
- * Creates the record for the ejsapp_expsyst2pract table
+ * Creates the record for the remlab_manager_expsyst2pract table
+ *
+ * @param stdClass $ejsapp
+ * @param stdClass $remlab_info
+ * @return void
+ *
+ */
+function ejsapp_expsyst2pract($ejsapp, $remlab_info) {
+    global $DB;
+
+    $ejsapp_expsyst2pract = new stdClass();
+    $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+    $expsyst2pract_list = $ejsapp->list_practices;
+    $expsyst2pract_list = explode(';', $expsyst2pract_list);
+    $selected_practices = $ejsapp->practiceintro;
+    if ($remlab_info->usingsarlab == 1) {
+        for ($i = 0; $i < count($selected_practices); $i++) {
+            $ejsapp_expsyst2pract->practiceid = $i + 1;
+            $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
+            $DB->insert_record('remlab_manager_expsyst2pract', $ejsapp_expsyst2pract);
+        }
+    } else {
+        $ejsapp_expsyst2pract->practiceid = 1;
+        $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[0]];
+        $DB->insert_record('remlab_manager_expsyst2pract', $ejsapp_expsyst2pract);
+    }
+
+} // remlab_manager_expsyst2pract
+
+
+/**
+ *
+ * Updates the ejsappbooking_usersaccess table
  *
  * @param stdClass $ejsapp
  * @return void
  *
  */
-function ejsapp_expsyst2pract($ejsapp) {
+function update_booking_table($ejsapp) {
     global $DB;
 
-    $ejsapp_expsyst2pract = new stdClass();
-    $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
-    if ($ejsapp->sarlab == 1) {
-        $expsyst2pract_list = $ejsapp->list_practices;
-        $expsyst2pract_list = explode(";", $expsyst2pract_list);
-        $selected_practices = $ejsapp->practiceintro;
-        for ($i = 0; $i < count($selected_practices); $i++) {
-            $ejsapp_expsyst2pract->practiceid = $i + 1;
-            $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
-            $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
+    function update_or_insert_record($ejsappbookingid, $ejsappbooking_usersaccess, $ejsappid) {
+        global $DB;
+        if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbookingid, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsappid))) {
+            $DB->insert_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
+        } else {
+            $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid'=>$ejsappbookingid, 'userid'=>$ejsappbooking_usersaccess->userid, 'ejsappid'=>$ejsappid));
+            $ejsappbooking_usersaccess->id = $record->id;
+            $DB->update_record('ejsappbooking_usersaccess', $ejsappbooking_usersaccess);
         }
-    } else {
-        $ejsapp_expsyst2pract->practiceid = 1;
-        $ejsapp_expsyst2pract->practiceintro = $ejsapp->name;
-        $DB->insert_record('ejsapp_expsyst2pract', $ejsapp_expsyst2pract);
     }
 
-} // ejsapp_expsyst2pract
+    if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
+        $course_context = context_course::instance($ejsapp->course);
+        $users = get_enrolled_users($course_context);
+        $ejsappbooking = $DB->get_record('ejsappbooking', array('course'=>$ejsapp->course));
+        //ejsappbooking_usersaccess table:
+        $ejsappbooking_usersaccess = new stdClass();
+        $ejsappbooking_usersaccess->bookingid = $ejsappbooking->id;
+        $ejsappbooking_usersaccess->ejsappid = $ejsapp->id;
+        //Grant remote access to admin user:
+        $ejsappbooking_usersaccess->userid = 2;
+        $ejsappbooking_usersaccess->allowremaccess = 1;
+        update_or_insert_record($ejsappbooking->id, $ejsappbooking_usersaccess, $ejsapp->id);
+        //Consider other enrolled users:
+        foreach ($users as $user) {
+            $ejsappbooking_usersaccess->userid = $user->id;
+            if (!has_capability('mod/ejsapp:addinstance', $course_context, $user->id, true)) {
+                $ejsappbooking_usersaccess->allowremaccess = 0;
+            } else {
+                $ejsappbooking_usersaccess->allowremaccess = 1;
+            }
+            update_or_insert_record($ejsappbooking->id, $ejsappbooking_usersaccess, $ejsapp->id);
+        }
+    }
+}
 
 
 /**
@@ -804,7 +916,7 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $l
         $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1));
         foreach ($bookings as $booking) { // If the user has an active booking, use that info
             if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
-                $expsyst2pract = $DB->get_record('ejsapp_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
+                $expsyst2pract = $DB->get_record('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;
                 $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $practice, $labmanager, $max_use_time);
                 break;
@@ -890,31 +1002,29 @@ function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsdurat
     $time_last_access = 0;
     $occupied_ejsapp_max_use_time = 3600;
     foreach($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
-        if (isset($repeated_ejsapp_lab->ejsappid)) {
-            $repeated_ejsapp = $DB->get_record('ejsapp', array('id'=>$repeated_ejsapp_lab->ejsappid));
-            if (isset($repeated_ejsapp->name)) {
-                // Retrieve information from ejsapp's logging table
-                $working_log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'working'));
-                $viewed_log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp->name, 'action'=>'viewed'));
-                $user_occupying_lab_id = $USER->id;
-                foreach ($working_log_records as $working_log_record) {
-                    if ($working_log_record->userid != $USER->id) {
-                        if ($working_log_record->time > $time_last_access) {
-                            $time_last_access = $working_log_record->time;
-                            $user_occupying_lab_id = $working_log_record->userid;
-                        }
+        if (isset($repeated_ejsapp_lab->name)) {
+            // Retrieve information from ejsapp's logging table
+            $working_log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp_lab->name, 'action'=>'working'));
+            $viewed_log_records = $DB->get_records('ejsapp_log', array('info'=>$repeated_ejsapp_lab->name, 'action'=>'viewed'));
+            $user_occupying_lab_id = $USER->id;
+            foreach ($working_log_records as $working_log_record) {
+                if ($working_log_record->userid != $USER->id) {
+                    if ($working_log_record->time > $time_last_access) {
+                        $time_last_access = $working_log_record->time;
+                        $user_occupying_lab_id = $working_log_record->userid;
                     }
                 }
-                foreach ($viewed_log_records as $viewed_log_record) {
-                    if ($viewed_log_record->userid != $USER->id) {
-                        if ($viewed_log_record->userid == $user_occupying_lab_id) { // accesses of the user that is currently working with the rem lab
-                            $occupied_ejsapp_slotsduration_conf = $DB->get_field('ejsapp_remlab_conf', 'slotsduration', array('ejsappid' => $repeated_ejsapp->id));
-                            if ($occupied_ejsapp_slotsduration_conf > 4) $occupied_ejsapp_slotsduration_conf = 0;
-                            $occupied_ejsapp_maxslots = $DB->get_field('ejsapp_remlab_conf', 'dailyslots', array('ejsappid' => $repeated_ejsapp->id));
-                            $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
-                            if ($viewed_log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
-                                $time_first_access = max($time_first_access, $viewed_log_record->time); // TODO: Change to min when we stop resetting time when a user connected to a remote lab refreshes the page
-                            }
+            }
+            $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $repeated_ejsapp_lab->id));
+            foreach ($viewed_log_records as $viewed_log_record) {
+                if ($viewed_log_record->userid != $USER->id) {
+                    if ($viewed_log_record->userid == $user_occupying_lab_id) { // accesses of the user that is currently working with the rem lab
+                        $occupied_ejsapp_slotsduration_conf = $DB->get_field('remlab_manager_conf', 'slotsduration', array('practiceintro' => $practiceintro));
+                        if ($occupied_ejsapp_slotsduration_conf > 4) $occupied_ejsapp_slotsduration_conf = 0;
+                        $occupied_ejsapp_maxslots = $DB->get_field('remlab_manager_conf', 'dailyslots', array('practiceintro' => $practiceintro));
+                        $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
+                        if ($viewed_log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
+                            $time_first_access = max($time_first_access, $viewed_log_record->time); // TODO: Change to min when we stop resetting time when a user connected to a remote lab refreshes the page
                         }
                     }
                 }
@@ -992,34 +1102,18 @@ function get_remaining_time($booking_info, $status, $time_information, $idle_tim
  * Checks whether a particular remote lab is also present in other courses or not and gives the list of repeated labs.
  *
  * @param stdClass $remlab_conf
- * @param stdClass $ejsapp
  * @return array $repeated_ejsapp_labs
  *
  */
-function get_repeated_remlabs($remlab_conf, $ejsapp) {
+function get_repeated_remlabs($remlab_conf) {
     global $DB;
 
-    if ($remlab_conf->usingsarlab == 0) {
-        $ejsapp_lab_ip = $DB->get_field('ejsapp_remlab_conf', 'ip', array('ejsappid'=>$ejsapp->id));
-        $ejsapp_lab_port = $DB->get_field('ejsapp_remlab_conf', 'port', array('ejsappid'=>$ejsapp->id));
-        $repeated_ejsapp_labs = $DB->get_records('ejsapp_remlab_conf', array('ip'=>$ejsapp_lab_ip, 'port'=>$ejsapp_lab_port));
-    } else {
-        $ejsapp_lab_conf = $DB->get_field('ejsapp_expsyst2pract', 'practiceintro', array('ejsappid'=>$ejsapp->id));
-        $repeated_practices = $DB->get_records('ejsapp_expsyst2pract', array('practiceintro'=>$ejsapp_lab_conf));
-        $ejsappids = array();
-        foreach ($repeated_practices as $repeated_practice) {
-            array_push($ejsappids, $repeated_practice->ejsappid);
-        }
-        $repeated_practices = $DB->get_records_list('ejsapp_remlab_conf', 'ejsappid', $ejsappids);
-        //Previous queries may identify two different remote labs in two different SARLAB systems as only one, so we need to do something more:
-        $sarlab_instance = $DB->get_field('ejsapp_remlab_conf', 'sarlabinstance', array('ejsappid'=>$ejsapp->id));
-        $repeated_ejsapp_labs = array();
-        foreach ($repeated_practices as $repeated_practice) { //check whether the remote lab is in the same SARLAB instance or not
-            if ($repeated_practice->usingsarlab == 1 && $repeated_practice->sarlabinstance == $sarlab_instance){
-                array_push($repeated_ejsapp_labs, $repeated_practice);
-            }
-        }
+    $repeated_practices = $DB->get_records('remlab_manager_expsyst2pract', array('practiceintro'=>$remlab_conf->practiceintro));
+    $ejsappids = array();
+    foreach ($repeated_practices as $repeated_practice) {
+        array_push($ejsappids, $repeated_practice->ejsappid);
     }
+    $repeated_ejsapp_labs = $DB->get_records_list('ejsapp', 'id', $ejsappids);
 
     return $repeated_ejsapp_labs;
 }
@@ -1034,13 +1128,10 @@ function get_repeated_remlabs($remlab_conf, $ejsapp) {
  *
  */
 function get_repeated_remlabs_with_bs($repeated_ejsapp_labs) {
-    global $DB;
 
     $repeated_ejsapp_labs_with_bs = array();
     foreach ($repeated_ejsapp_labs as $repeated_ejsapp_lab) {
-        $ejsappid = $DB->get_field('ejsapp_remlab_conf', 'ejsappid', array('id'=>$repeated_ejsapp_lab->id));
-        $ejsapp = $DB->get_record('ejsapp', array('id'=>$ejsappid));
-        if (check_booking_system($ejsapp)) array_push($repeated_ejsapp_labs_with_bs, $ejsapp);
+        if (check_booking_system($repeated_ejsapp_lab)) array_push($repeated_ejsapp_labs_with_bs, $repeated_ejsapp_lab);
     }
 
     return $repeated_ejsapp_labs_with_bs;

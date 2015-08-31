@@ -138,7 +138,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $min = date("i", $time);
         $seg = date("s", $time);
         $time = mktime($hour, $min, $seg, $month, $day, $year);
-        $DB->delete_records('ejsapp_sarlab_keys', array('user' => $USER->username)); //WARNING: This also deletes keys for collab sessions with Sarlab!!
+        $DB->delete_records('remlab_manager_sarlab_keys', array('user' => $USER->username)); //WARNING: This also deletes keys for collab sessions with Sarlab!!
         mt_srand(time());
         $random = mt_rand(0, 1000000);
         if ($sarlabinfo) $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $sarlabinfo->practice . fullname($USER) . $USER->username . $random);
@@ -150,7 +150,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $new_sarlab_key->labmanager = $sarlabinfo->labmanager;
         $new_sarlab_key->creationtime = $time;
 
-        $DB->insert_record('ejsapp_sarlab_keys', $new_sarlab_key);
+        $DB->insert_record('remlab_manager_sarlab_keys', $new_sarlab_key);
 
         if ($sarlabinfo) {
             $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
@@ -169,12 +169,19 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
     }
 
     $context = context_user::instance($USER->id);
+    $language = current_language();
 
     if ($ejsapp->class_file == '') { //EJS Javascript
 
         if (count(explode('/', $CFG->wwwroot)) <= 3) $path = $CFG->wwwroot . $ejsapp->codebase;
         else $path = substr($CFG->wwwroot, 0, strrpos( $CFG->wwwroot, '/') ) . $ejsapp->codebase;
-        $code = file_get_contents($path . $ejsapp->applet_name);
+
+        $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
+        $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
+
+        $file_headers = @get_headers($path . $filename . '_' . $language . '.' . $extension);
+        if ($file_headers[0] == 'HTTP/1.1 404 Not Found') $code = file_get_contents($path . $ejsapp->applet_name);
+        else $code = file_get_contents($path . $filename . '_' . $language . '.' . $extension);
 
         // Pass the needed parameters to the javascript application
         $search = "}, false);";
@@ -269,7 +276,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         $code .= "document.write('<applet code=\"{$class_file}\"');";
 
-        $language = current_language();
         $username = fullname($USER); //For collab
 
         $permissions = 'sandbox';
