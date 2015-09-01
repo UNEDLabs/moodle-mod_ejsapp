@@ -903,13 +903,13 @@ function check_booking_system($ejsapp) {
  * @param object $USER
  * @param stdClass $ejsapp
  * @param string $currenttime
- * @param stdClass $remlab_conf
+ * @param int $sarlabinstance
  * @param int $labmanager
  * param int $max_use_time
  * @return stdClass $sarlabinfo
  *
  */
-function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $labmanager, $max_use_time) {
+function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance, $labmanager, $max_use_time) {
     $sarlabinfo = null;
 
     if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1))) {
@@ -918,7 +918,7 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $remlab_conf, $l
             if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
                 $expsyst2pract = $DB->get_record('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;
-                $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $practice, $labmanager, $max_use_time);
+                $sarlabinfo = define_sarlab($sarlabinstance, 0, $practice, $labmanager, $max_use_time);
                 break;
             }
         }

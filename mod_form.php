@@ -192,24 +192,21 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');
 
         $list_showable_experiences = get_showable_experiences();
-        $select_practice = $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_showable_experiences);
+        $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_showable_experiences);
         $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
         $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('practiceintro', 'sarlab', 'eq', 0);
-        $select_practice->setMultiple(true);
         if ($this->current->instance) {
-            $practices_data = $DB->get_records('remlab_manager_expsyst2pract', array('ejsappid' => $this->current->instance));
-            if ($practices_data) {
-                $selected_practice_index = array();
-                foreach ($practices_data as $practice_data) {
-                    $i = 0;
-                    foreach ($list_showable_experiences as $sarlab_experience) {
-                        if ($practice_data->practiceintro == $sarlab_experience) {
-                            array_push($selected_practice_index, $i);
-                            break;
-                        }
-                        $i++;
+            $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $this->current->instance));
+            if ($practiceintro) {
+                $i = 0;
+                $selected_practice_index = $i;
+                foreach ($list_showable_experiences as $sarlab_experience) {
+                    if ($practiceintro == $sarlab_experience) {
+                        $selected_practice_index = $i;
+                        break;
                     }
+                    $i++;
                 }
                 $mform->setDefault('practiceintro', $selected_practice_index);
             }

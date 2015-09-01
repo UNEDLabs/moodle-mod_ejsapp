@@ -128,8 +128,8 @@ $string['rem_lab_conf'] = 'Remote lab configuration';
 $string['is_rem_lab'] = 'Remote experimental system?';
 $string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources AND you want the EJSApp Booking System to manage their access, select "yes". Otherwise, select "no".';
 
-$string['practiceintro'] = 'Practice identifier(s)';
-$string['practiceintro_help'] = 'The identifier of the practice(s) you want to use with this experimental system.';
+$string['practiceintro'] = 'Practice identifier';
+$string['practiceintro_help'] = 'The identifier of the practice you want to use with this experimental system.';
 $string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
 
 $string['file_error'] = "Can't open file from the server";

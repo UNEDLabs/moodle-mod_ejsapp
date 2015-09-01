@@ -127,8 +127,8 @@ $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 $string['is_rem_lab'] = 'Sistema experimental remoto?';
 $string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota Y quieres que el Sistema de Reservas EJSApp controle su acceso, selecciona "s&iacute;". En caso contrario, selecciona "no".';
 
-$string['practiceintro'] = 'Identificador(es) de pr&aacute;ctica';
-$string['practiceintro_help'] = 'El identificador de la(s) pr&aacute;ctica(s), que desea usar con este sistema experimental.';
+$string['practiceintro'] = 'Identificador de pr&aacute;ctica';
+$string['practiceintro_help'] = 'El identificador de la pr&aacute;ctica, que desea usar con este sistema experimental.';
 $string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
