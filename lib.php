@@ -165,7 +165,6 @@ function ejsapp_update_instance($ejsapp, $mform=null)
 
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
-    $ejsapp->practiceintro = $ejsapp->practiceintro[0]; //TODO: Several experiences
 
     if ($mform) {
         $ejsapp->appwording = $ejsapp->ejsappwording['text'];
