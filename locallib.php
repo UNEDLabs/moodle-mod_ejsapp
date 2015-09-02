@@ -805,21 +805,11 @@ function ejsapp_expsyst2pract($ejsapp, $remlab_info) {
 
     $ejsapp_expsyst2pract = new stdClass();
     $ejsapp_expsyst2pract->ejsappid = $ejsapp->id;
+    $ejsapp_expsyst2pract->practiceid = 1;
     $expsyst2pract_list = $ejsapp->list_practices;
     $expsyst2pract_list = explode(';', $expsyst2pract_list);
-    $selected_practices = $ejsapp->practiceintro;
-    if ($remlab_info->usingsarlab == 1) {
-        for ($i = 0; $i < count($selected_practices); $i++) {
-            $ejsapp_expsyst2pract->practiceid = $i + 1;
-            $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[$i]];
-            $DB->insert_record('remlab_manager_expsyst2pract', $ejsapp_expsyst2pract);
-        }
-    } else {
-        $ejsapp_expsyst2pract->practiceid = 1;
-        $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$selected_practices[0]];
-        $DB->insert_record('remlab_manager_expsyst2pract', $ejsapp_expsyst2pract);
-    }
-
+    $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$ejsapp->practiceintro];
+    $DB->insert_record('remlab_manager_expsyst2pract', $ejsapp_expsyst2pract);
 } // remlab_manager_expsyst2pract
 
 
