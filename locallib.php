@@ -796,11 +796,10 @@ function default_rem_lab_conf($ejsapp) {
  * Creates the record for the remlab_manager_expsyst2pract table
  *
  * @param stdClass $ejsapp
- * @param stdClass $remlab_info
  * @return void
  *
  */
-function ejsapp_expsyst2pract($ejsapp, $remlab_info) {
+function ejsapp_expsyst2pract($ejsapp) {
     global $DB;
 
     $ejsapp_expsyst2pract = new stdClass();

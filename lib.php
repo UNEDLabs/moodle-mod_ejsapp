@@ -46,8 +46,7 @@ require_once('locallib.php');
  * @return boolean true if EJSApp supports the feature, false elsewhere
  *
  */
-function ejsapp_supports($feature)
-{
+function ejsapp_supports($feature) {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -113,8 +112,7 @@ function ejsapp_get_post_actions() {
  *
  */
 
-function ejsapp_add_instance($ejsapp, $mform = null)
-{
+function ejsapp_add_instance($ejsapp, $mform = null) {
     global $DB;
 
     $ejsapp->timecreated = time();
@@ -127,18 +125,16 @@ function ejsapp_add_instance($ejsapp, $mform = null)
 
     $cmid = $ejsapp->coursemodule;
     $context = context_module::instance($cmid);
-    $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context, $context->id);
+    $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
 
     if ($ejs_ok) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            if (is_array($ejsapp->practiceintro)) $practices = $ejsapp->practiceintro;
-            else $practices = array($ejsapp->practiceintro);
-            foreach($practices as $practiceintro) {
-                $ejsapp->practiceintro = $practiceintro;
+            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp->practiceintro));
+            if ($remlab_info == null) {
                 $remlab_info = default_rem_lab_conf($ejsapp);
                 $DB->insert_record('remlab_manager_conf', $remlab_info);
-                ejsapp_expsyst2pract($ejsapp, $remlab_info);
             }
+            ejsapp_expsyst2pract($ejsapp);
             update_booking_table($ejsapp);
         }
     } else {
@@ -159,8 +155,7 @@ function ejsapp_add_instance($ejsapp, $mform = null)
  * @return boolean Success/Fail
  *
  */
-function ejsapp_update_instance($ejsapp, $mform=null)
-{
+function ejsapp_update_instance($ejsapp, $mform=null) {
     global $DB;
 
     $ejsapp->timemodified = time();
@@ -180,15 +175,13 @@ function ejsapp_update_instance($ejsapp, $mform=null)
     $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejs_ok) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            if (is_array($ejsapp->practiceintro)) $practices = $ejsapp->practiceintro;
-            else $practices = array($ejsapp->practiceintro);
-            foreach($practices as $practiceintro) {
-                $ejsapp->practiceintro = $practiceintro;
-                $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp->practiceintro));
-                if ($remlab_info == null) $remlab_info = default_rem_lab_conf($ejsapp);
-                $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
-                ejsapp_expsyst2pract($ejsapp, $remlab_info);
+            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp->practiceintro));
+            if ($remlab_info == null) {
+                $remlab_info = default_rem_lab_conf($ejsapp);
+                $DB->insert_record('remlab_manager_conf', $remlab_info);
             }
+            $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
+            ejsapp_expsyst2pract($ejsapp);
             update_booking_table($ejsapp);
         } else {
             $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
@@ -214,8 +207,7 @@ function ejsapp_update_instance($ejsapp, $mform=null)
  * @return boolean Success/Failure
  *
  */
-function ejsapp_delete_instance($id)
-{
+function ejsapp_delete_instance($id) {
     global $DB, $CFG;
     require_once($CFG->libdir . '/filelib.php');
 
@@ -269,8 +261,7 @@ function ejsapp_delete_instance($id)
  * $return->info = a short text description
  *
  */
-function ejsapp_user_outline($course, $user, $mod, $ejsapp)
-{
+function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
     global $DB;
 
     if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
@@ -301,8 +292,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp)
  * @return boolean
  *
  */
-function ejsapp_user_complete($course, $user, $mod, $ejsapp)
-{
+function ejsapp_user_complete($course, $user, $mod, $ejsapp) {
     global $DB;
 
     if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'ejsapp',
@@ -332,8 +322,7 @@ function ejsapp_user_complete($course, $user, $mod, $ejsapp)
  * @return boolean false
  *
  */
-function ejsapp_print_recent_activity($course, $viewfullnames, $timestart)
-{
+function ejsapp_print_recent_activity($course, $viewfullnames, $timestart) {
     return false; //  True if anything was printed, otherwise false
 }
 
@@ -355,8 +344,7 @@ function ejsapp_print_recent_activity($course, $viewfullnames, $timestart)
  * @return void adds items into $activities and increases $index
  *
  */
-function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0)
-{
+function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
 }
 
 /**
@@ -371,8 +359,7 @@ function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
  * @return void
  *
  */
-function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames)
-{
+function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
 }
 
 /**
@@ -384,8 +371,7 @@ function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnam
  * @return boolean
  *
  **/
-function ejsapp_cron()
-{
+function ejsapp_cron() {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/filter/multilang/filter.php');
 
@@ -399,12 +385,12 @@ function ejsapp_cron()
     //Checking whether remote labs are operative or not:
     $ejsapp_remlabs_conf = $DB->get_records('remlab_manager_conf');
     foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
-        $idExp = null;
+        $practiceintro= null;
         if ($ejsapp_remlab_conf->usingsarlab) {
-            $idExp = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
+            $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
         }
         $devices_info = new stdClass();
-        $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $idExp);
+        $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $practiceintro);
         // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive:
         $rem_lab = $DB->get_record('ejsapp', array('id' => $ejsapp_remlab_conf->ejsappid));
         $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
@@ -461,8 +447,7 @@ function ejsapp_cron()
  * @return array
  *
  */
-function ejsapp_get_extra_capabilities()
-{
+function ejsapp_get_extra_capabilities() {
     return array('moodle/role:assign', 'moodle/site:accessallgroups', 'moodle/course:viewhiddenuserfields',
                  'moodle/site:viewparticipants', 'moodle/course:managegroups', 'moodle/course:enrolreview',
                  'moodle/user:viewdetails');
@@ -480,8 +465,7 @@ function ejsapp_get_extra_capabilities()
  * @return boolean|array false if no participants, array of objects otherwise
  *
  */
-function ejsapp_get_participants($ejsappid)
-{
+function ejsapp_get_participants($ejsappid) {
     return false;
 }
 
@@ -558,8 +542,7 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
  * @return array of [(string)filearea] => (string)description
  *
  */
-function ejsapp_get_file_areas($course, $cm, $context)
-{
+function ejsapp_get_file_areas($course, $cm, $context) {
     return array('jarfiles' => 'Applets and Javascript files with the virtual or remote labs',
                  'xmlfile'  => 'Text files containing all the information to define the state of a lab',
                  'cntfiles' => 'Text files containing a code (typically, a controller)',
@@ -582,8 +565,7 @@ function ejsapp_get_file_areas($course, $cm, $context)
  * @return file_info instance or null if not found
  *
  */
-function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename)
-{
+function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     return null;
 }
 
@@ -601,8 +583,7 @@ function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $fileare
  * @return null
  *
  */
-function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, $options=null)
-{
+function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, $options=null) {
     global $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE && $context->contextlevel != CONTEXT_USER) {
