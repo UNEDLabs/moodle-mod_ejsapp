@@ -64,6 +64,10 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         $ejsapp_log = new backup_nested_element('ejsapp_log', array('id'),
             array('time', 'userid', 'action', 'info'));
 
+        // Remote labs configuration
+        $remlab_manager_exptsyst2pract = new backup_nested_element('remlab_manager_exptsyst2pract', array('id'),
+            array('ejsappid', 'practiceid', 'practiceintro'));
+
         // Booking
         $ejsappbooking = new backup_nested_element('ejsappbooking', array('id'),
             array('course', 'name', 'intro', 'introformat', 'timecreated', 'timemodified'));
@@ -79,15 +83,26 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // Build the tree
         $ejsapp->add_child($ejsapp_personal_vars);
         $ejsapp->add_child($ejsapp_log);
+        $ejsapp->add_child($remlab_manager_exptsyst2pract);
         $ejsapp->add_child($ejsappbooking);
-        $ejsapp->add_child($ejsappbooking_usersaccesses);
         $ejsapp->add_child($ejsappbooking_remlab_accesses);
+        $ejsapp->add_child($ejsappbooking_usersaccesses);
         $ejsappbooking_remlab_accesses->add_child($ejsappbooking_remlab_access);
         $ejsappbooking_usersaccesses->add_child($ejsappbooking_usersaccess);
 
         // Define sources
         $ejsapp->set_source_table('ejsapp', array('id' => backup::VAR_ACTIVITYID));
         $ejsapp_personal_vars->set_source_table('ejsapp_personal_vars', array('ejsappid'  => '../id'));
+
+        // Logging:
+        //if ($userinfo) $ejsapp_log->set_source_table('ejsapp_log', array('ejsappid'  => '../id'));
+
+        // Remote labs
+        $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
+        $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
+        if ($is_remlab_manager_installed) {
+            $remlab_manager_exptsyst2pract->set_source_table('remlab_manager_exptsyst2pract', array('ejsappid'  => '../../id'));
+        }
 
         // Booking
         $is_ejsappbooking_installed = $DB->get_records('modules',array('name'=>'ejsappbooking'));
@@ -96,10 +111,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             $ejsappbooking->set_source_table('ejsappbooking', array('course'  => '../course'));
             $ejsappbooking_usersaccess->set_source_table('ejsappbooking_usersaccess', array('ejsappid'  => '../../id'));
             $ejsappbooking_remlab_access->set_source_table('ejsappbooking_remlab_access', array('ejsappid'  => '../../id'));
-        }
-
-        // Define id annotations
-        if ($is_ejsappbooking_installed && $userinfo) {
+            // Define id annotations
             $ejsappbooking_usersaccess->annotate_ids('user', 'userid');
             $ejsappbooking_remlab_access->annotate_ids('user', 'username');
         }

@@ -305,13 +305,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
             }
         }
 
-
-        if ($data['is_rem_lab'] == 1) {
-            if (empty($data['practiceintro'])) {
-                $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
-            }
-        }
-
         if ($data['personalvars'] == 1) {
             if (empty($data['var_name'])) {
                 $errors['var_name[0]'] = get_string('vars_required', 'ejsapp');
