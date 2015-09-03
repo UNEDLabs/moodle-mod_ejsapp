@@ -297,7 +297,9 @@ function combine_experiences($list_sarlab_experiences) {
     $list_combined_experiences = array();
     if ($list_sarlab_experiences[0] != '') $list_combined_experiences = $list_sarlab_experiences;
     foreach ($list_remlab_experiences_without_sarlab as $remlab_experiences_without_sarlab) {
-        $list_combined_experiences[] = $remlab_experiences_without_sarlab->practiceintro;
+        if (!in_array($remlab_experiences_without_sarlab->practiceintro, $list_sarlab_experiences)) {
+            $list_combined_experiences[] = $remlab_experiences_without_sarlab->practiceintro;
+        }
     }
     //Order the list alphabetically
     sort($list_combined_experiences);
@@ -756,11 +758,12 @@ function default_rem_lab_conf($ejsapp) {
     global $USER, $CFG;
 
     $default_rem_lab_conf = new stdClass();
-    //Get experiences from Sarlab and check whether this practice is is a Sarlab server or not
+    //Get experiences from Sarlab and check whether this practice is in a Sarlab server or not
     $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
     $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
     $list_sarlab_experiences = explode(";", $listExperiences);
-    $default_rem_lab_conf->practiceintro = $ejsapp->practiceintro;
+    $complete_pract_list = explode(';', $ejsapp->list_practices);
+    $default_rem_lab_conf->practiceintro = $complete_pract_list[$ejsapp->practiceintro];
     $default_rem_lab_conf->usingsarlab = 0;
     if(in_array($ejsapp->practiceintro, $list_sarlab_experiences)) $default_rem_lab_conf->usingsarlab = 1;
     $default_rem_lab_conf->active = 1;

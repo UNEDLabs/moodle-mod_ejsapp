@@ -65,8 +65,8 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             array('time', 'userid', 'action', 'info'));
 
         // Remote labs configuration
-        $remlab_manager_exptsyst2pract = new backup_nested_element('remlab_manager_exptsyst2pract', array('id'),
-            array('ejsappid', 'practiceid', 'practiceintro'));
+        /*$remlab_manager_exptsyst2pract = new backup_nested_element('remlab_manager_exptsyst2pract',
+            array('id'), array('ejsappid', 'practiceid', 'practiceintro'));*/
 
         // Booking
         $ejsappbooking = new backup_nested_element('ejsappbooking', array('id'),
@@ -83,7 +83,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // Build the tree
         $ejsapp->add_child($ejsapp_personal_vars);
         $ejsapp->add_child($ejsapp_log);
-        $ejsapp->add_child($remlab_manager_exptsyst2pract);
+        //$ejsapp->add_child($remlab_manager_exptsyst2pract);
         $ejsapp->add_child($ejsappbooking);
         $ejsapp->add_child($ejsappbooking_remlab_accesses);
         $ejsapp->add_child($ejsappbooking_usersaccesses);
@@ -98,11 +98,11 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         //if ($userinfo) $ejsapp_log->set_source_table('ejsapp_log', array('ejsappid'  => '../id'));
 
         // Remote labs
-        $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
+        /*$is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
         $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
         if ($is_remlab_manager_installed) {
-            $remlab_manager_exptsyst2pract->set_source_table('remlab_manager_exptsyst2pract', array('ejsappid'  => '../../id'));
-        }
+            $remlab_manager_exptsyst2pract->set_source_table('remlab_manager_exptsyst2pract', array('ejsappid'  => '../id'));
+        }*/
 
         // Booking
         $is_ejsappbooking_installed = $DB->get_records('modules',array('name'=>'ejsappbooking'));

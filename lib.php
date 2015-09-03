@@ -129,7 +129,8 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
 
     if ($ejs_ok) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp->practiceintro));
+            $complete_pract_list = explode(';', $ejsapp->list_practices);
+            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
             if ($remlab_info == null) {
                 $remlab_info = default_rem_lab_conf($ejsapp);
                 $DB->insert_record('remlab_manager_conf', $remlab_info);
@@ -175,7 +176,8 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
     $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejs_ok) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp->practiceintro));
+            $complete_pract_list = explode(';', $ejsapp->list_practices);
+            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
             if ($remlab_info == null) {
                 $remlab_info = default_rem_lab_conf($ejsapp);
                 $DB->insert_record('remlab_manager_conf', $remlab_info);
@@ -225,7 +227,6 @@ function ejsapp_delete_instance($id) {
 
     $DB->delete_records('ejsapp', array('id' => $ejsapp->id));
     if ($ejsapp->is_rem_lab == 1) {
-        $DB->delete_records('remlab_manager_conf', array('ejsappid' => $ejsapp->id));
         $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
         // EJSApp booking system
         if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
