@@ -361,9 +361,12 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     }
     $code = str_replace($search,$replace,$code);
 
-    // Replace link for common_script.js
+    // Replace link for common_script.js and textsizedetector.js
     $search = '<script src="_ejs_library/scripts/common_script.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/scripts/common_script.js"></script>';
+    $code = str_replace($search,$replace,$code);
+    $search = '<script src="_ejs_library/scripts/textresizedetector.js"></script>';
+    $replace = '<script src="' . $path .'_ejs_library/scripts/textresizedetector.js"></script>';
     $code = str_replace($search,$replace,$code);
 
     // Replace call for main function so we can later pass parameters to it
@@ -616,7 +619,11 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         $pattern = '/available-languages\s*:\s*(.+)\s*/';
         preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
         $sub_str = $matches[1][0];
-        $languages = explode(',', $sub_str . ',');
+        if (strpos($sub_str, ',')) {
+            $languages = explode(',', $sub_str);
+        } else {
+            $languages = array('');
+        }
 
         // Change content of the html/js file to make them work
         foreach ($languages as $language) {

@@ -185,7 +185,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
         // Pass the needed parameters to the javascript application
         $search = "}, false);";
-        $replace = '__model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});
+        $replace = '_model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});
         }, false);';
         $code = str_replace($search,$replace,$code);
 
@@ -216,13 +216,13 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
         // <Loading personalized variables>
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
-            $personalize_vars_code = "__model._userUnserialize({";
+            $personalize_vars_code = "_model._userUnserialize({";
             for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
                 $personalize_vars_code .= $personalvarsinfo->name[$i] . ":" . $personalvarsinfo->value[$i];
                 if ($i < count($personalvarsinfo->name) - 1) $personalize_vars_code .= ",";
             }
             $personalize_vars_code .= "});";
-            $search = '__model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});';
+            $search = '_model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});';
             $replace = $search . $personalize_vars_code;
             $code = str_replace($search,$replace,$code);
         }
