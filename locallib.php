@@ -153,6 +153,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     if ($ext == 'jar') { //Java Applet
         $ejs_ok = modifications_for_java($filepath, $ejsapp, $file, $file_record, false);
     } else { //Javascript
+        $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $ejs_ok = modifications_for_javascript($filepath, $ejsapp, $path, $codebase);
     }
 
@@ -340,20 +341,15 @@ function get_showable_experiences() {
  * @return string $code
  *
  */
-function update_links($codebase, $ejsapp, $code, $method, $use_css) {
+function update_links($codebase, $ejsapp, $code, $use_css) {
     global $CFG;
 
     $path = $CFG->wwwroot . $codebase;
     $exploded_name = explode("_Simulation",$ejsapp->applet_name);
 
-    // Replace links for images
-    if ($method == 'old') {
-        $search = "window.addEventListener('load', function () {  new " . $exploded_name[0] . '("_topFrame","_ejs_library/",null);';
-        $replace = "window.addEventListener('load', function () {  new " . $exploded_name[0] . '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
-    } else {
-        $search = '("_topFrame","_ejs_library/",null);';
-        $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
-    }
+    // Replace links for images and stuff
+    $search = '("_topFrame","_ejs_library/",null);';
+    $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
     $code = str_replace($search,$replace,$code);
 
     // Replace link for css
@@ -365,7 +361,7 @@ function update_links($codebase, $ejsapp, $code, $method, $use_css) {
     }
     $code = str_replace($search,$replace,$code);
 
-    // Replace link for common_script
+    // Replace link for common_script.js
     $search = '<script src="_ejs_library/scripts/common_script.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/scripts/common_script.js"></script>';
     $code = str_replace($search,$replace,$code);
@@ -620,7 +616,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         $pattern = '/available-languages\s*:\s*(.+)\s*/';
         preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
         $sub_str = $matches[1][0];
-        $languages = explode(',', $sub_str);
+        $languages = explode(',', $sub_str . ',');
 
         // Change content of the html/js file to make them work
         foreach ($languages as $language) {
@@ -647,14 +643,14 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
                     $code2 = substr($code2, strpos($code2, '<script type'));
                     $code = $code1 . $code2;
-                    $code = update_links($codebase, $ejsapp, $code, 'old', false);
+                    $code = update_links($codebase, $ejsapp, $code, false);
                 } else { //New EJS version with an external .js file for the Javascript
                     $exploded_file_name = explode(".", $ejsapp->applet_name);
                     if (file_exists($folderpath . $exploded_file_name[0] . '.js')) {
                         $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
                         $code = $code1 . $code2;
                         $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
-                        $codeJS = update_links($codebase, $ejsapp, $codeJS, 'new', false);
+                        $codeJS = update_links($codebase, $ejsapp, $codeJS, false);
                         file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
                     }
                 }
