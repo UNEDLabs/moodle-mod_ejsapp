@@ -664,6 +664,21 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 file_put_contents($filepath, $code);
             }
         }
+
+        function chmod_r($path) {
+            $dir = new DirectoryIterator($path);
+            foreach ($dir as $item) {
+                if (!is_dir($item->getPathname())) {
+                    chmod($item->getPathname(), 0644);
+                } else {
+                    chmod($item->getPathname(), 0755);
+                }
+                if ($item->isDir() && !$item->isDot()) {
+                    chmod_r($item->getPathname());
+                }
+            }
+        }
+        chmod_r($folderpath);
     }
 
     return $ejs_ok;
