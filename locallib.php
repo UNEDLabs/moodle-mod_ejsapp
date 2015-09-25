@@ -114,11 +114,11 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     // Create folders to store the .jar or .zip file
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
     if (!file_exists($path)) {
-        mkdir($path, 0770);
+        mkdir($path, 0755);
     }
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course;
     if (!file_exists($path)) {
-        mkdir($path, 0770);
+        mkdir($path, 0755);
     }
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
     if (file_exists($path)) { // updating, not creating, the ejsapp activity
@@ -601,7 +601,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 $sub_str = $sub_str . $matches[1][0];
             }
         }
-        $ejsapp->applet_name = $sub_str;
+        $ejsapp->applet_name = rtrim ($sub_str);
 
         //Create/delete the css file to modify the visual aspect of the javascript application
         $css_file_location = $CFG->dirroot . $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
@@ -616,13 +616,13 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         }
 
         // Languages
+        $languages = array('');
         $pattern = '/available-languages\s*:\s*(.+)\s*/';
-        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
-        $sub_str = $matches[1][0];
-        if (strpos($sub_str, ',')) {
-            $languages = explode(',', $sub_str);
-        } else {
-            $languages = array('');
+        if (preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE)) {
+            $sub_str = $matches[1][0];
+            if (strpos($sub_str, ',')) {
+                $languages = explode(',', $sub_str);
+            }
         }
 
         // Change content of the html/js file to make them work
