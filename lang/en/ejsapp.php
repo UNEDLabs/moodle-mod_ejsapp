@@ -88,6 +88,8 @@ $string['appwording'] = 'Wording';
 
 $string['css_rules'] = 'Create your own css rules to change the visual aspect of the javascript application';
 
+$string['css_rules_help'] = 'Important! Write each selector and the beginning of its declaration (the opening curly bracket) in the same line.';
+
 $string['state_file'] = '.xml or .json file with the state to be read when this EJS lab loads';
 
 $string['statefile'] = 'Easy Java(script) Simulation State';

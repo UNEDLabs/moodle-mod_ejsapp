@@ -87,6 +87,8 @@ $string['appwording'] = 'Enunciado';
 
 $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visual de la aplicaci&oacute;n javascript';
 
+$string['css_rules_help'] = '¡Importante! Escriba cada selector y el comienzo de su declaración (la llave) en la misma línea.';
+
 $string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EJS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java(script) Simulation';
