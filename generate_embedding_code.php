@@ -187,7 +187,17 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $search = "}, false);";
         $replace = '_model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});
         }, false);';
-        $code = str_replace($search,$replace,$code);
+        $pos = strpos($code, $search);
+        if ($pos !== false) {
+            $code = substr_replace($code, $replace, $pos, strlen($search));
+        }
+
+        // For remote labs, make sure the application keeps running even when the focus is not in the browser window
+        if ($ejsapp->is_rem_lab) {
+            $search = "_model.addToInitialization(function() {";
+            $replace = "_model.addToInitialization(function() { _model.setRunAlways(true);";
+            $code = str_replace($search, $replace, $code);
+        }
 
         // <Loading state, controller and interaction files as well as personalized variables>
         // <Loading state files>
@@ -231,7 +241,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
     } else { //EJS Applet
 
-        $code = '<div id = "EJsS"><script type="text/javascript">';
+        $code = '<div id="EJsS"><script type="text/javascript">';
 
         // <set the applet size on the screen>
         if (isset($external_size->width)) {

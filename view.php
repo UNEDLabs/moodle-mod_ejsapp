@@ -96,9 +96,13 @@ $PAGE->set_context($modulecontext);
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'ejsapp'));
 
 // Set CSS style for javascript ejsapps
-$cssfilename = $ejsapp->codebase.'_ejs_library/css/ejsapp.css';
-if (file_exists($CFG->dirroot.$cssfilename)) {
-    $PAGE->requires->css($cssfilename);
+//$original_css_filename = $ejsapp->codebase.'_ejs_library/css/ejsSimulation.css';
+$custom_css_filename = $ejsapp->codebase.'_ejs_library/css/ejsapp.css';
+/*if (file_exists($CFG->dirroot.$original_css_filename)) {
+    $PAGE->requires->css($original_css_filename);
+}*/
+if (file_exists($CFG->dirroot.$custom_css_filename)) {
+    $PAGE->requires->css($custom_css_filename);
 }
 
 // Output starts here

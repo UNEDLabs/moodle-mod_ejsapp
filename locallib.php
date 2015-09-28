@@ -371,7 +371,7 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
 
     // Replace call for main function so we can later pass parameters to it
     $search = "window.addEventListener('load', function () {  new " . $exploded_name[0];
-    $replace = "window.addEventListener('load', function () {  var __model = new " . $exploded_name[0];
+    $replace = "window.addEventListener('load', function () {  var _model = new " . $exploded_name[0];
     $code = str_replace($search,$replace,$code);
 
     return $code;
@@ -603,17 +603,37 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         }
         $ejsapp->applet_name = rtrim ($sub_str);
 
-        //Create/delete the css file to modify the visual aspect of the javascript application
-        $css_file_location = $CFG->dirroot . $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
+        // Create/delete/modify the css file to modify the visual aspect of the javascript application
+        // Custom css
+        $use_original_css = false;
+        $css_file_location = $folderpath . '_ejs_library/css/ejsapp.css';
         if ($ejsapp->css == '' && file_exists($css_file_location)) {
             unlink($css_file_location);
         }
+        $css_file_content = "";
         if ($ejsapp->css != '') {
-            $css_file_content = '#EJsS{' . $ejsapp->css . '}';
+            $lines = explode(PHP_EOL, $ejsapp->css);
+            foreach ($lines as $line){
+                if (strpos($line, '{')) $css_file_content .= 'div#EJsS ' . $line;
+                else $css_file_content .= $line;
+            }
             $file = fopen($css_file_location, "w");
             fwrite($file, $css_file_content);
             fclose($file);
+        } else { // Original css
+            $use_original_css = true;
+            $css_file_location = $folderpath . '_ejs_library/css/ejsSimulation.css';
+            $handle = fopen($css_file_location, "r");
+            if ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    if (strpos($line, '{')) $css_file_content .= 'div#EJsS ' . $line;
+                    else $css_file_content .= $line;
+                }
+                fclose($handle);
+                file_put_contents($css_file_location, $css_file_content);
+            }
         }
+
 
         // Languages
         $languages = array('');
@@ -650,14 +670,14 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
                     $code2 = substr($code2, strpos($code2, '<script type'));
                     $code = $code1 . $code2;
-                    $code = update_links($codebase, $ejsapp, $code, false);
+                    $code = update_links($codebase, $ejsapp, $code, $use_original_css);
                 } else { //New EJS version with an external .js file for the Javascript
                     $exploded_file_name = explode(".", $ejsapp->applet_name);
                     if (file_exists($folderpath . $exploded_file_name[0] . '.js')) {
                         $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
                         $code = $code1 . $code2;
                         $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
-                        $codeJS = update_links($codebase, $ejsapp, $codeJS, false);
+                        $codeJS = update_links($codebase, $ejsapp, $codeJS, $use_original_css);
                         file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
                     }
                 }
