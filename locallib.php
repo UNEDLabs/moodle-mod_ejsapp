@@ -294,13 +294,19 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
  */
 function combine_experiences($list_sarlab_experiences) {
     global $DB;
-    $list_remlab_experiences_without_sarlab = $DB->get_records('remlab_manager_conf', array('usingsarlab' => '0'));
-    $list_combined_experiences = array();
-    if ($list_sarlab_experiences[0] != '') $list_combined_experiences = $list_sarlab_experiences;
-    foreach ($list_remlab_experiences_without_sarlab as $remlab_experiences_without_sarlab) {
-        if (!in_array($remlab_experiences_without_sarlab->practiceintro, $list_sarlab_experiences)) {
-            $list_combined_experiences[] = $remlab_experiences_without_sarlab->practiceintro;
+    $is_remlab_manager_installed = $DB->get_records('modules',array('name'=>'remlab_manager'));
+    $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
+    if ($is_remlab_manager_installed) {
+        $list_remlab_experiences_without_sarlab = $DB->get_records('remlab_manager_conf', array('usingsarlab' => '0'));
+        $list_combined_experiences = array();
+        if ($list_sarlab_experiences[0] != '') $list_combined_experiences = $list_sarlab_experiences;
+        foreach ($list_remlab_experiences_without_sarlab as $remlab_experiences_without_sarlab) {
+            if (!in_array($remlab_experiences_without_sarlab->practiceintro, $list_sarlab_experiences)) {
+                $list_combined_experiences[] = $remlab_experiences_without_sarlab->practiceintro;
+            }
         }
+    } else {
+        $list_combined_experiences = $list_sarlab_experiences;
     }
     //Order the list alphabetically
     sort($list_combined_experiences);
