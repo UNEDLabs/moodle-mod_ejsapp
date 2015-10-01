@@ -129,11 +129,15 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
 
     if ($ejs_ok) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            $complete_pract_list = explode(';', $ejsapp->list_practices);
-            $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
-            if ($remlab_info == null) {
-                $remlab_info = default_rem_lab_conf($ejsapp);
-                $DB->insert_record('remlab_manager_conf', $remlab_info);
+            $is_remlab_manager_installed = $DB->get_records('modules',array('name'=>'remlab_manager'));
+            $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
+            if ($is_remlab_manager_installed) {
+                $complete_pract_list = explode(';', $ejsapp->list_practices);
+                $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
+                if ($remlab_info == null) {
+                    $remlab_info = default_rem_lab_conf($ejsapp);
+                    $DB->insert_record('remlab_manager_conf', $remlab_info);
+                }
             }
             ejsapp_expsyst2pract($ejsapp);
             update_booking_table($ejsapp);
