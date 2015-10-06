@@ -294,7 +294,7 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
  */
 function combine_experiences($list_sarlab_experiences) {
     global $DB;
-    $is_remlab_manager_installed = $DB->get_records('modules',array('name'=>'remlab_manager'));
+    $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
     $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
     if ($is_remlab_manager_installed) {
         $list_remlab_experiences_without_sarlab = $DB->get_records('remlab_manager_conf', array('usingsarlab' => '0'));
@@ -312,7 +312,7 @@ function combine_experiences($list_sarlab_experiences) {
     sort($list_combined_experiences);
 
     return $list_combined_experiences;
-} //get_showable_experiences
+} //combine_experiences
 
 
 /**
@@ -332,7 +332,7 @@ function get_showable_experiences() {
     $list_showable_experiences = combine_experiences($list_sarlab_experiences);
 
     return $list_showable_experiences;
-}
+} //get_showable_experiences
 
 
 /**
