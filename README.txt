@@ -60,7 +60,7 @@ An explanation of EJSApp is included in the folder "doc". There, you will also f
  $ chown -R wwwrun jarfiles
                                                                                                 
  3) Change the permissions of the apache user:                                                  
- $ chmod -R 700 jarfiles
+ $ chmod -R 755 jarfiles
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------
