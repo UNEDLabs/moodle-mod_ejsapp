@@ -192,12 +192,15 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
         $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');
 
-        $list_showable_experiences = get_showable_experiences();
+        $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
+        $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
+        if ($is_remlab_manager_installed) $list_showable_experiences = get_showable_experiences();
+        else $list_showable_experiences = array();
         $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_showable_experiences);
         $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
         $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
         $mform->disabledIf('practiceintro', 'sarlab', 'eq', 0);
-        if ($this->current->instance) {
+        if ($this->current->instance && $is_remlab_manager_installed) {
             $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $this->current->instance));
             if ($practiceintro) {
                 $i = 0;
