@@ -59,7 +59,7 @@ $string['controller_fail_msg'] = 'Error while trying to load the controller';
 $string['recording_load_msg'] = 'A recording with this lab is going to be run';
 $string['recording_fail_msg'] = 'Error while trying to run the recording';
 
-$string['more_text'] = 'Optional text after the applet';
+$string['more_text'] = 'Optional text after the EJsS lab';
 
 $string['css_style'] = 'CSS stylesheet';
 
@@ -90,10 +90,10 @@ $string['css_rules'] = 'Create your own css rules to change the visual aspect of
 
 $string['css_rules_help'] = 'Important! Write each selector and the beginning of its declaration (the opening curly bracket) in the same line.';
 
-$string['state_file'] = '.xml or .json file with the state to be read when this EJS lab loads';
+$string['state_file'] = '.xml or .json file with the state to be read when this EJsS lab loads';
 
 $string['statefile'] = 'Easy Java(script) Simulation State';
-$string['statefile_help'] = 'Select the .xml (for Java) or .json (for Javascript) file with the state the Easy Java Simulation (EJS) application should load.';
+$string['statefile_help'] = 'Select the .xml (for Java) or .json (for Javascript) file with the state the EJsS application should load.';
 
 $string['controller_file'] = '.cnt file with the controller to be load when the EJS is initialized';
 
@@ -128,10 +128,10 @@ $string['vars_incorrect_type'] = 'WARNING: The specified type and values for thi
 $string['rem_lab_conf'] = 'Remote lab configuration';
 
 $string['is_rem_lab'] = 'Remote experimental system?';
-$string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources AND you want the EJSApp Booking System to manage their access, select "yes". Otherwise, select "no".';
+$string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources AND you want the EJSApp Booking System to manage their access, select "yes". Otherwise, select "no". NOTE: You need the Remlab Manager block for this option to be available.';
 
 $string['practiceintro'] = 'Practice identifier';
-$string['practiceintro_help'] = 'The identifier of the practice you want to use with this experimental system.';
+$string['practiceintro_help'] = 'The identifier of the practice you want to use with this experimental system. NOTE: You need the Remlab Manager block for this option to be available.';
 $string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
 
 $string['file_error'] = "Can't open file from the server";

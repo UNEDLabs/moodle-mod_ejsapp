@@ -58,7 +58,7 @@ $string['controller_fail_msg'] = 'Error al intentar cargar el controlador';
 $string['recording_load_msg'] = 'Se va a ejecutar una grabaci&oacute;n para este laboratorio';
 $string['recording_fail_msg'] = 'Error al intentar ejecutar la grabaci&oacute;n';
 
-$string['more_text'] = 'Texto optional tras el applet';
+$string['more_text'] = 'Texto optional tras el laboratorio EJsS';
 
 $string['css_style'] = 'Hoja de estilos CSS';
 
@@ -89,10 +89,10 @@ $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visu
 
 $string['css_rules_help'] = '¡Importante! Escriba cada selector y el comienzo de su declaración (la llave) en la misma línea.';
 
-$string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EJS debe leer';
+$string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EJsS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java(script) Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml (para Java) o .json (para Javascript) con el estado que la aplicaci&oacute;n EJS debe cargar al ejecutarse.';
+$string['statefile_help'] = 'Seleccione el archivo .xml (para Java) o .json (para Javascript) con el estado que la aplicaci&oacute;n EJsS debe cargar al ejecutarse.';
 
 $string['controller_file'] = 'Archivo .cnt con el controlador que la aplicaci&oacute;n EJS debe cargar al iniciarse';
 
@@ -127,11 +127,11 @@ $string['vars_incorrect_type'] = 'ATENCI&Oacute;N: El tipo y los valores especif
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
 $string['is_rem_lab'] = 'Sistema experimental remoto?';
-$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota Y quieres que el Sistema de Reservas EJSApp controle su acceso, selecciona "s&iacute;". En caso contrario, selecciona "no".';
+$string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera remota Y quieres que el Sistema de Reservas EJSApp controle su acceso, selecciona "s&iacute;". En caso contrario, selecciona "no". NOTA: Necesita el bloque Remlab Manager para que esta opci&oacute;n est&eacute; disponible.';
 
 $string['practiceintro'] = 'Identificador de pr&aacute;ctica';
 $string['practiceintro_help'] = 'El identificador de la pr&aacute;ctica, que desea usar con este sistema experimental.';
-$string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica.';
+$string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica. NOTA: Necesita el bloque Remlab Manager para que esta opci&oacute;n est&eacute; disponible.';
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
