@@ -2,6 +2,9 @@
 # EJSApp 2.3 #
 ##############
 
+http://dx.doi.org/10.5281/zenodo.32771
+DOI: 10.5281/zenodo.32771
+
 1. Content
 ==========
 
