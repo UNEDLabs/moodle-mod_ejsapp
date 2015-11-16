@@ -2,8 +2,8 @@
 # EJSApp 2.3 #
 ##############
 
-http://dx.doi.org/10.5281/zenodo.32771
-DOI: 10.5281/zenodo.32771
+https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp
+DOI: 10.5281/zenodo.33845
 
 1. Content
 ==========
