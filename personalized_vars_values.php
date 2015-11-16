@@ -63,6 +63,7 @@ $PAGE->set_context($contextmod);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
+$ejsappid = $cm->instance;
 // <Check whether the selected or other ejsapp in this course have personalized variables or not>
 $ejsapps = $DB->get_records_select('ejsapp', 'course = ? AND personalvars = ?', array($courseid, 1));
 $i = 1;
@@ -701,6 +702,7 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
       $userlist->close();
     }
 } else { // If there are no ejsapp activities with personalized variables
+    echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('no_ejsapps', 'ejsapp'));
     echo $OUTPUT->footer();
 }

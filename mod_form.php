@@ -52,7 +52,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
      */
     function definition()
     {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB;
         $mform = & $this->_form;
         // -------------------------------------------------------------------------------
         // Adding the "general" fieldset, where all the common settings are showed
