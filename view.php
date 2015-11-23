@@ -166,8 +166,8 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
         //<Getting the maximum time the user is allowed to use the remote lab>
         $maxslots = $remlab_conf->dailyslots;
         $slotsduration_conf = $remlab_conf->slotsduration;
-        if ($slotsduration_conf > 4) $slotsduration_conf = 1;
-        $slotsduration = array(60, 30, 15, 5, 2);
+        if ($slotsduration_conf > 4) $slotsduration_conf = 4;
+        $slotsduration = array(2, 5, 15, 30, 60);
         $max_use_time = $maxslots*60*$slotsduration[$slotsduration_conf]; //in seconds
         //</Getting the maximum time the user is allowed to use the remote lab>
         //Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course
@@ -188,7 +188,15 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
         } else {
             echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
-            $action = 'need_to_wait';
+            if (($usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) { //Teacher can still access in collaborative mode
+                echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
+                $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL', $labmanager, $max_use_time);
+                prepare_ejs_file($ejsapp);
+                echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+                $action = 'collab_view';
+            } else {
+                $action = 'need_to_wait';
+            }
         }
     } else { //Students trying to access a remote lab with restricted access OR remote lab not operative
         if (!$allow_access) { //Remote lab not operative
@@ -299,19 +307,6 @@ if ($ejsapp->appwording) {
     echo $OUTPUT->box($content, 'generalbox center clearfix');
 }
 
-// <Buttons to close or leave collab sessions>
-if (isset($collab_session)) {
-    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$session_id&courseid={$course->id}";
-    if ($USER->id == $collab_session->master_user) {
-        $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
-    } else {
-        $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
-    }
-    $button = html_writer::empty_tag('input', array('type'=>'button', 'name'=>'close_session', 'value'=>$text, 'onClick'=>"window.location.href = '$url'"));
-    echo $button;
-}
-// </Buttons to close or leave collab sessions>
-
 // <Javascript features>
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to work with the remote lab
@@ -328,6 +323,19 @@ if ($accessed) {
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, $check_activity, ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
 }
 // </Javascript features>
+
+// <Buttons to close or leave collab sessions>
+if (isset($collab_session)) {
+    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$session_id&courseid={$course->id}";
+    if ($USER->id == $collab_session->master_user) {
+        $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
+    } else {
+        $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
+    }
+    $button = html_writer::empty_tag('input', array('type'=>'button', 'name'=>'close_session', 'value'=>$text, 'onClick'=>"window.location.href = '$url'"));
+    echo $button;
+}
+// </Buttons to close or leave collab sessions>
 
 // Finish the page
 echo $OUTPUT->footer();

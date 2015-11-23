@@ -92,20 +92,15 @@ if ($method) { // from EJS
         mkdir($upload_dir, 0700);
     }
 
-    //if (!$method && !$file_extension) $file_extension = '.txt';
-
     $path = $upload_dir . $file_name . '.' . $file_extension;
 
-    if ($original_safe_file != null) { // as long as a file was selected...
-
+    if ($original_file_name != null) { // as long as a file was selected...
         if (copy($_FILES['user_file']['tmp_name'], $path)) {
             // if the file has been successfully copied do nothing
         } else {
             // print and error message
-            $theFileName = $original_safe_file;
-            echo "File $theFileName could not be uploaded";
+            echo "File $original_file_name could not be uploaded";
         }
-
     }
 }
 // </upload the file to a temporal folder>

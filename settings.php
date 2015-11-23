@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die;
 
 //certificate_path,     The path to your trust certificate for signing the java applets.
 //certificate_password, The password for using your trust certificate.
-//certificate_alia,     The alias of your trust certificate.
+//certificate_alias,    The alias of your trust certificate.
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
