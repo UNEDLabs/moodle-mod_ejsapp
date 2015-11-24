@@ -254,9 +254,10 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
         $ip = substr($sarlab_IP, $last_quote_mark);
         if ($ip != '127.0.0.1' && $ip != '') {
             if ($fp = @fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
+                fclose($fp);
                 $URI = 'http://' . $ip . '/';
-                $file_headers = @get_headers($URI);
-                if (substr($file_headers[0], 9, 3) == 200) { //Valid file
+                //$file_headers = @get_headers($URI);
+                //if (substr($file_headers[0], 9, 3) == 200) { //Valid file
                     if ($dom->load($URI)) {
                         $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
                         foreach ($experiences as $experience) {
@@ -272,8 +273,7 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
                             }
                         }
                     }
-                }
-                fclose($fp);
+                //}
             }
         }
     }
