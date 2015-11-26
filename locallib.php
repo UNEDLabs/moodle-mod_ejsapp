@@ -256,8 +256,8 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
             if ($fp = @fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
                 fclose($fp);
                 $URI = 'http://' . $ip . '/';
-                //$file_headers = @get_headers($URI);
-                //if (substr($file_headers[0], 9, 3) == 200) { //Valid file
+                $file_headers = @get_headers($URI);
+                if (substr($file_headers[0], 9, 3) == 200) { //Valid file
                     if ($dom->load($URI)) {
                         $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
                         foreach ($experiences as $experience) {
@@ -273,7 +273,7 @@ function get_experiences_sarlab($username, $list_sarlab_IPs) {
                             }
                         }
                     }
-                //}
+                }
             }
         }
     }
@@ -1206,6 +1206,82 @@ function check_active_booking($repeated_ejsapp_labs, $courseid) {
     }
 
     return $book_info;
+}
+
+
+/**
+ *
+ * Returns some info about or related to the access conditions to the remote lab: required idle time, whether the user
+ * is a manager of that lab or not, whether the lab is available or not, whether the user can access the lab freely or
+ * not and whether the lab uses sarlab or not.
+ *
+ * @param stdClass $ejsapp
+ * @param stdClass $course
+ * @return stdClass $remote_lab_info
+ *
+ */
+function remote_lab_access_info($ejsapp, $course) {
+    global $DB, $USER;
+
+    $coursecontext = context_course::instance($course->id);
+    $remote_lab_access = new stdClass;
+
+    $practice = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp->id));
+    $remote_lab_access->remlab_conf = $DB->get_record('remlab_manager_conf', array('practiceintro' => $practice));
+
+    //<Check if the remote lab is operative>
+    $remote_lab_access->operative = true;
+    $ejsapp_lab_active = $DB->get_field('remlab_manager_conf', 'active', array('practiceintro' => $practice));
+    if ($ejsapp_lab_active == 0) {
+        $remote_lab_access->operative = false;
+    }
+    //</Check if the remote lab is operative>
+
+    //<Check if we should grant free access to the user for this remote lab>
+    $remote_lab_access->allow_free_access = true;
+    $remote_lab_access->labmanager = has_capability('mod/ejsapp:accessremotelabs', $coursecontext, $USER->id, true);
+    $remote_lab_access->repeated_ejsapp_labs = get_repeated_remlabs($remote_lab_access->remlab_conf);
+    $remote_lab_access->booking_info = check_active_booking($remote_lab_access->repeated_ejsapp_labs, $course->id);
+    $booking_system_in_use = check_booking_system($ejsapp);
+    if (!$remote_lab_access->labmanager) { // The user does not have special privileges and...
+        if (($remote_lab_access->remlab_conf->free_access != 1) && $booking_system_in_use) { //Not free access and the booking system is in use
+            $remote_lab_access->allow_free_access = false;
+        } else if (($remote_lab_access->remlab_conf->free_access == 1) && $remote_lab_access->booking_info['active_booking']) { //Free access and there is an active booking for this remote lab made by anyone in a different course
+            $remote_lab_access->allow_free_access = false;
+        } else if (($remote_lab_access->remlab_conf->free_access != 1) && !$booking_system_in_use && $remote_lab_access->booking_info['active_booking']) { //Not free access, the booking system is not in use and there is an active booking for this remote lab made by anyone in a different course
+            $remote_lab_access->allow_free_access = false;
+        }
+    }
+    //</Check if we should grant free access to the user for this remote lab>
+
+    return $remote_lab_access;
+}
+
+
+/**
+ *
+ * Returns some the time use information regarding a particular remote lab.
+ *
+ * @param stdClass $remlab_conf
+ * @param stdClass $repeated_ejsapp_labs
+ * @return stdClass $remote_lab_info
+ *
+ */
+function remote_lab_use_time_info($remlab_conf, $repeated_ejsapp_labs) {
+    $remote_lab_time = new stdClass;
+
+    //<Getting the maximum time the user is allowed to use the remote lab>
+    $maxslots = $remlab_conf->dailyslots;
+    $slotsduration_conf = $remlab_conf->slotsduration;
+    if ($slotsduration_conf > 4) $slotsduration_conf = 4;
+    $slotsduration = array(2, 5, 15, 30, 60);
+    $remote_lab_time->max_use_time = $maxslots * 60 * $slotsduration[$slotsduration_conf]; //in seconds
+    //</Getting the maximum time the user is allowed to use the remote lab>
+
+    //Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or any other course
+    $remote_lab_time->time_information = get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, time());
+
+    return $remote_lab_time;
 }
 
 

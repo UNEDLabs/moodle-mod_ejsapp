@@ -140,7 +140,7 @@ $string['EJS_codebase'] = "ATENCI&Oacute;N: El manifest del applet que ha subido
 
 $string['inactive_lab'] = 'El laboratorio remoto es&aacute; inactivo en este momento.';
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
-$string['collab_access'] = 'Sin embargo, puede trabajar en modo colaborativo si ha sido invitado por un usuario con una reserva activa.';
+$string['collab_access'] = 'Esta es una sesi&oacute;n colaborativa.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';
 $string['lab_in_use'] = 'El laboratorio est&aacute; ocupado en este instante. Pruebe de nuevo m&aacute;s adelante.';
 $string['booked_lab'] = 'Este laboratorio ha sido reservado para esta hora en un curso distinto. Pruebe de nuevo m&aacute;s adelante.';

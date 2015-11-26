@@ -141,7 +141,7 @@ $string['EJS_codebase'] = "WARNING: The manifest in the applet you uploaded does
 
 $string['inactive_lab'] = 'The remote lab is inactive at this moment.';
 $string['no_booking'] = 'You do not have an active booking for this lab.';
-$string['collab_access'] = 'However, you can still work in collaborative mode if you have been invited by a user with an active booking';
+$string['collab_access'] = 'This is a collaborative session.';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';
 $string['lab_in_use'] = 'The lab is currently being used. Try again later.';
 $string['booked_lab'] = 'This lab has been booked for this hour in a different course. Try again later.';

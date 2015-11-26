@@ -129,9 +129,7 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
 
     if ($ejs_ok) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
-            $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
-            if ($is_remlab_manager_installed) {
+            if ($ejsapp->remlab_manager) {
                 $complete_pract_list = explode(';', $ejsapp->list_practices);
                 $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
                 if ($remlab_info == null) {
@@ -181,10 +179,8 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
     if ($ejs_ok) {
         $is_ejsappbooking_installed = $DB->get_records('modules',array('name'=>'ejsappbooking'));
         $is_ejsappbooking_installed = !empty($is_ejsappbooking_installed);
-        $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
-        $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
-            if ($is_remlab_manager_installed) {
+            if ($ejsapp->remlab_manager) {
                 $complete_pract_list = explode(';', $ejsapp->list_practices);
                 $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
                 if ($remlab_info == null) {
@@ -196,7 +192,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
             }
             if ($is_ejsappbooking_installed) update_booking_table($ejsapp);
         } else {
-            if ($is_remlab_manager_installed) $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
+            if ($ejsapp->remlab_manager) $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
             if ($is_ejsappbooking_installed) {
                 if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
                     $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));

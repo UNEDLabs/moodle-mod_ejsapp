@@ -197,6 +197,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $is_remlab_manager_installed = $DB->get_records('block', array('name'=>'remlab_manager'));
         $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
         $mform->setDefault('remlab_manager', $is_remlab_manager_installed ? 1 : 0);
+        $mform->setDefault('is_rem_lab', 0);
         $mform->disabledIf('is_rem_lab', 'remlab_manager', 'eq', 0);
 
         if ($is_remlab_manager_installed) $list_showable_experiences = get_showable_experiences();
