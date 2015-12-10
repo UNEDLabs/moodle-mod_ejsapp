@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die();
  * This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
  * It is used for four different cases:
  *      1) when only the EJSApp activity is being used
- *      2) when the EJSApp File Browser is used to load a state file
+ *      2) when the EJSApp File Browser is used to load a state, a controller or a recording file
  *      3) when the EJSApp Collab Session is used
  *      4) when third party plugins want to display EJS applets in their own activities by means of the EJSApp external interface
  *
@@ -79,8 +79,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return string code that embeds an EJS applet into Moodle
  *
  */
-function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo, $external_size)
-{
+function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo, $external_size) {
     global $DB, $USER, $CFG;
 
     /**
@@ -342,9 +341,15 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                       document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>')
                       document.write('<param name=\"max_time\" value=\"$sarlabinfo->max_use_time\"/>');";
             if ($sarlabinfo->collab == 0) {
-                  $code .= "document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
-                            document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
+                $user = "{$USER->username}@{$CFG->wwwroot}";
+                $passwd = $sarlab_key;
+            } else { // TODO: Get and pass the data received from Sarlab for accessing the collaborative session
+                // Ask the collab sessions plugin about the username and password for the session
+                $user = "{$USER->username}@{$CFG->wwwroot}";
+                $passwd = $sarlab_key;
             }
+            $code .= "document.write('<param name=\"user\" value=\"$user\"/>');
+                      document.write('<param name=\"passwd\" value=\"$passwd\"/>');";
         } // sarlabinfo for remote laboratories
 
         $code .= "document.write('</applet>');";

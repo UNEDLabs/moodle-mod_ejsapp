@@ -651,7 +651,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
             }
         }
 
-        // Change content of the html/js file to make them work
+        // Change content of the html/js file to make it work
         foreach ($languages as $language) {
             if ($language == '') $filepath = $folderpath . $ejsapp->applet_name;
             else {

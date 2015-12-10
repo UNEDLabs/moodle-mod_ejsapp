@@ -1,5 +1,5 @@
 ##############
-# EJSApp 2.3 #
+# EJSApp 2.4 #
 ##############
 
 https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp
