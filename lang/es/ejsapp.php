@@ -184,6 +184,9 @@ $string['time_is_up'] = 'Se ha agotado su tiempo con el laboratorio remoto. Si d
 $string['seconds'] = 'segundos restantes.';
 $string['refresh'] = 'Pruebe a refrescar su ventana ahora.';
 
+//generate_embedding_code.php
+$string['end_message'] = 'Fin de la reproducci&oacute;n';
+
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";
 $string['ejsapp:addinstance'] = "Añadir una nueva actividad EJSApp";

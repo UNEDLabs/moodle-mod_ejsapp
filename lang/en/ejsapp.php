@@ -185,6 +185,9 @@ $string['time_is_up'] = 'Your time with the remote lab has ended. If you want to
 $string['seconds'] = 'seconds left.';
 $string['refresh'] = 'Try refreshing your window now.';
 
+//generate_embedding_code.php
+$string['end_message'] = 'End of reproduction';
+
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Access to all the remote laboratories";
 $string['ejsapp:addinstance'] = "Add a new EJSApp activity";

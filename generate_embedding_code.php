@@ -108,7 +108,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
      *
      * @param string $user_data_file
      * @param stdClass $initial_data_file
-     * @return stdClass $data_file
+     * @return string $data_file
      */
     function get_data_file($user_data_file, $initial_data_file) {
         global $CFG;
@@ -203,7 +203,10 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $initial_state_file = initial_data_file($ejsapp, 'xmlfiles');
         if ($user_state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
             $state_file = get_data_file($user_state_file, $initial_state_file);
-            //TODO
+            $search = "window.addEventListener('resize', function () { _model._resized(window.innerWidth,window.innerHeight); }, false);";
+            $replace = "window.addEventListener('resize', function () { _model._resized(window.innerWidth,window.innerHeight); }, false);
+                        window.addEventListener('load', function() { _model.readState('$state_file','.json'); }, false);";
+            $code = str_replace($search, $replace, $code);
         }
         // <\Loading state files>
 
@@ -218,8 +221,12 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         // <Loading interaction recording files>
         $initial_rec_file = initial_data_file($ejsapp, 'recfiles');
         if ($user_rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
+            $end_message = get_string('end_message','ejsapp');
             $rec_file = get_data_file($user_rec_file, $initial_rec_file);
-            //TODO
+            $search = "window.addEventListener('resize', function () { _model._resized(window.innerWidth,window.innerHeight); }, false);";
+            $replace = "window.addEventListener('resize', function () { _model._resized(window.innerWidth,window.innerHeight); }, false);
+                        window.addEventListener('load', function() { _model.readText('$rec_file','.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})}); }, false);";
+            $code = str_replace($search, $replace, $code);
         }
         // <\Loading interaction recording files>
 
@@ -237,6 +244,56 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         // <\Loading personalized variables>
         // <\Loading state, controller and interaction files as well as personalized variables>
+
+        // <Buttons for starting, stopping and playing the recording of the user interaction>
+        $code = '<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+                 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>' . $code;
+        $end_message = get_string('end_message','ejsapp');
+        $search = "window.addEventListener('resize', function () { _model._resized(window.innerWidth,window.innerHeight); }, false);";
+        $replace = "window.addEventListener('resize', function () { _model._resized(window.innerWidth,window.innerHeight); }, false);
+                   $(document).ready(function(){
+                    $(\"#hide\").click(function(){
+                        $(\"div[class=captureInteraction]\").hide();
+                    });
+                    $(\"#show\").click(function(){
+                        $(\"div[class=captureInteraction]\").show();
+                    });
+                   });
+                   $(function() {
+                        $( \"input[type=submit][name=startCapture]\" )
+                        .button()
+                        .click(function( event ) {
+                            event.preventDefault();
+                            _model.startCapture();
+                        });
+                        $( \"input[type=submit][name=stopCapture]\" )
+                        .button()
+                        .click(function( event ) {
+                            event.preventDefault();
+                            _model.saveText('recording','rec',JSON.stringify(_model.stopCapture()));
+                        });
+                        $( \"input[type=submit][name=resetCapture]\" )
+                        .button()
+                        .click(function( event ) {
+                            event.preventDefault();
+                            _model.resetCapture();
+                        });
+                        $( \"input[type=submit][name=playCapture]\" )
+                        .button()
+                        .click(function( event ) {
+                            event.preventDefault();
+                            _model.readText(null,'.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})});
+                        });
+                        var el, step;
+                        $(\"input[type='range']\").change(function() {
+                            el = $(this);
+                            if (el.val() < 0) step = -1/el.val();
+                            else step = el.val();
+                            _model.changeCaptureStep(step);
+                        });
+                    });";
+        $code = str_replace($search, $replace, $code);
+        // <\Buttons for starting, stopping and playing the recording of the user interaction>
 
     } else { //EJS Applet
 
