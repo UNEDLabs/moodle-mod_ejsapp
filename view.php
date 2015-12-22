@@ -88,6 +88,8 @@ require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
 
 // Print the page header
+$PAGE->set_cm($cm, $course, $ejsapp);
+$PAGE->set_context($modulecontext);
 $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $cm->id));
 $PAGE->set_title($ejsapp->name);
 $PAGE->set_heading(format_string($course->fullname));
