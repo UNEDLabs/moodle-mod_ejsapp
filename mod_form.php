@@ -218,6 +218,8 @@ class mod_ejsapp_mod_form extends moodleform_mod
                     $i++;
                 }
                 $mform->setDefault('practiceintro', $selected_practice_index);
+            } else {
+                $mform->setDefault('practiceintro', '');
             }
         }
         $mform->addElement('hidden', 'list_practices', null);
@@ -328,6 +330,12 @@ class mod_ejsapp_mod_form extends moodleform_mod
                     $errors['var_type['.$i.']'] = get_string('vars_incorrect_type', 'ejsapp');
                 }
                 $i++;
+            }
+        }
+
+        if ($data['is_rem_lab'] == 1) {
+            if ($data['practiceintro'] == '') {
+                $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
             }
         }
 

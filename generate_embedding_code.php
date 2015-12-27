@@ -191,10 +191,15 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
             $code = substr_replace($code, $replace, $pos, strlen($search));
         }
 
-        // For remote labs, make sure the application keeps running even when the focus is not in the browser window
-        if ($ejsapp->is_rem_lab) {
+        // For remote labs and collaborative sessions, make sure the application keeps running even when the focus is not in the browser window
+        if ($ejsapp->is_rem_lab || $collabinfo) {
             $search = "_model.addToInitialization(function() {";
-            $replace = "_model.addToInitialization(function() { _model.setRunAlways(true);";
+            if ($collabinfo) {
+                $sse_uri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php";
+                $replace = "_model.addToInitialization(function() { _model.setRunAlways(true); _model.playCaptureStream('$sse_uri')";
+            } else {
+                $replace = "_model.addToInitialization(function() { _model.setRunAlways(true);";
+            }
             $code = str_replace($search, $replace, $code);
         }
 
@@ -400,8 +405,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
             if ($sarlabinfo->collab == 0) {
                 $user = "{$USER->username}@{$CFG->wwwroot}";
                 $passwd = $sarlab_key;
-            } else { // TODO: Get and pass the data received from Sarlab for accessing the collaborative session
-                // Ask the collab sessions plugin about the username and password for the session
+            } else { // TODO: Get and pass the data received from SARLAB for accessing the collaborative session
+                // Ask the collab sessions block plugin about the username and password for the session
                 $user = "{$USER->username}@{$CFG->wwwroot}";
                 $passwd = $sarlab_key;
             }

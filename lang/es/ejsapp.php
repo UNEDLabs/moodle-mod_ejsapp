@@ -131,7 +131,7 @@ $string['is_rem_lab_help'] = 'Si este EJSApp conecta a recursos reales de manera
 
 $string['practiceintro'] = 'Identificador de pr&aacute;ctica';
 $string['practiceintro_help'] = 'El identificador de la pr&aacute;ctica, que desea usar con este sistema experimental.';
-$string['practiceintro_required'] = 'ATENCI&Oacute;N: Debe especificar al menos una pr&aacute;ctica. NOTA: Necesita el bloque Remlab Manager para que esta opci&oacute;n est&eacute; disponible.';
+$string['practiceintro_required'] = 'ATENCI&Oacute;N: Si desea configurar esta actividad como un laboratorio remoto, necesita especificar un identificador de pr&aacute; que est&eacute; previamente definido en el bloque Remlab Manager.';
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
@@ -203,6 +203,9 @@ $string['event_inactive'] = "Lab is inactive";
 $string['event_booked'] = "Lab is booked in a different course";
 
 //Settings
+$string['default_general_set'] = "Opciones generales";
+$string['check_activity'] = "Comprobar actividad";
+$string['check_activity_description'] = "Con que frecuencia se comprueba la actividad de los usuarios en EJSApp (ms)";
 $string['default_certificate_set'] = "Opciones del certificado de confianza. (Importante s&oacute;lo si se desea firmar de manera autom&aacute;tica los applets subidos con EJSApp)";
 $string['certificate_path'] = "Ruta al fichero del certificado de confianza";
 $string['certificate_path_description'] = "La ruta en el servidor Moodle al fichero del certificado de confianza que se usar&aacute; para firmar los applets de Java";

@@ -48,7 +48,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/countdown.php');
 
 if ($remaining_time > 0) {
-    $slotsduration = array(2, 5, 15, 30, 60);
+    $slotsduration = array(60, 30,15, 5, 2);
     $currenttime = time();
     $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
     $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsappid));

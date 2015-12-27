@@ -117,7 +117,6 @@ $personalvarsinfo = personalize_vars($ejsapp, $USER);
 
 // For logging purposes:
 $action = 'view';
-$check_activity = 30;   //register whether the user is still in the activity or not every 30 seconds. TODO: make this a configurable parameter in settings
 $accessed = false;
 
 // <Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not>
@@ -127,7 +126,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $max_use_time = 604800; // High enough number... although it is never used in the case of a virtual lab
     prepare_ejs_file($ejsapp);
     echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
-} else { //<Remote lab>
+} else { // <Remote lab>
     $remote_lab_access = remote_lab_access_info($ejsapp, $course);
     $remlab_conf = $remote_lab_access->remlab_conf;
     $repeated_ejsapp_labs = $remote_lab_access->repeated_ejsapp_labs;
@@ -135,7 +134,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
         $remote_lab_time = remote_lab_use_time_info($remlab_conf, $repeated_ejsapp_labs);
         $max_use_time = $remote_lab_time->max_use_time;
         //Get the lab use status
-        $lab_status = get_lab_status($remote_lab_time->time_information, $remlab_conf->reboottime, $check_activity);
+        $lab_status = get_lab_status($remote_lab_time->time_information, $remlab_conf->reboottime, get_config('ejsapp', 'check_activity'));
         if ($lab_status == 'available') {
             if ($remlab_conf->usingsarlab == 1) {
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
@@ -196,8 +195,8 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 }
             }
         }
-    } //</Remote lab>
-} //if(($ejsapp->is_rem_lab == 0)... else
+    }
+} // </Remote lab>
 // </Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and whether the ejsapp instance is a remote lab or not>
 
 // <Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not>
@@ -276,13 +275,13 @@ if ($accessed) {
     $url_log = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsappname.'&userid='.$USER->id;
     $htmlid = "EJsS";
     $url_view = $CFG->wwwroot . '/mod/ejsapp/kick_out.php';
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $ejsapp->is_rem_lab, $htmlid, $check_activity, $max_use_time));
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $ejsapp->is_rem_lab, $htmlid, get_config('ejsapp', 'check_activity'), $max_use_time));
 } else if ($action == 'booked_lab' || $action == 'need_to_wait') { // remote lab not accessible by the user at the present moment
-    $remaining_time = get_remaining_time($remote_lab_access->booking_info, $lab_status, $remote_lab_time->time_information, $remlab_conf->reboottime, $check_activity);
-    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&courseid='.$course->id.'&check_activity='.$check_activity;
+    $remaining_time = get_remaining_time($remote_lab_access->booking_info, $lab_status, $remote_lab_time->time_information, $remlab_conf->reboottime, get_config('ejsapp', 'check_activity'));
+    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&courseid='.$course->id.'&check_activity='.get_config('ejsapp', 'check_activity');
     $htmlid = "timecountdown";
     echo $OUTPUT->box(html_writer::div('', '', array('id'=>$htmlid)));
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, $check_activity, ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, get_config('ejsapp', 'check_activity'), ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
 }
 // </Javascript features>
 

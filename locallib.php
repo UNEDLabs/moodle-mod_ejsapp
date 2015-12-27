@@ -200,7 +200,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
             }
         }
     }
-    // </update ejsapp_personal_vars table> // TODO: Only update personal variables that were set new when updating an ejsapp activity
+    // </update ejsapp_personal_vars table>
 
     return $ejs_ok;
  } //update_db
@@ -810,9 +810,8 @@ function default_rem_lab_conf($ejsapp) {
     $default_rem_lab_conf->practiceintro = $complete_pract_list[$ejsapp->practiceintro];
     $default_rem_lab_conf->usingsarlab = 0;
     if(in_array($ejsapp->practiceintro, $list_sarlab_experiences)) $default_rem_lab_conf->usingsarlab = 1;
-    $default_rem_lab_conf->active = 1;
     if ($default_rem_lab_conf->usingsarlab == 1) {
-        $sarlabinstance = 0; //TODO
+        $sarlabinstance = 0;
         $default_rem_lab_conf->sarlabinstance = $sarlabinstance;
         $default_rem_lab_conf->sarlabcollab = 0;
         $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
@@ -828,11 +827,13 @@ function default_rem_lab_conf($ejsapp) {
         $default_rem_lab_conf->ip = '127.0.0.1';
         $default_rem_lab_conf->port = 443;
     }
-    $default_rem_lab_conf->slotsduration = 60;
+    $default_rem_lab_conf->slotsduration = 1;
     $default_rem_lab_conf->totalslots = 18;
     $default_rem_lab_conf->weeklyslots = 9;
     $default_rem_lab_conf->dailyslots = 3;
     $default_rem_lab_conf->reboottime = 2;
+    $default_rem_lab_conf->active = 1;
+    $default_rem_lab_conf->free_access = 0;
 
     return $default_rem_lab_conf;
 } // ejsapp_rem_lab_conf
@@ -1118,7 +1119,11 @@ function get_remaining_time($booking_info, $status, $time_information, $idle_tim
             $ending_time = check_last_valid_booking($DB, $booking_info['username_with_booking'], $booking_info['ejsappid']);
             $ending_time = strtotime($ending_time);
             $remaining_time = 60 * $idle_time + $ending_time - $currenttime;
+        } else { // in_use
+            if ($time_information['time_first_access'] == INF) $time_information['time_first_access'] = time();
+            $remaining_time = 60 * $idle_time + $time_information['occupied_ejsapp_max_use_time'] - ($currenttime - $time_information['time_first_access']);
         }
+
     } else {
         if ($status == 'available') {
             $remaining_time = 0;
@@ -1274,7 +1279,7 @@ function remote_lab_use_time_info($remlab_conf, $repeated_ejsapp_labs) {
     $maxslots = $remlab_conf->dailyslots;
     $slotsduration_conf = $remlab_conf->slotsduration;
     if ($slotsduration_conf > 4) $slotsduration_conf = 4;
-    $slotsduration = array(2, 5, 15, 30, 60);
+    $slotsduration = array(60, 30,15, 5, 2);
     $remote_lab_time->max_use_time = $maxslots * 60 * $slotsduration[$slotsduration_conf]; //in seconds
     //</Getting the maximum time the user is allowed to use the remote lab>
 

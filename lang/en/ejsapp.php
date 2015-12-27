@@ -132,7 +132,7 @@ $string['is_rem_lab_help'] = 'If this EJSApp connects to real remote resources A
 
 $string['practiceintro'] = 'Practice identifier';
 $string['practiceintro_help'] = 'The identifier of the practice you want to use with this experimental system. NOTE: You need the Remlab Manager block for this option to be available.';
-$string['practiceintro_required'] = 'WARNING: You need to specify at least one practice.';
+$string['practiceintro_required'] = 'WARNING: If you want to configure this activity as a remote lab, you need to specify a practice identifier previously defined in the Remlab Manager block.';
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
@@ -204,6 +204,9 @@ $string['event_inactive'] = "Lab is inactive";
 $string['event_booked'] = "Lab is booked in a different course";
 
 //Settings
+$string['default_general_set'] = "General settings";
+$string['check_activity'] = "Check activity";
+$string['check_activity_description'] = "How often the users' activity in EJSApp is checked (ms)";
 $string['default_certificate_set'] = "Trust certificate settings. (Only important if you want to automatically sign the applets uploaded with EJSApp)";
 $string['certificate_path'] = "Trust certificate file path";
 $string['certificate_path_description'] = "The path in the Moodle server to the trust certificate file to be used for signing the Java applets";

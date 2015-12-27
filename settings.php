@@ -41,6 +41,21 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
+        'ejsapp/generalsettings',
+        get_string('default_general_set', 'ejsapp'),
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'ejsapp/check_activity',
+        get_string('check_activity', 'ejsapp'),
+        get_string('check_activity_description', 'ejsapp'),
+        30,
+        PARAM_INT,
+        '8'
+    ));
+
+    $settings->add(new admin_setting_heading(
         'ejsapp/certificatesettings',
         get_string('default_certificate_set', 'ejsapp'),
         ''
