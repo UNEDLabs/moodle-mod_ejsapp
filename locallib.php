@@ -648,6 +648,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
             $sub_str = $matches[1][0];
             if (strpos($sub_str, ',')) {
                 $languages = explode(',', $sub_str);
+                array_push($languages, '');
             }
         }
 
@@ -673,11 +674,11 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 $code2 = explode('</body>', $code2);
                 $code2 = $code2[0] . '</div>';
                 //</$code2 is $code from </head> to </body> tags, none of them included>
-                if (strpos($code, '<script type')) { //Old EJS version with Javascript embedded into the html page
+                if (strpos($code, '<script type')) { //New EjsS version with Javascript embedded into the html page
                     $code2 = substr($code2, strpos($code2, '<script type'));
                     $code = $code1 . $code2;
                     $code = update_links($codebase, $ejsapp, $code, $use_original_css);
-                } else { //New EJS version with an external .js file for the Javascript
+                } else { //Old EjsS version with an external .js file for the Javascript
                     $exploded_file_name = explode(".", $ejsapp->applet_name);
                     if (file_exists($folderpath . $exploded_file_name[0] . '.js')) {
                         $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
@@ -687,8 +688,8 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                         file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
                     }
                 }
-                file_put_contents($filepath, $code);
             }
+            file_put_contents($filepath, $code);
         }
 
         function chmod_r($path) {
