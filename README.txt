@@ -115,8 +115,7 @@ When installing ejsapp for the first time, you will need to set a few variables:
                                               
 5. Testing
 ==========
-The "test" directory of ejsapp includes a two EJS applications (one is a java applet and the other one is a javascript
-application) that can be used for testing purposes.
+The "test" directory of ejsapp includes an EjsS application that can be used for testing purposes.
 
 6. Authors
 ==========
