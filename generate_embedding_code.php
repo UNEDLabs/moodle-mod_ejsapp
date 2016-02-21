@@ -80,7 +80,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  */
 function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo, $external_size) {
-    global $DB, $USER, $CFG;
+    global $DB, $USER, $CFG, $PAGE;
 
     /**
      * If a state, controller or recording file has been configured in the ejsapp activity, this function returns the information of such file
@@ -250,47 +250,12 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         // <\Loading personalized variables>
         // <\Loading state, controller and interaction files as well as personalized variables>
 
-        // <Buttons for starting, stopping and playing the recording of the user interaction>
-        $code = '<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-                 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>' . $code;
+        // <End message when the recording of the user interaction stops>
         $end_message = get_string('end_message','ejsapp');
-        $search = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);";
-        $replace = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);
-                   $(document).ready(function() {
-                        $( \"input[type=submit][name=startCapture]\" )
-                        .button()
-                        .click(function( event ) {
-                            event.preventDefault();
-                            _model.startCapture();
-                        });
-                        $( \"input[type=submit][name=stopCapture]\" )
-                        .button()
-                        .click(function( event ) {
-                            event.preventDefault();
-                            _model.saveText('recording','rec',JSON.stringify(_model.stopCapture()));
-                        });
-                        $( \"input[type=submit][name=resetCapture]\" )
-                        .button()
-                        .click(function( event ) {
-                            event.preventDefault();
-                            _model.resetCapture();
-                        });
-                        $( \"input[type=submit][name=playCapture]\" )
-                        .button()
-                        .click(function( event ) {
-                            event.preventDefault();
-                            _model.readText(null,'.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})});
-                        });
-                        var el, step;
-                        $(\"input[type='range']\").change(function() {
-                            el = $(this);
-                            if (el.val() < 0) step = -1/el.val();
-                            else step = el.val();
-                            _model.changeCaptureStep(step);
-                        });
-                    });";
+        $search = "_model.playCapture(JSON.parse(content),function(){window.alert(end_message);});";
+        $replace = "_model.playCapture(JSON.parse(content),function(){window.alert(\"$end_message\");});";
         $code = str_replace($search, $replace, $code);
-        // <\Buttons for starting, stopping and playing the recording of the user interaction>
+        // <\End message when the recording of the user interaction stops>
 
     } else { //EJS Applet
 
