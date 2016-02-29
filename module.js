@@ -66,14 +66,14 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
                     //Call php code to refresh view.php and kick the user from the remote lab
                     Y.YUI2.util.Connect.asyncRequest('GET', url_max_time, callbackKickOut);
                 }
-                clearInterval(checkActivity);
+                clearInterval(checkUserActivity);
             }
         });
     };
     //Call a first time:
     checkActivity();
     //Call periodically:
-    setInterval(checkActivity,1000*frequency);
+    var checkUserActivity = setInterval(checkActivity,1000*frequency);
 };
 
 M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, check_activity, seconds_label, refresh_label){

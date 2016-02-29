@@ -204,21 +204,25 @@ switch ($action) {
     case 'view':
         $event = \mod_ejsapp\event\course_module_viewed::create(array(
             'objectid' => $ejsapp->id,
+            'courseid' => $course->id,
+            'userid' => $USER->id,
             'context' => $modulecontext,
             'other' => $ejsapp->name,
         ));
-        $record = new stdClass();
+        /*$record = new stdClass();
         $record->id = $cm->id;
         $record->time = time();
         $record->userid = $USER->id;
         $record->action = 'viewed';
         $record->info = $ejsapp->name;
         $event->add_record_snapshot('ejsapp_log', $record);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
         break;
     case 'need_to_wait':
         $event = \mod_ejsapp\event\course_module_wait::create(array(
             'objectid' => $ejsapp->id,
+            'courseid' => $course->id,
+            'userid' => $USER->id,
             'context' => $modulecontext,
             'other' => $ejsapp->name,
         ));
@@ -226,6 +230,8 @@ switch ($action) {
     case 'need_to_book':
         $event = \mod_ejsapp\event\course_module_book::create(array(
             'objectid' => $ejsapp->id,
+            'courseid' => $course->id,
+            'userid' => $USER->id,
             'context' => $modulecontext,
             'other' => $ejsapp->name,
         ));
@@ -233,6 +239,8 @@ switch ($action) {
     case 'collab_view':
         $event = \mod_ejsapp\event\course_module_collab::create(array(
             'objectid' => $ejsapp->id,
+            'courseid' => $course->id,
+            'userid' => $USER->id,
             'context' => $modulecontext,
             'other' => $ejsapp->name,
         ));
@@ -240,6 +248,8 @@ switch ($action) {
     case 'inactive_lab':
         $event = \mod_ejsapp\event\course_module_inactive::create(array(
             'objectid' => $ejsapp->id,
+            'courseid' => $course->id,
+            'userid' => $USER->id,
             'context' => $modulecontext,
             'other' => $ejsapp->name,
         ));
@@ -247,14 +257,13 @@ switch ($action) {
     case 'booked_lab':
         $event = \mod_ejsapp\event\course_module_booked::create(array(
             'objectid' => $ejsapp->id,
+            'courseid' => $course->id,
+            'userid' => $USER->id,
             'context' => $modulecontext,
             'other' => $ejsapp->name,
         ));
         break;
 }
-/*$event->add_record_snapshot('course_modules', $cm);
-$event->add_record_snapshot('course', $course);
-$event->add_record_snapshot('ejsapp', $ejsapp);*/
 $event->trigger();
 // </Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not>
 

@@ -205,7 +205,7 @@ $string['event_booked'] = "Lab is booked in a different course";
 //Settings
 $string['default_general_set'] = "Opciones generales";
 $string['check_activity'] = "Comprobar actividad";
-$string['check_activity_description'] = "Con que frecuencia se comprueba la actividad de los usuarios en EJSApp (ms)";
+$string['check_activity_description'] = "Con que frecuencia se comprueba la actividad de los usuarios en EJSApp (s)";
 $string['default_certificate_set'] = "Opciones del certificado de confianza. (Importante s&oacute;lo si se desea firmar de manera autom&aacute;tica los applets subidos con EJSApp)";
 $string['certificate_path'] = "Ruta al fichero del certificado de confianza";
 $string['certificate_path_description'] = "La ruta en el servidor Moodle al fichero del certificado de confianza que se usar&aacute; para firmar los applets de Java";

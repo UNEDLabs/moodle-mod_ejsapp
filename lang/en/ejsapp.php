@@ -206,7 +206,7 @@ $string['event_booked'] = "Lab is booked in a different course";
 //Settings
 $string['default_general_set'] = "General settings";
 $string['check_activity'] = "Check activity";
-$string['check_activity_description'] = "How often the users' activity in EJSApp is checked (ms)";
+$string['check_activity_description'] = "How often the users' activity in EJSApp is checked (s)";
 $string['default_certificate_set'] = "Trust certificate settings. (Only important if you want to automatically sign the applets uploaded with EJSApp)";
 $string['certificate_path'] = "Trust certificate file path";
 $string['certificate_path_description'] = "The path in the Moodle server to the trust certificate file to be used for signing the Java applets";

@@ -49,16 +49,18 @@ $modulecontext = context_module::instance($cm_id);
 //$ejsapp = $DB->get_record('ejsapp', array('id' => $cm->instance), '*', MUST_EXIST);
 $event = \mod_ejsapp\event\course_module_working::create(array(
     'objectid' => $cm_id,
+    'courseid' => $course_id,
+    'userid' => $user_id,
     'context' => $modulecontext,
     'other' => $ejsapp_name,
 ));
 /*$event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('ejsapp', $ejsapp);*/
-$record = new stdClass();
+/*$record = new stdClass();
 $record->id = $cm_id;
 $record->time = time();
 $record->userid = $user_id;
 $record->action = 'working';
 $record->info = $ejsapp_name;
-$event->add_record_snapshot('record', $record);
+$event->add_record_snapshot('ejsapp_log', $record);*/
 $event->trigger();

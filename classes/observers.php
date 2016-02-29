@@ -43,7 +43,7 @@ class observers {
      * @param \core\event\base $event The event.
      * @return void
      */
-    public static function course_module_viewed($event) {
+    /*public static function course_module_viewed($event) {
         //Write info in the db
         global $DB;
         $record =  $event->get_record_snapshot('ejsapp_log', $event->objectid);
@@ -56,11 +56,11 @@ class observers {
      * @param \core\event\base $event The event.
      * @return void
      */
-    public static function course_module_working($event) {
+    /*public static function course_module_working($event) {
         //Write info in the db
         global $DB;
-        $record =  $event->get_record_snapshot('record', $event->objectid);
+        $record =  $event->get_record_snapshot('ejsapp_log', $event->objectid);
         $DB->insert_record('ejsapp_log', $record);
-    }
+    }*/
 
 }

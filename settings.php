@@ -50,7 +50,7 @@ if ($ADMIN->fulltree) {
         'ejsapp/check_activity',
         get_string('check_activity', 'ejsapp'),
         get_string('check_activity_description', 'ejsapp'),
-        30,
+        60,
         PARAM_INT,
         '8'
     ));

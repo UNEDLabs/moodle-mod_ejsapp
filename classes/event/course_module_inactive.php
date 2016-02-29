@@ -25,7 +25,8 @@
  * Class for logging the inactive lab event of an EJSApp
  *
  * @package    mod
- * @subpackage ejsapp
+ * @subpackage
+ * @since      Moodle 2.7
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class course_module_inactive extends \core\event\base {
     protected function init() {
-        $this->data['crud'] = 'c'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'r'; // c(reate), r(ead), u(pdate), d(elete)
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'ejsapp';
     }

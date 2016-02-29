@@ -592,11 +592,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         $zip->close();
         $metadata = file_get_contents($folderpath . '_metadata.txt');
         $ejs_ok = true;
-    } else {
-        $ejs_ok = false;
-    }
 
-    if ($ejs_ok) {
         // Search in _metadata for the name of the main Javascript file
         $pattern = '/main-simulation\s*:\s*(.+)\s*/';
         preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
@@ -607,7 +603,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 $sub_str = $sub_str . $matches[1][0];
             }
         }
-        $ejsapp->applet_name = rtrim ($sub_str);
+        $ejsapp->applet_name = rtrim($sub_str);
 
         // Create/delete/modify the css file to modify the visual aspect of the javascript application
         // Custom css
@@ -619,7 +615,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         $css_file_content = "";
         if ($ejsapp->css != '') {
             $lines = explode(PHP_EOL, $ejsapp->css);
-            foreach ($lines as $line){
+            foreach ($lines as $line) {
                 if (strpos($line, '{')) $css_file_content .= 'div#EJsS ' . $line;
                 else $css_file_content .= $line;
             }
@@ -688,25 +684,27 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                         file_put_contents($folderpath . $exploded_file_name[0] . '.js', $codeJS);
                     }
                 }
-            }
-            file_put_contents($filepath, $code);
-        }
-
-        function chmod_r($path) {
-            $dir = new DirectoryIterator($path);
-            foreach ($dir as $item) {
-                if (!is_dir($item->getPathname())) {
-                    chmod($item->getPathname(), 0644);
-                } else {
-                    chmod($item->getPathname(), 0755);
-                }
-                if ($item->isDir() && !$item->isDot()) {
-                    chmod_r($item->getPathname());
-                }
+                file_put_contents($filepath, $code);
             }
         }
-        chmod_r($folderpath);
+    } else {
+        $ejs_ok = false;
     }
+
+    function chmod_r($path) {
+        $dir = new DirectoryIterator($path);
+        foreach ($dir as $item) {
+            if (!is_dir($item->getPathname())) {
+                chmod($item->getPathname(), 0644);
+            } else {
+                chmod($item->getPathname(), 0755);
+            }
+            if ($item->isDir() && !$item->isDot()) {
+                chmod_r($item->getPathname());
+            }
+        }
+    }
+    chmod_r($folderpath);
 
     return $ejs_ok;
 } // modifications_for_javascript

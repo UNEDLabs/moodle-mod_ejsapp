@@ -35,9 +35,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = array(
 
-    array(
+    /*array(
         'eventname'   => '\mod_ejsapp\event\course_module_working',
         'callback'    => 'mod_ejsapp\observers::course_module_working',
-    ),
+    ),*/
 
 );
