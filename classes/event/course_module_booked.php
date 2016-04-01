@@ -47,7 +47,7 @@ class course_module_booked extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} attempted to access the 'free' EJSApp remote lab with id {$this->objectid} but it was already booked in a different course.";
+        return "The user with id '{$this->userid}' attempted to access the free EJSApp remote lab with id '{$this->objectid}'' but it was already booked in a different course.";
     }
 
     /**

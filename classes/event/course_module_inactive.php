@@ -47,7 +47,7 @@ class course_module_inactive extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} attempted to access the EJSApp remote lab with id {$this->objectid} but it was inactive.";
+        return "The user with id '{$this->userid}'' attempted to access the EJSApp remote lab with id '{$this->objectid}' but it was inactive.";
     }
 
     /**

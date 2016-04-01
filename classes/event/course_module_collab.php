@@ -47,7 +47,7 @@ class course_module_collab extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} accessed the EJSApp activity with id {$this->objectid} in collaborative mode.";
+        return "The user with id '{$this->userid}' accessed the EJSApp activity with id '{$this->objectid}' in collaborative mode.";
     }
 
     /**

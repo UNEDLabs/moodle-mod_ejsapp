@@ -47,7 +47,7 @@ class course_module_book extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} attempted to access the EJSApp remote lab with id {$this->objectid} but needed to make a booking before.";
+        return "The user with id '{$this->userid}' attempted to access the EJSApp remote lab with id '{$this->objectid}' but needed to make a booking before.";
     }
 
     /**

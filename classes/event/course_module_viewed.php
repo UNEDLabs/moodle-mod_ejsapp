@@ -47,7 +47,7 @@ class course_module_viewed extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} accessed the EJSApp activity with id {$this->objectid}.";
+        return "The user with id '{$this->userid}' viewed the EJSApp activity with id '{$this->objectid}'.";
     }
 
     /**

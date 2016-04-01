@@ -47,7 +47,7 @@ class course_module_wait extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} attempted to access the EJSApp remote lab with id {$this->objectid} but needed to wait.";
+        return "The user with id '{$this->userid}' attempted to access the EJSApp remote lab with id '{$this->objectid}' but needed to wait.";
     }
 
     /**

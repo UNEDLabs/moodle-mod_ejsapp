@@ -47,7 +47,7 @@ class course_module_working extends \core\event\base {
     }
 
     public function get_description() {
-        return "User {$this->userid} was working with the EJSApp activity with id {$this->objectid}.";
+        return "The user with id '{$this->userid}' was working with the EJSApp activity with id '{$this->objectid}'.";
     }
 
     /**
