@@ -215,7 +215,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
             $state_file = get_data_file($user_state_file, $initial_state_file);
             $search = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);";
             $replace = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);
-                        window.addEventListener('load', function() { _model.readState('$state_file','.json'); }, false);";
+                        _model.readState('$state_file','.json');";
             $code = str_replace($search, $replace, $code);
         }
         // <\Loading state files>
@@ -235,7 +235,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
             $rec_file = get_data_file($user_rec_file, $initial_rec_file);
             $search = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);";
             $replace = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);
-                        window.addEventListener('load', function() { _model.readText('$rec_file','.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})}); }, false);";
+                        _model.readText('$rec_file','.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})});";
             $code = str_replace($search, $replace, $code);
         }
         // <\Loading interaction recording files>
