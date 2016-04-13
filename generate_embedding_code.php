@@ -250,7 +250,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
             $personalize_vars_code .= "});";
             $search = '_model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});';
             $replace = $search . $personalize_vars_code;
-            $code = str_replace($search,$replace,$code);
+            $code = str_replace($search, $replace, $code);
         }
         // <\Loading personalized variables>
         // <\Loading state, controller and interaction files as well as personalized variables>
