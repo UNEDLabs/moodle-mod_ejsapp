@@ -730,7 +730,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 } else { //Old EjsS version with an external .js file for the Javascript
                     $exploded_file_name = explode(".", $ejsapp->applet_name);
                     if (file_exists($folderpath . $exploded_file_name[0] . '.js')) {
-                        $code2 = '<script src="' . $CFG->wwwroot . $codebase . $exploded_file_name[0] . '.js"></script></body></html>';
+                        $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
                         $code = $code1 . $code2;
                         $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
                         $codeJS = update_links($codebase, $ejsapp, $codeJS, $use_original_css);
@@ -1403,7 +1403,7 @@ function prepare_ejs_file($ejsapp) {
         return $temp_file = $fs->create_file_from_pathname($fileinfo, $temp_filepath);
     }
 
-    // We first get the jar/ip file configured in the ejsapp activity and stored in the filzesystem
+    // We first get the jar/zip file configured in the ejsapp activity and stored in the filesystem
     $file_records = $DB->get_records('files', array('component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
     $file_record = reset($file_records);
     if ($file_record) {
