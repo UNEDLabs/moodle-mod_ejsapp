@@ -467,18 +467,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
 
         // class_file
-        $pattern = '/Main-Class\s*:\s*(.+)\s*/';
-        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-        $sub_str = $matches[1][0];
-        if (strlen($matches[1][0]) == 59) {
-            $pattern = '/^\s(.+)\s*/m';
-            if (preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
-                if (preg_match('/\s*:\s*/', $matches[1][0], $matches2, PREG_OFFSET_CAPTURE) == 0) {
-                    $sub_str = $sub_str . $matches[1][0];
-                }
-            }
-        }
-        $class_file = $sub_str . 'Applet.class';
+        $class_file = get_class_for_java($manifest);
         $ejsapp->class_file = preg_replace('/\s+/', "", $class_file); // delete all white-spaces and the first newline
 
         // mainframe
@@ -528,14 +517,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         $ejsapp->height = $height;
 
         // width
-        $pattern = '/Applet-Width\s*:\s*(\w+)/';
-        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-        if (count($matches) == 0) {
-            $width = 0;
-        } else {
-            $width = $matches[1][0];
-            $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
-        }
+        $width = get_width_for_java($manifest);
         $ejsapp->width = $width;
 
         // Sign the applet
@@ -570,6 +552,77 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
 
     return $ejs_ok;
 } // modifications_for_java
+
+/**
+ *
+ * Gets the java .class from the manifest
+ *
+ * @param string $manifest
+ * @return string $class_file
+ *
+ */
+function get_class_for_java($manifest){
+    $pattern = '/Main-Class\s*:\s*(.+)\s*/';
+    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+    $sub_str = $matches[1][0];
+    if (strlen($matches[1][0]) == 59) {
+        $pattern = '/^\s(.+)\s*/m';
+        if (preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
+            if (preg_match('/\s*:\s*/', $matches[1][0], $matches2, PREG_OFFSET_CAPTURE) == 0) {
+                $sub_str = $sub_str . $matches[1][0];
+            }
+        }
+    }
+    $class_file = $sub_str . 'Applet.class';
+
+    return $class_file;
+}
+
+/**
+ *
+ * Gets the java applet height from the manifest. If the form has the height param, it will be prioritary.
+ *
+ * @param string $manifest
+ * @param int $form_height
+ * @return string $class_file
+ *
+ */
+function get_height_for_java($manifest){
+    $height = 0;
+
+    $pattern = '/Applet-Height\s*:\s*(\w+)/';
+    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+    if (count($matches) > 0) {
+        $height = $matches[1][0];
+        $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
+    }
+
+
+    return $height;
+}
+
+/**
+ *
+ * Gets the java applet height from the manifest. If the form has the height param, it will be prioritary.
+ *
+ * @param string $manifest
+ * @param int $form_height
+ * @return string $class_file
+ *
+ */
+function get_width_for_java($manifest){
+    $width = 0;
+
+    $pattern = '/Applet-Width\s*:\s*(\w+)/';
+    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
+    if (count($matches) > 0) {
+        $width = $matches[1][0];
+        $width = preg_replace('/\s+/', "", $width); // delete all white-spaces
+    }
+
+
+    return $width;
+}
 
 
 /**
@@ -677,7 +730,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 } else { //Old EjsS version with an external .js file for the Javascript
                     $exploded_file_name = explode(".", $ejsapp->applet_name);
                     if (file_exists($folderpath . $exploded_file_name[0] . '.js')) {
-                        $code2 = '<script src="' . $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $exploded_file_name[0] . '.js"></script></body></html>';
+                        $code2 = '<script src="' . $CFG->wwwroot . $codebase . $exploded_file_name[0] . '.js"></script></body></html>';
                         $code = $code1 . $code2;
                         $codeJS = file_get_contents($folderpath . $exploded_file_name[0] . '.js');
                         $codeJS = update_links($codebase, $ejsapp, $codeJS, $use_original_css);
@@ -1350,7 +1403,7 @@ function prepare_ejs_file($ejsapp) {
         return $temp_file = $fs->create_file_from_pathname($fileinfo, $temp_filepath);
     }
 
-    // We first get the jar/zip file configured in the ejsapp activity and stored in the filesystem
+    // We first get the jar/ip file configured in the ejsapp activity and stored in the filzesystem
     $file_records = $DB->get_records('files', array('component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
     $file_record = reset($file_records);
     if ($file_record) {
