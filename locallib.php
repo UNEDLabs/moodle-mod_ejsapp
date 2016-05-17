@@ -138,6 +138,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     }
     $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
+
     // <Initialize the mod_form elements>
     $ejsapp->class_file = '';
     $ejsapp->codebase = $codebase;
@@ -358,16 +359,9 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $code = str_replace($search,$replace,$code);
 
     // Replace link for css
-    $ejss_css = '_ejs_library/css/ejsSimulation.css';
-    if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
-        $ejss_css = '_ejs_library/css/ejss.css';
-    }
-    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '/" />';
-    $file=fopen("testing.txt",'w');
-    fwrite($file,$search);
-    fclose($file);
+    $search = '<link rel="stylesheet"  type="text/css" href="_ejs_library/css/ejsSimulation.css" />';
     if ($use_css) {
-        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css . '" />';
+        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . '_ejs_library/css/ejsSimulation.css" />';
     } else {
         $replace = '';
     }
@@ -645,8 +639,6 @@ function get_width_for_java($manifest){
 function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase) {
     global $CFG;
 
-    $ejsapp->is_collaborative = 1;
-
     $zip = new ZipArchive;
     if ($zip->open($filepath) === TRUE) {
         $zip->extractTo($folderpath);
@@ -685,11 +677,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
             fclose($file);
         } else { // Original css
             $use_original_css = true;
-            $ejss_css = '_ejs_library/css/ejsSimulation.css';
-            if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
-                $ejss_css = '_ejs_library/css/ejss.css';
-            }
-            $css_file_location = $folderpath . $ejss_css;
+            $css_file_location = $folderpath . '_ejs_library/css/ejsSimulation.css';
             $handle = fopen($css_file_location, "r");
             if ($handle) {
                 while (($line = fgets($handle)) !== false) {
