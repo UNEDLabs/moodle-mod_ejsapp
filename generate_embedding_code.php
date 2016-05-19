@@ -391,10 +391,10 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function loadState(count) {
                 var to = typeof (document.getElementById($ejsapp_id));
                 if ((to == 'function' || to == 'object') && count > 0) {
-                    window.setTimeout( function() { loadState( --count ); }, 1000 );
+                    window.setTimeout( function() { loadState( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
-                  window.setTimeout( function() { $ejsapp_id._readState('url:$state_file'); }, 500 );
+                  window.setTimeout( function() { $ejsapp_id._readState('url:$state_file'); }, 1000 );
                   $ejsapp_id._view.resetTraces();
                   //$ejsapp_id._view.clearData();
                   //$ejsapp_id._view.clearElements();
@@ -404,7 +404,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                   alert('$state_fail_msg');
                 }
               }
-              loadState(10);";
+              loadState(20);";
                 //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
                 $code .= $load_state_code;
             } //end of if ($user_state_file)
@@ -420,19 +420,18 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function loadController(count) {
                 var to = typeof (document.getElementById($ejsapp_id));
                 if ((to == 'function' || to == 'object') && count > 0) {
-                    window.setTimeout( function() { loadState( --count ); }, 1000 );
+                    window.setTimeout( function() { loadController( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
                   window.setTimeout( function() {
                   var element = $ejsapp_id._model.getUserData('_codeController');
-                  element.setController($ejsapp_id._readText('url:$cnt_file')); }, 500 );
-                  //$ejsapp_id._model.codeEvaluator.setController($ejsapp_id._readText('url:$cnt_file')); }, 100 );
+                  element.setController($ejsapp_id._readText('url:$cnt_file')); }, 1000 );
                 }
                 else {
                   alert('$cnt_fail_msg');
                 }
               }
-              loadController(10);";
+              loadController(20);";
                 //<\to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
                 $code .= $load_cnt_code;
             } //end of if ($user_cnt_file)
@@ -448,16 +447,16 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function loadExperiment(count) {
                 var to = typeof (document.getElementById($ejsapp_id));
                 if ((to == 'function' || to == 'object') && count > 0) {
-                    window.setTimeout( function() { loadState( --count ); }, 1000 );
+                    window.setTimeout( function() { loadExperiment( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
-                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 500 );
+                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 1000 );
                 }
                 else {
                   alert('$rec_fail_msg');
                 }
               }
-              loadExperiment(10);";
+              loadExperiment(20);";
                 //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
                 $code .= $load_rec_code;
             } //end of if ($user_rec_file)
@@ -475,7 +474,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function personalizeVars(count) {
                 var to = typeof (document.getElementById($ejsapp_id));
                 if ((to == 'function' || to == 'object') && count > 0) {
-                    window.setTimeout( function() { loadState( --count ); }, 1000 );
+                    window.setTimeout( function() { personalizeVars( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
                     for (var i=0; i<js_vars_names.length; i++) {
@@ -490,7 +489,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                     //$ejsapp_id._initialize();
                 }
               }
-              personalizeVars(10);";
+              personalizeVars(20);";
                 $code .= $personalize_vars_code;
             }
             // <\Loading personalized variables>
