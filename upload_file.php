@@ -37,9 +37,9 @@ require_login();
 
 global $CFG;
 
-require_once("$CFG->libdir/formslib.php");
-require_once("$CFG->libdir/dml/moodle_database.php");
-require_once("$CFG->libdir/blocklib.php");
+require_once($CFG->libdir."/formslib.php");
+require_once($CFG->libdir."/dml/moodle_database.php");
+require_once($CFG->libdir."/blocklib.php");
 
 // user_file has the following format:
 // filename_context_id_879_user_id_5_ejsapp_id_87.extension

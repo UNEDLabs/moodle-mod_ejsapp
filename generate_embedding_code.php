@@ -389,11 +389,12 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
                 $load_state_code = "
               function loadState(count) {
-                if (!$ejsapp_id._simulation && count > 0) {
+                var to = typeof (document.getElementById($ejsapp_id));
+                if ((to == 'function' || to == 'object') && count > 0) {
                     window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if ($ejsapp_id._simulation) {
-                  window.setTimeout( function() { $ejsapp_id._readState('url:$state_file'); }, 100 );
+                else if (to == 'function' || to == 'object') {
+                  window.setTimeout( function() { $ejsapp_id._readState('url:$state_file'); }, 500 );
                   $ejsapp_id._view.resetTraces();
                   //$ejsapp_id._view.clearData();
                   //$ejsapp_id._view.clearElements();
@@ -417,14 +418,15 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
                 $load_cnt_code = "
               function loadController(count) {
-                if (!$ejsapp_id._model && count > 0) {
-                    window.setTimeout( function() { loadController( --count ); }, 1000 );
+                var to = typeof (document.getElementById($ejsapp_id));
+                if ((to == 'function' || to == 'object') && count > 0) {
+                    window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if ($ejsapp_id._model) {
+                else if (to == 'function' || to == 'object') {
                   window.setTimeout( function() {
                   var element = $ejsapp_id._model.getUserData('_codeController');
-                  element.setController($ejsapp_id._readText('url:$cnt_file')); }, 100 );
-                  //$ejsapp_id._model.codeEvaluator.setController(applet._readText('url:$cnt_file')); }, 100 );
+                  element.setController($ejsapp_id._readText('url:$cnt_file')); }, 500 );
+                  //$ejsapp_id._model.codeEvaluator.setController($ejsapp_id._readText('url:$cnt_file')); }, 100 );
                 }
                 else {
                   alert('$cnt_fail_msg');
@@ -444,11 +446,12 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
                 $load_rec_code = "
               function loadExperiment(count) {
-                if (!$ejsapp_id._simulation && count > 0) {
-                    window.setTimeout( function() { loadExperiment( --count ); }, 1000 );
+                var to = typeof (document.getElementById($ejsapp_id));
+                if ((to == 'function' || to == 'object') && count > 0) {
+                    window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if ($ejsapp_id._simulation) {
-                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 100 );
+                else if (to == 'function' || to == 'object') {
+                  window.setTimeout( function() { $ejsapp_id._simulation.runLoadExperiment('url:$rec_file'); }, 500 );
                 }
                 else {
                   alert('$rec_fail_msg');
@@ -470,10 +473,11 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               var js_vars_values = " . $js_vars_values . ";
               var js_vars_types = " . $js_vars_types . ";
               function personalizeVars(count) {
-                if (!$ejsapp_id._simulation && count > 0) {
-                    window.setTimeout( function() { personalizeVars( --count ); }, 1000 );
+                var to = typeof (document.getElementById($ejsapp_id));
+                if ((to == 'function' || to == 'object') && count > 0) {
+                    window.setTimeout( function() { loadState( --count ); }, 1000 );
                 }
-                else if ($ejsapp_id._simulation) {
+                else if (to == 'function' || to == 'object') {
                     for (var i=0; i<js_vars_names.length; i++) {
                         if (js_vars_types[i] != \"Boolean\") {
                             $ejsapp_id._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
