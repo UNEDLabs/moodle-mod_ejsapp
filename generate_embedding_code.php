@@ -447,7 +447,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
                 $load_rec_code = "
               function loadExperiment(count) {
-                var to = typeof (document.getElementById($ejsapp_id));
+                applet = document.getElementById('$ejsapp_id');
+                var to = typeof (applet);
                 if ((to == 'function' || to == 'object') && count > 0) {
                     window.setTimeout( function() { loadExperiment( --count ); }, 500 );
                 }
@@ -474,21 +475,22 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               var js_vars_values = " . $js_vars_values . ";
               var js_vars_types = " . $js_vars_types . ";
               function personalizeVars(count) {
-                var to = typeof (document.getElementById($ejsapp_id));
+                applet = document.getElementById('$ejsapp_id');
+                var to = typeof (applet);
                 if ((to == 'function' || to == 'object') && count > 0) {
                     window.setTimeout( function() { personalizeVars( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
                     for (var i=0; i<js_vars_names.length; i++) {
                         if (js_vars_types[i] != \"Boolean\") {
-                            $ejsapp_id._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
+                            applet._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
                         } else {
                             var bool = (js_vars_values[i] == 1);
-                            $ejsapp_id._simulation.setVariable(js_vars_names[i],bool);
+                            applet._simulation.setVariable(js_vars_names[i],bool);
                         }
                     }
-                    $ejsapp_id._simulation.update();
-                    //$ejsapp_id._initialize();
+                    applet._simulation.update();
+                    //applet._initialize();
                 }
               }
               personalizeVars(40);";
