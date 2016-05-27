@@ -635,9 +635,9 @@ function get_width_for_java($manifest){
  *
  * For EjsS javascript applications.
  *
- * @param string $folderpath
- * @param stdClass $ejsapp
  * @param string $filepath
+ * @param stdClass $ejsapp
+ * @param string $folderpath
  * @param string $codebase
  * @return boolean $ejs_ok
  *

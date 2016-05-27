@@ -106,21 +106,30 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
                 $path .= $newitemid;
                 if (!file_exists($path)) mkdir($path, 0700);
 
-                // copy file .jar or .zip file
                 $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
+
+                // copy file .jar or .zip file
                 $folderpath = $CFG->dirroot . $codebase;
                 $filepath = $folderpath . $file_record->filename;
                 $file->copy_content_to($filepath);
                 if (empty($data->class_file)) { //Zip file with Javascript
-                    modifications_for_javascript($folderpath, $filepath, $data, $codebase);
+                    modifications_for_javascript($filepath, $data, $folderpath, $codebase);
                     unlink($filepath);
                 }
+
+                // codebase
+                $codebase_complete = '';
+                preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
+                if (!empty($match_result) and $match_result[1]) {
+                    $codebase_complete .= '/' . $match_result[1];
+                }
+                $codebase_complete .= $codebase;
 
                 // <update ejsapp table>
                 $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
                 $record = new stdClass();
                 $record->id = $newitemid;
-                $record->codebase = $codebase;
+                $record->codebase = $codebase_complete;
                 $DB->update_record('ejsapp', $record);
             } //if ($file)
         } //if ($file_record)
