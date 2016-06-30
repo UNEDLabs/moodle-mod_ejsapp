@@ -198,7 +198,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 $f = @fopen("actions.log", "rb");
                 $id_coll_sess = 1;
                 $_SESSION["file_actions_session_$id_coll_sess"] = $f;
-                $sse_uri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?id=$id_coll_sess";
+                //$sse_uri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?id=$id_coll_sess";
+                $sse_uri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?";
                 $replace = "_model.addToInitialization(function() { _model.setRunAlways(true); _model.playCaptureStream('$sse_uri');";
             } else if ($collabinfo && isset($collabinfo->director)) { // collaborative session with the director of the session
                 $replace = "_model.addToInitialization(function() { _model.setRunAlways(true); _model.startCaptureStream(8000);";
