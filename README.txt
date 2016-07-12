@@ -80,17 +80,9 @@ An explanation of EJSApp is included in the folder "doc". There, you will also f
  2) Change the owner of the jarsigner file to apache.                                             
  For instance,                                                                                  
  2.a) in Linux CentOS, you should write                         
- $ chown apache /usr/bin/jarsigner                                                                     
+ $ chown apache /usr/java/jdk1.7.0_51/bin/jarsigner                                                                     
  2.b) in Linux OpenSuse,you should write                       
- $ chown wwwrun /usr/bin/jarsigner                                                                     
-                                                                                                
- 3) Set owner of mod/ejsapp/sign.sh to apache user in your machine (Note you may need to repeat
- this step when you update your EJSApp plugin).
- $ cd ejsapp
- 3.a) in Linux CentOS, you should write                         
- $ chown apache sign.sh                                                                     
- 3.b) in Linux OpenSuse,you should write                       
- $ chown wwwrun sign.sh                                                                       
+ $ chown wwwrun /usr/java/jdk1.7.0_51/bin/jarsigner                                                                                                                                  
 ------------------------------------------------------------------------------------------------
 
 4. Configuration

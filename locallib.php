@@ -532,12 +532,9 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         if (substr($matches[1][0], 0, -1) == $host[1]) {
             if (is_null($file->get_referencefileid())) { // linked files won't get signed!
                 // Sign the applet
-                shell_exec(dirname(__FILE__) . DIRECTORY_SEPARATOR . './sign.sh ' .
-                    $filepath . ' ' .                                       // parameter 1
-                    get_config('ejsapp', 'certificate_path') . ' ' .        // parameter 2
-                    get_config('ejsapp', 'certificate_password') . ' ' .    // parameter 3
-                    get_config('ejsapp', 'certificate_alias')               // parameter 4
-                );
+                shell_exec("jarsigner -storetype pkcs12 -keystore " . get_config('ejsapp', 'certificate_path') . " -storepass " .
+                            get_config('ejsapp', 'certificate_password') . " -tsa http://timestamp.comodoca.com/rfc3161 " .
+                            $filepath . " " . get_config('ejsapp', 'certificate_alias'));
                 // We replace the file stored in Moodle's filesystem and its table with the signed version:
                 $file->delete();
                 $fs = get_file_storage();
