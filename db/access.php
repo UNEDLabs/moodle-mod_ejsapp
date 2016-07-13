@@ -71,7 +71,7 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
 
-    // capability for ejsapp_external_interface
+    // capability for requesting information about ejsapp activities from third-party plugins
     'mod/ejsapp:requestinformation' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
