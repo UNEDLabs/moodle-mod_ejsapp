@@ -206,7 +206,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
         $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
         if ($this->current->instance && $is_remlab_manager_installed) {
-            $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $this->current->instance));
+            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $this->current->instance));
             if ($practiceintro) {
                 $i = 0;
                 $selected_practice_index = $i;

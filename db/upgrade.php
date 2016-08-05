@@ -186,37 +186,37 @@ function xmldb_ejsapp_upgrade($oldversion)
         $table_conf_old = new xmldb_table('ejsapp_remlab_conf');
         $table_sarlab_old = new xmldb_table('ejsapp_sarlab_keys');
         $table_expsyst_old = new xmldb_table('ejsapp_expsyst2pract');
-        // Rename tables ejsapp_remlab_conf, ejsapp_sarlab_keys and ejsapp_expsyst2pract as remlab_manager_conf,
-        // remlab_manager_sarlab_keys and remlab_manager_expsyst2pract
-        $dbman->rename_table($table_conf_old, 'remlab_manager_conf', $continue=true, $feedback=true);
-        $dbman->rename_table($table_sarlab_old, 'remlab_manager_sarlab_keys', $continue=true, $feedback=true);
-        $dbman->rename_table($table_expsyst_old, 'remlab_manager_expsyst2pract', $continue=true, $feedback=true);
+        // Rename tables ejsapp_remlab_conf, ejsapp_sarlab_keys and ejsapp_expsyst2pract as block_remlab_manager_conf,
+        // block_remlab_manager_sb_keys and block_remlab_manager_exp2prc
+        $dbman->rename_table($table_conf_old, 'block_remlab_manager_conf', $continue=true, $feedback=true);
+        $dbman->rename_table($table_sarlab_old, 'block_remlab_manager_sb_keys', $continue=true, $feedback=true);
+        $dbman->rename_table($table_expsyst_old, 'block_remlab_manager_exp2prc', $continue=true, $feedback=true);
     }
 
     if ($oldversion < '2015062800') {
         $dbman = $DB->get_manager();
-        $table_conf = new xmldb_table('remlab_manager_conf');
+        $table_conf = new xmldb_table('block_remlab_manager_conf');
         //Getting ejsappid fields in ejsapp_remlab_conf:
-        $ejsapp_ids = $DB->get_records('remlab_manager_conf', array(), '', 'ejsappid');
+        $ejsapp_ids = $DB->get_records('block_remlab_manager_conf', array(), '', 'ejsappid');
         // Delete index with dependency
         $index = new xmldb_index('ejsappid', XMLDB_INDEX_NOTUNIQUE, array('ejsappid'));
         if ($dbman->index_exists($table_conf, $index)) $dbman->drop_index($table_conf, $index, $continue=true, $feedback=true);
-        // Replacing ejsappid field configuration in remlab_manager_conf by practiceintro field configurattion: in remlab_manager_expsyst2pract
+        // Replacing ejsappid field configuration in block_remlab_manager_conf by practiceintro field configurattion: in block_remlab_manager_exp2prc
         $field = new xmldb_field('ejsappid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
         $dbman->rename_field($table_conf, $field, 'practiceintro');
         $field = new xmldb_field('practiceintro', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
         $dbman->change_field_type($table_conf, $field);
-        // Replacing ejsappid fields content in remlab_manager_conf by practiceintro fields content in remlab_manager_expsyst2pract
+        // Replacing ejsappid fields content in block_remlab_manager_conf by practiceintro fields content in block_remlab_manager_exp2prc
         foreach ($ejsapp_ids as $ejsapp_id) {
-            $practiceintros = $DB->get_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp_id->ejsappid));
+            $practiceintros = $DB->get_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp_id->ejsappid));
             $counter = 1;
             foreach ($practiceintros as $practiceintro) {
-                $record = $DB->get_record('remlab_manager_conf', array('practiceintro' => $ejsapp_id->ejsappid));
+                $record = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $ejsapp_id->ejsappid));
                 $record->practiceintro = $practiceintro->practiceintro;
-                if ($counter == 1) $DB->update_record('remlab_manager_conf', $record);
+                if ($counter == 1) $DB->update_record('block_remlab_manager_conf', $record);
                 else {
                     unset($record->id);
-                    $DB->insert_record('remlab_manager_conf', $record);
+                    $DB->insert_record('block_remlab_manager_conf', $record);
                 }
                 $counter++;
             }
@@ -224,14 +224,14 @@ function xmldb_ejsapp_upgrade($oldversion)
     }
 
     if ($oldversion < '2015070401') {
-        // Deleting records in remlab_manager_conf with repeated practiceintro
-        $practiceintros = $DB->get_records('remlab_manager_conf', array(), '', 'practiceintro');
+        // Deleting records in block_remlab_manager_conf with repeated practiceintro
+        $practiceintros = $DB->get_records('block_remlab_manager_conf', array(), '', 'practiceintro');
         foreach ($practiceintros as $practiceintro) {
-            $repeated_practiceintros = $DB->get_records('remlab_manager_conf', array('practiceintro' => $practiceintro->practiceintro));
+            $repeated_practiceintros = $DB->get_records('block_remlab_manager_conf', array('practiceintro' => $practiceintro->practiceintro));
             if (count($repeated_practiceintros) > 1) {
                 $counter = 1;
                 foreach ($repeated_practiceintros as $repeated_practiceintro) {
-                    if ($counter > 1) $DB->delete_records('remlab_manager_conf', array('id' => $repeated_practiceintro->id));
+                    if ($counter > 1) $DB->delete_records('block_remlab_manager_conf', array('id' => $repeated_practiceintro->id));
                     $counter++;
                 }
             }

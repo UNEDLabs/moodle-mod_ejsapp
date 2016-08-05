@@ -39,8 +39,8 @@ global $DB;
 $key = required_param('key', PARAM_TEXT);
 echo "key=$key\n";
 
-if ($DB->record_exists('remlab_manager_sarlab_keys', array('sarlabpass' => $key))) {
+if ($DB->record_exists('block_remlab_manager_sb_keys', array('sarlabpass' => $key))) {
     $permissions = "labmanager=false\n";
-    if($DB->get_field('remlab_manager_sarlab_keys', 'labmanager', array('sarlabpass'=>$key)) == 1) $permissions = "labmanager=true\n";
+    if($DB->get_field('block_remlab_manager_sb_keys', 'labmanager', array('sarlabpass'=>$key)) == 1) $permissions = "labmanager=true\n";
     echo "access=true\n".$permissions;
 } else echo "access=false\n";

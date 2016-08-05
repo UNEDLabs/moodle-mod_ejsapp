@@ -172,7 +172,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     }//process_ejsapp_log
 
     /**
-     * Process table remlab_manager_exptsyst2pract
+     * Process table block_remlab_manager_exptsyst2pract
      * @param stdClass $data
      */
     /*protected function process_remlab_manager_exptsyst2pract($data)
@@ -182,11 +182,11 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $data = (object)$data;
 
         $data->ejsappid = $this->get_new_parentid('ejsapp');
-        $data->practiceid = $DB->get_field('remlab_manager_expsyst2pract', 'practiceid', array('ejsappid'=>$data->ejsappid));
-        $data->practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid'=>$data->ejsappid));
+        $data->practiceid = $DB->get_field('block_remlab_manager_exp2prc', 'practiceid', array('ejsappid'=>$data->ejsappid));
+        $data->practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid'=>$data->ejsappid));
 
         // insert the ejsapp record
-        $is_exptsyst2pract_restored = $DB->get_record('remlab_manager_exptsyst2pract',array('ejsappid'=>$data->ejsappid));
+        $is_exptsyst2pract_restored = $DB->get_record(block_'remlab_manager_exptsyst2pract',array('ejsappid'=>$data->ejsappid));
         $is_exptsyst2pract_restored = !empty($is_exptsyst2pract_restored);
         if (!$is_exptsyst2pract_restored) {
             $DB->insert_record('remlab_manager_exptsyst2pract', $data);

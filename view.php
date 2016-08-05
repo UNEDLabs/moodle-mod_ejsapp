@@ -140,7 +140,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
                 $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlab_conf->sarlabinstance, $remote_lab_access->labmanager, $max_use_time);
                 if (is_null($sarlabinfo)) {
-                    $expsyst2pract = $DB->get_record('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => 1));
+                    $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id, 'practiceid' => 1));
                     $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, 0, $expsyst2pract->practiceintro, $remote_lab_access->labmanager, $max_use_time);
                 }
             }

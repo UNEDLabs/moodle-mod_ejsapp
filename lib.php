@@ -131,10 +131,10 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
             if ($ejsapp->remlab_manager) {
                 $complete_pract_list = explode(';', $ejsapp->list_practices);
-                $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
+                $remlab_info = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
                 if ($remlab_info == null) {
                     $remlab_info = default_rem_lab_conf($ejsapp);
-                    $DB->insert_record('remlab_manager_conf', $remlab_info);
+                    $DB->insert_record('block_remlab_manager_conf', $remlab_info);
                 }
             }
             ejsapp_expsyst2pract($ejsapp);
@@ -182,17 +182,17 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
             if ($ejsapp->remlab_manager) {
                 $complete_pract_list = explode(';', $ejsapp->list_practices);
-                $remlab_info = $DB->get_record('remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
+                $remlab_info = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $complete_pract_list[$ejsapp->practiceintro]));
                 if ($remlab_info == null) {
                     $remlab_info = default_rem_lab_conf($ejsapp);
-                    $DB->insert_record('remlab_manager_conf', $remlab_info);
+                    $DB->insert_record('block_remlab_manager_conf', $remlab_info);
                 }
-                $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
+                $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
                 ejsapp_expsyst2pract($ejsapp);
             }
             if ($is_ejsappbooking_installed) update_booking_table($ejsapp);
         } else {
-            if ($ejsapp->remlab_manager) $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
+            if ($ejsapp->remlab_manager) $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
             if ($is_ejsappbooking_installed) {
                 if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
                     $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
@@ -235,7 +235,7 @@ function ejsapp_delete_instance($id) {
 
     $DB->delete_records('ejsapp', array('id' => $ejsapp->id));
     if ($ejsapp->is_rem_lab == 1) {
-        $DB->delete_records('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id));
+        $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
         // EJSApp booking system
         if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
           $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
@@ -385,18 +385,18 @@ function ejsapp_cron() {
     require_once($CFG->dirroot . '/filter/multilang/filter.php');
 
     //Delete all stored Sarlab keys:
-    $DB->delete_records('remlab_manager_sarlab_keys');
+    $DB->delete_records('block_remlab_manager_sb_keys');
 
     //Delete all 'working' logs for EJSApp activities older than 15 min:
     $params = array(strtotime(date('Y-m-d H:i:s'))-900);
     $DB->delete_records_select('ejsapp_log', "time < ?", $params);
 
     //Checking whether remote labs are operative or not:
-    $ejsapp_remlabs_conf = $DB->get_records('remlab_manager_conf');
+    $ejsapp_remlabs_conf = $DB->get_records('block_remlab_manager_conf');
     foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
         $practiceintro= null;
         if ($ejsapp_remlab_conf->usingsarlab) {
-            $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
+            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
         }
         $devices_info = new stdClass();
         $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $practiceintro);
@@ -434,7 +434,7 @@ function ejsapp_cron() {
                 $send_mail = true;
             }
             $ejsapp_remlab_conf->active = $lab_state;
-            $DB->update_record('remlab_manager_conf', $ejsapp_remlab_conf);
+            $DB->update_record('block_remlab_manager_conf', $ejsapp_remlab_conf);
         }
         // Send e-mails:
         if ($send_mail) {

@@ -296,7 +296,7 @@ function combine_experiences($list_sarlab_experiences) {
     $is_remlab_manager_installed = $DB->get_records('block',array('name'=>'remlab_manager'));
     $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
     if ($is_remlab_manager_installed) {
-        $list_remlab_experiences_without_sarlab = $DB->get_records('remlab_manager_conf', array('usingsarlab' => '0'));
+        $list_remlab_experiences_without_sarlab = $DB->get_records('block_remlab_manager_conf', array('usingsarlab' => '0'));
         $list_combined_experiences = array();
         if ($list_sarlab_experiences[0] != '') $list_combined_experiences = $list_sarlab_experiences;
         foreach ($list_remlab_experiences_without_sarlab as $remlab_experiences_without_sarlab) {
@@ -843,7 +843,7 @@ function ping($host, $port=80, $usingsarlab, $idExp=null, $timeout=3) {
 
 /**
  *
- * Creates a default record for the remlab_manager_conf table
+ * Creates a default record for the block_remlab_manager_conf table
  *
  * @param stdClass $ejsapp
  * @return stdClass $default_rem_lab_conf
@@ -887,12 +887,12 @@ function default_rem_lab_conf($ejsapp) {
     $default_rem_lab_conf->free_access = 0;
 
     return $default_rem_lab_conf;
-} // ejsapp_rem_lab_conf
+} // default_rem_lab_conf
 
 
 /**
  *
- * Creates the record for the remlab_manager_expsyst2pract table
+ * Creates the record for the block_remlab_manager_exp2prc table
  *
  * @param stdClass $ejsapp
  * @return void
@@ -907,8 +907,8 @@ function ejsapp_expsyst2pract($ejsapp) {
     $expsyst2pract_list = $ejsapp->list_practices;
     $expsyst2pract_list = explode(';', $expsyst2pract_list);
     $ejsapp_expsyst2pract->practiceintro = $expsyst2pract_list[$ejsapp->practiceintro];
-    $DB->insert_record('remlab_manager_expsyst2pract', $ejsapp_expsyst2pract);
-} // remlab_manager_expsyst2pract
+    $DB->insert_record('block_remlab_manager_exp2prc', $ejsapp_expsyst2pract);
+} // ejsapp_expsyst2pract
 
 
 /**
@@ -1004,7 +1004,7 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance,
         $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id, 'valid' => 1));
         foreach ($bookings as $booking) { // If the user has an active booking, use that info
             if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
-                $expsyst2pract = $DB->get_record('remlab_manager_expsyst2pract', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
+                $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id, 'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;
                 $sarlabinfo = define_sarlab($sarlabinstance, 0, $practice, $labmanager, $max_use_time);
                 break;
@@ -1103,13 +1103,13 @@ function get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsdurat
                     }
                 }
             }
-            $practiceintro = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $repeated_ejsapp_lab->id));
+            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $repeated_ejsapp_lab->id));
             foreach ($viewed_log_records as $viewed_log_record) {
                 if ($viewed_log_record->userid != $USER->id) {
                     if ($viewed_log_record->userid == $user_occupying_lab_id) { // accesses of the user that is currently working with the rem lab
-                        $occupied_ejsapp_slotsduration_conf = $DB->get_field('remlab_manager_conf', 'slotsduration', array('practiceintro' => $practiceintro));
+                        $occupied_ejsapp_slotsduration_conf = $DB->get_field('block_remlab_manager_conf', 'slotsduration', array('practiceintro' => $practiceintro));
                         if ($occupied_ejsapp_slotsduration_conf > 4) $occupied_ejsapp_slotsduration_conf = 0;
-                        $occupied_ejsapp_maxslots = $DB->get_field('remlab_manager_conf', 'dailyslots', array('practiceintro' => $practiceintro));
+                        $occupied_ejsapp_maxslots = $DB->get_field('block_remlab_manager_conf', 'dailyslots', array('practiceintro' => $practiceintro));
                         $occupied_ejsapp_max_use_time = $occupied_ejsapp_maxslots * 60 * $slotsduration[$occupied_ejsapp_slotsduration_conf];
                         if ($viewed_log_record->time > $currenttime - $occupied_ejsapp_max_use_time) {
                             $time_first_access = max($time_first_access, $viewed_log_record->time); // TODO: Change to min when we stop resetting time when a user connected to a remote lab refreshes the page
@@ -1200,7 +1200,7 @@ function get_remaining_time($booking_info, $status, $time_information, $idle_tim
 function get_repeated_remlabs($remlab_conf) {
     global $DB;
 
-    $repeated_practices = $DB->get_records('remlab_manager_expsyst2pract', array('practiceintro'=>$remlab_conf->practiceintro));
+    $repeated_practices = $DB->get_records('block_remlab_manager_exp2prc', array('practiceintro'=>$remlab_conf->practiceintro));
     $ejsappids = array();
     foreach ($repeated_practices as $repeated_practice) {
         array_push($ejsappids, $repeated_practice->ejsappid);
@@ -1282,12 +1282,12 @@ function remote_lab_access_info($ejsapp, $course) {
     $coursecontext = context_course::instance($course->id);
     $remote_lab_access = new stdClass;
 
-    $practice = $DB->get_field('remlab_manager_expsyst2pract', 'practiceintro', array('ejsappid' => $ejsapp->id));
-    $remote_lab_access->remlab_conf = $DB->get_record('remlab_manager_conf', array('practiceintro' => $practice));
+    $practice = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsapp->id));
+    $remote_lab_access->remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
 
     //<Check if the remote lab is operative>
     $remote_lab_access->operative = true;
-    $ejsapp_lab_active = $DB->get_field('remlab_manager_conf', 'active', array('practiceintro' => $practice));
+    $ejsapp_lab_active = $DB->get_field('block_remlab_manager_conf', 'active', array('practiceintro' => $practice));
     if ($ejsapp_lab_active == 0) {
         $remote_lab_access->operative = false;
     }

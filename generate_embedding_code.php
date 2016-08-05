@@ -137,7 +137,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $min = date("i", $time);
         $seg = date("s", $time);
         $time = mktime($hour, $min, $seg, $month, $day, $year);
-        $DB->delete_records('remlab_manager_sarlab_keys', array('user' => $USER->username)); //WARNING: This also deletes keys for collab sessions with Sarlab!!
+        $DB->delete_records('block_remlab_manager_sb_keys', array('user' => $USER->username)); //WARNING: This also deletes keys for collab sessions with Sarlab!!
         mt_srand(time());
         $random = mt_rand(0, 1000000);
         if ($sarlabinfo) $sarlab_key = sha1($year . $month . $day . $hour . $min . $seg . $sarlabinfo->practice . fullname($USER) . $USER->username . $random);
@@ -149,7 +149,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $new_sarlab_key->labmanager = $sarlabinfo->labmanager;
         $new_sarlab_key->creationtime = $time;
 
-        $DB->insert_record('remlab_manager_sarlab_keys', $new_sarlab_key);
+        $DB->insert_record('block_remlab_manager_sb_keys', $new_sarlab_key);
 
         if ($sarlabinfo) {
             $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
