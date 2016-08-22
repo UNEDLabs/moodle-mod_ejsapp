@@ -134,7 +134,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
         $remote_lab_time = remote_lab_use_time_info($remlab_conf, $repeated_ejsapp_labs);
         $max_use_time = $remote_lab_time->max_use_time;
         //Get the lab use status
-        $lab_status = get_lab_status($remote_lab_time->time_information, $remlab_conf->reboottime, get_config('ejsapp', 'check_activity'));
+        $lab_status = get_lab_status($remote_lab_time->time_information, $remlab_conf->reboottime, get_config('mod_ejsapp', 'check_activity'));
         if ($lab_status == 'available') {
             if ($remlab_conf->usingsarlab == 1) {
                 //Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used:
@@ -284,13 +284,13 @@ if ($accessed) {
     $url_log = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php?courseid='.$course->id.'&activityid='.$cm->id.'&ejsappname='.$ejsappname.'&userid='.$USER->id;
     $htmlid = "EJsS";
     $url_view = $CFG->wwwroot . '/mod/ejsapp/kick_out.php';
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $ejsapp->is_rem_lab, $htmlid, get_config('ejsapp', 'check_activity'), $max_use_time));
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($url_log, $url_view, $ejsapp->is_rem_lab, $htmlid, get_config('mod_ejsapp', 'check_activity'), $max_use_time));
 } else if ($action == 'booked_lab' || $action == 'need_to_wait') { // remote lab not accessible by the user at the present moment
-    $remaining_time = get_remaining_time($remote_lab_access->booking_info, $lab_status, $remote_lab_time->time_information, $remlab_conf->reboottime, get_config('ejsapp', 'check_activity'));
-    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&courseid='.$course->id.'&check_activity='.get_config('ejsapp', 'check_activity');
+    $remaining_time = get_remaining_time($remote_lab_access->booking_info, $lab_status, $remote_lab_time->time_information, $remlab_conf->reboottime, get_config('mod_ejsapp', 'check_activity'));
+    $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid='.$ejsapp->id.'&courseid='.$course->id.'&check_activity='.get_config('mod_ejsapp', 'check_activity');
     $htmlid = "timecountdown";
     echo $OUTPUT->box(html_writer::div('', '', array('id'=>$htmlid)));
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, get_config('ejsapp', 'check_activity'), ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
+    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, get_config('mod_ejsapp', 'check_activity'), ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
 }
 // </Javascript features>
 

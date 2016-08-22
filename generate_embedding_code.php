@@ -152,14 +152,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $DB->insert_record('block_remlab_manager_sb_keys', $new_sarlab_key);
 
         if ($sarlabinfo) {
-            $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+            $list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
             $sarlab_IP = $list_sarlab_IPs[$sarlabinfo->instance];
             $init_pos = strpos($sarlab_IP, "'");
             $end_pos = strrpos($sarlab_IP, "'");
             if( !(($init_pos === false) || ($init_pos === $end_pos)) ) {
                 $sarlab_IP = substr($sarlab_IP,$end_pos+1);
             }
-            $list_sarlab_ports = explode(";", $CFG->sarlab_port);
+            $list_sarlab_ports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
             $sarlab_port = $list_sarlab_ports[$sarlabinfo->instance];
         } else {
             $sarlab_IP = $collabinfo->ip;
@@ -343,7 +343,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 $code .= "document.write('<param name=\"is_collaborative\" value=\"true\"/>');";
                 if (isset($collabinfo->director)) {
                     $code .= "document.write('<param name=\"directorname\" value=\"$username\"/>');
-                              document.write('<param name=\"Port_Teacher\" value=\"" . get_config('ejsapp_collab_session', 'collaborative_port') . "\"/>');";
+                              document.write('<param name=\"Port_Teacher\" value=\"" . get_config('block_ejsapp_collab_session', 'collaborative_port') . "\"/>');";
                 } else {
                     insert_collaborative_user($USER->id, null, $collabinfo->session);
                     //127.0.0.1\"/>');

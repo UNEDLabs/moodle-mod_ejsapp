@@ -41,13 +41,13 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
-        'ejsapp/generalsettings',
+        'mod_ejsapp/generalsettings',
         get_string('default_general_set', 'ejsapp'),
         ''
     ));
 
     $settings->add(new admin_setting_configtext(
-        'ejsapp/check_activity',
+        'mod_ejsapp/check_activity',
         get_string('check_activity', 'ejsapp'),
         get_string('check_activity_description', 'ejsapp'),
         60,
@@ -56,13 +56,13 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_heading(
-        'ejsapp/certificatesettings',
+        'mod_ejsapp/certificatesettings',
         get_string('default_certificate_set', 'ejsapp'),
         ''
     ));
 
     $settings->add(new admin_setting_configtext(
-        'ejsapp/certificate_path',
+        'mod_ejsapp/certificate_path',
         get_string('certificate_path', 'ejsapp'),
         get_string('certificate_path_description', 'ejsapp'),
         $CFG->dataroot . '/firmadia.pfx',
@@ -71,7 +71,7 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_configtext(
-        'ejsapp/certificate_password',
+        'mod_ejsapp/certificate_password',
         get_string('certificate_password', 'ejsapp'),
         get_string('certificate_password_description', 'ejsapp'),
         '',
@@ -80,7 +80,7 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_configtext(
-        'ejsapp/certificate_alias',
+        'mod_ejsapp/certificate_alias',
         get_string('certificate_alias', 'ejsapp'),
         get_string('certificate_alias_description', 'ejsapp'),
         '',

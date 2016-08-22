@@ -54,7 +54,7 @@ $password = $encryption->decrypt($password);
 //echo $username . "<br/>";
 //echo $password;
 
-$list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+$list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
 
 foreach ($list_sarlab_IPs as $list_sarlab_IP) {
 
@@ -99,8 +99,7 @@ class MCrypt {
 
     function __construct() {
         //Retrieve the key from the configuration of the ejsapp plugin:
-        global $CFG;
-        $this->key = $CFG->sarlab_enc_key;
+        $this->key = get_config('block_remlab_manager', 'sarlab_enc_key');
         if ($this->key == null) echo "WARNING: The encryption key has not been configured in the EJSApp plugin. Edit the settings of the EJSApp plugin to fix this.";
         elseif (strlen($this->key) != 16) echo "WARNING: An encryption key has been found but it does not have the required number of characters! Edit the settings of the EJSApp plugin to fix this.";
         //$this->key = "3?hZ=9%1VfMbl5_I"; //16 characters long key example

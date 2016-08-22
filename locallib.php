@@ -323,7 +323,7 @@ function combine_experiences($list_sarlab_experiences) {
  */
 function get_showable_experiences() {
     global $CFG, $USER;
-    $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+    $list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     //Get experiences from Sarlab
     $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
     $list_sarlab_experiences = explode(";", $listExperiences);
@@ -524,7 +524,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
 
         // Sign the applet
         // Check whether a certificate is installed and in use
-        //if (file_exists(get_config('ejsapp', 'certificate_path')) && get_config('ejsapp', 'certificate_password') != '' && get_config('ejsapp', 'certificate_alias') != '') {
+        //if (file_exists(get_config('mod_ejsapp', 'certificate_path')) && get_config('mod_ejsapp', 'certificate_password') != '' && get_config('mod_ejsapp', 'certificate_alias') != '') {
         // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot
         $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
@@ -532,9 +532,9 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         if (substr($matches[1][0], 0, -1) == $host[1]) {
             if (is_null($file->get_referencefileid())) { // linked files won't get signed!
                 // Sign the applet
-                shell_exec("jarsigner -storetype pkcs12 -keystore " . get_config('ejsapp', 'certificate_path') . " -storepass " .
-                            get_config('ejsapp', 'certificate_password') . " -tsa http://timestamp.comodoca.com/rfc3161 " .
-                            $filepath . " " . get_config('ejsapp', 'certificate_alias'));
+                shell_exec("jarsigner -storetype pkcs12 -keystore " . get_config('mod_ejsapp', 'certificate_path') . " -storepass " .
+                            get_config('mod_ejsapp', 'certificate_password') . " -tsa http://timestamp.comodoca.com/rfc3161 " .
+                            $filepath . " " . get_config('mod_ejsapp', 'certificate_alias'));
                 // We replace the file stored in Moodle's filesystem and its table with the signed version:
                 $file->delete();
                 $fs = get_file_storage();
@@ -854,7 +854,7 @@ function default_rem_lab_conf($ejsapp) {
 
     $default_rem_lab_conf = new stdClass();
     //Get experiences from Sarlab and check whether this practice is in a Sarlab server or not
-    $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
+    $list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
     $list_sarlab_experiences = explode(";", $listExperiences);
     $complete_pract_list = explode(';', $ejsapp->list_practices);
@@ -865,8 +865,8 @@ function default_rem_lab_conf($ejsapp) {
         $sarlabinstance = 0;
         $default_rem_lab_conf->sarlabinstance = $sarlabinstance;
         $default_rem_lab_conf->sarlabcollab = 0;
-        $list_sarlab_IPs = explode(";", $CFG->sarlab_IP);
-        $list_sarlab_ports = explode(";", $CFG->sarlab_port);
+        $list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+        $list_sarlab_ports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
         $init_char = strrpos($list_sarlab_IPs[intval($sarlabinstance)], "'");
         if ($init_char != 0) $init_char++;
         $ip = substr($list_sarlab_IPs[intval($sarlabinstance)], $init_char);
