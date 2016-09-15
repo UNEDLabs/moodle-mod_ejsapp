@@ -540,8 +540,9 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                                 <argument>-moodle_upload_file</argument>
                                 <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file.php</argument>
                                 <argument>-lookandfeel</argument>
-                                <argument>NIMBUS</argument>
-                                <argument>-ipserver</argument>
+                                <argument>NIMBUS</argument>";
+            if ($sarlabinfo) {
+                $content .= "<argument>-ipserver</argument>
                                 <argument>$sarlab_IP</argument>
                                 <argument>-portserver</argument>
                                 <argument>$sarlab_port</argument>
@@ -552,8 +553,9 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                                 <argument>-passwd</argument>
                                 <argument>$sarlab_key</argument>
                                 <argument>-max_time</argument>
-                                <argument>$sarlabinfo->max_use_time</argument>
-                            </application-desc>
+                                <argument>$sarlabinfo->max_use_time</argument>";
+            }
+            $content .= "</application-desc>
                             <security>
                                 <all-permissions/>
                             </security>

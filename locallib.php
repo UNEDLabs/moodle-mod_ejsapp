@@ -230,6 +230,7 @@ function delete_recursively($dir) {
         }
         return @rmdir($dir);
     }
+    return false;
 } //delete_recursively
 
 
@@ -322,7 +323,7 @@ function combine_experiences($list_sarlab_experiences) {
  *
  */
 function get_showable_experiences() {
-    global $CFG, $USER;
+    global $USER;
     $list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     //Get experiences from Sarlab
     $listExperiences = get_experiences_sarlab($USER->username, $list_sarlab_IPs);
@@ -407,6 +408,7 @@ function personalize_vars($ejsapp, $user) {
             $uniqueval = filter_var(md5($user->firstname . $i . $user->username . $user->lastname . $user->id .
                                     $personalvar->id . $personalvar->name . $personalvar->type . $user->email .
                                     $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
+            $uniqueval = round($uniqueval);
             mt_srand($uniqueval/(pow(10,strlen($user->username))));
             $personalvarsinfo->name[$i] = $personalvar->name;
             $factor = 1;
@@ -582,7 +584,6 @@ function get_class_for_java($manifest){
  * Gets the java applet height from the manifest. If the form has the height param, it will be prioritary.
  *
  * @param string $manifest
- * @param int $form_height
  * @return string $class_file
  *
  */
@@ -605,7 +606,6 @@ function get_height_for_java($manifest){
  * Gets the java applet height from the manifest. If the form has the height param, it will be prioritary.
  *
  * @param string $manifest
- * @param int $form_height
  * @return string $class_file
  *
  */
@@ -743,23 +743,32 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         $ejs_ok = false;
     }
 
-    function chmod_r($path) {
-        $dir = new DirectoryIterator($path);
-        foreach ($dir as $item) {
-            if (!is_dir($item->getPathname())) {
-                chmod($item->getPathname(), 0644);
-            } else {
-                chmod($item->getPathname(), 0755);
-            }
-            if ($item->isDir() && !$item->isDot()) {
-                chmod_r($item->getPathname());
-            }
-        }
-    }
     chmod_r($folderpath);
 
     return $ejs_ok;
 } // modifications_for_javascript
+
+
+/**
+ *
+ * Recursively change permissions for the jarfiles directory and subdirectories
+ *
+ * @param string $path
+ *
+ */
+function chmod_r($path) {
+    $dir = new DirectoryIterator($path);
+    foreach ($dir as $item) {
+        if (!is_dir($item->getPathname())) {
+            chmod($item->getPathname(), 0644);
+        } else {
+            chmod($item->getPathname(), 0755);
+        }
+        if ($item->isDir() && !$item->isDot()) {
+            chmod_r($item->getPathname());
+        }
+    }
+}
 
 
 /**
@@ -993,6 +1002,7 @@ function check_booking_system($ejsapp) {
  * @param string $currenttime
  * @param int $sarlabinstance
  * @param int $labmanager
+ * @param int $max_use_time
  * param int $max_use_time
  * @return stdClass $sarlabinfo
  *

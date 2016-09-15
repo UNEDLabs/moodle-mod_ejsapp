@@ -42,12 +42,15 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     {
         $paths = array();
         $paths[] = new restore_path_element('ejsapp', '/activity/ejsapp');
-        $paths[] = new restore_path_element('ejsapp_personal_vars', '/activity/ejsapp/ejsapp_personal_vars/personal_vars');
+        $paths[] = new restore_path_element('ejsapp_personal_vars', '/activity/ejsapp/ejsapp_personal_vars');
+        $paths[] = new restore_path_element('remlab_manager_exp2prc', '/activity/ejsapp/remlab_manager_exp2practs/block_remlab_manager_exp2prc');
+        $paths[] = new restore_path_element('ejsappbooking', '/activity/ejsapp/ejsappbookings/ejsappbooking');
 
         $userinfo = $this->get_setting_value('userinfo');
         if ($userinfo){
-            $paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');
+            //$paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');
             $paths[] = new restore_path_element('ejsappbooking_usersaccess', '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
+            $paths[] = new restore_path_element('ejsappbooking_remlab_access', '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
         }
 
         // Return the paths wrapped into standard activity structure
@@ -126,7 +129,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
                 $codebase_complete .= $codebase;
 
                 // <update ejsapp table>
-                $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
                 $record = new stdClass();
                 $record->id = $newitemid;
                 $record->codebase = $codebase_complete;
@@ -148,10 +150,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
-
         $data->ejsappid = $this->get_new_parentid('ejsapp');
-
-        // insert the ejsapp record
         $DB->insert_record('ejsapp_personal_vars', $data);
     }//process_ejsapp_personal_vars
 
@@ -164,34 +163,22 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
-
-        $data->ejsappid = $this->get_new_parentid('ejsapp_log');
-
-        // insert the ejsapp record
+        $data->ejsappid = $this->get_new_parentid('ejsapp');
         $DB->insert_record('ejsapp_log', $data);
     }//process_ejsapp_log
 
     /**
-     * Process table block_remlab_manager_exptsyst2pract
+     * Process table process_remlab_manager_exp2prc
      * @param stdClass $data
      */
-    /*protected function process_remlab_manager_exptsyst2pract($data)
+    protected function process_remlab_manager_exp2prc($data)
     {
         global $DB;
 
         $data = (object)$data;
-
         $data->ejsappid = $this->get_new_parentid('ejsapp');
-        $data->practiceid = $DB->get_field('block_remlab_manager_exp2prc', 'practiceid', array('ejsappid'=>$data->ejsappid));
-        $data->practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid'=>$data->ejsappid));
-
-        // insert the ejsapp record
-        $is_exptsyst2pract_restored = $DB->get_record(block_'remlab_manager_exptsyst2pract',array('ejsappid'=>$data->ejsappid));
-        $is_exptsyst2pract_restored = !empty($is_exptsyst2pract_restored);
-        if (!$is_exptsyst2pract_restored) {
-            $DB->insert_record('remlab_manager_exptsyst2pract', $data);
-        }
-    }//process_remlab_manager_exptsyst2pract
+        $DB->insert_record('block_remlab_manager_exp2prc', $data);
+    }//process_remlab_manager_exp2prc
 
     /**
      * Process table ejsappbooking
@@ -202,13 +189,10 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
-
         $data->course = $this->get_courseid();
-
-        // insert the ejsapp record
-        $is_ejsappbooking_restored = $DB->get_records('ejsappbooking',array('course'=>$data->course));
-        $is_ejsappbooking_restored = !empty($is_ejsappbooking_restored);
-        if (!$is_ejsappbooking_restored) {
+        $ejsappbooking_already_exists_in_course = $DB->get_records('ejsappbooking',array('course'=>$data->course));
+        $ejsappbooking_already_exists_in_course = !empty($ejsappbooking_already_exists_in_course);
+        if (!$ejsappbooking_already_exists_in_course) {
             $DB->insert_record('ejsappbooking', $data);
         }
     }//process_ejsappbooking
@@ -222,13 +206,9 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
-
         $data->ejsappid = $this->get_new_parentid('ejsapp');
         $data->bookingid = $this->get_mappingid('ejsappbooking', $data->bookingid);
         $data->userid = $this->get_mappingid('user', $data->userid);
-
-
-        // insert the ejsapp record
         $DB->insert_record('ejsappbooking_usersaccess', $data);
     }//process_ejsappbooking_usersaccess
 
@@ -241,11 +221,8 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object)$data;
-
         // There is no necessity of mapping for "practiceid" nor "username"
         $data->ejsappid = $this->get_new_parentid('ejsapp');
-
-        // insert the ejsapp record
         $DB->insert_record('ejsappbooking_remlab_access', $data);
     }//process_ejsappbooking_remlab_access
 
@@ -254,13 +231,11 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
      */
     protected function after_execute()
     {
-
         // Add ejsapp related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'cntfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'recfiles', 'ejsapp');
-
     } //after_execute
 
 } //class

@@ -46,7 +46,7 @@ $data_files = array($state_file, $cnt_file, $rec_file);
 if (!is_null($session_id)) {
     $collab_session = $DB->get_record('ejsapp_collab_sessions',array('id'=>$session_id));
     if (isset($collab_session->localport)) {
-        require_once('/../../blocks/ejsapp_collab_session/manage_collab_db.php');
+        require_once(dirname(dirname(dirname(__FILE__))) . '/blocks/ejsapp_collab_session/manage_collab_db.php');
 
         $n = $collab_session->ejsapp;
 
@@ -94,7 +94,9 @@ $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $cm->id));
 $PAGE->set_title($ejsapp->name);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'ejsapp'));
+if ($CFG->version > 2016090100) {
+    $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'ejsapp'));
+}
 
 // Set CSS style for javascript ejsapps
 //$original_css_filename = $ejsapp->codebase.'_ejs_library/css/ejsSimulation.css';
