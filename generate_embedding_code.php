@@ -265,7 +265,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
     } else { //EJS Java
 
-        if (true) { // Applet
+        if ($ejsapp->applet == 1) { // Applet
 
             $code = '<div id="EJsS"><script type="text/javascript">';
 
@@ -542,7 +542,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                                 <argument>-lookandfeel</argument>
                                 <argument>NIMBUS</argument>";
             if ($sarlabinfo) {
-                $content .= "<argument>-ipserver</argument>
+                $content .=     "<argument>-ipserver</argument>
                                 <argument>$sarlab_IP</argument>
                                 <argument>-portserver</argument>
                                 <argument>$sarlab_port</argument>
@@ -555,7 +555,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                                 <argument>-max_time</argument>
                                 <argument>$sarlabinfo->max_use_time</argument>";
             }
-            $content .= "</application-desc>
+            $content .=     "</application-desc>
                             <security>
                                 <all-permissions/>
                             </security>

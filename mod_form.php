@@ -106,8 +106,22 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
+        // -------------------------------------------------------------------------------
+        // More optional text to be shown after the applet
+        $mform->addElement('header', 'more_text', get_string('more_text', 'ejsapp'));
+
+        $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
+        $mform->setType('appwording', PARAM_RAW);
+        // -------------------------------------------------------------------------------
+        // Optional Applet display options
+        $mform->addElement('header', 'applet_display', get_string('applet_display', 'ejsapp'));
+
+        $mform->addElement('selectyesno', 'applet', get_string('applet', 'ejsapp'));
+        $mform->addHelpButton('applet', 'applet', 'ejsapp');
+
         $mform->addElement('select', 'applet_size_conf', get_string('applet_size_conf','ejsapp'), array(get_string('preserve_applet_size','ejsapp'), get_string('moodle_resize','ejsapp'), get_string('user_resize','ejsapp')));
         $mform->addHelpButton('applet_size_conf', 'applet_size_conf', 'ejsapp');
+        $mform->disabledIf('applet_size_conf', 'applet', 'eq', 0);
 
         $mform->addElement('selectyesno', 'preserve_aspect_ratio', get_string('preserve_aspect_ratio', 'ejsapp'));
         $mform->addHelpButton('preserve_aspect_ratio', 'preserve_aspect_ratio', 'ejsapp');
@@ -121,12 +135,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->setType('custom_height', PARAM_INT);
         $mform->disabledIf('custom_height', 'applet_size_conf', 'neq', 2);
         $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
-        // -------------------------------------------------------------------------------
-        // More optional text to be shown after the applet
-        $mform->addElement('header', 'more_text', get_string('more_text', 'ejsapp'));
-
-        $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
-        $mform->setType('appwording', PARAM_RAW);
         // -------------------------------------------------------------------------------
         // Optional CSS styles
         $mform->addElement('header', 'css_style', get_string('css_style', 'ejsapp'));
@@ -160,7 +168,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
         $varsarray = array();
         $varsarray[] = $mform->createElement('text', 'var_name', get_string('var_name', 'ejsapp'));
-        $varsarray[] = $mform->createElement('select', 'var_type', get_string('var_type', 'ejsapp'),  array('Boolean', 'Integer', 'Double'));
+        $varsarray[] = $mform->createElement('select', 'var_type', get_string('var_type', 'ejsapp'), array('Boolean', 'Integer', 'Double'));
         $varsarray[] = $mform->createElement('text', 'min_value', get_string('min_value', 'ejsapp'), array('size' => '8'));
         $varsarray[] = $mform->createElement('text', 'max_value', get_string('max_value', 'ejsapp'), array('size' => '8'));
 

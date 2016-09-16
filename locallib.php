@@ -408,8 +408,7 @@ function personalize_vars($ejsapp, $user) {
             $uniqueval = filter_var(md5($user->firstname . $i . $user->username . $user->lastname . $user->id .
                                     $personalvar->id . $personalvar->name . $personalvar->type . $user->email .
                                     $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
-            $uniqueval = round($uniqueval);
-            mt_srand($uniqueval/(pow(10,strlen($user->username))));
+            mt_srand(intval($uniqueval)/(pow(10,strlen($user->username))));
             $personalvarsinfo->name[$i] = $personalvar->name;
             $factor = 1;
             if ($personalvar->type == 'Double') $factor = 1000;

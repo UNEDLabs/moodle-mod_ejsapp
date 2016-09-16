@@ -61,13 +61,15 @@ $string['recording_fail_msg'] = 'Error while trying to run the recording';
 
 $string['more_text'] = 'Optional text after the EJsS lab';
 
-$string['css_style'] = 'CSS stylesheet';
-
 $string['jar_file'] = '.jar or .zip file that encapsulates the  EJsS lab';
 
 $string['appletfile'] = 'Easy Java(script) Simulation';
 $string['appletfile_required'] = 'A .jar or a .zip file must be selected';
 $string['appletfile_help'] = 'Select the .jar or .zip file that encapsulates the Easy Java(script) Simulation (EJsS) application. The official website of EJsS is http://fem.um.es/Ejs/';
+
+$string['appwording'] = 'Wording';
+
+$string['applet_display'] = 'Display options for a Java application';
 
 $string['applet_size_conf'] = 'Size the applet';
 $string['applet_size_conf_help'] = 'Three options: 1) "Preserve original size" will preserve the original size of the EJS applet, 2) "Let Moodle set the size" will resize the applet to take up all the possible space while mantaining the original aspect ratio, 3) "Let the user set the size" will let the user to set the size of the applet and select whether to preserve its original aspect ratio or not.';
@@ -84,10 +86,12 @@ $string['custom_width_required'] = 'WARNING: Applet width was not set. You must 
 $string['custom_height'] = 'Applet height (px)';
 $string['custom_height_required'] = 'WARNING: Applet height was not set. You must provide a different value.';
 
-$string['appwording'] = 'Wording';
+$string['applet'] = 'Embed application in the web browser?';
+$string['applet_help'] = 'Select \'yes\' to run this application embedded in the web browser as an applet; \'no\' to launch it as a Java Web Start application';
+
+$string['css_style'] = 'CSS stylesheet for a Javascript application';
 
 $string['css_rules'] = 'Create your own css rules to change the visual aspect of the javascript application';
-
 $string['css_rules_help'] = 'Important! Write each selector and the beginning of its declaration (the opening curly bracket) in the same line.';
 
 $string['state_file'] = '.xml or .json file with the state to be read when this EJsS lab loads';

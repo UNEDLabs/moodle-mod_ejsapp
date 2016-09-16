@@ -188,9 +188,9 @@ function xmldb_ejsapp_upgrade($oldversion)
         $table_expsyst_old = new xmldb_table('ejsapp_expsyst2pract');
         // Rename tables ejsapp_remlab_conf, ejsapp_sarlab_keys and ejsapp_expsyst2pract as block_remlab_manager_conf,
         // block_remlab_manager_sb_keys and block_remlab_manager_exp2prc
-        $dbman->rename_table($table_conf_old, 'block_remlab_manager_conf', $continue=true, $feedback=true);
-        $dbman->rename_table($table_sarlab_old, 'block_remlab_manager_sb_keys', $continue=true, $feedback=true);
-        $dbman->rename_table($table_expsyst_old, 'block_remlab_manager_exp2prc', $continue=true, $feedback=true);
+        $dbman->rename_table($table_conf_old, 'block_remlab_manager_conf');
+        $dbman->rename_table($table_sarlab_old, 'block_remlab_manager_sb_keys');
+        $dbman->rename_table($table_expsyst_old, 'block_remlab_manager_exp2prc');
     }
 
     if ($oldversion < '2015062800') {
@@ -236,6 +236,14 @@ function xmldb_ejsapp_upgrade($oldversion)
                 }
             }
         }
+    }
+
+    if ($oldversion < '2016091500') {
+        // Create "applet" field in ejsapp table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('applet', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'is_collaborative');
+        $dbman->add_field($table, $field);
     }
 
     return true;

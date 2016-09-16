@@ -60,13 +60,18 @@ $string['recording_fail_msg'] = 'Error al intentar ejecutar la grabaci&oacute;n'
 
 $string['more_text'] = 'Texto optional tras el laboratorio EJsS';
 
-$string['css_style'] = 'Hoja de estilos CSS';
-
 $string['jar_file'] = 'Archivo .jar o .zip que encapsula el laboratorio EJsS';
 
 $string['appletfile'] = 'Easy Java(script) Simulation';
 $string['appletfile_required'] = 'Se debe seleccionar un archivo .jar o .zip';
 $string['appletfile_help'] = 'Selecione el archivo .jar o .zip que encapsula el laboratorio EJsS (Easy Java(script) Simulation). La p&aacute;gina oficial de EJsS es http://fem.um.es/Ejs/';
+
+$string['appwording'] = 'Enunciado';
+
+$string['applet_display'] = 'Opciones de visualizaci&oacute;n para una aplicaci&oacute;n Java';
+
+$string['applet'] = 'Embeber aplicaci&oacute;n en el navegador?';
+$string['applet_help'] = 'Seleccione \'si\' para ejecutar la aplicaci&oacute;n embebida en el navegador como un applet; \'no\' para lanzarla como una aplicaci&oacute;n Java Web Start';
 
 $string['applet_size_conf'] = 'Reescalado del applet';
 $string['applet_size_conf_help'] = 'Tres opciones: 1) "Mantener tama&ntilde;o original" mantendr&aacute; el tama&ntilde;o original del applet en EJS, 2) "Permitir que Moodle fije el tama&ntilde;o" redimensionar&aacute; el applet para que ocupe todo el espacio posible a la par que respeta la relaci&oacute;n de tama&ntilde;o original, 3) "Permitir que el usuario fije el tama&ntilde;o" permitir&aacute; al usuario establecer el tama&ntilde;o del applet y seleccionar si desea mantener, o no, su relaci&oacute;n de tama&ntilde;o original.';
@@ -83,11 +88,10 @@ $string['custom_width_required'] = 'ATENCI&Oacute;N: La anchura del applet no ha
 $string['custom_height'] = 'Altura del applet (px)';
 $string['custom_height_required'] = 'ATENCI&Oacute;N: La altura del applet no ha sido fijada. Debes proporcionar un valor distinto.';
 
-$string['appwording'] = 'Enunciado';
+$string['css_style'] = 'Hoja de estilos CSS para una aplicaci&oacute;n Javascript';
 
 $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visual de la aplicaci&oacute;n javascript';
-
-$string['css_rules_help'] = '¡Importante! Escriba cada selector y el comienzo de su declaración (la llave) en la misma línea.';
+$string['css_rules_help'] = '¡Importante! Escriba cada selector y el comienzo de su declaraci&oacute;n (la llave) en la misma l&iacute;nnea.';
 
 $string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EJsS debe leer';
 
