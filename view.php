@@ -94,7 +94,7 @@ $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $cm->id));
 $PAGE->set_title($ejsapp->name);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-if ($CFG->version > 2016090100) {
+if ($CFG->version < 2016090100) {
     $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'ejsapp'));
 }
 
