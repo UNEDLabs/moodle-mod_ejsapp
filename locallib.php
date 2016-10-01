@@ -362,7 +362,7 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
         $ejss_css = '_ejs_library/css/ejsSimulation.css';
     }
-    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css;
+    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '/';
     if ($use_css) {
         $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css;
     } else {

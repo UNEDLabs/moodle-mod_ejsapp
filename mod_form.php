@@ -121,6 +121,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
         $mform->addElement('select', 'applet_size_conf', get_string('applet_size_conf','ejsapp'), array(get_string('preserve_applet_size','ejsapp'), get_string('moodle_resize','ejsapp'), get_string('user_resize','ejsapp')));
         $mform->addHelpButton('applet_size_conf', 'applet_size_conf', 'ejsapp');
+        $mform->setDefault('applet_size_conf', 0);
         $mform->disabledIf('applet_size_conf', 'applet', 'eq', 0);
 
         $mform->addElement('selectyesno', 'preserve_aspect_ratio', get_string('preserve_aspect_ratio', 'ejsapp'));
