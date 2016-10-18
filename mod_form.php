@@ -107,7 +107,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
         // -------------------------------------------------------------------------------
-        // More optional text to be shown after the applet
+        // More optional text to be shown after the lab
         $mform->addElement('header', 'more_text', get_string('more_text', 'ejsapp'));
 
         $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
@@ -137,25 +137,25 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->disabledIf('custom_height', 'applet_size_conf', 'neq', 2);
         $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
         // -------------------------------------------------------------------------------
-        // Optional CSS styles
+        // Optional Javascript CSS styles
         $mform->addElement('header', 'css_style', get_string('css_style', 'ejsapp'));
 
         $mform->addElement('textarea', 'css', get_string('css_rules', 'ejsapp'), 'wrap="virtual" rows="8" cols="50"');
         $mform->addHelpButton('css', 'css_rules', 'ejsapp');
         // -------------------------------------------------------------------------------
-        // Adding an optional state file to be read when the applet loads
+        // Adding an optional state file to be read when the lab loads
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
 
         $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/xml', 'application/json')));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
         // -------------------------------------------------------------------------------
-        // Adding an optional text file with a controller code to be load when the applet is run
+        // Adding an optional text file with a controller code to be load when the lab is run
         $mform->addElement('header', 'controller_file', get_string('controller_file', 'ejsapp'));
 
         $mform->addElement('filemanager', 'controllerfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.cnt'));
         $mform->addHelpButton('controllerfile', 'controllerfile', 'ejsapp');
         // -------------------------------------------------------------------------------
-        // Adding an optional text file with a recording to automatically run it when the applet loads
+        // Adding an optional text file with a recording to automatically run it when the lab loads
         $mform->addElement('header', 'recording_file', get_string('recording_file', 'ejsapp'));
 
         $mform->addElement('filemanager', 'recordingfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.rec'));
