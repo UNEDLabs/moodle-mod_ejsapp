@@ -352,9 +352,9 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $path = $CFG->wwwroot . $codebase;
     $exploded_name = explode("_Simulation",$ejsapp->applet_name);
 
-    // Replace links for images and stuff
+    // Replace links for images and stuff and insert a placeholder for future purposes
     $search = '("_topFrame","_ejs_library/",null);';
-    $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '");';
+    $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
     $code = str_replace($search,$replace,$code);
 
     // Replace link for css
@@ -364,7 +364,7 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     }
     $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '"';
     if ($use_css) {
-        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css;
+        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css . '"';
     } else {
         $replace = '';
     }
@@ -377,8 +377,11 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $search = '<script src="_ejs_library/scripts/textresizedetector.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/scripts/textresizedetector.js"></script>';
     $code = str_replace($search,$replace,$code);
+    $search = '<script src="_ejs_library/ejsS.v1.max.js"></script>';
+    $replace = '<script src="' . $path .'_ejs_library/ejsS.v1.max.js"></script>';
+    $code = str_replace($search,$replace,$code);
 
-    // Replace call for main function so we can later pass parameters to it
+    // Replace call for main function so we can later pass parameters to it. TODO: Not needed in newest versions of EjsS
     $search = "window.addEventListener('load', function () {  new " . $exploded_name[0];
     $replace = "window.addEventListener('load', function () {  var _model = new " . $exploded_name[0];
     $code = str_replace($search,$replace,$code);
@@ -658,7 +661,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
         }
         $ejsapp->applet_name = rtrim($sub_str);
 
-        // Create/delete/modify the css file to modify the visual aspect of the javascript application
+        // Create/delete/modify the css file to change the visual aspect of the javascript application
         // Custom css
         $use_original_css = false;
         $css_file_location = $folderpath . '_ejs_library/css/ejsapp.css';
@@ -722,14 +725,14 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 //<$code1 is $code till </head> (not included) and with the missing standard part>
                 $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
                 //</$code1 is $code till </head> (not included) and with the missing standard part>
-                if (strpos($code, '<script type')) { //EjsS version with Javascript embedded into the html page
+                if (strpos($code, '<script type')) { //EjsS with Javascript embedded into the html page
                     //<$code2 is $code from </head> to </body> tags, none of them included>
                     $code2 = substr($code, strpos($code, '</head>'));
                     $code2 = explode('</body>', $code2);
                     $code2 = $code2[0] . '</div>';
                     //</$code2 is $code from </head> to </body> tags, none of them included>
                     $code2 = substr($code2, strpos($code2, '<script type'));
-                } else { //EjsS version with an external .js file for the Javascript
+                } else { //EjsS with an external .js file for the Javascript
                     $exploded_file_name = explode(".", $ejsapp->applet_name);
                     $code2 = '<script src="' . $CFG->wwwroot . $codebase . $exploded_file_name[0] . '.js"></script></div>';
                 }

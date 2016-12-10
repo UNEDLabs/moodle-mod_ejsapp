@@ -69,7 +69,7 @@ An explanation of EJSApp is included in the folder "doc". There, you will also f
 ------------------------------------------------------------------------------------------------
  IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), if you have a trust certificate and you want to use
  the option to automatically sign the Java applets, you must give the apache user permissions over the jarsigner (Java
- installation folder) and the sign.sh script (included with this plugin) files.
+ installation folder) file.
                                                                                                 
  The following points describe how to do it:                                                    
                                                                                                 

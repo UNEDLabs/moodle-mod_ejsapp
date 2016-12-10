@@ -243,14 +243,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
         // <Loading personalized variables>
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
-            $personalize_vars_code = "_model._userUnserialize({";
+            $personalize_vars_code = "'{";
             for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
-                $personalize_vars_code .= $personalvarsinfo->name[$i] . ":" . $personalvarsinfo->value[$i];
+                $personalize_vars_code .= '"' . $personalvarsinfo->name[$i] . '":' . base64_encode($personalvarsinfo->value[$i]);
                 if ($i < count($personalvarsinfo->name) - 1) $personalize_vars_code .= ",";
             }
-            $personalize_vars_code .= "});";
-            $search = '_model.setStatusParams("'.$context->id.'", "'.$USER->id.'", "'.$ejsapp->id.'", "'.$CFG->wwwroot.'/mod/ejsapp/upload_file.php", "'.$CFG->wwwroot.'/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});';
-            $replace = $search . $personalize_vars_code;
+            $personalize_vars_code .= "}'";
+            $search = '"webUserInput"';
+            $replace = $personalize_vars_code;
             $code = str_replace($search, $replace, $code);
         }
         // <\Loading personalized variables>
@@ -392,7 +392,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function loadState(count) {
                 applet = document.getElementById('$ejsapp_id');
                 var to = typeof (applet);
-                if ((to == 'function' || to == 'object') && count > 0) {
+                if (count > 0) {
                     window.setTimeout( function() { loadState( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
@@ -406,7 +406,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                   alert('$state_fail_msg');
                 }
               }
-              loadState(40);";
+              loadState(20);";
                 //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
                 $code .= $load_state_code;
             } //end of if ($user_state_file)
@@ -422,7 +422,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function loadController(count) {
                 applet = document.getElementById('$ejsapp_id');
                 var to = typeof (applet);
-                if ((to == 'function' || to == 'object') && count > 0) {
+                if (count > 0) {
                     window.setTimeout( function() { loadController( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
@@ -434,7 +434,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                   alert('$cnt_fail_msg');
                 }
               }
-              loadController(40);";
+              loadController(20);";
                 //<\to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
                 $code .= $load_cnt_code;
             } //end of if ($user_cnt_file)
@@ -450,7 +450,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function loadExperiment(count) {
                 applet = document.getElementById('$ejsapp_id');
                 var to = typeof (applet);
-                if ((to == 'function' || to == 'object') && count > 0) {
+                if (count > 0) {
                     window.setTimeout( function() { loadExperiment( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
@@ -460,7 +460,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                   alert('$rec_fail_msg');
                 }
               }
-              loadExperiment(40);";
+              loadExperiment(20);";
                 //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
                 $code .= $load_rec_code;
             } //end of if ($user_rec_file)
@@ -478,7 +478,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
               function personalizeVars(count) {
                 applet = document.getElementById('$ejsapp_id');
                 var to = typeof (applet);
-                if ((to == 'function' || to == 'object') && count > 0) {
+                if (count > 0) {
                     window.setTimeout( function() { personalizeVars( --count ); }, 500 );
                 }
                 else if (to == 'function' || to == 'object') {
@@ -494,7 +494,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                     //applet._initialize();
                 }
               }
-              personalizeVars(40);";
+              personalizeVars(20);";
                 $code .= $personalize_vars_code;
             }
             // <\Loading personalized variables>
