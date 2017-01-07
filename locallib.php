@@ -350,7 +350,7 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     global $CFG;
 
     $path = $CFG->wwwroot . $codebase;
-    $exploded_name = explode("_Simulation",$ejsapp->applet_name);
+    $exploded_name = explode("_Simulation", $ejsapp->applet_name);
 
     // Replace links for images and stuff and insert a placeholder for future purposes
     $search = '("_topFrame","_ejs_library/",null);';
@@ -362,9 +362,9 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
         $ejss_css = '_ejs_library/css/ejsSimulation.css';
     }
-    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '"';
+    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '/" />';
     if ($use_css) {
-        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css . '"';
+        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css . '" />';
     } else {
         $replace = '';
     }
@@ -377,6 +377,9 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $search = '<script src="_ejs_library/scripts/textresizedetector.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/scripts/textresizedetector.js"></script>';
     $code = str_replace($search,$replace,$code);
+    $search = '<script src="_ejs_library/ejsS.v1.min.js"></script>';
+    $replace = '<script src="' . $path .'_ejs_library/ejsS.v1.min.js"></script>';
+    $code = str_replace($search,$replace,$code);
     $search = '<script src="_ejs_library/ejsS.v1.max.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/ejsS.v1.max.js"></script>';
     $code = str_replace($search,$replace,$code);
@@ -385,6 +388,18 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $search = "window.addEventListener('load', function () {  new " . $exploded_name[0];
     $replace = "window.addEventListener('load', function () {  var _model = new " . $exploded_name[0];
     $code = str_replace($search,$replace,$code);
+
+    // In case it exists, change the content of the separated .js file to make it work
+    $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
+    $filepath = $CFG->dirroot . $codebase . $filename . '.js';
+    if (file_exists($filepath)) { // Javascript code included in a separated .js file
+        // Replace links for images and stuff and insert a placeholder for future purposes
+        $code = file_get_contents($filepath);
+        $search = '("_topFrame","_ejs_library/",null);';
+        $replace = '("_topFrame","' . $CFG->wwwroot . $codebase . '_ejs_library/","' . $CFG->wwwroot . $codebase . '","webUserInput");';
+        $code = str_replace($search,$replace,$code);
+        file_put_contents($filepath, $code);
+    }
 
     return $code;
 } //update_links
@@ -436,8 +451,7 @@ function personalize_vars($ejsapp, $user) {
 function users_personalized_vars($ejsapp) {
     global $DB;
 
-    $courseid = $ejsapp->course;
-    $enrolids = $DB->get_fieldset_select('enrol', 'id', 'courseid = :courseid', array('courseid'=>$courseid));
+    $enrolids = $DB->get_fieldset_select('enrol', 'id', 'courseid = :courseid', array('courseid'=>$ejsapp->course));
     $usersids = $DB->get_fieldset_sql('SELECT userid FROM {user_enrolments} WHERE enrolid IN (' . implode(',',$enrolids) . ')');
     $users = $DB->get_records_sql('SELECT * FROM {user} WHERE id IN (' . implode(',',$usersids) . ')');
     $userspersonalvarsinfo = array();
@@ -708,7 +722,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
             }
         }
 
-        // Change content of the html/js file to make it work
+        // Change content of the html file to make it work
         foreach ($languages as $language) {
             if ($language == '') $filepath = $folderpath . $ejsapp->applet_name;
             else {

@@ -126,6 +126,10 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $user_state_file = $user_data_files[0];
         $user_cnt_file = $user_data_files[1];
         $user_rec_file = $user_data_files[2];
+    } else {
+        $user_state_file = null;
+        $user_cnt_file = null;
+        $user_rec_file = null;
     }
 
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {    // Sarlab is used to access this remote lab or to establish communication between users
@@ -178,9 +182,19 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
         $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
 
-        $file_headers = @get_headers($path . $filename . '_' . $language . '.' . $extension);
-        if ($file_headers[0] == 'HTTP/1.1 404 Not Found') $code = file_get_contents($path . $ejsapp->applet_name);
-        else $code = file_get_contents($path . $filename . '_' . $language . '.' . $extension);
+        $js_file_headers = @get_headers($path . $filename . '.js');
+        $js_file_headers_lang = @get_headers($path . $filename . '_' . $language . '.js');
+        $separated_js_file = false;
+        if (($js_file_headers[0] == 'HTTP/1.1 404 Not Found') && ($js_file_headers_lang[0] == 'HTTP/1.1 404 Not Found')) { // Javascript code included in html
+            $html_file_headers = @get_headers($path . $filename . '_' . $language . '.' . $extension);
+            if ($html_file_headers[0] == 'HTTP/1.1 404 Not Found') $code = file_get_contents($path . $ejsapp->applet_name);
+            else $code = file_get_contents($path . $filename . '_' . $language . '.' . $extension);
+        } else { // Javascript code in a separated .js file
+            $separated_js_file = true;
+            if ($js_file_headers_lang[0] == 'HTTP/1.1 404 Not Found') $code = file_get_contents($path . $filename . '.js');
+            else $code = file_get_contents($path . $filename . '_' . $language . '.js');
+            $html_code = file_get_contents($path . $ejsapp->applet_name);
+        }
 
         // Pass the needed parameters to the javascript application
         $search = "}, false);";
@@ -242,17 +256,19 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         // <\Loading interaction recording files>
 
         // <Loading personalized variables>
+        $search = ',"webUserInput"';
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
             $personalize_vars_code = "'{";
             for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
-                $personalize_vars_code .= '"' . $personalvarsinfo->name[$i] . '":' . base64_encode($personalvarsinfo->value[$i]);
+                $personalize_vars_code .= '"' . $personalvarsinfo->name[$i] . '":' . $personalvarsinfo->value[$i];
                 if ($i < count($personalvarsinfo->name) - 1) $personalize_vars_code .= ",";
             }
             $personalize_vars_code .= "}'";
-            $search = '"webUserInput"';
-            $replace = $personalize_vars_code;
-            $code = str_replace($search, $replace, $code);
+            $replace = "," . '"' . bin2hex(base64_encode($personalize_vars_code)) . '"';
+        } else {
+            $replace = "";
         }
+        $code = str_replace($search, $replace, $code);
         // <\Loading personalized variables>
         // <\Loading state, controller and interaction files as well as personalized variables>
 
@@ -262,6 +278,13 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $replace = "window.alert(\"$end_message\");";
         $code = str_replace($search, $replace, $code);
         // <\End message when the recording of the user interaction stops>
+
+        // <Embedding the js code in the html file in case there is a separated js file>
+        if ($separated_js_file) {
+            $code = '<script type="text/javascript"><!--//--><![CDATA[//><!--' . "\n" . $code . '//--><!]]></script>';
+            $code = substr($html_code, 0, -strlen($html_code) + strpos($html_code, '<div id="_topFrame" style="text-align:center"')) . '<div id="_topFrame" style="text-align:center"></div>' . $code . '</div>';
+        }
+        // </Embedding the js code in the html file in case there is a separate js file>
 
     } else { //EJS Java
 
