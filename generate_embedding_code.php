@@ -183,14 +183,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
 
         $js_file_headers = @get_headers($path . $filename . '.js');
-        $js_file_headers_lang = @get_headers($path . $filename . '_' . $language . '.js');
         $separated_js_file = false;
-        if (($js_file_headers[0] == 'HTTP/1.1 404 Not Found') && ($js_file_headers_lang[0] == 'HTTP/1.1 404 Not Found')) { // Javascript code included in html
+        if (($js_file_headers[0] == 'HTTP/1.1 404 Not Found')) { // Javascript code included in html
             $html_file_headers = @get_headers($path . $filename . '_' . $language . '.' . $extension);
             if ($html_file_headers[0] == 'HTTP/1.1 404 Not Found') $code = file_get_contents($path . $ejsapp->applet_name);
             else $code = file_get_contents($path . $filename . '_' . $language . '.' . $extension);
         } else { // Javascript code in a separated .js file
             $separated_js_file = true;
+            $js_file_headers_lang = @get_headers($path . $filename . '_' . $language . '.js');
             if ($js_file_headers_lang[0] == 'HTTP/1.1 404 Not Found') $code = file_get_contents($path . $filename . '.js');
             else $code = file_get_contents($path . $filename . '_' . $language . '.js');
             $html_code = file_get_contents($path . $ejsapp->applet_name);

@@ -362,7 +362,7 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
         $ejss_css = '_ejs_library/css/ejsSimulation.css';
     }
-    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '/" />';
+    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejss_css . '" />';
     if ($use_css) {
         $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejss_css . '" />';
     } else {
@@ -394,11 +394,9 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $filepath = $CFG->dirroot . $codebase . $filename . '.js';
     if (file_exists($filepath)) { // Javascript code included in a separated .js file
         // Replace links for images and stuff and insert a placeholder for future purposes
-        $code = file_get_contents($filepath);
         $search = '("_topFrame","_ejs_library/",null);';
         $replace = '("_topFrame","' . $CFG->wwwroot . $codebase . '_ejs_library/","' . $CFG->wwwroot . $codebase . '","webUserInput");';
         $code = str_replace($search,$replace,$code);
-        file_put_contents($filepath, $code);
     }
 
     return $code;
@@ -712,19 +710,21 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
 
 
         // Languages
-        $languages = array('');
+        $languages = array('default');
         $pattern = '/available-languages\s*:\s*(.+)\s*/';
         if (preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE)) {
             $sub_str = $matches[1][0];
             if (strpos($sub_str, ',')) {
                 $languages = explode(',', $sub_str);
-                array_push($languages, '');
+                array_push($languages, 'default');
+            } else if ($sub_str !== '') {
+                array_push($languages, $sub_str);
             }
         }
 
         // Change content of the html file to make it work
         foreach ($languages as $language) {
-            if ($language == '') $filepath = $folderpath . $ejsapp->applet_name;
+            if ($language == 'default') $filepath = $folderpath . $ejsapp->applet_name;
             else {
                 $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
                 $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
