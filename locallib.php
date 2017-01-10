@@ -352,10 +352,22 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $path = $CFG->wwwroot . $codebase;
     $exploded_name = explode("_Simulation", $ejsapp->applet_name);
 
-    // Replace links for images and stuff and insert a placeholder for future purposes
-    $search = '("_topFrame","_ejs_library/",null);';
-    $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
-    $code = str_replace($search,$replace,$code);
+    // In case it exists, change the content of the separated .js file to make it work TODO: Do it for all languages .js files
+    $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
+    $filepath = $CFG->dirroot . $codebase . $filename . '.js';
+    if (file_exists($filepath)) { // Javascript code included in a separated .js file
+        // Replace links for images and stuff and insert a placeholder for future purposes
+        $js_code = file_get_contents($filepath);
+        $search = '("_topFrame","_ejs_library/",null);';
+        $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
+        $js_code = str_replace($search,$replace,$js_code);
+        file_put_contents($filepath, $js_code);
+    } else { // If the .js file does not exists, then this part is inside the $code variable
+        // Replace links for images and stuff and insert a placeholder for future purposes
+        $search = '("_topFrame","_ejs_library/",null);';
+        $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
+        $code = str_replace($search, $replace, $code);
+    }
 
     // Replace link for css
     $ejss_css = '_ejs_library/css/ejss.css';
@@ -388,16 +400,6 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     $search = "window.addEventListener('load', function () {  new " . $exploded_name[0];
     $replace = "window.addEventListener('load', function () {  var _model = new " . $exploded_name[0];
     $code = str_replace($search,$replace,$code);
-
-    // In case it exists, change the content of the separated .js file to make it work
-    $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
-    $filepath = $CFG->dirroot . $codebase . $filename . '.js';
-    if (file_exists($filepath)) { // Javascript code included in a separated .js file
-        // Replace links for images and stuff and insert a placeholder for future purposes
-        $search = '("_topFrame","_ejs_library/",null);';
-        $replace = '("_topFrame","' . $CFG->wwwroot . $codebase . '_ejs_library/","' . $CFG->wwwroot . $codebase . '","webUserInput");';
-        $code = str_replace($search,$replace,$code);
-    }
 
     return $code;
 } //update_links
@@ -739,7 +741,7 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 //<$code1 is $code till </head> (not included) and with the missing standard part>
                 $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) . '<div id="_topFrame" style="text-align:center"></div>';
                 //</$code1 is $code till </head> (not included) and with the missing standard part>
-                if (strpos($code, '<script type')) { //EjsS with Javascript embedded into the html page
+                if (strpos($code, '<script type')) { //EjsS with Javascript embedded in the html page
                     //<$code2 is $code from </head> to </body> tags, none of them included>
                     $code2 = substr($code, strpos($code, '</head>'));
                     $code2 = explode('</body>', $code2);
