@@ -99,7 +99,10 @@ if ($CFG->version < 2016090100) {
 }
 
 // Set CSS style for javascript ejsapps
-$original_css_filename = $ejsapp->codebase.'_ejs_library/css/ejsSimulation.css';
+$original_css_filename = '_ejs_library/css/ejss.css';
+if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
+    $original_css_filename = '_ejs_library/css/ejsSimulation.css';
+}
 $custom_css_filename = $ejsapp->codebase.'_ejs_library/css/ejsapp.css';
 if (file_exists($CFG->dirroot.$custom_css_filename)) {
     $PAGE->requires->css($custom_css_filename);

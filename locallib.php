@@ -423,13 +423,14 @@ function personalize_vars($ejsapp, $user) {
         $personalvars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
         $i = 0;
         foreach ($personalvars as $personalvar) {
-            $uniqueval = filter_var(md5($user->firstname . $i . $user->username . $user->lastname . $user->id .
-                                    $personalvar->id . $personalvar->name . $personalvar->type . $user->email .
-                                    $personalvar->minval . $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
-            mt_srand(intval($uniqueval)/(pow(10,strlen($user->username))));
             $personalvarsinfo->name[$i] = $personalvar->name;
             $factor = 1;
             if ($personalvar->type == 'Double') $factor = 1000;
+            $uniqueval1 = filter_var(md5($user->firstname . $user->username . $user->lastname . $user->id .
+                $personalvar->name), FILTER_SANITIZE_NUMBER_INT);
+            $uniqueval2 = filter_var(md5($personalvar->type . $user->email . $personalvar->minval .
+                $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
+            mt_srand(intval($uniqueval1+$uniqueval2));
             $personalvarsinfo->value[$i] = mt_rand($factor*$personalvar->minval, $factor*$personalvar->maxval)/$factor;
             $personalvarsinfo->type[$i] = $personalvar->type;
             $i++;
