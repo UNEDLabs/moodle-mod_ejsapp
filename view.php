@@ -117,7 +117,7 @@ if ($ejsapp->intro) { // If some text was written, show the intro
 }
 
 // Check if there are variables configured to be personalized in this EJSApp
-$personalvarsinfo = personalize_vars($ejsapp, $USER);
+$personalvarsinfo = personalize_vars($ejsapp, $USER, false);
 
 // For logging purposes:
 $action = 'view';

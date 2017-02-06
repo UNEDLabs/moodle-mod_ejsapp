@@ -661,7 +661,7 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
                 }
             }
 
-            $personal_vars_info = personalize_vars($ejsapp, $user);
+            $personal_vars_info = personalize_vars($ejsapp, $user, false);
             for ($i=0; $i<sizeof($personal_vars_info->name); $i++) {
                 $data[] = $personal_vars_info->name[$i];
                 $data[] = $personal_vars_info->value[$i];

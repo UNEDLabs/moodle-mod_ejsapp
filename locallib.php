@@ -411,10 +411,11 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
  *
  * @param stdClass $ejsapp
  * @param stdClass $user
+ * @param boolean $shuffle
  * @return stdClass $personalvarsinfo
  *
  */
-function personalize_vars($ejsapp, $user) {
+function personalize_vars($ejsapp, $user, $shuffle) {
     global $DB;
 
     $personalvarsinfo = null;
@@ -426,11 +427,18 @@ function personalize_vars($ejsapp, $user) {
             $personalvarsinfo->name[$i] = $personalvar->name;
             $factor = 1;
             if ($personalvar->type == 'Double') $factor = 1000;
-            $uniqueval1 = filter_var(md5($user->firstname . $user->username . $user->lastname . $user->id .
-                $personalvar->name), FILTER_SANITIZE_NUMBER_INT);
-            $uniqueval2 = filter_var(md5($personalvar->type . $user->email . $personalvar->minval .
-                $personalvar->maxval), FILTER_SANITIZE_NUMBER_INT);
-            mt_srand(intval($uniqueval1+$uniqueval2));
+            $seed_array_1 = array($user->firstname, $personalvar->type, $user->lastname, $user->id, $personalvar->name);
+            $seed_array_2 = array($i, $user->email, $personalvar->minval, $user->username, $personalvar->maxval);
+            if ($shuffle) {
+                shuffle($seed_array_1);
+                shuffle($seed_array_2);
+            }
+            $seed_val1 = filter_var(md5($seed_array_1[0] . $seed_array_1[1] . $seed_array_1[2] . $seed_array_1[3] .
+                                    $seed_array_1[4]), FILTER_SANITIZE_NUMBER_INT);
+            $seed_val2 = filter_var(md5($seed_array_2[0] . $seed_array_2[1] . $seed_array_2[2] . $seed_array_1[3] .
+                                    $seed_array_2[4]), FILTER_SANITIZE_NUMBER_INT);
+            $seed_val = $seed_val1 + $seed_val2;
+            mt_srand(intval($seed_val));
             $personalvarsinfo->value[$i] = mt_rand($factor*$personalvar->minval, $factor*$personalvar->maxval)/$factor;
             $personalvarsinfo->type[$i] = $personalvar->type;
             $i++;
@@ -457,7 +465,7 @@ function users_personalized_vars($ejsapp) {
     $users = $DB->get_records_sql('SELECT * FROM {user} WHERE id IN (' . implode(',',$usersids) . ')');
     $userspersonalvarsinfo = array();
     foreach ($users as $user) {
-        $userspersonalvarsinfo[$user->id.''] = personalize_vars($ejsapp, $user);
+        $userspersonalvarsinfo[$user->id.''] = personalize_vars($ejsapp, $user, false);
     }
 
     return $userspersonalvarsinfo;
