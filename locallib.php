@@ -1553,7 +1553,7 @@ function create_blockly_configuration($ejsapp) {
         $variables = "'<category name=\"" . get_string('xml_variables', 'ejsapp') . "\" colour=\"330\" custom=\"VARIABLE\"></category>'";
         $functions = "'<category name=\"" . get_string('xml_functions', 'ejsapp') . "\" colour=\"290\" custom=\"PROCEDURE\"></category>'";
         $lab = "'<category name=\"" . get_string('xml_lab', 'ejsapp') . "\" colour=\"44\">'";
-        $lab_variables = "'<category name=\"" . get_string('xml_lab_variables', 'ejsapp') . "\"><block type=\"get_model_variable\"></block><block type=\"set_model_variable\"></block><category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\"><block type=\"set_model_variable_boolean\"></block><block type=\"get_model_variable_boolean\"></block></category><category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\"><block type=\"set_model_variable_string\"></block><block type=\"get_model_variable_string\"></block></category><category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\"><block type=\"set_model_variable_number\"></block><block type=\"get_model_variable_number\"></block></category></category><category name=\"" . get_string('xml_functions', 'ejsapp') . "\"><block type=\"set_model_variable_funs\"></block><block type=\"get_model_variable_funs\"></block></category><category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\"><block type=\"set_model_variable_others\"></block><block type=\"get_model_variable_others\"></block></category></category>'";
+        $lab_variables = "'<category name=\"" . get_string('xml_lab_variables', 'ejsapp') . "\"><block type=\"get_model_variable\"></block><block type=\"set_model_variable\"></block><category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\"><block type=\"set_model_variable_boolean\"></block><block type=\"get_model_variable_boolean\"></block></category><category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\"><block type=\"set_model_variable_string\"></block><block type=\"get_model_variable_string\"></block></category><category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\"><block type=\"set_model_variable_number\"></block><block type=\"get_model_variable_number\"></block></category><category name=\"" . get_string('xml_functions', 'ejsapp') . "\"><block type=\"set_model_variable_funs\"></block><block type=\"get_model_variable_funs\"></block></category><category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\"><block type=\"set_model_variable_others\"></block><block type=\"get_model_variable_others\"></block></category></category>'";
         $lab_functions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\"><block type=\"play_lab\"></block><block type=\"pause_lab\"></block><block type=\"reset_lab\"></block></category>'";
         $lab_control = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') . "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block></category>'";
         // </First, define all categories>
@@ -1567,9 +1567,9 @@ function create_blockly_configuration($ejsapp) {
             return function (str) { eval(str); }
         }
         var playCode = function() {
-            alert(code);
             Blockly.JavaScript.addReservedWords('code');
             var code = Blockly.JavaScript.workspaceToCode(workspace);
+			console.log(\"Code: \"+code);
             try { 
                 var eval1 = makeEvalContext(code);
             } catch (e) {alert(e);}
