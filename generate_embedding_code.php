@@ -228,10 +228,13 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $initial_state_file = initial_data_file($ejsapp, 'xmlfiles');
         if ($user_state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
             $state_file = get_data_file($user_state_file, $initial_state_file);
-            $search = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);";
-            $replace = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);
-                        _model.readState('$state_file','.json');";
-            $code = str_replace($search, $replace, $code);
+            $search = "}, false);";
+            $replace = "_model.readState('$state_file','.json');
+            }, false);";
+            $pos = strpos($code, $search);
+            if ($pos !== false) {
+                $code = substr_replace($code, $replace, $pos, strlen($search));
+            }
         }
         // <\Loading state files>
 
@@ -248,10 +251,13 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         if ($user_rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
             $end_message = get_string('end_message','ejsapp');
             $rec_file = get_data_file($user_rec_file, $initial_rec_file);
-            $search = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);";
-            $replace = "window.addEventListener('scroll', function () { if (_model._resized) _model._resized(window.innerWidth,window.innerHeight); }, false);
-                        _model.readText('$rec_file','.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})});";
-            $code = str_replace($search, $replace, $code);
+            $search = "}, false);";
+            $replace = "_model.readText('$rec_file','.rec',function(content){_model.playCapture(JSON.parse(content),function(){alert('$end_message')})});
+            }, false);";
+            $pos = strpos($code, $search);
+            if ($pos !== false) {
+                $code = substr_replace($code, $replace, $pos, strlen($search));
+            }
         }
         // <\Loading interaction recording files>
 

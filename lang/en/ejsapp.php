@@ -129,6 +129,23 @@ $string['max_value_help'] = 'Maximum value allowed for the variable.';
 $string['vars_required'] = 'WARNING: If you want to use personalized variables, you must specify at least one.';
 $string['vars_incorrect_type'] = 'WARNING: The specified type and values for this variable does not correspond to each other.';
 
+$string['blockly_config'] = 'Configure use of Blockly';
+
+$string['use_blockly'] = 'Enable using Blockly';
+$string['use_blockly_help'] = 'When using this option, the EJSApp activity will display a space for programming in Blockly. The programs created with Blockly will be able to interact with the virtual or remote lab.';
+$string['display_logic'] = 'Show logic blocks';
+$string['display_loops'] = 'Show loop blocks';
+$string['display_math'] = 'Show math blocks';
+$string['display_text'] = 'Show text blocks';
+$string['display_lists'] = 'Show lists blocks';
+$string['display_variables'] = 'Show variables blocks';
+$string['display_functions'] = 'Show functions blocks';
+$string['display_lab'] = 'Show EjsS lab blocks';
+$string['display_lab_help'] = 'This option allows showing blocks related to variables and methods of the virtual or remote lab.';
+$string['display_lab_variables'] = 'Show the EjsS lab\'s variables';
+$string['display_lab_functions'] = 'Show the EjsS lab\'s functions';
+$string['display_lab_control'] = 'Show the EjsS lab\'s controls';
+
 $string['rem_lab_conf'] = 'Remote lab configuration';
 
 $string['is_rem_lab'] = 'Remote experimental system?';
@@ -191,6 +208,19 @@ $string['refresh'] = 'Try refreshing your window now.';
 
 //generate_embedding_code.php
 $string['end_message'] = 'End of reproduction';
+
+//Blockly XML configuration file
+$string['xml_logic'] = 'Logic';
+$string['xml_loops'] = 'Loops';
+$string['xml_maths'] = 'Math';
+$string['xml_text'] = 'Text';
+$string['xml_lists'] = 'Lists';
+$string['xml_variables'] = 'Variables';
+$string['xml_functions'] = 'Functions';
+$string['xml_lab'] = 'Laboratory';
+$string['xml_lab_variables'] = 'Variables';
+$string['xml_lab_functions'] ='Functions';
+$string['xml_lab_control'] ='Control';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Access to all the remote laboratories";

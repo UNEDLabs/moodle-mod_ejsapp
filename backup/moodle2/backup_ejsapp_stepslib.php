@@ -56,7 +56,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             'course', 'name', 'intro', 'introformat', 'appwording', 'appwordingformat', 'css', 'timecreated',
             'timemodified', 'applet_name', 'class_file', 'codebase',
             'mainframe', 'is_collaborative', 'applet_size_conf', 'preserve_aspect_ratio',
-            'custom_width', 'custom_height', 'is_rem_lab', 'height', 'width', 'personalvars'));
+            'custom_width', 'custom_height', 'is_rem_lab', 'height', 'width', 'personalvars', 'blockly_conf'));
 
         $ejsapp_personal_vars = new backup_nested_element('ejsapp_personal_vars', array('id'),
             array('name', 'type', 'minval', 'maxval'));

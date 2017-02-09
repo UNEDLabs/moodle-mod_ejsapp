@@ -246,5 +246,13 @@ function xmldb_ejsapp_upgrade($oldversion)
         $dbman->add_field($table, $field);
     }
 
+    if ($oldversion < '2017020702') {
+        // Create "blocky_conf" field in ejsapp table
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('blockly_conf', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0', 'personalvars');
+        $dbman->add_field($table, $field);
+    }
+
     return true;
 }

@@ -60,7 +60,9 @@
                 <FIELD NAME="width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="height" NEXT="personalvars"/>
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="width"/>
+                       PREVIOUS="width" NEXT="blockly_conf"/>
+                <FIELD NAME="blockly_conf" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Blockly configuration parameters encoded in json" PREVIOUS="personalvars"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

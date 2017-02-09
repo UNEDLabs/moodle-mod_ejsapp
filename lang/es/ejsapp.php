@@ -128,6 +128,23 @@ $string['max_value_help'] = 'M&aacute;ximo valor permitido para la variable.';
 $string['vars_required'] = 'ATENCI&Oacute;N: Si desea utilizar variables personalizadas, debe espeficificar al menos una.';
 $string['vars_incorrect_type'] = 'ATENCI&Oacute;N: El tipo y los valores especificados para esta variable no se corresponden entre s&iacute;.';
 
+$string['blockly_config'] = 'Configurar uso de Blockly';
+
+$string['use_blockly'] = 'Habilitar el uso de Blockly';
+$string['use_blockly_help'] = 'Cuando se usa esta opci&oacute;n, la actividad EJSApp mostrar&aacute; un espacio para programar en Blockly. Los programas creados en Blockly podr&aacute;n interactuar con el laboratorio virtual o remoto.';
+$string['display_logic'] = 'Mostrar bloques de l&oacute;gica';
+$string['display_loops'] = 'Mostrar bloques de bucles';
+$string['display_math'] = 'Mostrar bloques de m&aacute;tematicas';
+$string['display_text'] = 'Mostrar bloques de texto';
+$string['display_lists'] = 'Mostrar bloques de array';
+$string['display_variables'] = 'Mostrar bloques de variables';
+$string['display_functions'] = 'Mostrar bloques de funciones';
+$string['display_lab'] = 'Mostrar bloques del laboratorio EjsS';
+$string['display_lab_help'] = 'Esta opci&oacute;n permite mostrar bloques relacionados con variables y m&eacute;todos del laboratorio virtual o remoto.';
+$string['display_lab_variables'] = 'Mostrar variables del laboratorio EjsS';
+$string['display_lab_functions'] = 'Mostrar funciones del laboratorio EjsS';
+$string['display_lab_control'] = 'Mostrar controles del laboratorio EjsS';
+
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
 $string['is_rem_lab'] = 'Sistema experimental remoto?';
@@ -190,6 +207,19 @@ $string['refresh'] = 'Pruebe a refrescar su ventana ahora.';
 
 //generate_embedding_code.php
 $string['end_message'] = 'Fin de la reproducci&oacute;n';
+
+//Blockly XML configuration file
+$string['xml_logic'] = 'Lógica';
+$string['xml_loops'] = 'Bucles';
+$string['xml_maths'] = 'Matemáticas';
+$string['xml_text'] = 'Texto';
+$string['xml_lists'] = 'Arrays';
+$string['xml_variables'] = 'Variables';
+$string['xml_functions'] = 'Funciones';
+$string['xml_lab'] = 'Laboratorio';
+$string['xml_lab_variables'] = 'Variables';
+$string['xml_lab_functions'] ='Funciones';
+$string['xml_lab_control'] ='Control';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";

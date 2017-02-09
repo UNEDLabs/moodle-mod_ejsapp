@@ -99,14 +99,14 @@ if ($CFG->version < 2016090100) {
 }
 
 // Set CSS style for javascript ejsapps
-$original_css_filename = '_ejs_library/css/ejss.css';
-if (!file_exists($CFG->dirroot . $codebase . $ejss_css)) {
-    $original_css_filename = '_ejs_library/css/ejsSimulation.css';
+$original_css_filename =  $ejsapp->codebase . '_ejs_library/css/ejss.css';
+if (!file_exists($CFG->dirroot . $original_css_filename)) {
+    $original_css_filename =  $ejsapp->codebase . '_ejs_library/css/ejsSimulation.css';
 }
-$custom_css_filename = $ejsapp->codebase.'_ejs_library/css/ejsapp.css';
-if (file_exists($CFG->dirroot.$custom_css_filename)) {
+$custom_css_filename = $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
+if (file_exists($CFG->dirroot . $custom_css_filename)) {
     $PAGE->requires->css($custom_css_filename);
-} elseif (file_exists($CFG->dirroot.$original_css_filename)) {
+} elseif (file_exists($CFG->dirroot . $original_css_filename)) {
     $PAGE->requires->css($original_css_filename);
 }
 
@@ -118,6 +118,9 @@ if ($ejsapp->intro) { // If some text was written, show the intro
 
 // Check if there are variables configured to be personalized in this EJSApp
 $personalvarsinfo = personalize_vars($ejsapp, $USER, false);
+
+// If required, create the javascript file with the configuration for using blockly
+create_blockly_configuration($ejsapp);
 
 // For logging purposes:
 $action = 'view';
@@ -310,6 +313,34 @@ if (isset($collab_session)) {
     echo $button;
 }
 // </Buttons to close or leave collab sessions>
+
+// <Blockly programming space>
+$blockly_conf = json_decode($ejsapp->blockly_conf);
+if ($blockly_conf[0] == 1) {
+    $include_js_libraries = html_writer::tag('script', '', array('src'=>$ejsapp->codebase . 'configuration.js')) .
+                            html_writer::tag('script', '', array('src'=>'blockly/blockly_compressed.js')) .
+                            html_writer::tag('script', '', array('src'=>'blockly/blocks_compressed.js')) .
+                            html_writer::tag('script', '', array('src'=>'blockly/javascript_compressed.js')) .
+                            html_writer::tag('script', '', array('src'=>'blockly/blockly_addon.js')) .
+                            html_writer::tag('script', '', array('src'=>'blockly/GUI_functions.js')) .
+                            html_writer::tag('script', '', array('src'=>'blockly/API_functions.js'));
+    if (strpos(current_language(), 'es') !== false) {
+        $include_js_libraries .= html_writer::tag('script', '', array('src'=>'blockly/es.js'));
+    } else {
+        $include_js_libraries .= html_writer::tag('script', '', array('src'=>'blockly/en.js'));
+    }
+    echo $include_js_libraries;
+    echo html_writer::div('', 'blockly', array('id'=>'blocklyDiv'));
+    /*echo "<button onclick=\"playCode()\" id=\"playbutton\" style=\"border:none;background:none;\" >Play</button>
+          <button onclick=\"saveCode()\" id=\"savebutton\" style=\"border:none;background:none;\" >Save</button>
+          <button onclick=\"loadCode()\" id=\"loadbutton\" style=\"border:none;background:none;\" >Load</button>";
+    echo "<script type=\"text/javascript\">
+              document.getElementById('playbutton').title = 'Play';
+		      document.getElementById('savebutton').title = 'Save';
+		      document.getElementById('loadbutton').title = 'Load';
+		  </script>";*/
+}
+// </Blockly programming space>
 
 // Finish the page
 echo $OUTPUT->footer();

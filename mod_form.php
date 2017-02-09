@@ -198,6 +198,49 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
         $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats', 'option_add_vars', 2, null, true);
         // -------------------------------------------------------------------------------
+        // Use and configuration of Blockly
+        $mform->addElement('header', 'blockly_config', get_string('blockly_config', 'ejsapp'));
+
+        $mform->addElement('selectyesno', 'use_blockly', get_string('use_blockly', 'ejsapp'));
+        $mform->addHelpButton('use_blockly', 'use_blockly', 'ejsapp');
+
+        $mform->addElement('selectyesno', 'display_logic', get_string('display_logic', 'ejsapp'));
+        $mform->disabledIf('display_logic', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_loops', get_string('display_loops', 'ejsapp'));
+        $mform->disabledIf('display_loops', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_math', get_string('display_math', 'ejsapp'));
+        $mform->disabledIf('display_math', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_text', get_string('display_text', 'ejsapp'));
+        $mform->disabledIf('display_text', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_lists', get_string('display_lists', 'ejsapp'));
+        $mform->disabledIf('display_lists', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_variables', get_string('display_variables', 'ejsapp'));
+        $mform->disabledIf('display_variables', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_functions', get_string('display_functions', 'ejsapp'));
+        $mform->disabledIf('display_functions', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_lab', get_string('display_lab', 'ejsapp'));
+        $mform->addHelpButton('display_lab', 'display_lab', 'ejsapp');
+        $mform->disabledIf('display_lab', 'use_blockly', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_lab_variables', get_string('display_lab_variables', 'ejsapp'));
+        $mform->disabledIf('display_lab_variables', 'use_blockly', 'eq', 0);
+        $mform->disabledIf('display_lab_variables', 'display_lab', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_lab_functions', get_string('display_lab_functions', 'ejsapp'));
+        $mform->disabledIf('display_lab_functions', 'use_blockly', 'eq', 0);
+        $mform->disabledIf('display_lab_functions', 'display_lab', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'display_lab_control', get_string('display_lab_control', 'ejsapp'));
+        $mform->disabledIf('display_lab_control', 'use_blockly', 'eq', 0);
+        $mform->disabledIf('display_lab_control', 'display_lab', 'eq', 0);
+        // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
 
@@ -295,6 +338,21 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 }
                 $key ++;
             }
+
+            $json_blockly_configuration = $DB->get_field('ejsapp', 'blockly_conf', array('id' => $this->current->instance));
+            $blockly_configuration =json_decode($json_blockly_configuration);
+            $default_values['use_blockly'] = $blockly_configuration[0];
+            $default_values['display_logic'] = $blockly_configuration[1];
+            $default_values['display_loops'] = $blockly_configuration[2];
+            $default_values['display_math'] = $blockly_configuration[3];
+            $default_values['display_text'] = $blockly_configuration[4];
+            $default_values['display_lists'] = $blockly_configuration[5];
+            $default_values['display_variables'] = $blockly_configuration[6];
+            $default_values['display_functions'] = $blockly_configuration[7];
+            $default_values['display_lab'] = $blockly_configuration[8];
+            $default_values['display_lab_variables'] = $blockly_configuration[9];
+            $default_values['display_lab_functions'] = $blockly_configuration[10];
+            $default_values['display_lab_control'] = $blockly_configuration[11];
         }
 
         // Element listing EJS public variables

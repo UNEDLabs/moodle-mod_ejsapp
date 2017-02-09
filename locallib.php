@@ -156,6 +156,22 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
         $ejs_ok = modifications_for_javascript($filepath, $ejsapp, $path, $codebase);
     }
 
+    // <Configuration of blockly>
+    $blockly_conf = array();
+    array_push($blockly_conf, $ejsapp->use_blockly);
+    array_push($blockly_conf, $ejsapp->display_logic);
+    array_push($blockly_conf, $ejsapp->display_loops);
+    array_push($blockly_conf, $ejsapp->display_math);
+    array_push($blockly_conf, $ejsapp->display_text);
+    array_push($blockly_conf, $ejsapp->display_lists);
+    array_push($blockly_conf, $ejsapp->display_variables);
+    array_push($blockly_conf, $ejsapp->display_functions);
+    array_push($blockly_conf, $ejsapp->display_lab);
+    array_push($blockly_conf, $ejsapp->display_lab_variables);
+    array_push($blockly_conf, $ejsapp->display_lab_functions);
+    array_push($blockly_conf, $ejsapp->display_lab_control);
+    $ejsapp->blockly_conf = json_encode($blockly_conf);
+
     $DB->update_record('ejsapp', $ejsapp);
 
     // We add an entry in Moodle's file table for the .zip or .jar file in the jarfiles directory
@@ -1508,5 +1524,81 @@ function prepare_ejs_file($ejsapp) {
             modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase);
         }
         $DB->update_record('ejsapp', $ejsapp);
+    }
+}
+
+
+/**
+ * Creates a javascript file with all the required configuration to start using Blockly when an ejsapp activity is
+ * configure to use it.
+ *
+ * @param stdClass $ejsapp
+ * @return void
+ *
+ */
+function create_blockly_configuration($ejsapp) {
+    global $CFG;
+
+   $blockly_conf = json_decode($ejsapp->blockly_conf);
+    if ($blockly_conf[0] == 1) {
+        $filepath = $CFG->dirroot . $ejsapp->codebase . 'configuration.js';
+        if (file_exists($filepath)) unlink($filepath);
+
+        // <First, define all categories>
+        $logic = "'<category name=\"" . get_string('xml_logic', 'ejsapp') . "\" colour=\"210\"><block type=\"controls_if\"></block><block type=\"logic_compare\"></block><block type=\"logic_operation\"></block><block type=\"logic_negate\"></block><block type=\"logic_boolean\"></block><block type=\"logic_null\"></block><block type=\"logic_ternary\"></block></category>'";
+        $loops = "'<category name=\"" . get_string('xml_loops', 'ejsapp') . "\" colour=\"120\"><block type=\"controls_repeat_ext\"><value name=\"TIMES\"><shadow type=\"math_number\"><field name=\"NUM\">10</field></shadow></value></block><block type=\"controls_whileUntil\"></block> <block type=\"controls_for\"> <value name=\"FROM\"><shadow type=\"math_number\"><field name=\"NUM\">1</field></shadow></value><value name=\"TO\"><shadow type=\"math_number\"><field name=\"NUM\">10</field></shadow></value><value name=\"BY\"><shadow type=\"math_number\"><field name=\"NUM\">1</field></shadow></value></block><block type=\"controls_forEach\"></block><block type=\"controls_flow_statements\"></block></category>'";
+        $math = "'<category name=\"" . get_string('xml_maths', 'ejsapp') . "\" colour=\"230\"><block type=\"math_number\"></block><block type=\"math_arithmetic\"><value name=\"A\"><shadow type=\"math_number\"><field name=\"NUM\">1</field></shadow></value><value name=\"B\"><shadow type=\"math_number\"><field name=\"NUM\">1</field></shadow></value></block> <block type=\"math_single\"><value name=\"NUM\"><shadow type=\"math_number\"><field name=\"NUM\">9</field></shadow></value></block><block type=\"math_trig\"><value name=\"NUM\"><shadow type=\"math_number\"><field name=\"NUM\">45</field></shadow></value></block><block type=\"math_constant\"></block><block type=\"math_number_property\"><value name=\"NUMBER_TO_CHECK\"><shadow type=\"math_number\"><field name=\"NUM\">0</field></shadow></value></block><block type=\"math_round\"><value name=\"NUM\"><shadow type=\"math_number\"><field name=\"NUM\">3.1</field></shadow></value></block><block type=\"math_on_list\"></block><block type=\"math_modulo\"><value name=\"DIVIDEND\"><shadow type=\"math_number\"><field name=\"NUM\">64</field></shadow></value><value name=\"DIVISOR\"><shadow type=\"math_number\"><field name=\"NUM\">10</field></shadow></value> </block><block type=\"math_constrain\"><value name=\"VALUE\"><shadow type=\"math_number\"><field name=\"NUM\">50</field></shadow></value><value name=\"LOW\"><shadow type=\"math_number\"><field name=\"NUM\">1</field></shadow></value><value name=\"HIGH\"><shadow type=\"math_number\"><field name=\"NUM\">100</field></shadow></value></block><block type=\"math_random_int\"><value name=\"FROM\"><shadow type=\"math_number\"><field name=\"NUM\">1</field></shadow></value> <value name=\"TO\"><shadow type=\"math_number\"><field name=\"NUM\">100</field></shadow> </value></block><block type=\"math_random_float\"></block></category>'";
+        $text = "'<category name=\"" . get_string('xml_text', 'ejsapp') . "\" colour=\"160\"><block type=\"text\"></block><block type=\"text_join\"></block><block type=\"text_append\"><value name=\"TEXT\"><shadow type=\"text\"></shadow></value></block><block type=\"text_length\"><value name=\"VALUE\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block><block type=\"text_isEmpty\"><value name=\"VALUE\"><shadow type=\"text\"><field name=\"TEXT\"></field></shadow></value></block><block type=\"text_indexOf\"><value name=\"VALUE\"><block type=\"variables_get\"><field name=\"VAR\">{textVariable}</field></block></value><value name=\"FIND\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block><block type=\"text_charAt\"><value name=\"VALUE\"><block type=\"variables_get\"><field name=\"VAR\">{textVariable}</field></block></value></block><block type=\"text_getSubstring\"><value name=\"STRING\"><block type=\"variables_get\"><field name=\"VAR\">{textVariable}</field></block></value></block><block type=\"text_changeCase\"><value name=\"TEXT\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block><block type=\"text_trim\"><value name=\"TEXT\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block><block type=\"text_print\"><value name=\"TEXT\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block><block type=\"text_prompt_ext\"><value name=\"TEXT\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block></category>'";
+        $lists = "'<category name=\"" . get_string('xml_lists', 'ejsapp') . "\" colour=\"260\"><block type=\"lists_create_with\"><mutation items=\"0\"></mutation></block><block type=\"lists_create_with\"></block><block type=\"lists_repeat\"><value name=\"NUM\"><shadow type=\"math_number\"><field name=\"NUM\">5</field></shadow></value></block><block type=\"lists_length\"></block><block type=\"lists_isEmpty\"></block><block type=\"lists_indexOf\"><value name=\"VALUE\"><block type=\"variables_get\"><field name=\"VAR\">{listVariable}</field></block></value></block><block type=\"lists_getIndex\"><value name=\"VALUE\"><block type=\"variables_get\"><field name=\"VAR\">{listVariable}</field></block></value></block><block type=\"lists_setIndex\"><value name=\"LIST\"><block type=\"variables_get\"><field name=\"VAR\">{listVariable}</field></block></value></block><block type=\"lists_getSublist\"><value name=\"LIST\"><block type=\"variables_get\"><field name=\"VAR\">{listVariable}</field></block></value></block><block type=\"lists_split\"><value name=\"DELIM\"><shadow type=\"text\"><field name=\"TEXT\">,</field></shadow></value></block><block type=\"lists_sort\"></block></category>'";
+        $variables = "'<category name=\"" . get_string('xml_variables', 'ejsapp') . "\" colour=\"330\" custom=\"VARIABLE\"></category>'";
+        $functions = "'<category name=\"" . get_string('xml_functions', 'ejsapp') . "\" colour=\"290\" custom=\"PROCEDURE\"></category>'";
+        $lab = "'<category name=\"" . get_string('xml_lab', 'ejsapp') . "\" colour=\"44\">'";
+        $lab_variables = "'<category name=\"" . get_string('xml_lab_variables', 'ejsapp') . "\"><block type=\"get_model_variable\"></block><block type=\"set_model_variable\"></block><category name=\"Boolean\"><block type=\"set_model_variable_boolean\"></block><block type=\"get_model_variable_boolean\"></block></category><category name=\"String\"><block type=\"set_model_variable_string\"></block><block type=\"get_model_variable_string\"></block></category><category name=\"Number\"><block type=\"set_model_variable_number\"></block><block type=\"get_model_variable_number\"></block></category><category name=\"Others\"><block type=\"set_model_variable_others\"></block><block type=\"get_model_variable_others\"></block></category></category>'";
+        $lab_functions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\"><block type=\"play_lab\"></block><block type=\"pause_lab\"></block><block type=\"reset_lab\"></block></category>'";
+        $lab_control = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') . "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block></category>'";
+        // </First, define all categories>
+
+        // <Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
+        // <Categories>
+        $js_conf_code = "
+        var buttonFunction = playCode;
+        function makeEvalContext (declarations) {
+            eval(declarations);
+            return function (str) { eval(str); }
+        }
+        var playCode = function() {
+            alert(code);
+            Blockly.JavaScript.addReservedWords('code');
+            var code = Blockly.JavaScript.workspaceToCode(workspace);
+            try { 
+                var eval1 = makeEvalContext(code);
+            } catch (e) {alert(e);}
+        };";
+        $js_conf_code .= "\n" . "var toolbox = '<xml>';";
+        if ($blockly_conf[1] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $logic . ';';
+        if ($blockly_conf[2] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $loops . ';';
+        if ($blockly_conf[3] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $math . ';';
+        if ($blockly_conf[4] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $text . ';';
+        if ($blockly_conf[5] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $lists . ';';
+        if ($blockly_conf[6] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $variables . ';';
+        if ($blockly_conf[7] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $functions . ';';
+        if ($blockly_conf[8] == 1) {
+            $js_conf_code .= "\n" . 'toolbox += ' . $lab . ';'; //starts lab category in the xml structure
+            if ($blockly_conf[9] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $lab_variables . ';';
+            if ($blockly_conf[10] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $lab_functions . ';';
+            if ($blockly_conf[11] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $lab_control . ';';
+            $js_conf_code .= "\n" . "toolbox += '</category>'"; //closes the lab category if created
+        }
+        $js_conf_code .= "\n" . "toolbox += '</xml>';";
+        // </Categories>
+        // <Initial blocks>
+        $js_conf_code .= "\n" . "var initial = '<xml>';";
+        $js_conf_code .= "\n" . "initial += '<block type=\"text_print\"></block>';";
+        $js_conf_code .= "\n" . "initial += '</xml>';";
+        // </Initial blocks>
+        // </Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
+
+        // Finally, create the javascript file
+        file_put_contents($filepath, $js_conf_code);
     }
 }
