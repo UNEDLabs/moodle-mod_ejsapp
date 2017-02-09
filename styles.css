@@ -1,0 +1,14 @@
+/**
+ * CSS styles
+ *
+ * @package    mod
+ * @subpackage ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
+
+.path-mod-ejsapp .blockly {
+    margin-top: 20px;
+    width: 100%;
+    height: 450px;
+}
