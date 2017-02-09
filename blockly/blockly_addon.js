@@ -3,8 +3,14 @@ var keys_boolean = [];
 	  var keys_number = [];
 	  var keys_string = [];
 	  var keys_others = [];
+	  var keys_functions = [];
 	 
 
+function isFunction(functionToCheck) {
+ var getType = {};
+ return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
+	 
 function loadModelBlocks(){
 	var obj = _model._userSerialize();
 	  
@@ -15,19 +21,23 @@ function loadModelBlocks(){
 		  var dupla = []
 		  dupla.push(k);
 		  dupla.push(k);
-		  switch (typeof obj[k]){
-		  	case 'string':
-		  		keys_string.push(dupla);
-		  		break;
-		  	case 'number':
-		  		keys_number.push(dupla);
-		  		break;
-		  	case 'boolean':
-				keys_boolean.push(dupla);
-		  		break;
-		  	default:
-		  		keys_others.push(dupla);
-		  		break;
+		  if(isFunction(obj[k]))
+			keys_functions.push(dupla);
+		  else{
+			  switch (typeof obj[k]){
+				case 'string':
+					keys_string.push(dupla);
+					break;
+				case 'number':
+					keys_number.push(dupla);
+					break;
+				case 'boolean':
+					keys_boolean.push(dupla);
+					break;
+				default:
+					keys_others.push(dupla);
+					break;
+			  }
 		  }
 	  	  keys.push(dupla);
 		  i++;
@@ -60,6 +70,8 @@ function loadModelBlocks(){
     		    this.setTooltip('');
     		  }
     		};
+			
+	if(keys_boolean.length > 0){
       Blockly.Blocks['get_model_variable_boolean'] = {
     		  init: function() {
     		    this.appendDummyInput()
@@ -84,7 +96,8 @@ function loadModelBlocks(){
     		    this.setTooltip('');
     		  }
     		};
-      
+    }  
+	if(keys_string.length > 0){
       Blockly.Blocks['get_model_variable_string'] = {
     		  init: function() {
     		    this.appendDummyInput()
@@ -109,6 +122,9 @@ function loadModelBlocks(){
     		    this.setTooltip('');
     		  }
     		};
+	}		
+	
+	if(keys_number.length > 0){
       Blockly.Blocks['get_model_variable_number'] = {
     		  init: function() {
     		    this.appendDummyInput()
@@ -133,6 +149,8 @@ function loadModelBlocks(){
     		    this.setTooltip('');
     		  }
     		};
+	}
+	if(keys_others.length > 0){
       Blockly.Blocks['get_model_variable_others'] = {
     		  init: function() {
     		    this.appendDummyInput()
@@ -156,7 +174,33 @@ function loadModelBlocks(){
     		    this.setTooltip('');
     		  }
     		};
+	}
+	
+	if(keys_functions.length > 0){
+	  Blockly.Blocks['get_model_variable_funs'] = {
+    		  init: function() {
+    		    this.appendDummyInput()
+    		        .appendField("get")
+    		        .appendField(new Blockly.FieldDropdown(keys_functions), "modelvariables5");
+    		    this.setOutput(true, null);
+    		    this.setColour(290);
+    		    this.setTooltip('');
+    		  }
+    		};
       
+      Blockly.Blocks['set_model_variable_funs'] = {
+    		  init: function() {
+    		    this.appendValueInput("NAME")
+    		        .appendField("set")
+    		        .appendField(new Blockly.FieldDropdown(keys_functions), "model variables5")
+    		        .appendField("to")
+    		    this.setPreviousStatement(true, null);
+    		    this.setNextStatement(true, null);
+    		    this.setColour(120);
+    		    this.setTooltip('');
+    		  }
+    		};
+    }  
       Blockly.Blocks['play_lab'] = {
     		  init: function() {
     		    this.appendDummyInput()

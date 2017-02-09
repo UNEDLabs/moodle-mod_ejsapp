@@ -220,6 +220,10 @@ $string['xml_lab'] = 'Laboratorio';
 $string['xml_lab_variables'] = 'Variables';
 $string['xml_lab_functions'] ='Funciones';
 $string['xml_lab_control'] ='Control';
+$string['xml_lab_var_boolean'] ='Booleanas';
+$string['xml_lab_var_string'] ='Textos';
+$string['xml_lab_var_number'] ='Númericas';
+$string['xml_lab_var_others'] ='Otras';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";
