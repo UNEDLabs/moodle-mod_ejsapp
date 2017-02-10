@@ -1,50 +1,39 @@
 
 var keys_boolean = [];
-	  var keys_number = [];
-	  var keys_string = [];
-	  var keys_others = [];
-	  var keys_functions = [];
-	 
-
-function isFunction(functionToCheck) {
- var getType = {};
- return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-}
+var keys_number = [];
+var keys_string = [];
+var keys_others = [];
+var keys_functions = [];
 	 
 function loadModelBlocks(){
 	var obj = _model._userSerialize();
-	  
-	  var keys = [];
-	  var condition = false;
-	  var i = 1;
-	  for(var k in obj){
-		  var dupla = []
-		  dupla.push(k);
-		  dupla.push(k);
-		  if(isFunction(obj[k]))
-			keys_functions.push(dupla);
-		  else{
-			  switch (typeof obj[k]){
-				case 'string':
-					keys_string.push(dupla);
-					break;
-				case 'number':
-					keys_number.push(dupla);
-					break;
-				case 'boolean':
-					keys_boolean.push(dupla);
-					break;
-				default:
-					keys_others.push(dupla);
-					break;
-			  }
-		  }
-	  	  keys.push(dupla);
-		  i++;
-	  }
-	
-	
-	
+	var keys = [];
+	var condition = false;
+	var i = 1;
+	for(var k in obj){
+		var dupla = []
+		dupla.push(k);
+		dupla.push(k);
+		switch (typeof obj[k]){
+			case 'string':
+				keys_string.push(dupla);
+				break;
+			case 'number':
+				keys_number.push(dupla);
+				break;
+			case 'boolean':
+				keys_boolean.push(dupla);
+				break;
+			case 'function':
+				keys_functions.push(dupla);
+				break;
+			default:
+				keys_others.push(dupla);
+				break;
+		}
+		keys.push(dupla);
+		i++;
+	}
 	
 	Blockly.Blocks['get_model_variable'] = {
     		  init: function() {
