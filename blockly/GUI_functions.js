@@ -164,10 +164,22 @@ myInterpreter = null;
           interpreter.createNativeFunction(wrapper));
 
     }
-	
 
-	
-	
- 
-	
-	
+//Funcion para guardar
+var saveCode = function () {
+    var xmlDom = Blockly.Xml.workspaceToDom(workspace);
+    var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+    console.log(xmlText);
+    _model.saveText('blockly.blk', 'blockly', xmlText);
+};
+
+//Funcion para cargar
+var loadCode = function () {
+    var xmlText = _model.readText();
+    console.log(xmlText);
+    if (xmlText) {
+        workspace.clear();
+        xmlDom = Blockly.Xml.textToDom(xmlText);
+        Blockly.Xml.domToWorkspace(xmlDom,workspace);
+    }
+};
