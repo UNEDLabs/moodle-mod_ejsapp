@@ -39,9 +39,10 @@ $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $state_file = optional_param('state_file', null, PARAM_TEXT);
 $cnt_file = optional_param('cnt_file', null, PARAM_TEXT);
 $rec_file = optional_param('rec_file', null, PARAM_TEXT);
+$blk_file = optional_param('blk_file', null, PARAM_TEXT);
 $session_id = optional_param('colsession', null, PARAM_INT);
 
-$data_files = array($state_file, $cnt_file, $rec_file);
+$data_files = array($state_file, $cnt_file, $rec_file, $blk_file);
 
 if (!is_null($session_id)) {
     $collab_session = $DB->get_record('ejsapp_collab_sessions',array('id'=>$session_id));

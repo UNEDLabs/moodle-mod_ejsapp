@@ -586,7 +586,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'cntfiles' && $filearea !== 'recfiles') {
+    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'cntfiles' && $filearea !== 'recfiles' && $filearea !== 'blkfiles') {
         return false;
     }
 
@@ -692,7 +692,7 @@ function get_ejsapp_states($ejsapp_id) {
 
 }//get_ejsapp_states
 
-//TODO: get .rec files (get_ejsapp_recordings)
+//TODO: get .rec files (get_ejsapp_recordings) and .blk files (get_ejsapp_blockly_programs)
 
 function draw_ejsapp_instance($ejsapp_id, $data_files=null, $width=null, $height=null) {
     global $DB, $CFG;

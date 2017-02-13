@@ -23,7 +23,7 @@
 
 
 /**
- * This file is used to receive any .xml, .rec, .cnt, text or image file saved by
+ * This file is used to receive any .xml, .rec, .blk, .cnt, text or image file saved by
  * an EJS applet or an EjsS javascript application.
  *
  * @package    mod
@@ -132,6 +132,9 @@ if ($method) { // from EJS
     // remove the temporal file from the temporal folder
     unlink("$path");
 } else { // from EjsS
+    $file = fopen('filename.txt', 'w');
+    fwrite($file, $fileinfo['filename']);
+    fclose("file");
     if ($_POST['type'] != 'png') $fs->create_file_from_string($fileinfo, rawurldecode($_POST['file']));
     else {
         $data = rawurldecode($_POST['file']);

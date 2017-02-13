@@ -165,21 +165,21 @@ myInterpreter = null;
 
     }
 
-//Funcion para guardar
-var saveCode = function () {
+// Save a program in blockly
+var saveCode = function (context_id, user_id, ejsapp_id) {
     var xmlDom = Blockly.Xml.workspaceToDom(workspace);
     var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
-    console.log(xmlText);
-    _model.saveText('blockly.blk', 'blockly', xmlText);
+    _model.saveText('blocks_context_id_' + context_id + '_user_id_' + user_id + '_ejsapp_id_' + ejsapp_id, 'blk', xmlText);
 };
 
-//Funcion para cargar
+// Load a program in blockly
 var loadCode = function () {
-    var xmlText = _model.readText();
-    console.log(xmlText);
-    if (xmlText) {
-        workspace.clear();
-        xmlDom = Blockly.Xml.textToDom(xmlText);
-        Blockly.Xml.domToWorkspace(xmlDom,workspace);
-    }
+    _model.readText(null, '.blk',
+        function (xmlText) {
+            if (xmlText) {
+                workspace.clear();
+                xmlDom = Blockly.Xml.textToDom(xmlText);
+                Blockly.Xml.domToWorkspace(xmlDom, workspace);
+            }
+        });
 };

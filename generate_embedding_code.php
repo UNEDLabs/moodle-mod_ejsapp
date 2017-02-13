@@ -59,6 +59,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $user_data_files[0]: user_state_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .xml or .json file that stores the state of an EJS applet, elsewhere it is null
  *                                  $user_data_files[1]: user_cnt_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .cnt file that stores the code of the controller used within an EJS applet, elsewhere it is null
  *                                  $user_data_files[2]: user_rec_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .rec file that stores the script with the recording of the interaction with an EJS applet, elsewhere it is null
+ *                                  $user_data_files[3]: user_blk_file, if generate_embedding_code is called from block ejsapp_file_browser, this is the name of the .blk file that stores a blockly program, elsewhere it is null
  * @param stdClass|null $collabinfo 
  *                                  $collabinfo->session: int collaborative session id, 
  *                                  $collabinfo->ip: string collaborative session ip, 
@@ -126,10 +127,12 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $user_state_file = $user_data_files[0];
         $user_cnt_file = $user_data_files[1];
         $user_rec_file = $user_data_files[2];
+        $user_blk_file = $user_data_files[3];
     } else {
         $user_state_file = null;
         $user_cnt_file = null;
         $user_rec_file = null;
+        $user_nlk_file = null;
     }
 
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {    // Sarlab is used to access this remote lab or to establish communication between users
@@ -223,7 +226,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
             $code = str_replace($search, $replace, $code);
         }
 
-        // <Loading state, controller and interaction files as well as personalized variables>
+        // <Loading state, controller, interaction and blockly programs files as well as personalized variables>
         // <Loading state files>
         $initial_state_file = initial_data_file($ejsapp, 'xmlfiles');
         if ($user_state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
@@ -261,6 +264,21 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         // <\Loading interaction recording files>
 
+        // <Loading blockly programs files>
+        $initial_blk_file = initial_data_file($ejsapp, 'blkfiles');
+        if ($user_blk_file || (isset($initial_blk_file->filename) && $initial_blk_file->filename != '.')) {
+            $end_message = get_string('end_message','ejsapp');
+            $blk_file = get_data_file($user_blk_file, $initial_blk_file);
+            $search = "}, false);";
+            $replace = "_model.readText('$blk_file','.blk',function(xmlText){if (xmlText){workspace.clear();xmlDom = Blockly.Xml.textToDom(xmlText);Blockly.Xml.domToWorkspace(xmlDom, workspace);}});
+            }, false);";
+            $pos = strpos($code, $search);
+            if ($pos !== false) {
+                $code = substr_replace($code, $replace, $pos, strlen($search));
+            }
+        }
+        // <\Loading blockly programs files>
+
         // <Loading personalized variables>
         $search = ',"webUserInput"';
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
@@ -276,7 +294,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         $code = str_replace($search, $replace, $code);
         // <\Loading personalized variables>
-        // <\Loading state, controller and interaction files as well as personalized variables>
+        // <\Loading state, controller, interaction and blockly programs files as well as personalized variables>
 
         // <End message when the recording of the user interaction stops>
         $end_message = get_string('end_message','ejsapp');
