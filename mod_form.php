@@ -240,6 +240,11 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('selectyesno', 'display_lab_control', get_string('display_lab_control', 'ejsapp'));
         $mform->disabledIf('display_lab_control', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_control', 'display_lab', 'eq', 0);
+
+        // Adding an optional text file with a recording to automatically run it when the lab loads
+        $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
+        $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
+        $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
         // -------------------------------------------------------------------------------
         // Adding elements to configure the remote lab, if that's the case
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
@@ -323,6 +328,10 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $draftitemid_recording = file_get_submitted_draft_itemid('recordingfile');
             file_prepare_draft_area($draftitemid_recording, $this->context->id, 'mod_ejsapp', 'recfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
             $default_values['recordingfile'] = $draftitemid_recording;
+
+            $draftitemid_blockly = file_get_submitted_draft_itemid('blocklyfile');
+            file_prepare_draft_area($draftitemid_blockly, $this->context->id, 'mod_ejsapp', 'blkfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $default_values['blocklyfile'] = $draftitemid_blockly;
 
             $personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
             $key = 0;

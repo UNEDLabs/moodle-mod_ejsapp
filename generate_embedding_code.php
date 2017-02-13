@@ -264,17 +264,19 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         // <\Loading interaction recording files>
 
-        // <Loading blockly programs files>
+        // <Loading blockly program files>
         $initial_blk_file = initial_data_file($ejsapp, 'blkfiles');
         if ($user_blk_file || (isset($initial_blk_file->filename) && $initial_blk_file->filename != '.')) {
-            $end_message = get_string('end_message','ejsapp');
-            $blk_file = get_data_file($user_blk_file, $initial_blk_file);
-            $search = "}, false);";
-            $replace = "_model.readText('$blk_file','.blk',function(xmlText){if (xmlText){workspace.clear();xmlDom = Blockly.Xml.textToDom(xmlText);Blockly.Xml.domToWorkspace(xmlDom, workspace);}});
-            }, false);";
-            $pos = strpos($code, $search);
-            if ($pos !== false) {
-                $code = substr_replace($code, $replace, $pos, strlen($search));
+            $blockly_conf = json_decode($ejsapp->blockly_conf);
+            if ($blockly_conf[0] == 1) {
+                $blk_file = get_data_file($user_blk_file, $initial_blk_file);
+                $search = "}, false);";
+                $replace = "_model.readText('$blk_file','.blk',function(xmlText){if (xmlText){workspace.clear();xmlDom = Blockly.Xml.textToDom(xmlText);Blockly.Xml.domToWorkspace(xmlDom, workspace);}});
+                }, false);";
+                $pos = strpos($code, $search);
+                if ($pos !== false) {
+                    $code = substr_replace($code, $replace, $pos, strlen($search));
+                }
             }
         }
         // <\Loading blockly programs files>

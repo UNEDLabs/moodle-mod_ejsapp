@@ -224,6 +224,8 @@ $string['xml_lab_var_boolean'] ='Booleanas';
 $string['xml_lab_var_string'] ='Textos';
 $string['xml_lab_var_number'] ='Númericas';
 $string['xml_lab_var_others'] ='Otras';
+$string['blocklyfile'] = 'Bloques iniciales';
+$string['blocklyfile_help'] = 'Puede seleccionar un fichero .blk que especifique los bloques que deben mostrarse inicialmente en Blockly.';
 
 //Capabilities
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";

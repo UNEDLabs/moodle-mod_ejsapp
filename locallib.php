@@ -75,6 +75,12 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
         file_save_draft_area_files($draftitemid_recording, $context->id, 'mod_ejsapp', 'recfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
     }
 
+    // Creating the recording file in dataroot and updating the files table in the database
+    $draftitemid_blockly = $ejsapp->blocklyfile;
+    if ($draftitemid_blockly) {
+        file_save_draft_area_files($draftitemid_blockly, $context->id, 'mod_ejsapp', 'blkfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+    }
+
     // Same with the content of the wording element
     $draftitemid_wording = $ejsapp->ejsappwording['itemid'];
     if ($draftitemid_wording) {
@@ -1591,11 +1597,6 @@ function create_blockly_configuration($ejsapp) {
         }
         $js_conf_code .= "\n" . "toolbox += '</xml>';";
         // </Categories>
-        // <Initial blocks>
-        $js_conf_code .= "\n" . "var initial = '<xml>';";
-        $js_conf_code .= "\n" . "initial += '<block type=\"text_print\"></block>';";
-        $js_conf_code .= "\n" . "initial += '</xml>';";
-        // </Initial blocks>
         // </Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
 
         // Finally, create the javascript file
