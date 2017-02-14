@@ -1597,6 +1597,10 @@ function create_blockly_configuration($ejsapp) {
         }
         $js_conf_code .= "\n" . "toolbox += '</xml>';";
         // </Categories>
+        // <Initial blocks>
+        $js_conf_code .= "\n" . "var initial = '<xml>';";
+        $js_conf_code .= "\n" . "initial += '</xml>';";
+        // </Initial blocks>
         // </Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
 
         // Finally, create the javascript file

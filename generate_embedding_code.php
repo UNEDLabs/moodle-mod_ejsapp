@@ -279,7 +279,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                 }
             }
         }
-        // <\Loading blockly programs files>
+        // <\Loading blockly program files>
 
         // <Loading personalized variables>
         $search = ',"webUserInput"';
@@ -296,7 +296,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         $code = str_replace($search, $replace, $code);
         // <\Loading personalized variables>
-        // <\Loading state, controller, interaction and blockly programs files as well as personalized variables>
+        // <\Loading state, controller, interaction and blockly program files as well as personalized variables>
 
         // <End message when the recording of the user interaction stops>
         $end_message = get_string('end_message','ejsapp');
