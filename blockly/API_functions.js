@@ -231,6 +231,13 @@
 	  _model.reset();
   }
   
+  function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+  async function wait(ms) {
+	return sleep(ms);
+}
   
     // Add an API function for the record() block.
  /* var wrapper = function(text,number) {

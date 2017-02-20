@@ -464,6 +464,19 @@ function loadModelBlocks(){
 		this.setTooltip('');
 	  }
 	};
+	
+	
+	Blockly.Blocks['wait'] = {
+	  init: function() {
+		this.setColour(60);
+		this.appendDummyInput()
+			.appendField("wait")
+			.appendField(new Blockly.FieldDropdown([["half a second", "500"], ["a second", "1000"], ["two seconds", "2000"], ["five seconds", "5000"]]), "DELAY");
+		this.setPreviousStatement(true, "null");
+		this.setNextStatement(true, "null");
+		this.setTooltip('');
+	  }
+	};
 }
 
 
@@ -624,6 +637,10 @@ function loadJavaScriptModelBlocks(){
 		  return value_name+"\n";
 		};
 	
-	
+	Blockly.JavaScript['wait'] = function(block) {
+		  var dropdown_delay = block.getFieldValue('DELAY');
+		  var code = 'wait(' + dropdown_delay + ');\n';
+		  return code;
+		};
 	
 }
