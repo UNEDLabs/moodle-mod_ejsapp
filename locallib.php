@@ -1577,7 +1577,7 @@ function create_blockly_configuration($ejsapp) {
             var code = Blockly.JavaScript.workspaceToCode(workspace);
 			//ADD SLEEP TERMINATION
 			  for(var counter=sleep.length - 1; counter >= 0;counter--){
-					code = code + ' }, '+sleep[counter]+');'+"\n+";
+					code = code + ' }, '+sleep[counter]+');'+'\n';
 				}
 			  sleep = [];
 			console.log(\"Code: \"+code);
