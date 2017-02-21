@@ -287,6 +287,9 @@ class mod_ejsapp_mod_form extends moodleform_mod
         }
         $mform->setDefault('list_practices', $string_showable_experiences);
         // -------------------------------------------------------------------------------
+        // Add standard grading elements
+        $this->standard_grading_coursemodule_elements();
+        // -------------------------------------------------------------------------------
         // Add standard elements, common to all modules
         $this->standard_coursemodule_elements();
         // -------------------------------------------------------------------------------

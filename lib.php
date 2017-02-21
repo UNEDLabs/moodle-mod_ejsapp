@@ -144,6 +144,8 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
         ejsapp_delete_instance($ejsapp->id);
     }
 
+    ejsapp_grade_item_update($ejsapp);
+
     return $ejsapp->id;
 }
 
@@ -204,6 +206,8 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
         ejsapp_delete_instance($ejsapp->id);
     }
 
+    ejsapp_grade_item_update($ejsapp);
+
     return $ejsapp->id;
 }
 
@@ -247,10 +251,61 @@ function ejsapp_delete_instance($id) {
         $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
     }
 
+    ejsapp_grade_item_delete($ejsapp);
+
     // Delete recursively
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $id;
     delete_recursively($path);
     return true;
+}
+
+/**
+ * Create grade item for given $ejsapp
+ *
+ * @category grade
+ * @param object $ejsapp object
+ * @param mixed array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return int 0 if ok, error code otherwise
+ */
+function ejsapp_grade_item_update($ejsapp, $grades = null) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    $params = array('itemname' => $ejsapp->name);
+
+    if ($ejsapp->grade > 0) {
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax']  = $ejsapp->grade;
+        $params['grademin']  = 0;
+
+    } else if ($ejsapp->grade < 0) {
+        $params['gradetype'] = GRADE_TYPE_SCALE;
+        $params['scaleid']   = -$ejsapp->grade;
+
+    } else {
+        $params['gradetype'] = GRADE_TYPE_TEXT; // Allow text comments only.
+    }
+
+    if ($grades === 'reset') {
+        $params['reset'] = true;
+        $grades = null;
+    }
+
+    return grade_update('mod/ejsapp', $ejsapp->course, 'mod', 'ejsapp', $ejsapp->id, 0, $grades, $params);
+}
+
+/**
+ * Delete grade item for given ejsapp
+ *
+ * @category grade
+ * @param object $ejsapp object
+ * @return int
+ */
+function ejsapp_grade_item_delete($ejsapp) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    return grade_update('mod/ejsapp', $ejsapp->course, 'mod', '$ejsapp', $ejsapp->id, 0, null, array('deleted' => 1));
 }
 
 /**
