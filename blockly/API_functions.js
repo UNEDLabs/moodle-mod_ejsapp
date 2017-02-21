@@ -1,4 +1,6 @@
- 	  var checkedValue;
+   var sleep = []; 		  
+	  
+	  var checkedValue;
   var vars_to_record = [];
   var old_data;
   var data;
@@ -225,6 +227,10 @@
   
   function addEvent(number){
 	  selectEvent(number);
+  }
+  
+  function initialize(){
+	  _model.initialize();
   }
   
   function reset(){

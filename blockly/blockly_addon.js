@@ -35,6 +35,18 @@ function loadModelBlocks(){
 		i++;
 	}
 	
+	Blockly.Blocks['wait'] = {
+	  init: function() {
+		this.appendDummyInput()
+			.appendField("wait")
+			.appendField(new Blockly.FieldDropdown([["0.5 s", "500"], ["1 s", "1000"], ["2 s", "2000"], ["5 s", "5000"]]), "DELAY");
+		this.setPreviousStatement(true, "null");
+		this.setNextStatement(true, "null");
+		this.setColour(60);
+		this.setTooltip('');
+	  }
+	};
+	
 	Blockly.Blocks['get_model_variable'] = {
     		  init: function() {
     		    this.appendDummyInput()
@@ -219,6 +231,17 @@ function loadModelBlocks(){
     		  init: function() {
     		    this.appendDummyInput()
     		        .appendField("pause the lab");
+    		    this.setPreviousStatement(true, null);
+    		    this.setNextStatement(true, null);
+    		    this.setColour(0);
+    		    this.setTooltip('');
+    		  }
+      };
+	  
+      Blockly.Blocks['initialize_lab'] = {
+    		  init: function() {
+    		    this.appendDummyInput()
+    		        .appendField("initialize the lab");
     		    this.setPreviousStatement(true, null);
     		    this.setNextStatement(true, null);
     		    this.setColour(0);
@@ -466,17 +489,7 @@ function loadModelBlocks(){
 	};
 	
 	
-	Blockly.Blocks['wait'] = {
-	  init: function() {
-		this.setColour(60);
-		this.appendDummyInput()
-			.appendField("wait")
-			.appendField(new Blockly.FieldDropdown([["half a second", "500"], ["a second", "1000"], ["two seconds", "2000"], ["five seconds", "5000"]]), "DELAY");
-		this.setPreviousStatement(true, "null");
-		this.setNextStatement(true, "null");
-		this.setTooltip('');
-	  }
-	};
+	
 }
 
 
@@ -605,6 +618,7 @@ function loadJavaScriptModelBlocks(){
           return code;
 		}; 
       Blockly.JavaScript['pause_lab'] = function(block) {return "pause();\n";}; 
+      Blockly.JavaScript['initialize_lab'] = function(block) {return "initialize();\n";}; 
       Blockly.JavaScript['reset_lab'] = function(block) {return "reset();\n";}; 
 	
 	
@@ -639,7 +653,8 @@ function loadJavaScriptModelBlocks(){
 	
 	Blockly.JavaScript['wait'] = function(block) {
 		  var dropdown_delay = block.getFieldValue('DELAY');
-		  var code = 'wait(' + dropdown_delay + ');\n';
+		  var code = 'setTimeout(function() {\n';
+		  sleep.push(Number(dropdown_delay));
 		  return code;
 		};
 	
