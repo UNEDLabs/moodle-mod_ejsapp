@@ -1576,10 +1576,8 @@ function create_blockly_configuration($ejsapp) {
             Blockly.JavaScript.addReservedWords('code');
             var code = Blockly.JavaScript.workspaceToCode(workspace);
 			//ADD SLEEP TERMINATION
-			  for(var counter=sleep.length - 1; counter >= 0;counter--){
-					code = code + ' }, '+sleep[counter]+');'+'\n';
-				}
-			  sleep = [];
+			code = addSleepTimes(code);
+			
 			console.log(\"Code: \"+code);
             try { 
                 var eval1 = makeEvalContext(code);

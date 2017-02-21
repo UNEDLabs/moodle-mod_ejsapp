@@ -236,13 +236,13 @@
   function reset(){
 	  _model.reset();
   }
-  
-  function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+ 
 
-  async function wait(ms) {
-	return sleep(ms);
+function addSleepTimes(code2){
+	for(var counter=sleep.length - 1; counter >= 0;counter--){
+	}
+	sleep = [];
+	return code2;
 }
   
     // Add an API function for the record() block.
