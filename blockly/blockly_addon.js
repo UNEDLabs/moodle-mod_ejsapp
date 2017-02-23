@@ -558,9 +558,9 @@ function loadJavaScriptModelBlocks(){
 		
 		
 	  Blockly.JavaScript['fixedRelation'] = function(block) {
-    	  condition= true;
+    	  //condition= true;
 		  var statements_name1 = Blockly.JavaScript.statementToCode(block, 'NAME');
-		  condition = false;
+		  //condition = false;
 		  fixedStatements.push(statements_name1);
 		  code = "addFixedRelation("+(fixedStatements.length-1)+");\n";
 		  return code;
