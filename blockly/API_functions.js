@@ -222,8 +222,6 @@
   
     function pause(){
 	  _model.pause();
-	  for(var i in conditionFixed)
-		  conditionFixed[i] = false;
   }
   
   function addEvent(number){
@@ -236,6 +234,8 @@
   
   function reset(){
 	  _model.reset();
+	  for(var i in conditionFixed)
+		  conditionFixed[i] = false;
   }
  
 
