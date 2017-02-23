@@ -448,9 +448,9 @@ function personalize_vars($ejsapp, $user, $shuffle) {
         foreach ($personalvars as $personalvar) {
             $personalvarsinfo->name[$i] = $personalvar->name;
             $factor = 1;
-            if ($personalvar->type == 'Double') $factor = 1000;
-            $seed_array_1 = array($user->firstname, $personalvar->type, $user->lastname, $user->id, $personalvar->name);
-            $seed_array_2 = array($i, $user->email, $personalvar->minval, $user->username, $personalvar->maxval);
+            if ($personalvar->type == 'Double') $factor = 100;
+            $seed_array_1 = array($user->firstname, $user->lastname, $user->id, $personalvar->name);
+            $seed_array_2 = array($user->email, $personalvar->minval, $user->username, $personalvar->maxval);
             if ($shuffle) {
                 shuffle($seed_array_1);
                 shuffle($seed_array_2);
