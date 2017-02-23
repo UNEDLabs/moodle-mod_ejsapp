@@ -212,17 +212,7 @@
 	  conditionFixed.push(true);
 	  var text2 = fixedStatements[number];
 	  var text = "if(conditionFixed["+(conditionFixed.length-1)+"])"+"{"+ text2+"}";
-	  addFixedRel(text);
-  }
-  
-  
-  addFixedRel = function(code)
-  {
-	  _model.addToFixedRelations(function() 
-		{ 
-			eval(code);
-		}
-	  );
+	  _model.addFixedRel(text);
   }
   
   
