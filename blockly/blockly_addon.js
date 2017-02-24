@@ -39,7 +39,10 @@ function loadModelBlocks(){
 	  init: function() {
 		this.appendDummyInput()
 			.appendField("wait")
-			.appendField(new Blockly.FieldDropdown([["0.5 s", "500"], ["1 s", "1000"], ["2 s", "2000"], ["5 s", "5000"]]), "DELAY");
+			.appendField(new Blockly.FieldNumber(0, 0, 600), "TIME")
+			.appendField("seconds to do");
+		this.appendStatementInput("CODE")
+			.setCheck(null);
 		this.setPreviousStatement(true, "null");
 		this.setNextStatement(true, "null");
 		this.setColour(60);
@@ -652,9 +655,10 @@ function loadJavaScriptModelBlocks(){
 		};
 	
 	Blockly.JavaScript['wait'] = function(block) {
-		  var dropdown_delay = block.getFieldValue('DELAY');
-		  var code = 'setTimeout(function() {\n';
-		  sleep.push(Number(dropdown_delay));
+		  var number_name = block.getFieldValue('TIME');
+		  number_name = Number(number_name)*1000;
+		  var statements_name = Blockly.JavaScript.statementToCode(block, 'CODE');
+		  var code = 'setTimeout(function() {\n'+statements_name+'\n}, '+number_name+');'+'\n';
 		  return code;
 		};
 	

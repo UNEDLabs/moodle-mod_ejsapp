@@ -1,4 +1,4 @@
-   var sleep = []; 		  
+	  
 	  
 	  var checkedValue;
   var vars_to_record = [];
@@ -239,13 +239,6 @@
   }
  
 
-function addSleepTimes(code2){
-	for(var counter=sleep.length - 1; counter >= 0;counter--){
-		code2 = code2 + ' }, '+sleep[counter]+');\n';
-	}
-	sleep = [];
-	return code2;
-}
   
     // Add an API function for the record() block.
  /* var wrapper = function(text,number) {

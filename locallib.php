@@ -1575,8 +1575,6 @@ function create_blockly_configuration($ejsapp) {
         var playCode = function() {
             Blockly.JavaScript.addReservedWords('code');
             var code = Blockly.JavaScript.workspaceToCode(workspace);
-			//ADD SLEEP TERMINATION
-			code = addSleepTimes(code);
 			
 			console.log(\"Code: \"+code);
             try { 
