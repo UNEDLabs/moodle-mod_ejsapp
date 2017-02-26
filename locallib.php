@@ -1567,20 +1567,14 @@ function create_blockly_configuration($ejsapp) {
         // <Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
         // <Categories>
         $js_conf_code = "
+		var time_step = 10; // INTERVAL BETWEEN ACTIONS
         var buttonFunction = playCode;
-        function makeEvalContext (declarations) {
-            eval(declarations);
-            return function (str) { eval(str); }
-        }
-        var playCode = function() {
-            Blockly.JavaScript.addReservedWords('code');
-            var code = Blockly.JavaScript.workspaceToCode(workspace);
-			
-			console.log(\"Code: \"+code);
-            try { 
-                var eval1 = makeEvalContext(code);
-            } catch (e) {alert(e);}
-        };";
+		
+		var playCode = function playCode() {
+			parseCode();
+			inter=setInterval(stepCode, time_step);
+		};";
+		
         $js_conf_code .= "\n" . "var toolbox = '<xml>';";
         if ($blockly_conf[1] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $logic . ';';
         if ($blockly_conf[2] == 1) $js_conf_code .= "\n" . 'toolbox += ' . $loops . ';';

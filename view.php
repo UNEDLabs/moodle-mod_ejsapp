@@ -321,6 +321,7 @@ if ($ejsapp->applet == 0) {
     $blockly_conf = json_decode($ejsapp->blockly_conf);
     if ($blockly_conf[0] == 1) {
         $include_js_libraries = html_writer::tag('script', '', array('src' => $ejsapp->codebase . 'configuration.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/acorn_interpreter.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blockly_compressed.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blocks_compressed.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/javascript_compressed.js')) .

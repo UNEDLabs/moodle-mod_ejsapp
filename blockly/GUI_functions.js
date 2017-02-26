@@ -162,6 +162,13 @@ myInterpreter = null;
       };
       interpreter.setProperty(scope, 'createChart',
           interpreter.createNativeFunction(wrapper));
+		  
+   // Add an API function for the setTimeStep block.
+      var wrapper = function(number) {
+        return interpreter.createPrimitive(setTimeStep(number));
+      };
+      interpreter.setProperty(scope, 'setTimeStep',
+          interpreter.createNativeFunction(wrapper));
 
     }
 
@@ -183,3 +190,60 @@ var loadCode = function () {
             }
         });
 };
+
+
+/////////////// INTERPRETER
+
+ var highlightPause = false;
+
+function highlightBlock(id) {
+      workspace.highlightBlock(id);
+      highlightPause = true;
+}
+
+
+function parseCode() {
+      // Generate JavaScript code and parse it.
+      Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+      Blockly.JavaScript.addReservedWords('highlightBlock');
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
+	  console.log("Code: "+code);
+      //Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+      myInterpreter = new Interpreter(code, initApi);
+
+      document.getElementById('stepButton').disabled = '';
+      highlightPause = false;
+      workspace.highlightBlock(null);
+}
+
+
+function changeInterval() {
+	interval = false;
+	clearInterval(flags);
+}
+
+function stepCode() {
+	
+	if(!interval){
+      try {
+        var ok = myInterpreter.step();
+      } finally {
+        if (!ok) {
+          // Program complete, no more code to execute.
+          workspace.highlightBlock(null);
+		  clearInterval(inter);
+          return;
+        }
+      }
+      if (highlightPause) {
+        // A block has been highlighted.  Pause execution here.
+        highlightPause = false;
+      } else {
+        // Keep executing until a highlight statement is reached.
+        stepCode();
+      }
+	}
+}
+
+var interval = false;
+var inter;
