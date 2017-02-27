@@ -124,6 +124,13 @@ myInterpreter = null;
       };
       interpreter.setProperty(scope, 'pause',
           interpreter.createNativeFunction(wrapper));
+		  
+   // Add an API function for the initialize block.
+      var wrapper = function() {
+        return interpreter.createPrimitive(initialize());
+      };
+      interpreter.setProperty(scope, 'initialize',
+          interpreter.createNativeFunction(wrapper));
       
    // Add an API function for the reset block.
       var wrapper = function() {
