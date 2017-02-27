@@ -404,6 +404,10 @@ function update_links($codebase, $ejsapp, $code, $use_css) {
     }
     $code = str_replace($search,$replace,$code);
 
+    $search = '<link rel="stylesheet"  type="text/css" href="css/style.css" />';
+    $search = '<link rel="stylesheet"  type="text/css" href="' . $path . 'css/style.css' . '" />';
+    $code = str_replace($search,$replace,$code);
+
     // Replace link for common_script.js and textsizedetector.js
     $search = '<script src="_ejs_library/scripts/common_script.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/scripts/common_script.js"></script>';
