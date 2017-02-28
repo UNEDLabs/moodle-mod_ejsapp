@@ -6,7 +6,7 @@
   var data;
   var functions;
   var events =[{}];
-  var fixedStatements = [];
+  var fixedStatements = new Array();
   var num_events = 0;
   var timers =[];
   var data;// = [];
@@ -15,7 +15,7 @@
   var chart; 
   var record = false;
   var dataTables = [];
-  var conditionFixed =[]
+  var conditionFixed = new Array();
   var  options = {
 					hAxis: {
 						title: 'Time'
@@ -140,7 +140,7 @@
   function addFixedRelation(number){
 	  conditionFixed.push(true);
 	  var text2 = fixedStatements[number];
-	  var text = "if(conditionFixed["+(conditionFixed.length-1)+"])"+"{"+ text2+"}";
+	  var text = "if(conditionFixed["+number+"])"+"{"+ text2+"}";
 	  _model.addFixedRel(text);
   }
   

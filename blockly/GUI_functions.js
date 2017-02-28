@@ -134,7 +134,7 @@ myInterpreter = null;
       
    // Add an API function for the reset block.
       var wrapper = function() {
-        return interpreter.createPrimitive(_model.reset());
+        return interpreter.createPrimitive(reset());
       };
       interpreter.setProperty(scope, 'reset',
           interpreter.createNativeFunction(wrapper));
