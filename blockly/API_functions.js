@@ -165,6 +165,9 @@
 	  _model.reset();
 	  for(var i in conditionFixed)
 		  conditionFixed[i] = false;
+	  if (typeof _model.removeEvents != 'undefined'){
+		_model.removeEvents();
+	  }
   }
  
   var flags;

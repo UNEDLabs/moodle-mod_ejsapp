@@ -209,16 +209,31 @@ function highlightBlock(id) {
 }
 
 
+  var functions;
+  
 function parseCode() {
       // Generate JavaScript code and parse it.
       Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
       Blockly.JavaScript.addReservedWords('highlightBlock');
       var code = Blockly.JavaScript.workspaceToCode(workspace);
+	  
+		var code2 = code;
+		/// BUSCAR FUNCIONES /////
+		functions ="function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
+		var continueSearch=true;
+		while(continueSearch){
+			var pos = code2.search("function ");
+			if(pos==-1) continueSearch = false;
+			else{
+				var pos2 = code2.search("}\n");
+				functions = functions+"\n"+code2.slice(pos,pos2+1); 
+				code2=code2.slice(pos2+1,code2.length);
+			}
+		}
+		//////////////////////////
 	  console.log("Code: "+code);
       //Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
       myInterpreter = new Interpreter(code, initApi);
-
-      document.getElementById('stepButton').disabled = '';
       highlightPause = false;
       workspace.highlightBlock(null);
 }
