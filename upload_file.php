@@ -132,9 +132,6 @@ if ($method) { // from EJS
     // remove the temporal file from the temporal folder
     unlink("$path");
 } else { // from EjsS
-    $file = fopen('filename.txt', 'w');
-    fwrite($file, $fileinfo['filename']);
-    fclose("file");
     if ($_POST['type'] != 'png') $fs->create_file_from_string($fileinfo, rawurldecode($_POST['file']));
     else {
         $data = rawurldecode($_POST['file']);

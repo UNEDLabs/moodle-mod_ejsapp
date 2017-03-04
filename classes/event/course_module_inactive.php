@@ -56,6 +56,6 @@ class course_module_inactive extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/ejsapp/view.php', array('n' => $this->objectid));
+        return new \moodle_url('/mod/ejsapp/view.php', array('id' => $this->objectid));
     }
 } 

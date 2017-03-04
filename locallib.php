@@ -268,27 +268,25 @@ function delete_recursively($dir) {
 function get_experiences_sarlab($username, $list_sarlab_IPs) {
     $listExperiences = '';
 
-    $dom = new DOMDocument;
-    $dom->validateOnParse = true;
     foreach ($list_sarlab_IPs as $sarlab_IP) {
         $last_quote_mark = strrpos($sarlab_IP, "'");
         if ($last_quote_mark != 0) $last_quote_mark++;
         $ip = substr($sarlab_IP, $last_quote_mark);
         if ($ip != '127.0.0.1' && $ip != '') {
-            if ($fp = @fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
+            if ($fp = fsockopen($ip, '80', $errCode, $errStr, 1)) { //IP is alive
                 fclose($fp);
                 $URI = 'http://' . $ip . '/';
-                $file_headers = @get_headers($URI);
+                $file_headers = get_headers($URI);
                 if (substr($file_headers[0], 9, 3) == 200) { //Valid file
-                    if ($dom->load($URI)) {
-                        $experiences = $dom->getElementsByTagName('Experience'); //Get list of experiences
+                    if ($xml = simplexml_load_file($URI)) {
+                        $experiences = $xml->Experience; //Get list of experiences
                         foreach ($experiences as $experience) {
-                            $ownerUsers = $experience->getElementsByTagName('owneUser'); //Get list of users who can access the experience
+                            $ownerUsers = $experience->owneUser; //Get list of users who can access the experience
                             foreach ($ownerUsers as $ownerUser) {
-                                if ($username == $ownerUser->nodeValue || is_siteadmin()) { //Check whether the required user has access to the experience
-                                    $idExperiences = $experience->getElementsByTagName('idExperience');
+                                if ($username == $ownerUser || is_siteadmin()) { //Check whether the required user has access to the experience
+                                    $idExperiences = $experience->idExperience;
                                     foreach ($idExperiences as $idExperience) {
-                                        $listExperiences .= $idExperience->nodeValue . ';'; //Add the experience to the user's list of accessible experiences
+                                        $listExperiences .= $idExperience . ';'; //Add the experience to the user's list of accessible experiences
                                     }
                                     break;
                                 }

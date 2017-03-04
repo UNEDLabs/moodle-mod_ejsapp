@@ -56,7 +56,7 @@ class course_module_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/ejsapp/view.php', array('n' => $this->objectid));
+        return new \moodle_url('/mod/ejsapp/view.php', array('id' => $this->objectid));
     }
 
     /**
@@ -65,7 +65,7 @@ class course_module_viewed extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'ejsapp', 'view', 'view.php?n=' . $this->objectid,
+        return array($this->courseid, 'ejsapp', 'view', 'view.php?id=' . $this->objectid,
             $this->objectid, $this->contextinstanceid);
     }
 } 
