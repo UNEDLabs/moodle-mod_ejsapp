@@ -171,11 +171,13 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
         $ejsapp->appwordingformat = $ejsapp->ejsappwording['format'];
     }
 
-    $cmid = $ejsapp->coursemodule;
+    $cmid = $DB->get_field('course_modules', 'id', array('course'=>$ejsapp->course, 'instance'=>$ejsapp->id));
     $context = context_module::instance($cmid);
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
     $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejs_ok) {
@@ -229,26 +231,27 @@ function ejsapp_delete_instance($id) {
         return false;
     }
 
-    $context = context_system::instance();
+    $cmid = $DB->get_field('course_modules', 'id', array('course'=>$ejsapp->course, 'instance'=>$id));
+    $context = context_module::instance($cmid);
 
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
 
-    $DB->delete_records('ejsapp', array('id' => $ejsapp->id));
+    $DB->delete_records('ejsapp', array('id' => $id));
     if ($ejsapp->is_rem_lab == 1) {
-        $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
+        $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $id));
         // EJSApp booking system
         if($DB->record_exists('ejsappbooking', array('course'=>$ejsapp->course))) {
-          $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
-          $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
+          $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $id));
+          $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $id));
         }
     }
 
     if ($ejsapp->personalvars == 1) {
-        $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
+        $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $id));
     }
 
     ejsapp_grade_item_delete($ejsapp);
@@ -439,8 +442,9 @@ function ejsapp_cron() {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/filter/multilang/filter.php');
 
-    //Delete all stored Sarlab keys:
-    $DB->delete_records('block_remlab_manager_sb_keys');
+    //Delete stored Sarlab keys:
+    //TODO: Deletion of records should only be done for those remote labs and users that do not have an active booking
+    $DB->delete_records_list('block_remlab_manager_sb_keys', 'labmanager', array(0));
 
     //Delete all 'working' logs for EJSApp activities older than 15 min:
     $params = array(strtotime(date('Y-m-d H:i:s'))-900);

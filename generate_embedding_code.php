@@ -312,6 +312,16 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         }
         // </Embedding the js code in the html file in case there is a separate js file>
 
+        // <Launching the websocket service for Sarlab>
+        if ($sarlabinfo) {
+            global $PAGE;
+            $username = $USER->username . "@" . $CFG->wwwroot;
+            //$PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket', array($CFG->wwwroot, $sarlab_IP, $sarlab_port, $username, $sarlab_key, $sarlabinfo->practice));
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket', array($CFG->wwwroot, $sarlab_IP, $sarlab_port, "luis", "Sar*2013#Lab", $sarlabinfo->practice));
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
+        }
+        // </Launching the websocket service for Sarlab>
+
     } else { //EJS Java
 
         if ($ejsapp->applet == 1) { // Applet
@@ -558,58 +568,53 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
 
             if (count(explode('/', $CFG->wwwroot)) <= 3) $wwwpath = $CFG->wwwroot . $ejsapp->codebase;
             else $wwwpath = substr($CFG->wwwroot, 0, strrpos($CFG->wwwroot, '/')) . $ejsapp->codebase;
+            /*$records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => ($ejsapp->id), 'filename' => ($ejsapp->applet_name)));
+            $record = reset($records);
+            $wwwpath = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/jarfiles/' . $record->itemid . '/';*/
 
             $main_class = substr($ejsapp->class_file, 0, -12);
 
             // Create the JNLP file:
             $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
                             <jnlp spec=\"1.0+\"
-                            codebase=\"$wwwpath\"
-                            href=\"$ejsapp_name.jnlp\">
-                            <information>
-                                <title>$ejsapp_name</title>
-                                <vendor>Easy Java Simulations</vendor>
-                            </information>
-                            <resources>
-                                <!-- Application Resources -->
-                                <j2se version=\"1.7+\"
-                                      href=\"http://java.sun.com/products/autodl/j2se\"/>
-                                <jar href=\"$ejsapp_name.jar\" main=\"true\"/>
-                            </resources>
-                            <application-desc
-                                main-class=\"$main_class\">
-                                <argument>-context_id</argument>
-                                <argument>{$context->id}</argument>
-                                <argument>-user_id</argument>
-                                <argument>{$USER->id}</argument>
-                                <argument>-ejsapp_id</argument>
-                                <argument>{$ejsapp->id}</argument>
-                                <argument>-language</argument>
-                                <argument>$language</argument>
-                                <argument>-moodle_upload_file</argument>
-                                <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file.php</argument>
-                                <argument>-lookandfeel</argument>
-                                <argument>NIMBUS</argument>";
+                                codebase=\"$wwwpath\"
+                                href=\"$ejsapp_name.jnlp\">
+                                <information>
+                                    <title>$ejsapp_name</title>
+                                    <vendor>Easy Java Simulations</vendor>
+                                </information>
+                                <resources>
+                                    <!-- Application Resources -->
+                                    <j2se version=\"1.7+\"
+                                        href=\"http://java.sun.com/products/autodl/j2se\"/>
+                                    <jar href=\"$ejsapp_name.jar\" main=\"true\"/>
+                                </resources>
+                                <application-desc
+                                    main-class=\"$main_class\">
+                                    <argument>-language</argument>
+                                    <argument>$language</argument>
+                                    <argument>-lookandfeel</argument>
+                                    <argument>NIMBUS</argument>";
             if ($sarlabinfo) {
-                $content .=     "<argument>-ipserver</argument>
-                                <argument>$sarlab_IP</argument>
-                                <argument>-portserver</argument>
-                                <argument>$sarlab_port</argument>
-                                <argument>-idExp</argument>
-                                <argument>$sarlabinfo->practice</argument>
-                                <argument>-user</argument>
-                                <argument>{$USER->username}@{$CFG->wwwroot}</argument>
-                                <argument>-passwd</argument>
-                                <argument>$sarlab_key</argument>
-                                <argument>-max_time</argument>
-                                <argument>$sarlabinfo->max_use_time</argument>";
+                $content .=         "<argument>-ipserver</argument>
+                                    <argument>$sarlab_IP</argument>
+                                    <argument>-portserver</argument>
+                                    <argument>$sarlab_port</argument>
+                                    <argument>-idExp</argument>
+                                    <argument>$sarlabinfo->practice</argument>
+                                    <argument>-user</argument>
+                                    <argument>{$USER->username}@{$CFG->wwwroot}</argument>
+                                    <argument>-passwd</argument>
+                                    <argument>$sarlab_key</argument>
+                                    <argument>-max_time</argument>
+                                    <argument>$sarlabinfo->max_use_time</argument>";
             }
-            $content .=     "</application-desc>
-                            <security>
-                                <all-permissions/>
-                            </security>
-                            <update check=\"background\"/>
-                        </jnlp>";
+            $content .=         "</application-desc>
+                                <security>
+                                    <all-permissions/>
+                                </security>
+                                <update check=\"background\"/>
+                            </jnlp>";
 
             $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
             $jnlp = fopen($dirpath.$ejsapp_name.'.jnlp', 'w');

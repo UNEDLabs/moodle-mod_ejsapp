@@ -76,9 +76,10 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     }
 
     // Creating the recording file in dataroot and updating the files table in the database
-    $draftitemid_blockly = $ejsapp->blocklyfile;
-    if ($draftitemid_blockly) {
-        file_save_draft_area_files($draftitemid_blockly, $context->id, 'mod_ejsapp', 'blkfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+    if ($ejsapp->use_blockly == 1) {
+        if ($draftitemid_blockly = $ejsapp->blocklyfile) {
+            file_save_draft_area_files($draftitemid_blockly, $context->id, 'mod_ejsapp', 'blkfiles', $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+        }
     }
 
     // Same with the content of the wording element
@@ -89,7 +90,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
 
     // Obtain the uploaded .zip or .jar file from moodledata using the information in the files table
     //$file_records = $DB->get_records('files', array('component'=>'user', 'filearea'=>'draft', 'itemid'=>$draftitemid_applet), 'filesize DESC');
-    $file_records = $DB->get_records('files', array('contextid'=>$context->id, 'component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
+    $file_records = $DB->get_records('files', array('component'=>'mod_ejsapp', 'filearea'=>'jarfiles', 'itemid'=>$ejsapp->id), 'filesize DESC');
     $file_record = reset($file_records);
     $fs = get_file_storage();
     $file = $fs->get_file_by_id($file_record->id);
@@ -1498,7 +1499,7 @@ function prepare_ejs_file($ejsapp) {
         $ext = pathinfo($file_record->filename, PATHINFO_EXTENSION);
         $filepath = $folderpath . $file_record->filename;
         // We get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated
-        $tmp_file_records = $DB->get_records('files', array('contextid' => $file_record->contextid, 'component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
+        $tmp_file_records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
         $tmp_file_record = reset($tmp_file_records);
         if (file_exists($filepath)) { // if file in jarfiles exists...
             if ($tmp_file_record) { // the file exists in jarfiles and in Moodle filesystem
@@ -1566,7 +1567,7 @@ function create_blockly_configuration($ejsapp) {
         $lab_control = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') . "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block><block type=\"wait\"></block></category>'";
         // </First, define all categories>
 
-        // <Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
+        // <Now, create the configuration by adding the categories selected in the ejsapp activity configuration>
         // <Categories>
         $js_conf_code = "
 		var time_step = 10; // INTERVAL BETWEEN ACTIONS
@@ -1594,10 +1595,6 @@ function create_blockly_configuration($ejsapp) {
         }
         $js_conf_code .= "\n" . "toolbox += '</xml>';";
         // </Categories>
-        // <Initial blocks>
-        $js_conf_code .= "\n" . "var initial = '<xml>';";
-        $js_conf_code .= "\n" . "initial += '</xml>';";
-        // </Initial blocks>
         // </Now, create the configuration by adding those categories and initial blocks selected in the ejsapp activity configuration>
 
         // Finally, create the javascript file

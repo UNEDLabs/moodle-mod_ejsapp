@@ -13,7 +13,7 @@
 	  ///////////// INIT CHART ///////////////////////////////
 	  //cleanChart(); // To initialize the chart;
 	  
-	  
+
 		workspace = Blockly.inject('blocklyDiv',{media: 'blockly/media/',toolbox: toolbox});
 		if(typeof initial != 'undefined'){
 			var xmlDom = Blockly.Xml.textToDom(initial);

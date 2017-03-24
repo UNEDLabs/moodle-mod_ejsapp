@@ -203,43 +203,55 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
         $mform->addElement('selectyesno', 'use_blockly', get_string('use_blockly', 'ejsapp'));
         $mform->addHelpButton('use_blockly', 'use_blockly', 'ejsapp');
+        $mform->setDefault('use_blockly', 0);
 
         $mform->addElement('selectyesno', 'display_logic', get_string('display_logic', 'ejsapp'));
         $mform->disabledIf('display_logic', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_logic', 0);
 
         $mform->addElement('selectyesno', 'display_loops', get_string('display_loops', 'ejsapp'));
         $mform->disabledIf('display_loops', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_loops', 0);
 
         $mform->addElement('selectyesno', 'display_math', get_string('display_math', 'ejsapp'));
         $mform->disabledIf('display_math', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_math', 0);
 
         $mform->addElement('selectyesno', 'display_text', get_string('display_text', 'ejsapp'));
         $mform->disabledIf('display_text', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_text', 0);
 
         $mform->addElement('selectyesno', 'display_lists', get_string('display_lists', 'ejsapp'));
         $mform->disabledIf('display_lists', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_lists', 0);
 
         $mform->addElement('selectyesno', 'display_variables', get_string('display_variables', 'ejsapp'));
         $mform->disabledIf('display_variables', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_variables', 0);
 
         $mform->addElement('selectyesno', 'display_functions', get_string('display_functions', 'ejsapp'));
         $mform->disabledIf('display_functions', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_functions', 0);
 
         $mform->addElement('selectyesno', 'display_lab', get_string('display_lab', 'ejsapp'));
         $mform->addHelpButton('display_lab', 'display_lab', 'ejsapp');
         $mform->disabledIf('display_lab', 'use_blockly', 'eq', 0);
+        $mform->setDefault('display_lab', 0);
 
         $mform->addElement('selectyesno', 'display_lab_variables', get_string('display_lab_variables', 'ejsapp'));
         $mform->disabledIf('display_lab_variables', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_variables', 'display_lab', 'eq', 0);
+        $mform->setDefault('display_lab_variables', 0);
 
         $mform->addElement('selectyesno', 'display_lab_functions', get_string('display_lab_functions', 'ejsapp'));
         $mform->disabledIf('display_lab_functions', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_functions', 'display_lab', 'eq', 0);
+        $mform->setDefault('display_lab_functions', 0);
 
         $mform->addElement('selectyesno', 'display_lab_control', get_string('display_lab_control', 'ejsapp'));
         $mform->disabledIf('display_lab_control', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_control', 'display_lab', 'eq', 0);
+        $mform->setDefault('display_lab_control', 0);
 
         // Adding an optional text file with a recording to automatically run it when the lab loads
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));

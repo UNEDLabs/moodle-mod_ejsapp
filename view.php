@@ -286,6 +286,42 @@ if ($ejsapp->appwording) {
     echo $OUTPUT->box($content, 'generalbox center clearfix');
 }
 
+// <Blockly programming space for Javascript labs>
+if ($ejsapp->applet == 0) {
+    $blockly_conf = json_decode($ejsapp->blockly_conf);
+    if ($blockly_conf[0] == 1) {
+        $PAGE->requires->js_call_amd('mod_ejsapp/jqueryui', 'init');
+        $include_js_libraries = html_writer::tag('script', '', array('src' => $ejsapp->codebase . 'configuration.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/acorn_interpreter.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/blockly_compressed.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/blocks_compressed.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/javascript_compressed.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/GUI_functions.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js'));
+        if (strpos(current_language(), 'es') !== false) {
+            $include_js_libraries .= html_writer::tag('script', '', array('src' => 'blockly/es.js'));
+        } else {
+            $include_js_libraries .= html_writer::tag('script', '', array('src' => 'blockly/en.js'));
+        }
+        echo html_writer::div($include_js_libraries, 'blockly', array('id' => 'blocklyDiv'));
+    }
+}
+// </Blockly programming space for Javascript labs>
+
+// <Buttons to close or leave collab sessions>
+if (isset($collab_session)) {
+    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$session_id&courseid={$course->id}";
+    if ($USER->id == $collab_session->master_user) {
+        $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
+    } else {
+        $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
+    }
+    $button = html_writer::empty_tag('input', array('type'=>'button', 'name'=>'close_session', 'value'=>$text, 'onClick'=>"window.location.href = '$url'"));
+    echo $button;
+}
+// </Buttons to close or leave collab sessions>
+
 // <Javascript features for monitoring the time spent by a user in the activity>
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to work with the remote lab
@@ -302,50 +338,6 @@ if ($accessed) {
     $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $remaining_time, get_config('mod_ejsapp', 'check_activity'), ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
 }
 // </Javascript features for monitoring the time spent by a user in the activity>
-
-// <Buttons to close or leave collab sessions>
-if (isset($collab_session)) {
-    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$session_id&courseid={$course->id}";
-    if ($USER->id == $collab_session->master_user) {
-        $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
-    } else {
-        $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
-    }
-    $button = html_writer::empty_tag('input', array('type'=>'button', 'name'=>'close_session', 'value'=>$text, 'onClick'=>"window.location.href = '$url'"));
-    echo $button;
-}
-// </Buttons to close or leave collab sessions>
-
-// <Blockly programming space for Javascript labs>
-if ($ejsapp->applet == 0) {
-    $blockly_conf = json_decode($ejsapp->blockly_conf);
-    if ($blockly_conf[0] == 1) {
-        $include_js_libraries = html_writer::tag('script', '', array('src' => $ejsapp->codebase . 'configuration.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/acorn_interpreter.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blockly_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blocks_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/javascript_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/GUI_functions.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js'));
-        if (strpos(current_language(), 'es') !== false) {
-            $include_js_libraries .= html_writer::tag('script', '', array('src' => 'blockly/es.js'));
-        } else {
-            $include_js_libraries .= html_writer::tag('script', '', array('src' => 'blockly/en.js'));
-        }
-        echo $include_js_libraries;
-        echo html_writer::div('', 'blockly', array('id' => 'blocklyDiv'));
-        /*echo "<button onclick=\"playCode()\" id=\"playbutton\" style=\"border:none;background:none;\" >Play</button>
-              <button onclick=\"saveCode()\" id=\"savebutton\" style=\"border:none;background:none;\" >Save</button>
-              <button onclick=\"loadCode()\" id=\"loadbutton\" style=\"border:none;background:none;\" >Load</button>";
-        echo "<script type=\"text/javascript\">
-                  document.getElementById('playbutton').title = 'Play';
-                  document.getElementById('savebutton').title = 'Save';
-                  document.getElementById('loadbutton').title = 'Load';
-              </script>";*/
-    }
-}
-// </Blockly programming space for Javascript labs>
 
 // Finish the page
 echo $OUTPUT->footer();

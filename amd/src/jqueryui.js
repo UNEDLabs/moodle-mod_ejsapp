@@ -1,11 +1,9 @@
-<?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// the Free Software Foundation, either moodle_version 3 of the License, or
+// (at your option) any later moodle_version.
 //
 // EJSApp is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,21 +19,23 @@
 //  at the Computer Science and Automatic Control, Spanish Open University
 //  (UNED), Madrid, Spain
 
-
 /**
- * Version file for the ejsapp module
+ * jQuery UI options for making elements draggable.
  *
  * @package    mod
  * @subpackage ejsapp
- * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @copyright  2016 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2017032400;         // The current module version (Date: YYYYMMDDXX)
-$plugin->requires = 2013111800;
-$plugin->cron     = 86400;              // Period for cron to check this module (secs)
-$plugin->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.5 (Build: 2017032400)';
+define(['jquery', 'jqueryui'], function($, jqui) {
+    var t = {
+        init : function() {
+            $("#blocklyDiv")
+                .draggable({
+                    containment: $("div[role='main']")
+                })
+        }
+    };
+    return t;
+});

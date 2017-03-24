@@ -41,8 +41,6 @@ the ejsapp_collab_session blocks and the osp repository plugin. You can find and
 https://moodle.org/plugins/browse.php?list=set&id=27, in the plugins section in the Moodle.org webpage or at
 https://github.com/UNEDLabs.
 
-An explanation of EJSApp is included in the folder "doc". There, you will also find a txt file with relevant links.
-
  WARNING: If you are updating ejsapp from a previous version, DO NOT replace/delete your old jarfiles directory inside
  your old ejsapp directory.
 
@@ -104,12 +102,8 @@ When installing ejsapp for the first time, you will need to set a few variables:
 
    sarlab_enc_key:	This 16 characters long variable must be configure to match exactly the key set in the SARLAB
                     system(s).
-                                              
-5. Testing
-==========
-The "test" directory of ejsapp includes an EjsS application that can be used for testing purposes.
 
-6. Authors
+5. Authors
 ==========
 EJSApp has been developed by:
  - Luis de la Torre: ldelatorre@dia.uned.es
