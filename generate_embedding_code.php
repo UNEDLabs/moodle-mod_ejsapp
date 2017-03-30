@@ -155,6 +155,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $new_sarlab_key->sarlabpass = $sarlab_key;
         $new_sarlab_key->labmanager = $sarlabinfo->labmanager;
         $new_sarlab_key->creationtime = $time;
+        $new_sarlab_key->expirationtime = $time + $sarlabinfo->max_use_time;
 
         $DB->insert_record('block_remlab_manager_sb_keys', $new_sarlab_key);
 

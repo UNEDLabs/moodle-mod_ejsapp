@@ -39,8 +39,12 @@ global $DB;
 $key = required_param('key', PARAM_TEXT);
 echo "key=$key\n";
 
-if ($DB->record_exists('block_remlab_manager_sb_keys', array('sarlabpass' => $key))) {
+//Delete expired Sarlab keys:
+$time = array(strtotime(date('Y-m-d H:i:s')) + 180); //at least three minutes margin for working with the lab
+$DB->delete_records_select('block_remlab_manager_sb_keys', "expirationtime < ?", $time);
+
+if ($record = $DB->get_record('block_remlab_manager_sb_keys', array('sarlabpass' => $key))) {
     $permissions = "labmanager=false\n";
-    if($DB->get_field('block_remlab_manager_sb_keys', 'labmanager', array('sarlabpass'=>$key)) == 1) $permissions = "labmanager=true\n";
+    if($record->labmanager == 1) $permissions = "labmanager=true\n";
     echo "access=true\n".$permissions;
 } else echo "access=false\n";

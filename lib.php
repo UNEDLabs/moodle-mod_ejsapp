@@ -442,64 +442,62 @@ function ejsapp_cron() {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/filter/multilang/filter.php');
 
-    //Delete stored Sarlab keys:
-    //TODO: Deletion of records should only be done for those remote labs and users that do not have an active booking
-    $DB->delete_records_list('block_remlab_manager_sb_keys', 'labmanager', array(0));
+    //Delete stored Sarlab keys that are one day old or more:
+    $time = array(strtotime(date('Y-m-d H:i:s'))-86400);
+    $DB->delete_records_select('block_remlab_manager_sb_keys', "creationtime < ?", $time);
 
-    //Delete all 'working' logs for EJSApp activities older than 15 min:
-    $params = array(strtotime(date('Y-m-d H:i:s'))-900);
-    $DB->delete_records_select('ejsapp_log', "time < ?", $params);
-
-    //Checking whether remote labs are operative or not:
-    $ejsapp_remlabs_conf = $DB->get_records('block_remlab_manager_conf');
-    foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
-        $practiceintro= null;
-        if ($ejsapp_remlab_conf->usingsarlab) {
-            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
-        }
-        $devices_info = new stdClass();
-        $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $practiceintro);
-        // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive:
-        $rem_lab = $DB->get_record('ejsapp', array('id' => $ejsapp_remlab_conf->ejsappid));
-        $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
-        // TODO: Allow configuring which roles will receive the e-mails? (managers, non-editing teacher...) Use Moodle capabilities
-        $context = context_course::instance($rem_lab->course);
-        $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
-        $send_mail = false;
-        // Prepare e-mails' content and update lab state when checkable:
-        $subject = '';
-        $messagebody = '';
-        if ($lab_state == 2) {  // Not checkable:
-            $subject = get_string('mail_subject_lab_not_checkable', 'ejsapp');
-            $messagebody = get_string('mail_content1_lab_not_checkable', 'ejsapp') . $multilang->filter($rem_lab->name) .
-                get_string('mail_content2_lab_not_checkable', 'ejsapp') . $ejsapp_remlab_conf->ip .
-                get_string('mail_content3_lab_not_checkable', 'ejsapp');
-            $send_mail = true;
-        } else {                // Active or inactive:
-            if ($ejsapp_remlab_conf->active == 1 && $lab_state == 0) {  // Lab has passed from active to inactive
-                $subject = get_string('mail_subject_lab_down', 'ejsapp');
-                $messagebody = get_string('mail_content1_lab_down', 'ejsapp') . $multilang->filter($rem_lab->name) .
-                    get_string('mail_content2_lab_down', 'ejsapp') . $ejsapp_remlab_conf->ip .
-                    get_string('mail_content3_lab_down', 'ejsapp') . get_string('mail_content4_lab_down', 'ejsapp');
-                foreach ($devices_info as $device_info) {
-                    if (!$device_info->alive) $messagebody .= $device_info->name . ', ' . $device_info->ip . "\r\n";
-                }
-                $send_mail = true;
-            } else if ($ejsapp_remlab_conf->active == 0 && $lab_state == 1) { // Lab has passed from inactive to active
-                $subject = get_string('mail_subject_lab_up', 'ejsapp');
-                $messagebody = get_string('mail_content1_lab_up', 'ejsapp') . $multilang->filter($rem_lab->name) .
-                    get_string('mail_content2_lab_up', 'ejsapp') . $ejsapp_remlab_conf->ip .
-                    get_string('mail_content3_lab_up', 'ejsapp');
-                $send_mail = true;
+    //Checking whether remote labs are operative or not (once per day):
+    if (date('H') >= 8) {
+        $ejsapp_remlabs_conf = $DB->get_records('block_remlab_manager_conf');
+        foreach ($ejsapp_remlabs_conf as $ejsapp_remlab_conf) {
+            $practiceintro = null;
+            if ($ejsapp_remlab_conf->usingsarlab) {
+                $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsapp_remlab_conf->ejsappid));
             }
-            $ejsapp_remlab_conf->active = $lab_state;
-            $DB->update_record('block_remlab_manager_conf', $ejsapp_remlab_conf);
-        }
-        // Send e-mails:
-        if ($send_mail) {
-            $teachers = get_role_users($role->id, $context);
-            foreach ($teachers as $teacher) {
-                email_to_user($teacher, $teacher, $subject, $messagebody);
+            $devices_info = new stdClass();
+            $lab_state = ping($ejsapp_remlab_conf->ip, $ejsapp_remlab_conf->port, $ejsapp_remlab_conf->usingsarlab, $practiceintro);
+            // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive:
+            $rem_lab = $DB->get_record('ejsapp', array('id' => $ejsapp_remlab_conf->ejsappid));
+            $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+            // TODO: Allow configuring which roles will receive the e-mails? (managers, non-editing teacher...) Use Moodle capabilities
+            $context = context_course::instance($rem_lab->course);
+            $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
+            $send_mail = false;
+            // Prepare e-mails' content and update lab state when checkable:
+            $subject = '';
+            $messagebody = '';
+            if ($lab_state == 2) {  // Not checkable:
+                $subject = get_string('mail_subject_lab_not_checkable', 'ejsapp');
+                $messagebody = get_string('mail_content1_lab_not_checkable', 'ejsapp') . $multilang->filter($rem_lab->name) .
+                    get_string('mail_content2_lab_not_checkable', 'ejsapp') . $ejsapp_remlab_conf->ip .
+                    get_string('mail_content3_lab_not_checkable', 'ejsapp');
+                $send_mail = true;
+            } else {                // Active or inactive:
+                if ($ejsapp_remlab_conf->active == 1 && $lab_state == 0) {  // Lab has passed from active to inactive
+                    $subject = get_string('mail_subject_lab_down', 'ejsapp');
+                    $messagebody = get_string('mail_content1_lab_down', 'ejsapp') . $multilang->filter($rem_lab->name) .
+                        get_string('mail_content2_lab_down', 'ejsapp') . $ejsapp_remlab_conf->ip .
+                        get_string('mail_content3_lab_down', 'ejsapp') . get_string('mail_content4_lab_down', 'ejsapp');
+                    foreach ($devices_info as $device_info) {
+                        if (!$device_info->alive) $messagebody .= $device_info->name . ', ' . $device_info->ip . "\r\n";
+                    }
+                    $send_mail = true;
+                } else if ($ejsapp_remlab_conf->active == 0 && $lab_state == 1) { // Lab has passed from inactive to active
+                    $subject = get_string('mail_subject_lab_up', 'ejsapp');
+                    $messagebody = get_string('mail_content1_lab_up', 'ejsapp') . $multilang->filter($rem_lab->name) .
+                        get_string('mail_content2_lab_up', 'ejsapp') . $ejsapp_remlab_conf->ip .
+                        get_string('mail_content3_lab_up', 'ejsapp');
+                    $send_mail = true;
+                }
+                $ejsapp_remlab_conf->active = $lab_state;
+                $DB->update_record('block_remlab_manager_conf', $ejsapp_remlab_conf);
+            }
+            // Send e-mails:
+            if ($send_mail) {
+                $teachers = get_role_users($role->id, $context);
+                foreach ($teachers as $teacher) {
+                    email_to_user($teacher, $teacher, $subject, $messagebody);
+                }
             }
         }
     }
