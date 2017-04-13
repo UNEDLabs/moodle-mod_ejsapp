@@ -45,6 +45,7 @@ define(['jquery'], function($) {
                     +'"user" : ' + user + ','
                     +'"password"  : ' + password
                     +'}';
+                ws.send(obj);
                 console.log("Connected to Sarlab experience: "+idExp);
             };
 
