@@ -41,49 +41,55 @@ require_once($CFG->libdir."/formslib.php");
 require_once($CFG->libdir."/dml/moodle_database.php");
 require_once($CFG->libdir."/blocklib.php");
 
-// user_file has the following format:
-// filename_context_id_879_user_id_5_ejsapp_id_87.extension
-
 // Distinguish between a file sent by EJS and EjsS
 $original_file_name = null;
-if ($_FILES['user_file']['name'] != null) { //receiving from EJS
+if ($_FILES['user_file']['name'] != null) { //receiving from EJS (java client)
     $method = true;
     $original_file_name = $_FILES['user_file']['name'];
-} else { //receiving from EjsS
+    $safe_file = replace_characters($original_file_name);
+    // user_file has the following format:
+    // filename_context_id_879_user_id_5_ejsapp_id_87.extension
+    // Get file_name, context_id,  ejsapp_id and file_extension
+    $extension = pathinfo($safe_file, PATHINFO_EXTENSION);
+    preg_match('/(.+)_context_id_/', $safe_file, $match);
+    $file_name = $match[1] . $extension;
+    preg_match('/_context_id_(\d+)/', $safe_file, $match);
+    $context_id = $match[1];
+    preg_match('/_user_id_(\d+)/', $safe_file, $match);
+    $user_id = $match[1];
+    preg_match('/_ejsapp_id_(\d+)/', $safe_file, $match);
+    $ejsapp_id = $match[1];
+} else { //receiving from EjsS (javascript client)
     $method = false;
     $original_file_name = $_POST['user_file'];
-    $extension = pathinfo($original_file_name, PATHINFO_EXTENSION);
+    $file_name = replace_characters($original_file_name);
+    $extension = pathinfo($file_name, PATHINFO_EXTENSION);
     if (!$extension) {
         if ($_POST['type'] == 'json') $extension = '.json';
         if ($_POST['type'] == 'txt') $extension = '.txt';
         if ($_POST['type'] == 'png') $extension = '.png';
-        $original_file_name = $original_file_name . $extension;
+        $file_name = $file_name . $extension;
     }
+    $context_id = $_POST['context_id'];
+    $user_id = $_POST['user_id'];
+    $ejsapp_id = $_POST['ejsapp_id'];
 }
 
 // To avoid problems with the file names
-$aux_array = explode('\\', $original_file_name);
-$aux_array = explode('/', $original_file_name);
-$safe_file = $aux_array[count($aux_array) - 1];
-$safe_file = str_replace(" ", "_", $safe_file);
-$safe_file = str_replace("#", "", $safe_file);
-$safe_file = str_replace("$", "Dollar", $safe_file);
-$safe_file = str_replace("%", "Percent", $safe_file);
-$safe_file = str_replace("^", "", $safe_file);
-$safe_file = str_replace("&", "", $safe_file);
-$safe_file = str_replace("*", "", $safe_file);
-$safe_file = str_replace("?", "", $safe_file);
+function replace_characters($original_file_name) {
+    $aux_array = explode('/', $original_file_name);
+    $safe_file = $aux_array[count($aux_array) - 1];
+    $safe_file = str_replace(" ", "_", $safe_file);
+    $safe_file = str_replace("#", "", $safe_file);
+    $safe_file = str_replace("$", "Dollar", $safe_file);
+    $safe_file = str_replace("%", "Percent", $safe_file);
+    $safe_file = str_replace("^", "", $safe_file);
+    $safe_file = str_replace("&", "", $safe_file);
+    $safe_file = str_replace("*", "", $safe_file);
+    $safe_file = str_replace("?", "", $safe_file);
 
-// Get file_name, context_id,  ejsapp_id and file_extension
-preg_match('/(.+)_context_id_/', $safe_file, $match);
-$file_name = $match[1];
-preg_match('/_context_id_(\d+)/', $safe_file, $match);
-$context_id = $match[1];
-preg_match('/_user_id_(\d+)/', $safe_file, $match);
-$user_id = $match[1];
-preg_match('/_ejsapp_id_(\d+)/', $safe_file, $match);
-$ejsapp_id = $match[1];
-$file_extension = pathinfo($safe_file, PATHINFO_EXTENSION);
+    return $safe_file;
+}
 
 // <upload the file to a temporal folder>
 if ($method) { // from EJS
@@ -92,7 +98,7 @@ if ($method) { // from EJS
         mkdir($upload_dir, 0700);
     }
 
-    $path = $upload_dir . $file_name . '.' . $file_extension;
+    $path = $upload_dir . $file_name;
 
     if ($original_file_name != null) { // as long as a file was selected...
         if (copy($_FILES['user_file']['tmp_name'], $path)) {
@@ -109,7 +115,7 @@ if ($method) { // from EJS
 // <prepare the file info data>
 $fs = get_file_storage();
 // Prepare file record object
-if ($file_extension == 'cnt') $source_info = 'controller';
+if ($extension == 'cnt') $source_info = 'controller';
 else $source_info = 'ejsappid='.$ejsapp_id;
 $fileinfo = array(
     'contextid' => $context_id, // ID of context
@@ -119,7 +125,7 @@ $fileinfo = array(
     'source' => $source_info,
     'userid' => $user_id,
     'filepath' => '/',
-    'filename' => $file_name . '.' . $file_extension);
+    'filename' => $file_name);
 // </prepare the file info data>
 
 // <if there is an old file in the user repository with the same name, then delete it>

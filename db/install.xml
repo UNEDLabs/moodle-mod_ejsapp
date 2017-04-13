@@ -43,22 +43,8 @@
                 <FIELD NAME="is_collaborative" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0"
                        SEQUENCE="false" COMMENT="Does the lab supports collaborative sessions? (1=yes, 0=not)"
                        PREVIOUS="mainframe" NEXT="applet"/>
-                <FIELD NAME="applet" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="is_collaborative" NEXT="applet_size_conf"/>
-                <FIELD NAME="applet_size_conf" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="applet" NEXT="preserve_aspect_ratio"/>
-                <FIELD NAME="preserve_aspect_ratio" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="applet_size_conf" NEXT="custom_width"/>
-                <FIELD NAME="custom_width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="preserve_aspect_ratio" NEXT="custom_height"/>
-                <FIELD NAME="custom_height" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="custom_width" NEXT="is_rem_lab"/>
                 <FIELD NAME="is_rem_lab" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0"
                        PREVIOUS="custom_height" NEXT="height"/>
-                <FIELD NAME="height" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="is_rem_lab" NEXT="width"/>
-                <FIELD NAME="width" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="height" NEXT="personalvars"/>
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="width" NEXT="blockly_conf"/>
                 <FIELD NAME="blockly_conf" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"

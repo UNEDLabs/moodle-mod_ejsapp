@@ -72,21 +72,17 @@ defined('MOODLE_INTERNAL') || die();
  *                                  $personalvarsinfo->value: double[] value(s) of the EJS variable(s),
  *                                  $personalvarsinfo->type: string[] type(s) of the EJS variable(s),
  *                                  Null if no personal variables were defined for this EJSApp
- * @param stdClass|null $external_size
- *                                  $external_size->width: int value (in pixels) for the width of the applet to be drawn
- *                                  $external_size->height: int value (in pixels) for the height of the applet to be drawn  
- *                                  Null if generate_embedding_code is not called from the external interface (draw_ejsapp_instance() function)
 
- * @return string code that embeds an EJS applet into Moodle
+ * @return string code that embeds an EjsS application in Moodle
  *
  */
-function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo, $external_size) {
+function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collabinfo, $personalvarsinfo) {
     global $DB, $USER, $CFG;
 
     /**
      * If a state, controller or recording file has been configured in the ejsapp activity, this function returns the information of such file
      *
-     * @param stdCall $ejsapp
+     * @param stdClass $ejsapp
      * @param string $data_type
      * @return stdClass $initial_data_file
      */
@@ -132,7 +128,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         $user_state_file = null;
         $user_cnt_file = null;
         $user_rec_file = null;
-        $user_nlk_file = null;
+        $user_blk_file = null;
     }
 
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {    // Sarlab is used to access this remote lab or to establish communication between users
@@ -178,7 +174,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
     $context = context_user::instance($USER->id);
     $language = current_language();
 
-    if ($ejsapp->class_file == '') { //EJS Javascript
+    if ($ejsapp->class_file == '') { //EjsS Javascript
 
         if (count(explode('/', $CFG->wwwroot)) <= 3) $path = $CFG->wwwroot . $ejsapp->codebase;
         else $path = substr($CFG->wwwroot, 0, strrpos( $CFG->wwwroot, '/') ) . $ejsapp->codebase;
@@ -317,322 +313,80 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
         if ($sarlabinfo) {
             global $PAGE;
             $username = $USER->username . "@" . $CFG->wwwroot;
-            //$PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket', array($CFG->wwwroot, $sarlab_IP, $sarlab_port, $username, $sarlab_key, $sarlabinfo->practice));
-            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket', array($CFG->wwwroot, $sarlab_IP, $sarlab_port, "luis", "Sar*2013#Lab", $sarlabinfo->practice));
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket', array($CFG->wwwroot, $sarlab_IP, $sarlab_port, $sarlabinfo->practice, $new_sarlab_key->expirationtime, $username, $sarlab_key));
             $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
         }
         // </Launching the websocket service for Sarlab>
 
-    } else { //EJS Java
+    } else { //EjsS Java (Web Start Application)
 
-        if ($ejsapp->applet == 1) { // Applet
+        $ejsapp_name = $ejsapp->applet_name;
+        if (pathinfo($ejsapp_name, PATHINFO_EXTENSION) == 'jar') $ejsapp_name = substr($ejsapp->applet_name, 0, -4);
 
-            $code = '<div id="EJsS"><script type="text/javascript">';
+        if (count(explode('/', $CFG->wwwroot)) <= 3) $wwwpath = $CFG->wwwroot . $ejsapp->codebase;
+        else $wwwpath = substr($CFG->wwwroot, 0, strrpos($CFG->wwwroot, '/')) . $ejsapp->codebase;
+        /*$records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => ($ejsapp->id), 'filename' => ($ejsapp->applet_name)));
+        $record = reset($records);
+        $wwwpath = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/jarfiles/' . $record->itemid . '/';*/
 
-            // <set the applet size on the screen>
-            if (isset($external_size->width)) {
-                $code .= " var w = $external_size->width, h = $external_size->height;";
-            } else {
-                switch ($ejsapp->applet_size_conf) {
-                    case 0:
-                        $code .= " var w = {$ejsapp->width}, h = {$ejsapp->height};";
-                        break;
-                    case 1:
-                        $code .= " h_max = 460;
-                    if (window.innerWidth && window.innerHeight) {
-                        h_max = window.innerHeight;
-                    } else if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth && document.documentElement.offsetHeight) {
-                        h_max = document.documentElement.offsetHeight;
-                    } else if (document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight) {
-                        h_max = document.documentElement.clientHeight;
-                    }
-                    w = document.getElementById('EJsS').offsetWidth
-                    h = w*{$ejsapp->height}/{$ejsapp->width};
-                    if (h > h_max) {
-                        h = 0.93*h_max;
-                        w = h*{$ejsapp->width}/{$ejsapp->height};
-                    }";
-                        break;
-                    case 2:
-                        if ($ejsapp->preserve_aspect_ratio == 0) {
-                            $code .= " var w = {$ejsapp->custom_width}, h = {$ejsapp->custom_height};";
-                        } else {
-                            $code .= " var w = {$ejsapp->custom_width}, h = w*{$ejsapp->height}/{$ejsapp->width};";
-                        }
-                        break;
-                }
-            }
-            // <\set the applet size on the screen>
+        $main_class = substr($ejsapp->class_file, 0, -12);
 
-            if ($collabinfo && !isset($collabinfo->director)) { // Invited users to collaborative sessions
-                $class_file = $ejsapp->class_file;
-                $class_file = str_replace(".class", "Student.class", $class_file);
-            } else { // Director of the collaborative session
-                $class_file = $ejsapp->class_file;
-            }
-            $code .= "document.write('<applet code=\"{$class_file}\"');";
-
-            $username = fullname($USER); //For collab
-
-            $permissions = 'sandbox';
-            if ($ejsapp->is_rem_lab == 1) $permissions = 'all-permissions';
-            $ejsapp_id = $ejsapp->applet_name;
-            $ext = '.jar';
-            if (pathinfo($ejsapp->applet_name, PATHINFO_EXTENSION) == 'jar') {
-                $ejsapp_id = substr($ejsapp_id, 0, -4);
-                $ext = '';
-            }
-            $code .= "document.write(' codebase=\"{$ejsapp->codebase}\"');
-                  document.write(' id=\"$ejsapp_id\"');
-                  document.write(' width=\"'+w+'\"');
-                  document.write(' height=\"'+h+'\">');
-                  document.write('<param name=\"cache_archive\" value=\"{$ejsapp->applet_name}$ext\">');
-                  document.write('<param name=\"permissions\" value=\"{$permissions}\"/>');
-                  document.write('<param name=\"codebase_lookup\" value=\"false\"/>');
-                  document.write('<param name=\"context_id\" value=\"{$context->id}\"/>');
-                  document.write('<param name=\"user_id\" value=\"{$USER->id}\"/>');
-                  document.write('<param name=\"ejsapp_id\" value=\"{$ejsapp->id}\"/>');
-                  document.write('<param name=\"language\" value=\"$language\"/>');
-                  document.write('<param name=\"username\" value=\"$username\"/>');
-                  document.write('<param name=\"user_moodle\" value=\"{$USER->username}\"/>');
-                  document.write('<param name=\"password_moodle\" value=\"DEPRECATED\"/>');
-                  document.write('<param name=\"moodle_upload_file\" value=\"{$CFG->wwwroot}/mod/ejsapp/upload_file.php\"/>');
-                  document.write('<param name=\"lookandfeel\" value=\"NIMBUS\"/>');";
-
-            if ($collabinfo) {
-                $code .= "document.write('<param name=\"is_collaborative\" value=\"true\"/>');";
-                if (isset($collabinfo->director)) {
-                    $code .= "document.write('<param name=\"directorname\" value=\"$username\"/>');
-                              document.write('<param name=\"Port_Teacher\" value=\"" . get_config('block_ejsapp_collab_session', 'collaborative_port') . "\"/>');";
-                } else {
-                    insert_collaborative_user($USER->id, null, $collabinfo->session);
-                    //127.0.0.1\"/>');
-                    $code .= "document.write('<param name=\"IP_Teacher\" value=\"{$collabinfo->ip}\"/>');
-                              document.write('<param name=\"MainFrame_Teacher\" value=\"{$ejsapp->mainframe}\"/>');
-                              document.write('<param name=\"Port_Teacher\" value=\"{$collabinfo->localport}\"/>');";
-                }
-                if (isset($collabinfo->sarlabport)) {
-                    $code .= "document.write('<param name=\"ipserver\" value=\"{$collabinfo->ip}\"/>');
-                              document.write('<param name=\"portserver\" value=\"{$collabinfo->sarlabport}\"/>');
-                              document.write('<param name=\"idExp\" value=\"EJS Collab\"/>');
-                              document.write('<param name=\"user\" value=\"{$USER->username}@{$CFG->wwwroot}\"/>');
-                              document.write('<param name=\"passwd\" value=\"$sarlab_key\"/>');";
-                }
-            } else {
-                $code .= "document.write('<param name=\"is_collaborative\" value=\"false\"/>');";
-            } // collabinfo for collaborative sessions
-
-            if ($sarlabinfo) {
-                $code .= "document.write('<param name=\"ipserver\" value=\"{$sarlab_IP}\"/>');
-                      document.write('<param name=\"portserver\" value=\"{$sarlab_port}\"/>');
-                      document.write('<param name=\"idExp\" value=\"$sarlabinfo->practice\"/>')
-                      document.write('<param name=\"max_time\" value=\"$sarlabinfo->max_use_time\"/>');";
-                if ($sarlabinfo->collab == 0) {
-                    $user = "{$USER->username}@{$CFG->wwwroot}";
-                    $passwd = $sarlab_key;
-                } else { // TODO: Get and pass the data received from SARLAB for accessing the collaborative session
-                    // Ask the collab sessions block plugin about the username and password for the session
-                    $user = "{$USER->username}@{$CFG->wwwroot}";
-                    $passwd = $sarlab_key;
-                }
-                $code .= "document.write('<param name=\"user\" value=\"$user\"/>');
-                      document.write('<param name=\"passwd\" value=\"$passwd\"/>');";
-            } // sarlabinfo for remote laboratories
-
-            $code .= "document.write('</applet>');";
-
-            // <Loading state, controller and interaction files as well as personalized variables>
-            // <Loading state files>
-            $initial_state_file = initial_data_file($ejsapp, 'xmlfiles');
-            if ($user_state_file || (isset($initial_state_file->filename)) && $initial_state_file->filename != '.') {
-                $state_file = get_data_file($user_state_file, $initial_state_file);
-                //<to read the applet state, javascript must wait until the applet has been totally downloaded>
-                $state_fail_msg = get_string('state_fail_msg', 'ejsapp');
-                $load_state_code = "
-              function loadState(count) {
-                applet = document.getElementById('$ejsapp_id');
-                var to = typeof (applet);
-                if (count > 0) {
-                    window.setTimeout( function() { loadState( --count ); }, 500 );
-                }
-                else if (to == 'function' || to == 'object') {
-                  window.setTimeout( function() { applet._readState('url:$state_file'); }, 200 );
-                  applet._view.resetTraces();
-                  //applet._view.clearData();
-                  //applet._view.clearElements();
-                  //applet._view.resetElements();
-                }
-                else {
-                  alert('$state_fail_msg');
-                }
-              }
-              loadState(20);";
-                //<\to read the applet state, javascript must wait until the applet has been totally downloaded>
-                $code .= $load_state_code;
-            } //end of if ($user_state_file)
-            // <\Loading state files>
-
-            // <Loading controller files>
-            $initial_cnt_file = initial_data_file($ejsapp, 'cntfiles');
-            if ($user_cnt_file || (isset($initial_cnt_file->filename) && $initial_cnt_file->filename != '.')) {
-                $cnt_file = get_data_file($user_cnt_file, $initial_cnt_file);
-                //<to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
-                $cnt_fail_msg = get_string('controller_fail_msg', 'ejsapp');
-                $load_cnt_code = "
-              function loadController(count) {
-                applet = document.getElementById('$ejsapp_id');
-                var to = typeof (applet);
-                if (count > 0) {
-                    window.setTimeout( function() { loadController( --count ); }, 500 );
-                }
-                else if (to == 'function' || to == 'object') {
-                  window.setTimeout( function() {
-                  var element = applet._model.getUserData('_codeController');
-                  element.setController(applet._readText('url:$cnt_file')); }, 200 );
-                }
-                else {
-                  alert('$cnt_fail_msg');
-                }
-              }
-              loadController(20);";
-                //<\to allow the applet loading the controller, javascript must wait until the applet has been totally downloaded>
-                $code .= $load_cnt_code;
-            } //end of if ($user_cnt_file)
-            // <\Loading controller files>
-
-            // <Loading interaction recording files>
-            $initial_rec_file = initial_data_file($ejsapp, 'recfiles');
-            if ($user_rec_file || (isset($initial_rec_file->filename) && $initial_rec_file->filename != '.')) {
-                $rec_file = get_data_file($user_rec_file, $initial_rec_file);
-                //<to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
-                $rec_fail_msg = get_string('recording_fail_msg', 'ejsapp');
-                $load_rec_code = "
-              function loadExperiment(count) {
-                applet = document.getElementById('$ejsapp_id');
-                var to = typeof (applet);
-                if (count > 0) {
-                    window.setTimeout( function() { loadExperiment( --count ); }, 500 );
-                }
-                else if (to == 'function' || to == 'object') {
-                  window.setTimeout( function() { applet._simulation.runLoadExperiment('url:$rec_file'); }, 200 );
-                }
-                else {
-                  alert('$rec_fail_msg');
-                }
-              }
-              loadExperiment(20);";
-                //<\to allow the applet running the recording file, javascript must wait until the applet has been totally downloaded>
-                $code .= $load_rec_code;
-            } //end of if ($user_rec_file)
-            // <\Loading interaction recording files>
-
-            // <Loading personalized variables>
-            if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
-                $js_vars_names = json_encode($personalvarsinfo->name);
-                $js_vars_values = json_encode($personalvarsinfo->value);
-                $js_vars_types = json_encode($personalvarsinfo->type);
-                $personalize_vars_code = "
-              var js_vars_names = " . $js_vars_names . ";
-              var js_vars_values = " . $js_vars_values . ";
-              var js_vars_types = " . $js_vars_types . ";
-              function personalizeVars(count) {
-                applet = document.getElementById('$ejsapp_id');
-                var to = typeof (applet);
-                if (count > 0) {
-                    window.setTimeout( function() { personalizeVars( --count ); }, 500 );
-                }
-                else if (to == 'function' || to == 'object') {
-                    for (var i=0; i<js_vars_names.length; i++) {
-                        if (js_vars_types[i] != \"Boolean\") {
-                            applet._simulation.setVariable(js_vars_names[i],js_vars_values[i].toString());
-                        } else {
-                            var bool = (js_vars_values[i] == 1);
-                            applet._simulation.setVariable(js_vars_names[i],bool);
-                        }
-                    }
-                    applet._simulation.update();
-                    //applet._initialize();
-                }
-              }
-              personalizeVars(20);";
-                $code .= $personalize_vars_code;
-            }
-            // <\Loading personalized variables>
-            // <\Loading state, controller and interaction files as well as personalized variables>
-
-            $code .= '</script></div>';
-
-        } else { // Java Web Start Application
-
-            $ejsapp_name = $ejsapp->applet_name;
-            if (pathinfo($ejsapp_name, PATHINFO_EXTENSION) == 'jar') $ejsapp_name = substr($ejsapp->applet_name, 0, -4);
-
-            if (count(explode('/', $CFG->wwwroot)) <= 3) $wwwpath = $CFG->wwwroot . $ejsapp->codebase;
-            else $wwwpath = substr($CFG->wwwroot, 0, strrpos($CFG->wwwroot, '/')) . $ejsapp->codebase;
-            /*$records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles', 'itemid' => ($ejsapp->id), 'filename' => ($ejsapp->applet_name)));
-            $record = reset($records);
-            $wwwpath = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/jarfiles/' . $record->itemid . '/';*/
-
-            $main_class = substr($ejsapp->class_file, 0, -12);
-
-            // Create the JNLP file:
-            $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
-                            <jnlp spec=\"1.0+\"
-                                codebase=\"$wwwpath\"
-                                href=\"$ejsapp_name.jnlp\">
-                                <information>
-                                    <title>$ejsapp_name</title>
-                                    <vendor>Easy Java Simulations</vendor>
-                                </information>
-                                <resources>
-                                    <!-- Application Resources -->
-                                    <j2se version=\"1.7+\"
-                                        href=\"http://java.sun.com/products/autodl/j2se\"/>
-                                    <jar href=\"$ejsapp_name.jar\" main=\"true\"/>
-                                </resources>
-                                <application-desc
-                                    main-class=\"$main_class\">
-                                    <argument>-language</argument>
-                                    <argument>$language</argument>
-                                    <argument>-lookandfeel</argument>
-                                    <argument>NIMBUS</argument>";
-            if ($sarlabinfo) {
-                $content .=         "<argument>-ipserver</argument>
-                                    <argument>$sarlab_IP</argument>
-                                    <argument>-portserver</argument>
-                                    <argument>$sarlab_port</argument>
-                                    <argument>-idExp</argument>
-                                    <argument>$sarlabinfo->practice</argument>
-                                    <argument>-user</argument>
-                                    <argument>{$USER->username}@{$CFG->wwwroot}</argument>
-                                    <argument>-passwd</argument>
-                                    <argument>$sarlab_key</argument>
-                                    <argument>-max_time</argument>
-                                    <argument>$sarlabinfo->max_use_time</argument>";
-            }
-            $content .=         "</application-desc>
-                                <security>
-                                    <all-permissions/>
-                                </security>
-                                <update check=\"background\"/>
-                            </jnlp>";
-
-            $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-            $jnlp = fopen($dirpath.$ejsapp_name.'.jnlp', 'w');
-            fwrite($jnlp, $content);
-            fclose($jnlp);
-
-            // Run or download JNLP:
-            $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
-                <script src=\"https://www.java.com/js/deployJava.js\"></script>
-                <script>
-                    var url = '$wwwpath$ejsapp_name.jnlp';
-                    var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                    if (is_chrome) document.getElementById('EJsS').src = url;
-                    else deployJava.launchWebStartApplication(url);
-                </script>";
-
+        // Create the JNLP file:
+        $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+                        <jnlp spec=\"1.0+\"
+                            codebase=\"$wwwpath\"
+                            href=\"$ejsapp_name.jnlp\">
+                            <information>
+                                <title>$ejsapp_name</title>
+                                <vendor>Easy Java Simulations</vendor>
+                            </information>
+                            <resources>
+                                <!-- Application Resources -->
+                                <j2se version=\"1.7+\"
+                                    href=\"http://java.sun.com/products/autodl/j2se\"/>
+                                <jar href=\"$ejsapp_name.jar\" main=\"true\"/>
+                            </resources>
+                            <application-desc
+                                main-class=\"$main_class\">
+                                <argument>-language</argument>
+                                <argument>$language</argument>
+                                <argument>-lookandfeel</argument>
+                                <argument>NIMBUS</argument>";
+        if ($sarlabinfo) {
+            $content .=         "<argument>-ipserver</argument>
+                                <argument>$sarlab_IP</argument>
+                                <argument>-portserver</argument>
+                                <argument>$sarlab_port</argument>
+                                <argument>-idExp</argument>
+                                <argument>$sarlabinfo->practice</argument>
+                                <argument>-user</argument>
+                                <argument>{$USER->username}@{$CFG->wwwroot}</argument>
+                                <argument>-passwd</argument>
+                                <argument>$sarlab_key</argument>
+                                <argument>-max_time</argument>
+                                <argument>$sarlabinfo->max_use_time</argument>";
         }
+        $content .=         "</application-desc>
+                            <security>
+                                <all-permissions/>
+                            </security>
+                            <update check=\"background\"/>
+                        </jnlp>";
+
+        $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+        $jnlp = fopen($dirpath.$ejsapp_name.'.jnlp', 'w');
+        fwrite($jnlp, $content);
+        fclose($jnlp);
+
+        // Run or download JNLP:
+        $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
+            <script src=\"https://www.java.com/js/deployJava.js\"></script>
+            <script>
+                var url = '$wwwpath$ejsapp_name.jnlp';
+                var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                if (is_chrome) document.getElementById('EJsS').src = url;
+                else deployJava.launchWebStartApplication(url);
+            </script>";
 
     }
 

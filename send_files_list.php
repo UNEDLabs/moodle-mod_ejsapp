@@ -43,7 +43,10 @@ require_once($CFG->libdir . '/moodlelib.php');
 $ejsapp_id = required_param('ejsapp_id', PARAM_INT);
 $type = optional_param('type', '.xml', PARAM_TEXT);
 
-$info = '';
+$file_name = array();
+$file_path = array();
+$file_names_array = array();
+$file_paths_array = array();
 if ($type == '.cnt') $source_info = 'controller';
 else $source_info = 'ejsappid='.$ejsapp_id;
 $records = $DB->get_records_select('files', "component='user' AND filearea='private' AND userid='$USER->id' AND source='$source_info'");
@@ -52,8 +55,12 @@ foreach ($records as $record) {
     $file_extension = pathinfo($record->filename, PATHINFO_EXTENSION);
     if ( ($type == '.xml' && $file_extension == 'xml') || ($type == 'text' && $file_extension == 'txt') || ($type == '.cnt' && $file_extension == 'cnt') || ($type == '.rec' && $file_extension == 'rec') || ($type == '.blk' && $file_extension == 'blk') || ($type == '.json' && $file_extension == 'json')) {
         $ejsapp_file_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
-        $info .= $record->filename . ';' . $ejsapp_file_path . $record->filename . ';';
+        $file_name["file_name"] = $record->filename;
+        $file_names_array[] = $file_name;
+        $file_path["file_path"] = $ejsapp_file_path . $record->filename;
+        $file_paths_array[] = $file_path;
     }
 }
 
-echo $info;
+$obj = array('file_names' => $file_names_array, 'file_paths' => $file_paths_array);
+echo json_encode($obj);

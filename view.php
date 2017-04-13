@@ -134,7 +134,7 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
     $accessed = true;
     $max_use_time = 604800; // High enough number... although it is never used in the case of a virtual lab
     prepare_ejs_file($ejsapp);
-    echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+    echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo));
 } else { // <Remote lab>
     $remote_lab_access = remote_lab_access_info($ejsapp, $course);
     $remlab_conf = $remote_lab_access->remlab_conf;
@@ -155,13 +155,13 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
             }
             $accessed = true;
             prepare_ejs_file($ejsapp);
-            echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+            echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo));
         } else {
             if (($remlab_conf->usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) { //Teacher can still access in collaborative mode
                 echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                 $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL', $remote_lab_access->labmanager, $max_use_time);
                 prepare_ejs_file($ejsapp);
-                echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+                echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo));
                 $action = 'collab_view';
             } else { //No access
                 echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
@@ -188,14 +188,14 @@ if (($ejsapp->is_rem_lab == 0)) { //Virtual lab
                 if (!is_null($sarlabinfo)) { //The user has an active booking -> he can access the lab
                     $accessed = true;
                     prepare_ejs_file($ejsapp);
-                    echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+                    echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo));
                 } else { //No active booking
                     echo $OUTPUT->box(get_string('no_booking', 'ejsapp'));
                     if (($remlab_conf->usingsarlab == 1 && $remlab_conf->sarlabcollab == 1)) { //Student can still access in collaborative mode
                         echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                         $sarlabinfo = define_sarlab($remlab_conf->sarlabinstance, $remlab_conf->sarlabcollab, 'NULL', $remote_lab_access->labmanager, $max_use_time);
                         prepare_ejs_file($ejsapp);
-                        echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo, null));
+                        echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $data_files, $collabinfo, $personalvarsinfo));
                         $action = 'collab_view';
                     } else { //No access
                         echo $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
@@ -287,7 +287,7 @@ if ($ejsapp->appwording) {
 }
 
 // <Blockly programming space for Javascript labs>
-if ($ejsapp->applet == 0) {
+if ($ejsapp->class_file == '') {
     $blockly_conf = json_decode($ejsapp->blockly_conf);
     if ($blockly_conf[0] == 1) {
         $PAGE->requires->js_call_amd('mod_ejsapp/jqueryui', 'init');

@@ -113,30 +113,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
         $mform->setType('appwording', PARAM_RAW);
         // -------------------------------------------------------------------------------
-        // Optional Applet display options
-        $mform->addElement('header', 'applet_display', get_string('applet_display', 'ejsapp'));
-
-        $mform->addElement('selectyesno', 'applet', get_string('applet', 'ejsapp'));
-        $mform->addHelpButton('applet', 'applet', 'ejsapp');
-
-        $mform->addElement('select', 'applet_size_conf', get_string('applet_size_conf','ejsapp'), array(get_string('preserve_applet_size','ejsapp'), get_string('moodle_resize','ejsapp'), get_string('user_resize','ejsapp')));
-        $mform->addHelpButton('applet_size_conf', 'applet_size_conf', 'ejsapp');
-        $mform->setDefault('applet_size_conf', 0);
-        $mform->disabledIf('applet_size_conf', 'applet', 'eq', 0);
-
-        $mform->addElement('selectyesno', 'preserve_aspect_ratio', get_string('preserve_aspect_ratio', 'ejsapp'));
-        $mform->addHelpButton('preserve_aspect_ratio', 'preserve_aspect_ratio', 'ejsapp');
-        $mform->disabledIf('preserve_aspect_ratio', 'applet_size_conf', 'neq', 2);
-
-        $mform->addElement('text', 'custom_width', get_string('custom_width', 'ejsapp'), array('size' => '3'));
-        $mform->setType('custom_width', PARAM_INT);
-        $mform->disabledIf('custom_width', 'applet_size_conf', 'neq', 2);
-
-        $mform->addElement('text', 'custom_height', get_string('custom_height', 'ejsapp'), array('size' => '3'));
-        $mform->setType('custom_height', PARAM_INT);
-        $mform->disabledIf('custom_height', 'applet_size_conf', 'neq', 2);
-        $mform->disabledIf('custom_height', 'preserve_aspect_ratio', 'eq', 1);
-        // -------------------------------------------------------------------------------
         // Optional Javascript CSS styles
         $mform->addElement('header', 'css_style', get_string('css_style', 'ejsapp'));
 
@@ -396,17 +372,6 @@ class mod_ejsapp_mod_form extends moodleform_mod
     {
         $errors = parent::validation($data, $files);
 
-        if ($data['applet_size_conf'] == 2) {
-            if (empty($data['custom_width'])) {
-                $errors['custom_width'] = get_string('custom_width_required', 'ejsapp');
-            }
-            if ($data['preserve_aspect_ratio'] == 0) {
-                if (empty($data['custom_height'])) {
-                    $errors['custom_height'] = get_string('custom_height_required', 'ejsapp');
-                }
-            }
-        }
-
         if ($data['personalvars'] == 1) {
             if (empty($data['var_name'])) {
                 $errors['var_name[0]'] = get_string('vars_required', 'ejsapp');
@@ -429,6 +394,15 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
             }
         }
+
+        // TODO: Check whether the uploaded file is a valid EjsS file
+        /*
+        $draftitemid = $data['appletfile'];
+        $draftitemid = file_get_submitted_draft_itemid('appletfile');
+        $file = $fs->get_file_by_id($draftitemid);
+
+        $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
+        */
 
         return $errors;
     } // validation

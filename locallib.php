@@ -151,8 +151,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $ejsapp->mainframe = '';
     $ejsapp->is_collaborative = 0;
     $ejsapp->manifest = 'EJsS';
-    $ejsapp->height = 0;
-    $ejsapp->width = 0;
 
     $ext = pathinfo($filepath, PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table
@@ -458,10 +456,10 @@ function personalize_vars($ejsapp, $user, $shuffle) {
                 shuffle($seed_array_1);
                 shuffle($seed_array_2);
             }
-            $seed_val1 = filter_var(md5($seed_array_1[0] . $seed_array_1[1] . $seed_array_1[2] . $seed_array_1[3] .
-                                    $seed_array_1[4]), FILTER_SANITIZE_NUMBER_INT);
-            $seed_val2 = filter_var(md5($seed_array_2[0] . $seed_array_2[1] . $seed_array_2[2] . $seed_array_1[3] .
-                                    $seed_array_2[4]), FILTER_SANITIZE_NUMBER_INT);
+            $seed_val1 = filter_var(md5($seed_array_1[0] . $seed_array_1[1] . $seed_array_1[2] . $seed_array_1[3]),
+                                        FILTER_SANITIZE_NUMBER_INT);
+            $seed_val2 = filter_var(md5($seed_array_2[0] . $seed_array_2[1] . $seed_array_2[2] . $seed_array_1[3]),
+                                        FILTER_SANITIZE_NUMBER_INT);
             $seed_val = $seed_val1 + $seed_val2;
             mt_srand(intval($seed_val));
             $personalvarsinfo->value[$i] = mt_rand($factor*$personalvar->minval, $factor*$personalvar->maxval)/$factor;
@@ -550,11 +548,10 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
         }
         $ejsapp->is_collaborative = $is_collaborative;
 
-        // height
+        // Check whether the EjsS version to build this applet is supported
         $pattern = '/Applet-Height\s*:\s*(\w+)/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
         if (count($matches) == 0) {
-            $height = 0;
             // If this field does not exist in the manifest, it means the version of EJS used to compile the jar does not support Moodle.
             if ($alert) {
                 $message = get_string('EJS_version', 'ejsapp');
@@ -563,16 +560,7 @@ function modifications_for_java($filepath, $ejsapp, $file, $file_record, $alert)
                       </script>";
                 echo $alert;
             }
-        } else {
-            $ejs_ok = true;
-            $height = $matches[1][0];
-            $height = preg_replace('/\s+/', "", $height); // delete all white-spaces
-        }
-        $ejsapp->height = $height;
-
-        // width
-        $width = get_width_for_java($manifest);
-        $ejsapp->width = $width;
+        } else $ejs_ok = true;
 
         // Sign the applet
         // Check whether a certificate is installed and in use

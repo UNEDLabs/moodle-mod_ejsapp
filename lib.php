@@ -128,6 +128,7 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
     $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
 
     if ($ejs_ok) {
+        ejsapp_grade_item_update($ejsapp);
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
             if ($ejsapp->remlab_manager) {
                 $complete_pract_list = explode(';', $ejsapp->list_practices);
@@ -140,11 +141,7 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
             ejsapp_expsyst2pract($ejsapp);
             update_booking_table($ejsapp);
         }
-    } else {
-        ejsapp_delete_instance($ejsapp->id);
     }
-
-    ejsapp_grade_item_update($ejsapp);
 
     return $ejsapp->id;
 }
@@ -181,6 +178,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
     $ejs_ok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejs_ok) {
+        ejsapp_grade_item_update($ejsapp);
         $is_ejsappbooking_installed = $DB->get_records('modules',array('name'=>'ejsappbooking'));
         $is_ejsappbooking_installed = !empty($is_ejsappbooking_installed);
         if ($ejsapp->is_rem_lab == 1) { // Remote lab
@@ -204,11 +202,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
                 }
             }
         }
-    } else {
-        ejsapp_delete_instance($ejsapp->id);
     }
-
-    ejsapp_grade_item_update($ejsapp);
 
     return $ejsapp->id;
 }
@@ -752,20 +746,13 @@ function get_ejsapp_states($ejsapp_id) {
 
 //TODO: get .rec files (get_ejsapp_recordings) and .blk files (get_ejsapp_blockly_programs)
 
-function draw_ejsapp_instance($ejsapp_id, $data_files=null, $width=null, $height=null) {
+function draw_ejsapp_instance($ejsapp_id, $data_files=null) {
     global $DB, $CFG;
 
     if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
         $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsapp_id));
-        if ($width && $height) {
-            $external_size = new stdClass();
-            $external_size->width = $width;
-            $external_size->height = $height;
-        } else {
-            $external_size = null;
-        }
         require_once($CFG->dirroot . '/mod/ejsapp/generate_embedding_code.php');
-        $code = generate_embedding_code($ejsapp, null, $data_files, null, null, $external_size);
+        $code = generate_embedding_code($ejsapp, null, $data_files, null, null);
     }
     else {
         $code = get_string('ejsapp_error', 'ejsapp');
@@ -773,18 +760,3 @@ function draw_ejsapp_instance($ejsapp_id, $data_files=null, $width=null, $height
 
     return $code;
 } //draw_ejsapp_instance
-
-function get_ejsapp_size($ejsapp_id) { //only for Java
-    global $DB;
-
-    if ($DB->record_exists('ejsapp', array('id' => $ejsapp_id))) {
-        $record = $DB->get_record('ejsapp', array('id' => $ejsapp_id));
-        $result = new stdClass();
-        $result->width = $record->width;
-        $result->height = $record->height;
-    }
-    else {
-        $result = get_string('ejsapp_error', 'ejsapp');
-    }
-    return $result;
-}//get_ejsapp_states

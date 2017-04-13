@@ -35,13 +35,17 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'EJSApp';
 $string['modulenameplural'] = 'EJSApps';
-$string['modulename_help'] = 'El m&oacute;dulo de actividad EJSApp permite a un profesor a&ntilde;adir applets de Java creados con Easy Java Simulations (EJS) en sus cursos de Moodle.
+$string['modulename_help'] = 'El m&oacute;dulo de actividad EJSApp permite a un profesor a&ntilde;adir aplicaciones Javascript y applets de Java creados con Easy Java/Javascript Simulations (EjsS) en sus cursos de Moodle.
 
-Los applets de EJS quedar&aacute;n embebidos dentro de los cursos de Moodle. El profesor puede seleccionar si mantener el tama&ntilde;o original del applet o permitir que Moodle lo reescale de acuerdo al espacio disponible. Si el applet fue compilado con la opci&oacute;n "A&ntilde;adir soporte idiomas" en EJS, el applet embebido en Moodle con la actividad EJSApp configurar&aacute; autom&aacute;ticamente su idioma a aquel seleccionado por el usuario de Moodle, si esto es posible. Esta actividad es compatible con la configuraci&oacute;n de restricciones de acceso condicional.
+Las aplicaciones Javascript de EjsS quedar&aacute;n embebidos dentro de los cursos de Moodle y los applets Java se ejecutar&aacute; como aplicaciones de escritorio, lanzadas mediante el protocolo JNLP. Si la aplicaci&oacute;n fue compilada con la opci&oacute;n "A&ntilde;adir soporte idiomas" en EjsS, el laboratorio embebido en Moodle con la actividad EJSApp configurar&aacute; autom&aacute;ticamente su idioma a aquel seleccionado por el usuario de Moodle, si esto es posible.
 
-Cuando se usa junto al Navegador EJSApp de Ficheros, los estudiantes pueden guardar el estado del applet EJS, cuando lo est&eacute;n ejecutando, simplemente pulsando con el bot&oacute;n derecho del rat&oacute;n sobre el applet y seleccionando la opci&oacute;n adecuada en el men&uacute; que aparece. La informaci&oacute;n de estos estados se graba en un fichero .xml (para Java) o .json (para Javascript) que es guardado en el area de ficheros privados (Navegador EJSApp de Ficheros). Estos estados pueden recuperarse de dos maneras distintas: pulsando sobre los ficheros .xml o .json en el Navegador EJSApp de Ficheros o pulsando con el bot&oacute;n derecho del rat&oacute;n sobre el applet EJS y seleccionando la opci&oacute;n adecuada en el men&uacute;. Si el applet EJS est&aacute; preparado para tal efecto, tambi&eacute;n puede grabar ficheros de texto o im&aacute;genes y guardarlos en el &aacute;rea de ficheros privados.
+Cuando se usa junto al Navegador EJSApp de Ficheros, y si la aplicaci&oacute; est&ha sido preparada en EjsS para tal efecto, los estudiantes pueden guardar el estado de la aplicaci$oacute, as&iacute; como ficheros de texto o im&aacute;genes y guardarlos en el bloque Navegador EJSApp de Ficheros. La informaci&oacute;n de estos estados se graba en un fichero .json que es guardado en el area de ficheros privados (Navegador EJSApp de Ficheros). Estos estados pueden recuperarse pulsando sobre los ficheros .xml o .json en el Navegador EJSApp de Ficheros.
 
-Cuando se usa junto al bloque EJSApp de Sesiones Colaborativas, los usuarios de Moodle pueden trabajar con el mismo applet EJS de una manera s&iacute;ncrona, es decir, de tal forma que el applet mostrar&aacute; el mismo estado para todos los usuarios en la sesi&oacute;n colaborativa. Gracias a este bloque, los usuarios pueden crear sesiones, invitar a otros usuarios y trabajar juntos con la misma actividad EJSApp.';
+Cuando se usa junto al bloque EJSApp de Sesiones Colaborativas, los usuarios de Moodle pueden trabajar con el mismo laboratorio EjsS de una manera s&iacute;ncrona, es decir, de tal forma que la aplicaci&oacute; mostrar&aacute; el mismo estado para todos los usuarios en la sesi&oacute;n colaborativa. Gracias a este bloque, los usuarios pueden crear sesiones, invitar a otros usuarios y trabajar juntos con la misma actividad EJSApp.
+
+Cuando se usa junto al bloque Remlab Manager, las actividades EJSApp que sean laboratorios remotos pueden beneficiarse de numerosas opciones de gesti$oacute que aporta dicho bloque.
+
+Cuando se usa junto a la actividad EJSApp Booking System, las sesiones de experimentación con las actividades EJSApp que sean laboratorios remotos se gestionar&aacute; y organizar&aacuten desde dicho m&oacute;dulo.';
 $string['ejsappname'] = 'Nombre del laboratorio';
 $string['ejsappname_help'] = 'Nombre con que figurar&aacute; el laboratorio en el curso';
 $string['ejsapp'] = 'EJSApp';
@@ -58,66 +62,46 @@ $string['controller_fail_msg'] = 'Error al intentar cargar el controlador';
 $string['recording_load_msg'] = 'Se va a ejecutar una grabaci&oacute;n para este laboratorio';
 $string['recording_fail_msg'] = 'Error al intentar ejecutar la grabaci&oacute;n';
 
-$string['more_text'] = 'Texto optional tras el laboratorio EJsS';
+$string['more_text'] = 'Texto optional tras el laboratorio EjsS';
 
-$string['jar_file'] = 'Archivo .jar o .zip que encapsula el laboratorio EJsS';
+$string['jar_file'] = 'Archivo .jar o .zip que encapsula el laboratorio EjsS';
 
 $string['appletfile'] = 'Easy Java(script) Simulation';
 $string['appletfile_required'] = 'Se debe seleccionar un archivo .jar o .zip';
-$string['appletfile_help'] = 'Selecione el archivo .jar o .zip que encapsula el laboratorio EJsS (Easy Java(script) Simulation). La p&aacute;gina oficial de EJsS es http://fem.um.es/Ejs/';
+$string['appletfile_help'] = 'Selecione el archivo .jar o .zip que encapsula el laboratorio EjsS (Easy Java/Javascript Simulations). La p&aacute;gina oficial de EjsS es http://fem.um.es/Ejs/';
 
 $string['appwording'] = 'Enunciado';
-
-$string['applet_display'] = 'Opciones de visualizaci&oacute;n para una aplicaci&oacute;n Java';
-
-$string['applet'] = 'Embeber aplicaci&oacute;n en el navegador?';
-$string['applet_help'] = 'Seleccione \'si\' para ejecutar la aplicaci&oacute;n embebida en el navegador como un applet; \'no\' para lanzarla como una aplicaci&oacute;n Java Web Start';
-
-$string['applet_size_conf'] = 'Reescalado del applet';
-$string['applet_size_conf_help'] = 'Tres opciones: 1) "Mantener tama&ntilde;o original" mantendr&aacute; el tama&ntilde;o original del applet en EJS, 2) "Permitir que Moodle fije el tama&ntilde;o" redimensionar&aacute; el applet para que ocupe todo el espacio posible a la par que respeta la relaci&oacute;n de tama&ntilde;o original, 3) "Permitir que el usuario fije el tama&ntilde;o" permitir&aacute; al usuario establecer el tama&ntilde;o del applet y seleccionar si desea mantener, o no, su relaci&oacute;n de tama&ntilde;o original.';
-$string['preserve_applet_size'] = 'Mantener tama&ntilde;o original';
-$string['moodle_resize'] = 'Permitir que Moodle fije el tama&ntilde;o';
-$string['user_resize'] = 'Permitir que el usuario fije el tama&ntilde;o';
-
-$string['preserve_aspect_ratio'] = 'Mantener relaci&oacute;n de tama&ntilde;o';
-$string['preserve_aspect_ratio_help'] = 'Si selecciona esta opci&oacute;n, se respetar&aacute; la relaci&oacute;n de tama&ntilde;o original del applet. En ese caso, el usuario podr&aacute; modificar la anchura del applet y el sistema ajustar&aacute; autom&aacute;ticamente el valor para su altura. Si no se selecciona, el usuario podr&aacute; fijar tanto su anchura como su altura.';
-
-$string['custom_width'] = 'Anchura del applet (px)';
-$string['custom_width_required'] = 'ATENCI&Oacute;N: La anchura del applet no ha sido fijada. Debes proporcionar un valor distinto.';
-
-$string['custom_height'] = 'Altura del applet (px)';
-$string['custom_height_required'] = 'ATENCI&Oacute;N: La altura del applet no ha sido fijada. Debes proporcionar un valor distinto.';
 
 $string['css_style'] = 'Hoja de estilos CSS para una aplicaci&oacute;n Javascript';
 
 $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visual de la aplicaci&oacute;n javascript';
 $string['css_rules_help'] = '¡Importante! Escriba cada selector y el comienzo de su declaraci&oacute;n (la llave) en la misma l&iacute;nnea.';
 
-$string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EJsS debe leer';
+$string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EjsS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java(script) Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml (para Java) o .json (para Javascript) con el estado que la aplicaci&oacute;n EJsS debe cargar al ejecutarse.';
+$string['statefile_help'] = 'Seleccione el archivo .xml (para Java) o .json (para Javascript) con el estado que la aplicaci&oacute;n EjsS debe cargar al ejecutarse.';
 
-$string['controller_file'] = 'Archivo .cnt con el controlador que la aplicaci&oacute;n EJS debe cargar al iniciarse';
+$string['controller_file'] = 'Archivo .cnt con el controlador que la aplicaci&oacute;n EjsS debe cargar al iniciarse';
 
-$string['controllerfile'] = 'Controlador para el Easy Java(script) Simulation';
-$string['controllerfile_help'] = 'Seleccione el archivo .cnt con el c&oacute;digo del controlador que la aplicaci&oacute;n EJS debe ejecutar al iniciarse.';
+$string['controllerfile'] = 'Controlador para el Easy Java/Javascript Simulations';
+$string['controllerfile_help'] = 'Seleccione el archivo .cnt con el c&oacute;digo del controlador que la aplicaci&oacute;n EjsS debe ejecutar al iniciarse.';
 
-$string['recording_file'] = 'Archivo .rec con la grabaci&oacute;n que la aplicaci&oacute;n EJS debe ejecutar al cargarse';
+$string['recording_file'] = 'Archivo .rec con la grabaci&oacute;n que la aplicaci&oacute;n EjsS debe ejecutar al cargarse';
 
 $string['recordingfile'] = 'Grabaci&oacute;n del Easy Java(script) Simulation';
-$string['recordingfile_help'] = 'Seleccione el archivo .rec con la grabación de la interacción que la aplicaci&oacute;n EJS debe ejecutar al cargarse.';
+$string['recordingfile_help'] = 'Seleccione el archivo .rec con la grabación de la interacción que la aplicaci&oacute;n EjsS debe ejecutar al cargarse.';
 
-$string['personalize_vars'] = 'Personalizar variables del laboratorio EJS';
+$string['personalize_vars'] = 'Personalizar variables del laboratorio EjsS';
 
 $string['use_personalized_vars'] = 'Personalizar variables para cada usuario?';
-$string['use_personalized_vars_help'] = 'Seleccione "ss&iacute;" si conoce el nombre de alguna de las variables en el modelo EJS y deseas que adquieran valores diferentes para cada usuario que acceda a esta aplicaci&oacute;n.';
+$string['use_personalized_vars_help'] = 'Seleccione "ss&iacute;" si conoce el nombre de alguna de las variables en el modelo EjsS y deseas que adquieran valores diferentes para cada usuario que acceda a esta aplicaci&oacute;n.';
 
 $string['var_name'] = 'Nombre {no}';
-$string['var_name_help'] = 'Nombre de la variable en el modelo EJS.';
+$string['var_name_help'] = 'Nombre de la variable en el modelo EjsS.';
 
 $string['var_type'] = 'Tipo {no}';
-$string['var_type_help'] = 'Tipo de la variable en el modelo EJS.';
+$string['var_type_help'] = 'Tipo de la variable en el modelo EjsS.';
 
 $string['min_value'] = 'Valor m&iacute;nimo {no}';
 $string['min_value_help'] = 'M&iacute;nimo valor permitido para la variable.';
@@ -156,7 +140,7 @@ $string['practiceintro_required'] = 'ATENCI&Oacute;N: Si desea configurar esta a
 
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
-$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EJS 4.37 (build 121201), o superior. Recomp&iacute;lelo con una versi&oacute;n m&aacute;s moderna de EJS.";
+$string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EjsS 4.37 (build 121201), o superior. Recomp&iacute;lelo con una versi&oacute;n m&aacute;s moderna de EjsS.";
 $string['EJS_codebase'] = "ATENCI&Oacute;N: El manifest del applet que ha subido no especifica este servidor Moodle en el par&aacute;metro 'codebase', de modo que no ha sido firmado.";
 
 $string['inactive_lab'] = 'El laboratorio remoto es&aacute; inactivo en este momento.';

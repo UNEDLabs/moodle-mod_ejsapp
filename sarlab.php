@@ -37,14 +37,23 @@ require_once ('../../config.php');
 global $DB;
 
 $key = required_param('key', PARAM_TEXT);
-echo "key=$key\n";
+$obj = "key=$key\n";
+//$obj->key = $key;
 
-//Delete expired Sarlab keys:
 $time = array(strtotime(date('Y-m-d H:i:s')) + 180); //at least three minutes margin for working with the lab
-$DB->delete_records_select('block_remlab_manager_sb_keys', "expirationtime < ?", $time);
 
-if ($record = $DB->get_record('block_remlab_manager_sb_keys', array('sarlabpass' => $key))) {
+if ($record = $DB->get_records_select('block_remlab_manager_sb_keys', 'sarlabpass = ? AND expirationtime > ?', array($key, $time))) {
+    //Delete expired Sarlab keys:
+    $DB->delete_records_select('block_remlab_manager_sb_keys', "expirationtime < ?", $time);
+    //Check permissions, expiration time, and grant access:
     $permissions = "labmanager=false\n";
-    if($record->labmanager == 1) $permissions = "labmanager=true\n";
-    echo "access=true\n".$permissions;
-} else echo "access=false\n";
+    if(reset($record)->labmanager == 1) $permissions = "labmanager=true\n";
+    $expirationtime = "expiration_time=" . reset($record)->expirationtime . "\n";
+    $obj .= "access=true\n".$permissions.$expirationtime;
+    /*$obj->access = "true";
+    $obj->lab_manager = $permissions;
+    $obj->expiration_time = $expiration_time;*/
+} else $obj .= "access=false\n"; //$obj->access = "false";
+
+echo $obj;
+//echo json_encode($obj);

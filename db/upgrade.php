@@ -254,5 +254,25 @@ function xmldb_ejsapp_upgrade($oldversion)
         $dbman->add_field($table, $field);
     }
 
+    if ($oldversion < '2017033101') {
+        // Delete the fields related to applet embedding
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('applet', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'is_collaborative');
+        $dbman->drop_field($table,$field);
+        $field = new xmldb_field('applet_size_conf', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'applet');
+        $dbman->drop_field($table,$field);
+        $field = new xmldb_field('preserve_aspect_ratio', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'applet_size_conf');
+        $dbman->drop_field($table,$field);
+        $field = new xmldb_field('custom_width', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'preserve_aspect_ratio');
+        $dbman->drop_field($table,$field);
+        $field = new xmldb_field('custom_height', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'custom_width');
+        $dbman->drop_field($table,$field);
+        $field = new xmldb_field('width', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'is_rem_lab');
+        $dbman->drop_field($table,$field);
+        $field = new xmldb_field('height', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'width');
+        $dbman->drop_field($table,$field);
+    }
+
     return true;
 }

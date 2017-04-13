@@ -35,13 +35,17 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'EJSApp';
 $string['modulenameplural'] = 'EJSApps';
-$string['modulename_help'] = 'The EJSApp activity module enables teachers to add a java applets created with Easy Java Simulations (EJS) into their Moodle courses.
+$string['modulename_help'] = 'The EJSApp activity module enables teachers to add javascript applications and java applets created with Easy Java/Javascript Simulations (EjsS) into their Moodle courses.
 
-EJS applets will be embedded into Moodle courses. The teacher can select to keep the orginal applet size or let Moodle to resize it according to the available space. If the EJS applet was compiled using the "Add language facilities" option in EJS, the applet embedded into Moodle with the EJSApp activity will automatically set its language to the one selected by the user in Moodle, if possible. This activity supports configuring conditional access restrictions.
+Javascript applications will be embedded into the Moodle courses and the Java applets will be launched as desktop applications, using the JNLP protocol. If the EjsS application was compiled using the "Add language facilities" option in EjsS, the lab embedded into Moodle with the EJSApp activity will automatically set its language to the one selected by the user in Moodle, if possible.
 
-When used along with the EJSApp File Browser block, students can save the state of the EJS applet, when it is running, by just right-clicking on it and selecting the proper option in the menu. The information of these states is saved into an .xml (for Java) or .json (for Javascript) file which is stored in the private files area (EJSApp File Browser). These states can be recovered by an EJS applet in two different ways: clicking on the .xml or .json files in the EJSApp File Browser block or right-clicking on the EJS applet and selecting the proper option in the menu. If the EJS applet is prepared to do so, it can also save text or image files and store them in the private files area.
+When used along with the EJSApp File Browser block, and if the applications have been prepared in EjsS for this purpose, students can save the state of the EjsS application, as well as text or image files. The information of the states is saved into a .json file which is stored in the EJSApp File Browser block. These states can be recovered by an EjsS application clicking on the .json files in the EJSApp File Browser block.
 
-When used along with the EJSApp Collab Sessions block, Moodle users can work with the same EJS applet in a synchronous way, meaning the applet will show the same state for all the users in the collaborative session. Thanks to this block, users can create sessions, invite other users and work together with the same EJSApp activity.';
+When used along with the EJSApp Collab Sessions block, Moodle users can work with the same EjsS application in a synchronous way, meaning the application will show the same state for all the users in the collaborative session. Thanks to this block, users can create sessions, invite other users and work together with the same EJSApp activity.
+
+When used along with the Remlab Manager block, the EJSApp activities that consist on remote labs can benefit from the numerous management options featured by such block.
+
+When used along with the EJSApp Booking System activity, experimentation sessions with the EJSApp activities that consist of remote labs are scheduled from this module.';
 $string['ejsappfieldset'] = 'Custom example fieldset';
 $string['ejsappname'] = 'Lab name';
 $string['ejsappname_help'] = 'Name that will appear in the course for this laboratory';
@@ -59,66 +63,46 @@ $string['controller_fail_msg'] = 'Error while trying to load the controller';
 $string['recording_load_msg'] = 'A recording with this lab is going to be run';
 $string['recording_fail_msg'] = 'Error while trying to run the recording';
 
-$string['more_text'] = 'Optional text after the EJsS lab';
+$string['more_text'] = 'Optional text after the EjsS lab';
 
-$string['jar_file'] = '.jar or .zip file that encapsulates the  EJsS lab';
+$string['jar_file'] = '.jar or .zip file that encapsulates the  EjsS lab';
 
 $string['appletfile'] = 'Easy Java(script) Simulation';
 $string['appletfile_required'] = 'A .jar or a .zip file must be selected';
-$string['appletfile_help'] = 'Select the .jar or .zip file that encapsulates the Easy Java(script) Simulation (EJsS) application. The official website of EJsS is http://fem.um.es/Ejs/';
+$string['appletfile_help'] = 'Select the .jar or .zip file that encapsulates the Easy Java/Javascript Simulations (EjsS) application. The official website of EjsS is http://fem.um.es/Ejs/';
 
 $string['appwording'] = 'Wording';
-
-$string['applet_display'] = 'Display options for a Java application';
-
-$string['applet_size_conf'] = 'Size the applet';
-$string['applet_size_conf_help'] = 'Three options: 1) "Preserve original size" will preserve the original size of the EJS applet, 2) "Let Moodle set the size" will resize the applet to take up all the possible space while mantaining the original aspect ratio, 3) "Let the user set the size" will let the user to set the size of the applet and select whether to preserve its original aspect ratio or not.';
-$string['preserve_applet_size'] = 'Preserve original size';
-$string['moodle_resize'] = 'Let Moodle set the size';
-$string['user_resize'] = 'Let the user set the size';
-
-$string['preserve_aspect_ratio'] = 'Preserve aspect ratio';
-$string['preserve_aspect_ratio_help'] = 'If this option is selected, the original aspect ratio of the applet will be respected. In this case, the user will be able to modify the width of the applet and the system will automatically adjust its height. If this option is set to "no", the user will be able to set both the width and the height of the applet.';
-
-$string['custom_width'] = 'Applet width (px)';
-$string['custom_width_required'] = 'WARNING: Applet width was not set. You must provide a different value.';
-
-$string['custom_height'] = 'Applet height (px)';
-$string['custom_height_required'] = 'WARNING: Applet height was not set. You must provide a different value.';
-
-$string['applet'] = 'Embed application in the web browser?';
-$string['applet_help'] = 'Select \'yes\' to run this application embedded in the web browser as an applet; \'no\' to launch it as a Java Web Start application';
 
 $string['css_style'] = 'CSS stylesheet for a Javascript application';
 
 $string['css_rules'] = 'Create your own css rules to change the visual aspect of the javascript application';
 $string['css_rules_help'] = 'Important! Write each selector and the beginning of its declaration (the opening curly bracket) in the same line.';
 
-$string['state_file'] = '.xml or .json file with the state to be read when this EJsS lab loads';
+$string['state_file'] = '.xml or .json file with the state to be read when this EJjS lab loads';
 
 $string['statefile'] = 'Easy Java(script) Simulation State';
 $string['statefile_help'] = 'Select the .xml (for Java) or .json (for Javascript) file with the state the EJsS application should load.';
 
-$string['controller_file'] = '.cnt file with the controller to be load when the EJS is initialized';
+$string['controller_file'] = '.cnt file with the controller to be load when the EjsS application is initialized';
 
 $string['controllerfile'] = 'Easy Java(script) Simulation Controller';
 $string['controllerfile_help'] = 'Select the .cnt file with the code of the controller to be load when the the EJS application is initialized.';
 
-$string['recording_file'] = '.rec file with the recording to be run when this EJS lab loads';
+$string['recording_file'] = '.rec file with the recording to be run when this EjsS lab loads';
 
 $string['recordingfile'] = 'Easy Java(script) Simulations Recording';
-$string['recordingfile_help'] = 'Select the .rec file with the interaction recording the EJS application should run.';
+$string['recordingfile_help'] = 'Select the .rec file with the interaction recording the EjsS application should run.';
 
-$string['personalize_vars'] = 'Personalize variables of the EJS lab';
+$string['personalize_vars'] = 'Personalize variables of the EjsS lab';
 
 $string['use_personalized_vars'] = 'Personalize variables for each user?';
-$string['use_personalized_vars_help'] = 'Select yes if you know the name of some of the variables in the EJS model and you want them to adquire different values for each of the users accessing this application.';
+$string['use_personalized_vars_help'] = 'Select yes if you know the name of some of the variables in the EjsS model and you want them to adquire different values for each of the users accessing this application.';
 
 $string['var_name'] = 'Name {no}';
-$string['var_name_help'] = 'Name of the variable in the EJS model.';
+$string['var_name_help'] = 'Name of the variable in the EjsS model.';
 
 $string['var_type'] = 'Type {no}';
-$string['var_type_help'] = 'Type of the variable in the EJS model.';
+$string['var_type_help'] = 'Type of the variable in the EjsS model.';
 
 $string['min_value'] = 'Minimum value {no}';
 $string['min_value_help'] = 'Minimum value allowed for the variable.';
@@ -159,7 +143,7 @@ $string['practiceintro_required'] = 'WARNING: If you want to configure this acti
 
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
-$string['EJS_version'] = "WARNING: The applet file was not generated with EJS 4.37 (build 121201), or higher. Recompile it with a newer version of EJS.";
+$string['EJS_version'] = "WARNING: The applet file was not generated with EjsS 4.37 (build 121201), or higher. Recompile it with a newer version of EjsS.";
 $string['EJS_codebase'] = "WARNING: The manifest in the applet you uploaded does not specified this Moodle server in the 'codebase' parameter, so it has not been signed.";
 
 $string['inactive_lab'] = 'The remote lab is inactive at this moment.';

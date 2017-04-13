@@ -30,15 +30,21 @@
 
 define(['jquery'], function($) {
     var t = {
-        SarlabWebSocket : function(host, IP, port, user, password, idExp) {
+        SarlabWebSocket : function(host, IP, port, idEx, expTime, puser, password) {
             ws = new WebSocket("ws://127.0.0.1:8887");
 
             ws.onopen = function()
             {
                 // Web Socket is connected, send data using send()
                 ws.send("Message to send \r\n");
-                var val='sarlab:'+IP+':'+port+':'+user+':'+password+':'+idExp;
-                ws.send(val);
+                var obj = '{'
+                    +'"ip_server" : ' + IP + ','
+                    +'"port_server"  : ' + port + ','
+                    +'"id_exp" : ' + idExp + ','
+                    +'"expiration_time" : ' + expTime + ','
+                    +'"user" : ' + user + ','
+                    +'"password"  : ' + password
+                    +'}';
                 console.log("Connected to Sarlab experience: "+idExp);
             };
 
@@ -50,7 +56,7 @@ define(['jquery'], function($) {
 
             ws.onerror = function()
             {
-                if (ws.readyState == 1 || ws.readyState == 2) ws.send("exit");
+                if (ws.readyState === 1 || ws.readyState === 2) ws.send("exit");
                 alert("You need to download, install and/or run the Sarlab service");
                 var a = document.createElement("a");
                 a.download = "installsarlabservice.zip";
@@ -69,9 +75,16 @@ define(['jquery'], function($) {
             };
         },
 
-        connectExperience : function(IP, port, user, password, idExp){
-            var val='sarlab:'+IP+':'+port+':'+user+':'+password+':'+idExp;
-            ws.send(val);
+        connectExperience : function(IP, port, idExp, expTime, user, password){
+            var obj = '{'
+             +'"ip_server" : ' + IP + ','
+             +'"port_server"  : ' + port + ','
+             +'"id_exp" : ' + idExp + ','
+             +'"expiration_time" : ' + expTime + ','
+             +'"user" : ' + user + ','
+             +'"password"  : ' + password
+             +'}';
+            ws.send(obj);
         },
 
         stopExperience : function(){
