@@ -351,7 +351,19 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $user_data_files, $collab
                                 <argument>-language</argument>
                                 <argument>$language</argument>
                                 <argument>-lookandfeel</argument>
-                                <argument>NIMBUS</argument>";
+                                <argument>NIMBUS</argument>
+                                <argument>-context_id</argument>
+                                <argument>{$context->id}</argument>
+                                <argument>-user_id</argument>
+                                <argument>{$USER->id}</argument>
+                                <argument>-ejsapp_id</argument>
+                                <argument>{$ejsapp->id}</argument>
+                                <argument>-user_moodle</argument>
+                                <argument>user</argument>
+                                <argument>-password_moodle</argument>
+                                <argument>password</argument>
+                                <argument>-moodle_upload_file</argument>
+                                <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file</argument>";
         if ($sarlabinfo) {
             $content .=         "<argument>-ipserver</argument>
                                 <argument>$sarlab_IP</argument>

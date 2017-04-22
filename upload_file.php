@@ -46,19 +46,7 @@ $original_file_name = null;
 if ($_FILES['user_file']['name'] != null) { //receiving from EJS (java client)
     $method = true;
     $original_file_name = $_FILES['user_file']['name'];
-    $safe_file = replace_characters($original_file_name);
-    // user_file has the following format:
-    // filename_context_id_879_user_id_5_ejsapp_id_87.extension
-    // Get file_name, context_id,  ejsapp_id and file_extension
-    $extension = pathinfo($safe_file, PATHINFO_EXTENSION);
-    preg_match('/(.+)_context_id_/', $safe_file, $match);
-    $file_name = $match[1] . $extension;
-    preg_match('/_context_id_(\d+)/', $safe_file, $match);
-    $context_id = $match[1];
-    preg_match('/_user_id_(\d+)/', $safe_file, $match);
-    $user_id = $match[1];
-    preg_match('/_ejsapp_id_(\d+)/', $safe_file, $match);
-    $ejsapp_id = $match[1];
+    $file_name = replace_characters($original_file_name);
 } else { //receiving from EjsS (javascript client)
     $method = false;
     $original_file_name = $_POST['user_file'];
@@ -70,26 +58,11 @@ if ($_FILES['user_file']['name'] != null) { //receiving from EJS (java client)
         if ($_POST['type'] == 'png') $extension = '.png';
         $file_name = $file_name . $extension;
     }
-    $context_id = $_POST['context_id'];
-    $user_id = $_POST['user_id'];
-    $ejsapp_id = $_POST['ejsapp_id'];
 }
 
-// To avoid problems with the file names
-function replace_characters($original_file_name) {
-    $aux_array = explode('/', $original_file_name);
-    $safe_file = $aux_array[count($aux_array) - 1];
-    $safe_file = str_replace(" ", "_", $safe_file);
-    $safe_file = str_replace("#", "", $safe_file);
-    $safe_file = str_replace("$", "Dollar", $safe_file);
-    $safe_file = str_replace("%", "Percent", $safe_file);
-    $safe_file = str_replace("^", "", $safe_file);
-    $safe_file = str_replace("&", "", $safe_file);
-    $safe_file = str_replace("*", "", $safe_file);
-    $safe_file = str_replace("?", "", $safe_file);
-
-    return $safe_file;
-}
+$context_id = $_POST['context_id'];
+$user_id = $_POST['user_id'];
+$ejsapp_id = $_POST['ejsapp_id'];
 
 // <upload the file to a temporal folder>
 if ($method) { // from EJS
@@ -148,3 +121,19 @@ if ($method) { // from EJS
     }
 }
 // </store the file in the user repository>
+
+// To avoid problems with the file names
+function replace_characters($original_file_name) {
+    $aux_array = explode('/', $original_file_name);
+    $safe_file = $aux_array[count($aux_array) - 1];
+    $safe_file = str_replace(" ", "_", $safe_file);
+    $safe_file = str_replace("#", "", $safe_file);
+    $safe_file = str_replace("$", "Dollar", $safe_file);
+    $safe_file = str_replace("%", "Percent", $safe_file);
+    $safe_file = str_replace("^", "", $safe_file);
+    $safe_file = str_replace("&", "", $safe_file);
+    $safe_file = str_replace("*", "", $safe_file);
+    $safe_file = str_replace("?", "", $safe_file);
+
+    return $safe_file;
+}
