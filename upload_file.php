@@ -53,6 +53,8 @@ if ($_FILES['user_file']['name'] != null) { //receiving from EJS (java client)
     $file_name = replace_characters($original_file_name);
     $extension = pathinfo($file_name, PATHINFO_EXTENSION);
     if (!$extension) {
+        if ($_POST['type'] == 'blk') $extension = '.blk';
+        if ($_POST['type'] == 'rec') $extension = '.rec';
         if ($_POST['type'] == 'json') $extension = '.json';
         if ($_POST['type'] == 'txt') $extension = '.txt';
         if ($_POST['type'] == 'png') $extension = '.png';

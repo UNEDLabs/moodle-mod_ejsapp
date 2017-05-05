@@ -180,10 +180,10 @@ myInterpreter = null;
     }
 
 // Save a program in blockly
-var saveCode = function (context_id, user_id, ejsapp_id) {
+var saveCode = function () {
     var xmlDom = Blockly.Xml.workspaceToDom(workspace);
     var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
-    _model.saveText('blocks_context_id_' + context_id + '_user_id_' + user_id + '_ejsapp_id_' + ejsapp_id, 'blk', xmlText);
+    _model.saveText('blocks_diagram', 'blk', xmlText);
 };
 
 // Load a program in blockly

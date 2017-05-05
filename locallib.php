@@ -131,7 +131,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     if (file_exists($path)) { // updating, not creating, the ejsapp activity
         delete_recursively($path);
     }
-    mkdir($path, 0770);
+    mkdir($path, 0755);
 
     // Copy the jar/zip file to its destination folder in jarfiles
     $filepath = $path . $file_record->filename;

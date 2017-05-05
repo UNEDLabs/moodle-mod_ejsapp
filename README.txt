@@ -1,6 +1,6 @@
-##############
-# EJSApp 2.4 #
-##############
+##########
+# EJSApp #
+##########
 
 https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp
 DOI: 10.5281/zenodo.33845
@@ -33,8 +33,6 @@ from Moodle.org, then you are fine.
 
 This is a module plugin for Moodle so you should place the ejsapp folder in your /mod folder,inside your Moodle
 installation directory.
-
-This module has been tested in Moodle 2.7, 2.8 and 2.9.
 
 This module enhances its functionality when used along with the ejsappbooking module and/or the ejsapp_file_browser,
 the ejsapp_collab_session blocks and the osp repository plugin. You can find and download them at
