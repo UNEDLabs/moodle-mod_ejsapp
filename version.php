@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,30 +11,29 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
-
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  * Version file for the ejsapp module
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017041300;         // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 2017060200;         // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2013111800;
-$plugin->cron     = 3600;               // Period for cron to check this module (secs)
-$plugin->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place
+$plugin->cron     = 3600;               // Period for cron to check this module (secs).
+$plugin->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.0 (Build: 2017041300)';
+$plugin->release = '3.0 (Build: 2017060200)';

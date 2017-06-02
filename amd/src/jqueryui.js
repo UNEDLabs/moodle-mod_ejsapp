@@ -13,11 +13,11 @@
 // The GNU General Public License is available on <http://www.gnu.org/licenses/>
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain
 
 /**
  * jQuery UI options for making elements draggable.
@@ -28,13 +28,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'jqueryui'], function($, jqui) {
+define(['jquery', 'jqueryui'], function($) {
     var t = {
         init : function() {
             $("#blocklyDiv")
                 .draggable({
                     containment: $("div[role='main']")
-                })
+                });
         }
     };
     return t;

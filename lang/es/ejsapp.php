@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,21 +11,20 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
-
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  * Spanish strings for ejsapp
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -154,7 +152,7 @@ $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de 
 
 $string['personal_vars_button'] = 'Ver variables personalizadas';
 
-//lib.php
+// Strings in lib.php.
 $string['mail_subject_lab_not_checkable'] = 'Alerta de Estado de Laboratorio no Verificable';
 $string['mail_content1_lab_not_checkable'] = 'El estado de uno de tus laboratorios remotos (';
 $string['mail_content2_lab_not_checkable'] = ' - IP: ';
@@ -171,7 +169,7 @@ $string['mail_content1_lab_up'] = 'Uno de tus laboratorios remotos previamente i
 $string['mail_content2_lab_up'] = ' - IP: ';
 $string['mail_content3_lab_up'] = ') vuelve a estar operativo.';
 
-//personalized_vars_values.php
+// Strings in personalized_vars_values.php.
 $string['personalVars_pageTitle'] = 'Valores de las variables personalizadas';
 $string['users_ejsapp_selection'] = 'Seleccione los usuarios y la actividad EJSApp';
 $string['ejsapp_activity_selection'] = 'Selecci&oacute;n de la actividad EJSApp';
@@ -182,17 +180,17 @@ $string['export_this_data'] = 'Exportar datos para esta actividad EJSApp';
 $string['no_ejsapps'] = 'La actividad EJSApp seleccionada no tiene variables personalizadas';
 $string['personalized_values'] = 'valores_personalizdos_';
 
-//kick_out.php
+// Strings in kick_out.php.
 $string['time_is_up'] = 'Se ha agotado su tiempo con el laboratorio remoto. Si desea seguir trabajando con &eacute;l, haga una nueva reserva y/o refresque esta p&aacute;gina.';
 
-//countdown.php
+// Strings in countdown.php.
 $string['seconds'] = 'segundos restantes.';
 $string['refresh'] = 'Pruebe a refrescar su ventana ahora.';
 
-//generate_embedding_code.php
+// Strings in generate_embedding_code.php.
 $string['end_message'] = 'Fin de la reproducci&oacute;n';
 
-//Blockly XML configuration file
+// Blockly XML configuration file.
 $string['xml_logic'] = 'Lógica';
 $string['xml_loops'] = 'Bucles';
 $string['xml_maths'] = 'Matemáticas';
@@ -202,22 +200,22 @@ $string['xml_variables'] = 'Variables';
 $string['xml_functions'] = 'Funciones';
 $string['xml_lab'] = 'Laboratorio';
 $string['xml_lab_variables'] = 'Variables';
-$string['xml_lab_functions'] ='Ejecución';
-$string['xml_lab_control'] ='Control';
-$string['xml_lab_var_boolean'] ='Booleanas';
-$string['xml_lab_var_string'] ='Textos';
-$string['xml_lab_var_number'] ='Númericas';
-$string['xml_lab_var_others'] ='Otras';
+$string['xml_lab_functions'] = 'Ejecución';
+$string['xml_lab_control'] = 'Control';
+$string['xml_lab_var_boolean'] = 'Booleanas';
+$string['xml_lab_var_string'] = 'Textos';
+$string['xml_lab_var_number'] = 'Númericas';
+$string['xml_lab_var_others'] = 'Otras';
 $string['blocklyfile'] = 'Bloques iniciales';
 $string['blocklyfile_help'] = 'Puede seleccionar un fichero .blk que especifique los bloques que deben mostrarse inicialmente en Blockly.';
 
-//Capabilities
+// Capabilities.
 $string['ejsapp:accessremotelabs'] = "Acceso a todos los laboratorios remotos";
 $string['ejsapp:addinstance'] = "Añadir una nueva actividad EJSApp";
 $string['ejsapp:view'] = "Ver una actividad EJSApp";
 $string['ejsapp:requestinformation'] = "Pedir informaci&oacute;n para plugins de terceros";
 
-//Events
+// Events.
 $string['event_viewed'] = "EJSApp activity viewed";
 $string['event_working'] = "Working with the EJSApp activity";
 $string['event_wait'] = "Waiting for the lab to be free";
@@ -226,7 +224,7 @@ $string['event_collab'] = "Working with the EJSApp activity in collaborative mod
 $string['event_inactive'] = "Lab is inactive";
 $string['event_booked'] = "Lab is booked in a different course";
 
-//Settings
+// Settings.
 $string['default_general_set'] = "Opciones generales";
 $string['check_activity'] = "Comprobar actividad";
 $string['check_activity_description'] = "Con que frecuencia se comprueba la actividad de los usuarios en EJSApp (s)";

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,22 +11,22 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  * Capability definitions for the ejsapp module
  *
  * The variable name for the capability definitions array is $capabilities
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -48,7 +47,7 @@ $capabilities = array(
         ),
     ),
 
-    // capability for accessing remote labs
+    // Capability for accessing remote labs.
     'mod/ejsapp:accessremotelabs' => array(
         'riskbitmask' => RISK_XSS,
         'captype' => 'read',
@@ -71,7 +70,7 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
 
-    // capability for requesting information about ejsapp activities from third-party plugins
+    // Capability for requesting information about ejsapp activities from third-party plugins.
     'mod/ejsapp:requestinformation' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,

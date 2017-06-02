@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,76 +11,76 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
-
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
+ * Authentication and privileges verification between Moodle and Sarlab.
  *
  * Receives an encrypted username and password from Sarlab and checks whether that user exists in Moodle
  * and has, at least, a teacher role in, at least, one course.
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ('../../config.php');
+require_once('../../config.php');
 
 global $DB, $CFG;
 
-//Receive encrypted username and password
+// Receive encrypted username and password.
 $username = $_GET["username"];
 $password = $_GET["password"];
 
-//rawurldecode must be used due to problems with symbols like + or = when obtained via GET
+// Function rawurldecode must be used due to problems with symbols like + or = when obtained via GET.
 $username = rawurldecode($username);
 $password = rawurldecode($password);
 
-//Decrypt username and password
+// Decrypt username and password.
 $encryption = new MCrypt();
 $username = $encryption->decrypt($username);
 $password = $encryption->decrypt($password);
 
-//For testing purposes only:
-//echo $username . "<br/>";
-//echo $password;
+$listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
 
-$list_sarlab_IPs = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+foreach ($listsarlabips as $sarlabip) {
 
-foreach ($list_sarlab_IPs as $list_sarlab_IP) {
+    $ip = substr($sarlabip, strrpos($sarlabip, "'") + 1);
 
-    $ip = substr($list_sarlab_IP,strrpos($list_sarlab_IP,"'")+1);
-
-    if ($_SERVER['REMOTE_ADDR'] == $ip) { //Allow connections only from a registered Sarlab server
+    if ($_SERVER['REMOTE_ADDR'] == $ip) { // Allow connections only from a registered Sarlab server.
 
         if ( isset($username) && !empty($username) && isset($password) && !empty($password) ) {
 
             $user = authenticate_user_login($username, $password);
 
-            if ($user != false) { //Only users registered in Moodle are allowed
-                if ($user->id == 2) { //admin user
+            if ($user != false) { // Only users registered in Moodle are allowed.
+                if ($user->id == 2) { // If admin user.
                     echo "access=true\n";
                 } else {
-                    $grant_access = false;
-                    $roles_assig = $DB->get_records('role_assignments', array('userid' => $user->id));
-                    foreach ($roles_assig as $role_assig) {
-                        if ($role_assig->roleid <= 3) { //user is teacher in, at least, one course
+                    $access = false;
+                    $roles = $DB->get_records('role_assignments', array('userid' => $user->id));
+                    foreach ($roles as $role) {
+                        if ($role->roleid <= 3) { // User is teacher in, at least, one course.
                             echo "access=true\n";
-                            $grant_access = true;
+                            $access = true;
                             break;
                         }
                     }
-                    if (!$grant_access) echo "access=false\n"; //otherwise, we don't let him in
+                    if (!$access) {
+                        echo "access=false\n";
+                    } // Otherwise, we don't let him in.
                 }
-            } else echo "access=false\n";
+            } else {
+                echo "access=false\n";
+            }
 
         }
 
@@ -91,28 +90,49 @@ foreach ($list_sarlab_IPs as $list_sarlab_IP) {
 
 }
 
+/**
+ * Class for encryption
+ *
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class MCrypt {
 
-    private $iv = '0000000000000000'; //It doesn't affect to the ECB encryption method
-    private $key; //Same as in the JAVA code on the corresponding Sarlab server
+    /** @var string It doesn't affect to the ECB encryption method */
+    private $iv = '0000000000000000';
+    /** @var string  Same as in the JAVA code on the corresponding Sarlab server */
+    private $key;
 
-
-    function __construct() {
-        //Retrieve the key from the configuration of the ejsapp plugin:
+    /**
+     * Constructor
+     *
+     */
+    public function __construct() {
+        // Retrieve the key from the configuration of the ejsapp plugin.
         $this->key = get_config('block_remlab_manager', 'sarlab_enc_key');
-        if ($this->key == null) echo "WARNING: The encryption key has not been configured in the EJSApp plugin. Edit the settings of the EJSApp plugin to fix this.";
-        elseif (strlen($this->key) != 16) echo "WARNING: An encryption key has been found but it does not have the required number of characters! Edit the settings of the EJSApp plugin to fix this.";
-        //$this->key = "3?hZ=9%1VfMbl5_I"; //16 characters long key example
+        if ($this->key == null) {
+            echo "WARNING: The encryption key has not been configured in the EJSApp plugin. Edit the settings of the
+             EJSApp plugin to fix this.";
+        } else if (strlen($this->key) != 16) {
+            echo "WARNING: An encryption key has been found but it does not have the required number of characters!
+             Edit the settings of the EJSApp plugin to fix this.";
+        }
     }
 
-    function encrypt($str) {
+    /**
+     * Encrypts a string
+     *
+     * @param string $str
+     * @return string
+     */
+    public function encrypt($str) {
         $iv = $this->iv;
 
         $td = mcrypt_module_open('rijndael-128', '', 'ecb', '');
 
         mcrypt_generic_init($td, $this->key, $iv);
-        $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
-        $padding = $blockSize - (strlen($str) % $blockSize);
+        $blocksize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
+        $padding = $blocksize - (strlen($str) % $blocksize);
         $str .= str_repeat(chr($padding), $padding);
         $encrypted = mcrypt_generic($td, $str);
 
@@ -121,7 +141,13 @@ class MCrypt {
         return base64_encode($encrypted);
     }
 
-    function decrypt($code) {
+    /**
+     * Decrypts a string
+     *
+     * @param string $code
+     * @return string
+     */
+    public function decrypt($code) {
         $code = base64_decode($code);
 
         $iv = $this->iv;
@@ -131,7 +157,9 @@ class MCrypt {
         mcrypt_generic_init($td, $this->key, $iv);
         if (function_exists('mdecrypt_generic')) {
             $decrypted = mdecrypt_generic($td, $code);
-        } else echo "mcrypt not installed in your system"; //can happen in unix systems?
+        } else {
+            echo "mcrypt not installed in your system";
+        } // Can happen in unix systems?
 
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,21 +11,21 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  *
  * Ajax update for the EJSApp view.php when a user needs to wait for a remote lab to be available
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
@@ -39,28 +38,28 @@ require_login(0, false);
 
 $ejsappid = required_param('ejsappid', 'int');
 $courseid = required_param('courseid', 'int');
-$check_activity = required_param('check_activity', 'int');
-$remaining_time = required_param('remaining_time', 'int');
+$check = required_param('check_activity', 'int');
+$remainingtime = required_param('remaining_time', 'int');
 
 global $PAGE, $DB;
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/countdown.php');
 
-if ($remaining_time > 0) {
-    $slotsduration = array(60, 30,15, 5, 2);
+if ($remainingtime > 0) {
+    $slotsduration = array(60, 30, 15, 5, 2);
     $currenttime = time();
     $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
     $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsappid));
-    $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
-    $idle_time = $remlab_conf->reboottime;
-    $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf);
-    $time_information = get_occupied_ejsapp_time_information($repeated_ejsapp_labs, $slotsduration, $currenttime);
-    $lab_status = get_lab_status($time_information, $idle_time, $check_activity);
-    $repeated_ejsapp_labs = get_repeated_remlabs($remlab_conf);
-    $booking_info = check_active_booking($repeated_ejsapp_labs, $courseid);
-    $remaining_time = get_remaining_time($booking_info, $lab_status, $time_information, $idle_time, $check_activity);
-    echo $remaining_time . ' ' . get_string('seconds', 'ejsapp');
+    $remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
+    $idletime = $remlabconf->reboottime;
+    $repeatedlabs = get_repeated_remlabs($remlabconf);
+    $timeinfo = get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $currenttime);
+    $labstatus = get_lab_status($timeinfo, $idletime, $check);
+    $repeatedlabs = get_repeated_remlabs($remlabconf);
+    $bookinginfo = check_active_booking($repeatedlabs, $courseid);
+    $remainingtime = get_remaining_time($bookinginfo, $labstatus, $timeinfo, $idletime, $check);
+    echo $remainingtime . ' ' . get_string('seconds', 'ejsapp');
 } else {
     echo get_string('refresh', 'ejsapp');
 }

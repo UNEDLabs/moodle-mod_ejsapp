@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,48 +11,55 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  * Tasks file to perform the EJSApp backup
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 /**
  * Structure step to restore one EJSApp activity
+ *
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_ejsapp_activity_structure_step extends restore_activity_structure_step
-{
+class restore_ejsapp_activity_structure_step extends restore_activity_structure_step {
     /**
      * Define structure
      */
-    protected function define_structure()
-    {
+    protected function define_structure() {
         $paths = array();
         $paths[] = new restore_path_element('ejsapp', '/activity/ejsapp');
-        $paths[] = new restore_path_element('ejsapp_personal_vars', '/activity/ejsapp/ejsapp_personal_vars');
-        $paths[] = new restore_path_element('remlab_manager_exp2prc', '/activity/ejsapp/remlab_manager_exp2practs/block_remlab_manager_exp2prc');
+        $paths[] = new restore_path_element('ejsapp_personal_vars',
+            '/activity/ejsapp/ejsapp_personal_vars');
+        $paths[] = new restore_path_element('remlab_manager_exp2prc',
+            '/activity/ejsapp/remlab_manager_exp2practs/block_remlab_manager_exp2prc');
         $paths[] = new restore_path_element('ejsappbooking', '/activity/ejsapp/ejsappbookings/ejsappbooking');
 
         $userinfo = $this->get_setting_value('userinfo');
-        if ($userinfo){
-            //$paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');
-            $paths[] = new restore_path_element('ejsappbooking_usersaccess', '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
-            $paths[] = new restore_path_element('ejsappbooking_remlab_access', '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
+        if ($userinfo) {
+            // $paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');.
+            $paths[] = new restore_path_element('ejsappbooking_usersaccess',
+                '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
+            $paths[] = new restore_path_element('ejsappbooking_remlab_access',
+                '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -61,8 +67,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
      * Process table ejsapp
      * @param stdClass $data
      */
-    protected function process_ejsapp($data)
-    {
+    protected function process_ejsapp($data) {
         global $DB, $CFG;
 
         $data = (object)$data;
@@ -70,139 +75,143 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         $data->course = $this->get_courseid();
 
-        // insert the ejsapp record
+        // Insert the ejsapp record.
         $newitemid = $DB->insert_record('ejsapp', $data);
 
-        // immediately after inserting "activity" record, call this
+        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
 
-        // copy files
-        if (!empty($data->class_file)) { //JAR applet
+        // Copy files.
+        if (!empty($data->class_file)) { // JAR applet.
             $ext = '.jar';
-            if (pathinfo($data->applet_name, PATHINFO_EXTENSION) == 'jar') $ext = '';
+            if (pathinfo($data->applet_name, PATHINFO_EXTENSION) == 'jar') {
+                $ext = '';
+            }
             $name = $data->applet_name . $ext;
-            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and itemid = {$data->id} and filename = '{$name}'";
-        } else { //Zip file with Javascript
-            $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->applet_name);
-            $without_Simulation = substr($withoutExt, 0, strrpos($withoutExt, '_Simulation'));
-            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and itemid = {$data->id} and filename like '%$without_Simulation%'";
+            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
+itemid = {$data->id} and filename = '{$name}'";
+        } else { // Zip file with Javascript.
+            $withoutextension = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->applet_name);
+            $withoutsimulation = substr($withoutextension, 0, strrpos($withoutextension, '_Simulation'));
+            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
+itemid = {$data->id} and filename like '%$withoutsimulation%'";
         }
-        $file_record = $DB->get_record_sql($sql);
-        if ($file_record) {
+        $filerecord = $DB->get_record_sql($sql);
+        if ($filerecord) {
             $fs = get_file_storage();
             $fileinfo = array(
-                'contextid' => $file_record->contextid, // ID of context
-                'component' => 'mod_ejsapp',            // usually = table name
-                'filearea' => 'jarfiles',               // usually = table name
-                'itemid' => $file_record->itemid,       // usually = ID of row in table
-                'filepath' => '/',                      // any path beginning and ending in /
-                'filename' => $file_record->filename);  // any filename
+                'contextid' => $filerecord->contextid,  // ID of context.
+                'component' => 'mod_ejsapp',            // Usually = table name.
+                'filearea' => 'jarfiles',               // Usually = table name.
+                'itemid' => $filerecord->itemid,        // Usually = ID of row in table.
+                'filepath' => '/',                      // Any path beginning and ending in /.
+                'filename' => $filerecord->filename);   // Any filename.
             $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'],
                 $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'],
                 $fileinfo['filename']);
             if ($file) {
-                // create directories
+                // Create directories.
                 $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
-                if (!file_exists($path)) mkdir($path, 0700);
+                if (!file_exists($path)) {
+                    mkdir($path, 0700);
+                }
                 $path .= $data->course . '/';
-                if (!file_exists($path)) mkdir($path, 0700);
+                if (!file_exists($path)) {
+                    mkdir($path, 0700);
+                }
                 $path .= $newitemid;
-                if (!file_exists($path)) mkdir($path, 0700);
+                if (!file_exists($path)) {
+                    mkdir($path, 0700);
+                }
 
                 $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
 
-                // copy file .jar or .zip file
+                // Copy file .jar or .zip file.
                 $folderpath = $CFG->dirroot . $codebase;
-                $filepath = $folderpath . $file_record->filename;
+                $filepath = $folderpath . $filerecord->filename;
                 $file->copy_content_to($filepath);
-                if (empty($data->class_file)) { //Zip file with Javascript
+                if (empty($data->class_file)) { // Zip file with Javascript.
                     modifications_for_javascript($filepath, $data, $folderpath, $codebase);
                     unlink($filepath);
                 }
 
-                // codebase
-                $codebase_complete = '';
-                preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match_result);
-                if (!empty($match_result) and $match_result[1]) {
-                    $codebase_complete .= '/' . $match_result[1];
+                // Codebase.
+                $completecodebase = '';
+                preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match);
+                if (!empty($match) and $match[1]) {
+                    $completecodebase .= '/' . $match[1];
                 }
-                $codebase_complete .= $codebase;
+                $completecodebase .= $codebase;
 
-                // <update ejsapp table>
+                // Update ejsapp table.
                 $record = new stdClass();
                 $record->id = $newitemid;
-                $record->codebase = $codebase_complete;
+                $record->codebase = $completecodebase;
                 $DB->update_record('ejsapp', $record);
-            } //if ($file)
-        } //if ($file_record)
+            }
+        }
 
-        // mapping old_ejsapp_id->new_old_ejsapp_id for xml state_files
-        // (see after_execute)
+        // Mapping old_ejsapp_id->new_old_ejsapp_id for xml state_files (see after_execute).
         $this->set_mapping('ejsapp', $oldid, $newitemid, true);
-    }//process_ejsapp
+    }
 
     /**
      * Process table ejsapp_personal_vars
      * @param stdClass $data
      */
-    protected function process_ejsapp_personal_vars($data)
-    {
+    protected function process_ejsapp_personal_vars($data) {
         global $DB;
 
         $data = (object)$data;
         $data->ejsappid = $this->get_new_parentid('ejsapp');
         $DB->insert_record('ejsapp_personal_vars', $data);
-    }//process_ejsapp_personal_vars
+    }
 
     /**
      * Process table ejsapp_log
      * @param stdClass $data
      */
-    protected function process_ejsapp_log($data)
-    {
+    protected function process_ejsapp_log($data) {
         global $DB;
 
         $data = (object)$data;
         $data->ejsappid = $this->get_new_parentid('ejsapp');
         $DB->insert_record('ejsapp_log', $data);
-    }//process_ejsapp_log
+    }
 
     /**
      * Process table process_remlab_manager_exp2prc
      * @param stdClass $data
      */
-    protected function process_remlab_manager_exp2prc($data)
-    {
+    protected function process_remlab_manager_exp2prc($data) {
         global $DB;
 
         $data = (object)$data;
         $data->ejsappid = $this->get_new_parentid('ejsapp');
         $DB->insert_record('block_remlab_manager_exp2prc', $data);
-    }//process_remlab_manager_exp2prc
+    }
 
     /**
      * Process table ejsappbooking
      * @param stdClass $data
      */
-    protected function process_ejsappbooking($data)
-    {
+    protected function process_ejsappbooking($data) {
         global $DB;
 
         $data = (object)$data;
         $data->course = $this->get_courseid();
-        $ejsappbooking_already_exists_in_course = $DB->get_records('ejsappbooking',array('course'=>$data->course));
-        $ejsappbooking_already_exists_in_course = !empty($ejsappbooking_already_exists_in_course);
-        if (!$ejsappbooking_already_exists_in_course) {
+        $ejsappbooking = $DB->get_records('ejsappbooking', array('course' => $data->course));
+        $ejsappbooking = !empty($ejsappbooking);
+        if (!$ejsappbooking) {
             $DB->insert_record('ejsappbooking', $data);
         }
-    }//process_ejsappbooking
+    }
 
     /**
      * Process table process_ejsappbooking_usersaccess
      * @param stdClass $data
      */
-    protected function process_ejsappbooking_usersaccess($data)
-    {
+    protected function process_ejsappbooking_usersaccess($data) {
         global $DB;
 
         $data = (object)$data;
@@ -210,32 +219,30 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $data->bookingid = $this->get_mappingid('ejsappbooking', $data->bookingid);
         $data->userid = $this->get_mappingid('user', $data->userid);
         $DB->insert_record('ejsappbooking_usersaccess', $data);
-    }//process_ejsappbooking_usersaccess
+    }
 
     /**
      * Process table process_ejsappbooking_remlab_access
      * @param stdClass $data
      */
-    protected function process_ejsappbooking_remlab_access($data)
-    {
+    protected function process_ejsappbooking_remlab_access($data) {
         global $DB;
 
         $data = (object)$data;
-        // There is no necessity of mapping for "practiceid" nor "username"
+        // There is no necessity of mapping for "practiceid" nor "username".
         $data->ejsappid = $this->get_new_parentid('ejsapp');
         $DB->insert_record('ejsappbooking_remlab_access', $data);
-    }//process_ejsappbooking_remlab_access
+    }
 
     /**
      * Extract jarfiles to the ejsapp jar folder
      */
-    protected function after_execute()
-    {
-        // Add ejsapp related files, no need to match by itemname (just internally handled context)
+    protected function after_execute() {
+        // Add ejsapp related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'cntfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'recfiles', 'ejsapp');
-    } //after_execute
+    }
 
-} //class
+}

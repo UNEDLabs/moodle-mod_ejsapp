@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,21 +11,20 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  * Class for logging the collab work event of an EJSApp
  *
- * @package    mod
- * @subpackage ejsapp
- * @since      Moodle 2.7
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,19 +33,41 @@ namespace mod_ejsapp\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class for logging the collab work event of an EJSApp
+ *
+ * @package    mod_ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class course_module_collab extends \core\event\base {
+
+    /**
+     * Init function
+     */
     protected function init() {
-        $this->data['crud'] = 'r'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'ejsapp';
     }
 
+    /**
+     * Get event's name
+     *
+     * @return string
+     */
     public static function get_name() {
         return get_string('event_collab', 'ejsapp');
     }
 
+    /**
+     * Get event description
+     *
+     * @return string
+     */
     public function get_description() {
-        return "The user with id '{$this->userid}' accessed the EJSApp activity with id '{$this->objectid}' in collaborative mode.";
+        return "The user with id '{$this->userid}' accessed the EJSApp activity with id '{$this->objectid}'
+         in collaborative mode.";
     }
 
     /**
@@ -68,4 +88,5 @@ class course_module_collab extends \core\event\base {
         return array($this->courseid, 'ejsapp', 'collab_view', 'view.php?id=' . $this->objectid,
             $this->objectid, $this->contextinstanceid);
     }
-} 
+
+}

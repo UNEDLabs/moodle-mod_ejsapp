@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,20 +11,20 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
  * EJSApp settings form.
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,27 +36,27 @@ require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/filestorage/zip_packer.php');
 require_once('locallib.php');
 
-
 /**
  * Class that defines the EJSApp settings form.
+ *
+ * @package    mod_ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_ejsapp_mod_form extends moodleform_mod
-{
-
-
+class mod_ejsapp_mod_form extends moodleform_mod {
+    
     /**
      * Called from Moodle to define this form
      *
      * @return void
      */
-    function definition()
-    {
+    public function definition() {
         global $CFG, $DB;
         $mform = & $this->_form;
-        // -------------------------------------------------------------------------------
-        // Adding the "general" fieldset, where all the common settings are showed
+
+        // Adding the "general" fieldset, where all the common settings are showed.
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        // Adding the standard "name" field
+        // Adding the standard "name" field.
         $mform->addElement('text', 'name', get_string('ejsappname', 'ejsapp'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -65,13 +64,17 @@ class mod_ejsapp_mod_form extends moodleform_mod
             $mform->setType('name', PARAM_NOTAGS);
         }
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength',
+            255, 'client');
         $mform->addHelpButton('name', 'ejsappname', 'ejsapp');
-        // Adding the standard "intro" and "introformat" fields
-        if ($CFG->version < 2015051100) $this->add_intro_editor();
-        else $this->standard_intro_elements();
-        // -------------------------------------------------------------------------------
-        // Adding other ejsapp settings by adding more fieldsets
+        // Adding the standard "intro" and "introformat" fields.
+        if ($CFG->version < 2015051100) {
+            $this->add_intro_editor();
+        } else {
+            $this->standard_intro_elements();
+        }
+
+        // Adding other ejsapp settings by adding hidden fieldsets.
         $mform->addElement('header', 'conf_parameters', get_string('jar_file', 'ejsapp'));
 
         $mform->addElement('hidden', 'class_file', null);
@@ -101,53 +104,57 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->addElement('hidden', 'remlab_manager', null);
         $mform->setType('remlab_manager', PARAM_INT);
 
+        // File picker.
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
-        $mform->addElement('filemanager', 'appletfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
+        $mform->addElement('filemanager', 'appletfile', get_string('file'), null, array('subdirs' => 0,
+            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
         $mform->addRule('appletfile', get_string('appletfile_required', 'ejsapp'), 'required');
         $mform->addHelpButton('appletfile', 'appletfile', 'ejsapp');
 
-        // -------------------------------------------------------------------------------
-        // More optional text to be shown after the lab
+        // More optional text to be shown after the lab.
         $mform->addElement('header', 'more_text', get_string('more_text', 'ejsapp'));
-
-        $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
+        $mform->addElement('editor', 'ejsappwording', get_string('appwording', 'ejsapp'), null,
+            array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'maxfiles' => -1, 'changeformat' => 1,
+                'context' => $this->context, 'noclean' => 1, 'trusttext' => 0));
         $mform->setType('appwording', PARAM_RAW);
-        // -------------------------------------------------------------------------------
-        // Optional Javascript CSS styles
+
+        // Optional Javascript CSS styles.
         $mform->addElement('header', 'css_style', get_string('css_style', 'ejsapp'));
-
-        $mform->addElement('textarea', 'css', get_string('css_rules', 'ejsapp'), 'wrap="virtual" rows="8" cols="50"');
+        $mform->addElement('textarea', 'css', get_string('css_rules', 'ejsapp'),
+            'wrap="virtual" rows="8" cols="50"');
         $mform->addHelpButton('css', 'css_rules', 'ejsapp');
-        // -------------------------------------------------------------------------------
-        // Adding an optional state file to be read when the lab loads
+
+        // Adding an optional state file to be read when the lab loads.
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
-
-        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/xml', 'application/json')));
+        $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0,
+            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/xml', 'application/json')));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
-        // -------------------------------------------------------------------------------
-        // Adding an optional text file with a controller code to be load when the lab is run
+
+        // Adding an optional text file with a controller code to be load when the lab is run.
         $mform->addElement('header', 'controller_file', get_string('controller_file', 'ejsapp'));
-
-        $mform->addElement('filemanager', 'controllerfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.cnt'));
+        $mform->addElement('filemanager', 'controllerfile', get_string('file'), null, array('subdirs' => 0,
+            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.cnt'));
         $mform->addHelpButton('controllerfile', 'controllerfile', 'ejsapp');
-        // -------------------------------------------------------------------------------
-        // Adding an optional text file with a recording to automatically run it when the lab loads
+
+        // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('header', 'recording_file', get_string('recording_file', 'ejsapp'));
-
-        $mform->addElement('filemanager', 'recordingfile', get_string('file'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.rec'));
+        $mform->addElement('filemanager', 'recordingfile', get_string('file'), null, array('subdirs' => 0,
+            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.rec'));
         $mform->addHelpButton('recordingfile', 'recordingfile', 'ejsapp');
-        // -------------------------------------------------------------------------------
-        // Personalize variables from the EJS application
-        $mform->addElement('header', 'personalize_vars', get_string('personalize_vars', 'ejsapp'));
 
+        // Personalize variables from the EJS application.
+        $mform->addElement('header', 'personalize_vars', get_string('personalize_vars', 'ejsapp'));
         $mform->addElement('selectyesno', 'personalvars', get_string('use_personalized_vars', 'ejsapp'));
         $mform->addHelpButton('personalvars', 'use_personalized_vars', 'ejsapp');
 
         $varsarray = array();
         $varsarray[] = $mform->createElement('text', 'var_name', get_string('var_name', 'ejsapp'));
-        $varsarray[] = $mform->createElement('select', 'var_type', get_string('var_type', 'ejsapp'), array('Boolean', 'Integer', 'Double'));
-        $varsarray[] = $mform->createElement('text', 'min_value', get_string('min_value', 'ejsapp'), array('size' => '8'));
-        $varsarray[] = $mform->createElement('text', 'max_value', get_string('max_value', 'ejsapp'), array('size' => '8'));
+        $varsarray[] = $mform->createElement('select', 'var_type', get_string('var_type', 'ejsapp'),
+            array('Boolean', 'Integer', 'Double'));
+        $varsarray[] = $mform->createElement('text', 'min_value', get_string('min_value', 'ejsapp'),
+            array('size' => '8'));
+        $varsarray[] = $mform->createElement('text', 'max_value', get_string('max_value', 'ejsapp'),
+            array('size' => '8'));
 
         $repeateloptions = array();
         $repeateloptions['var_name']['disabledif'] = array('personalvars', 'eq', 0);
@@ -167,14 +174,15 @@ class mod_ejsapp_mod_form extends moodleform_mod
 
         $no = 2;
         if ($this->current->instance) {
-            if ($personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance))) {
-                $no = count($personal_vars);
+            if ($personalvars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance))) {
+                $no = count($personalvars);
             }
         }
 
-        $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats', 'option_add_vars', 2, null, true);
-        // -------------------------------------------------------------------------------
-        // Use and configuration of Blockly
+        $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats',
+            'option_add_vars', 2, null, true);
+
+        // Use and configuration of Blockly.
         $mform->addElement('header', 'blockly_config', get_string('blockly_config', 'ejsapp'));
 
         $mform->addElement('selectyesno', 'use_blockly', get_string('use_blockly', 'ejsapp'));
@@ -229,147 +237,166 @@ class mod_ejsapp_mod_form extends moodleform_mod
         $mform->disabledIf('display_lab_control', 'display_lab', 'eq', 0);
         $mform->setDefault('display_lab_control', 0);
 
-        // Adding an optional text file with a recording to automatically run it when the lab loads
-        $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'), null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
+        // Adding an optional text file with a recording to automatically run it when the lab loads.
+        $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
+            null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
         $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
         $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
-        // -------------------------------------------------------------------------------
-        // Adding elements to configure the remote lab, if that's the case
+
+        // Adding elements to configure the remote lab, if that's the case.
         $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
 
         $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
         $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');
-        $is_remlab_manager_installed = $DB->get_records('block', array('name'=>'remlab_manager'));
-        $is_remlab_manager_installed = !empty($is_remlab_manager_installed);
-        $mform->setDefault('remlab_manager', $is_remlab_manager_installed ? 1 : 0);
+        $remlabmanagerinstalled = $DB->get_records('block', array('name' => 'remlab_manager'));
+        $remlabmanagerinstalled = !empty($remlabmanagerinstalled);
+        $mform->setDefault('remlab_manager', $remlabmanagerinstalled ? 1 : 0);
         $mform->setDefault('is_rem_lab', 0);
         $mform->disabledIf('is_rem_lab', 'remlab_manager', 'eq', 0);
 
-        if ($is_remlab_manager_installed) $list_showable_experiences = get_showable_experiences();
-        else $list_showable_experiences = array();
-        $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'), $list_showable_experiences);
+        if ($remlabmanagerinstalled) {
+            $showableexperiences = get_showable_experiences();
+        } else {
+            $showableexperiences = array();
+        }
+        $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'),
+            $showableexperiences);
         $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
         $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $is_remlab_manager_installed) {
-            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $this->current->instance));
+        if ($this->current->instance && $remlabmanagerinstalled) {
+            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
+                array('ejsappid' => $this->current->instance));
             if ($practiceintro) {
                 $i = 0;
-                $selected_practice_index = $i;
-                foreach ($list_showable_experiences as $sarlab_experience) {
-                    if ($practiceintro == $sarlab_experience) {
-                        $selected_practice_index = $i;
+                $selectedpracticeindex = $i;
+                foreach ($showableexperiences as $sarlabexp) {
+                    if ($practiceintro == $sarlabexp) {
+                        $selectedpracticeindex = $i;
                         break;
                     }
                     $i++;
                 }
-                $mform->setDefault('practiceintro', $selected_practice_index);
+                $mform->setDefault('practiceintro', $selectedpracticeindex);
             } else {
                 $mform->setDefault('practiceintro', '');
             }
         }
         $mform->addElement('hidden', 'list_practices', null);
         $mform->setType('list_practices', PARAM_TEXT);
-        $string_showable_experiences = '';
-        foreach ($list_showable_experiences as $experience) {
-            $string_showable_experiences .= $experience . ';';
+        $showableexperiences = '';
+        foreach ($showableexperiences as $experience) {
+            $showableexperiences .= $experience . ';';
         }
-        $mform->setDefault('list_practices', $string_showable_experiences);
-        // -------------------------------------------------------------------------------
-        // Add standard grading elements
+        $mform->setDefault('list_practices', $showableexperiences);
+
+        // Adding standard grading elements.
         $this->standard_grading_coursemodule_elements();
-        // -------------------------------------------------------------------------------
-        // Add standard elements, common to all modules
+
+        // Adding standard elements, common to all modules.
         $this->standard_coursemodule_elements();
-        // -------------------------------------------------------------------------------
-        // Add standard buttons, common to all modules
+
+        // Adding standard buttons, common to all modules.
         $this->add_action_buttons();
-    } // definition
+    } // End of function definition().
 
 
     /**
-     * Any data processing needed before the form is displayed
-     * (needed to set up draft areas for editor and filemanager elements)
-     * @param array &$default_values
+     * Any data processing needed before the form is displayed (needed to set up draft areas for editor and filemanager
+     * elements).
+     *
+     * @param array $defaultvalues
      */
-    function data_preprocessing(&$default_values)
-    {
+    public function data_preprocessing(&$defaultvalues) {
         global $CFG, $DB;
 
         $maxbytes = get_max_upload_file_size($CFG->maxbytes);
 
-        // Fill the form elements with previous submitted files/data
+        // Fill the form elements with previous submitted files/data.
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('appletfile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/java-archive', 'application/zip')));
-            $default_values['appletfile'] = $draftitemid;
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles',
+                $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1,
+                    'accepted_types' => array('application/java-archive', 'application/zip')));
+            $defaultvalues['appletfile'] = $draftitemid;
 
-            $draftitemid_wording = file_get_submitted_draft_itemid('appwording');
-            $default_values['ejsappwording']['format'] = $default_values['appwordingformat'];
-            $default_values['ejsappwording']['text'] = file_prepare_draft_area($draftitemid_wording, $this->context->id, 'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes, 'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0), $default_values['appwording']);
-            $default_values['ejsappwording']['itemid'] = $draftitemid_wording;
+            $draftitemidwording = file_get_submitted_draft_itemid('appwording');
+            $defaultvalues['ejsappwording']['format'] = $defaultvalues['appwordingformat'];
+            $defaultvalues['ejsappwording']['text'] = file_prepare_draft_area($draftitemidwording, $this->context->id,
+                'mod_ejsapp', 'appwording', 0, array('subdirs' => 1, 'maxbytes' => $CFG->maxbytes,
+                    'changeformat' => 1, 'context' => $this->context, 'noclean' => 1, 'trusttext' => 0),
+                $defaultvalues['appwording']);
+            $defaultvalues['ejsappwording']['itemid'] = $draftitemidwording;
             
-            $draftitemid_state = file_get_submitted_draft_itemid('statefile');
-            file_prepare_draft_area($draftitemid_state, $this->context->id, 'mod_ejsapp', 'xmlfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => 'application/xml'));
-            $default_values['statefile'] = $draftitemid_state;
+            $draftitemidstate = file_get_submitted_draft_itemid('statefile');
+            file_prepare_draft_area($draftitemidstate, $this->context->id, 'mod_ejsapp', 'xmlfiles',
+                $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1,
+                    'accepted_types' => 'application/xml'));
+            $defaultvalues['statefile'] = $draftitemidstate;
 
-            $draftitemid_controller = file_get_submitted_draft_itemid('controllerfile');
-            file_prepare_draft_area($draftitemid_controller, $this->context->id, 'mod_ejsapp', 'cntfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $default_values['controllerfile'] = $draftitemid_controller;
+            $draftitemidcontroller = file_get_submitted_draft_itemid('controllerfile');
+            file_prepare_draft_area($draftitemidcontroller, $this->context->id, 'mod_ejsapp', 'cntfiles',
+                $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $defaultvalues['controllerfile'] = $draftitemidcontroller;
 
-            $draftitemid_recording = file_get_submitted_draft_itemid('recordingfile');
-            file_prepare_draft_area($draftitemid_recording, $this->context->id, 'mod_ejsapp', 'recfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $default_values['recordingfile'] = $draftitemid_recording;
+            $draftitemidrecording = file_get_submitted_draft_itemid('recordingfile');
+            file_prepare_draft_area($draftitemidrecording, $this->context->id, 'mod_ejsapp', 'recfiles',
+                $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $defaultvalues['recordingfile'] = $draftitemidrecording;
 
-            $draftitemid_blockly = file_get_submitted_draft_itemid('blocklyfile');
-            file_prepare_draft_area($draftitemid_blockly, $this->context->id, 'mod_ejsapp', 'blkfiles', $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $default_values['blocklyfile'] = $draftitemid_blockly;
+            $draftitemidblockly = file_get_submitted_draft_itemid('blocklyfile');
+            file_prepare_draft_area($draftitemidblockly, $this->context->id, 'mod_ejsapp', 'blkfiles',
+                $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
+            $defaultvalues['blocklyfile'] = $draftitemidblockly;
 
-            $personal_vars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
+            $personalvars = $DB->get_records('ejsapp_personal_vars', array('ejsappid' => $this->current->instance));
             $key = 0;
-            foreach ($personal_vars as $personal_var) {
-                $default_values['var_name['.$key.']'] = $personal_var->name;
+            foreach ($personalvars as $personalvar) {
+                $defaultvalues['var_name['.$key.']'] = $personalvar->name;
                 $vartype = '0';
-                if ($personal_var->type == 'Integer') $vartype = '1';
-                elseif ($personal_var->type == 'Double') $vartype = '2';
-                $default_values['var_type['.$key.']'] = $vartype;
+                if ($personalvar->type == 'Integer') {
+                    $vartype = '1';
+                } else if ($personalvar->type == 'Double') {
+                    $vartype = '2';
+                }
+                $defaultvalues['var_type['.$key.']'] = $vartype;
                 if ($vartype != 0) {
-                    $default_values['min_value['.$key.']'] = $personal_var->minval;
-                    $default_values['max_value['.$key.']'] = $personal_var->maxval;
+                    $defaultvalues['min_value['.$key.']'] = $personalvar->minval;
+                    $defaultvalues['max_value['.$key.']'] = $personalvar->maxval;
                 }
                 $key ++;
             }
 
-            $json_blockly_configuration = $DB->get_field('ejsapp', 'blockly_conf', array('id' => $this->current->instance));
-            $blockly_configuration =json_decode($json_blockly_configuration);
-            $default_values['use_blockly'] = $blockly_configuration[0];
-            $default_values['display_logic'] = $blockly_configuration[1];
-            $default_values['display_loops'] = $blockly_configuration[2];
-            $default_values['display_math'] = $blockly_configuration[3];
-            $default_values['display_text'] = $blockly_configuration[4];
-            $default_values['display_lists'] = $blockly_configuration[5];
-            $default_values['display_variables'] = $blockly_configuration[6];
-            $default_values['display_functions'] = $blockly_configuration[7];
-            $default_values['display_lab'] = $blockly_configuration[8];
-            $default_values['display_lab_variables'] = $blockly_configuration[9];
-            $default_values['display_lab_functions'] = $blockly_configuration[10];
-            $default_values['display_lab_control'] = $blockly_configuration[11];
+            $jsonblocklyconf = $DB->get_field('ejsapp', 'blockly_conf',
+                array('id' => $this->current->instance));
+            $blocklyconf = json_decode($jsonblocklyconf);
+            $defaultvalues['use_blockly'] = $blocklyconf[0];
+            $defaultvalues['display_logic'] = $blocklyconf[1];
+            $defaultvalues['display_loops'] = $blocklyconf[2];
+            $defaultvalues['display_math'] = $blocklyconf[3];
+            $defaultvalues['display_text'] = $blocklyconf[4];
+            $defaultvalues['display_lists'] = $blocklyconf[5];
+            $defaultvalues['display_variables'] = $blocklyconf[6];
+            $defaultvalues['display_functions'] = $blocklyconf[7];
+            $defaultvalues['display_lab'] = $blocklyconf[8];
+            $defaultvalues['display_lab_variables'] = $blocklyconf[9];
+            $defaultvalues['display_lab_functions'] = $blocklyconf[10];
+            $defaultvalues['display_lab_control'] = $blocklyconf[11];
         }
 
-        // Element listing EJS public variables
+        // Element listing EJS public variables.
         // $PAGE->requires->js_init_call;
-        // TODO: Get list of public variables: their names, values and types
-        // </Set the mod_form elements>
-    } // data_preprocessing
+        // TODO: Get list of public variables: their names, values and types.
+    } // End of funtion data_preprocessing().
 
 
     /**
      * Performs minimal validation on the settings form
+     *
      * @param array $data
      * @param array $files
      * @return array $errors
      */
-    function validation($data, $files)
-    {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         if ($data['personalvars'] == 1) {
@@ -377,12 +404,13 @@ class mod_ejsapp_mod_form extends moodleform_mod
                 $errors['var_name[0]'] = get_string('vars_required', 'ejsapp');
             }
             $i = 0;
-            foreach ($data['var_type'] as $this_var_type) {
-                $min_values = $data['min_value'];
-                $max_values = $data['max_value'];
-                if ($this_var_type == 1 && (!(floor($min_values[$i]) == $min_values[$i]) || !(floor($max_values[$i]) == $max_values[$i]))) {
+            foreach ($data['var_type'] as $vartype) {
+                $minvalues = $data['min_value'];
+                $maxvalues = $data['max_value'];
+                if ($vartype == 1 && (!(floor($minvalues[$i]) == $minvalues[$i]) ||
+                        !(floor($maxvalues[$i]) == $maxvalues[$i]))) {
                     $errors['var_type['.$i.']'] = get_string('vars_incorrect_type', 'ejsapp');
-                } elseif ($this_var_type == 2 && (!is_float($min_values[$i]) || !is_float($max_values[$i]))) {
+                } else if ($vartype == 2 && (!is_float($minvalues[$i]) || !is_float($maxvalues[$i]))) {
                     $errors['var_type['.$i.']'] = get_string('vars_incorrect_type', 'ejsapp');
                 }
                 $i++;
@@ -395,7 +423,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
             }
         }
 
-        // TODO: Check whether the uploaded file is a valid EjsS file
+        // TODO: Check whether the uploaded file is a valid EjsS file.
         /*
         $draftitemid = $data['appletfile'];
         $draftitemid = file_get_submitted_draft_itemid('appletfile');
@@ -405,7 +433,7 @@ class mod_ejsapp_mod_form extends moodleform_mod
         */
 
         return $errors;
-    } // validation
+    } // End of function validation().
 
 
-} // class mod_ejsapp_mod_form
+}

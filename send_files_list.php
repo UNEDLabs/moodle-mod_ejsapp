@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,27 +11,25 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
-
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 /**
- * This file is used to send to an EJS applet the list of .xml state files,
- * .exp file or text plain files saved by that applet.
+ * Sends to an EjsS application the list of state files, *.exp files or text plain files saved by that application.
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//Some security issues when receiving data from users:
+// Some security issues when receiving data from users.
 require_once('../../config.php');
 require_login();
 
@@ -40,27 +37,34 @@ global $DB, $USER, $CFG;
 
 require_once($CFG->libdir . '/moodlelib.php');
 
-$ejsapp_id = required_param('ejsapp_id', PARAM_INT);
+$ejsappid = required_param('ejsapp_id', PARAM_INT);
 $type = optional_param('type', '.xml', PARAM_TEXT);
 
-$file_name = array();
-$file_path = array();
-$file_names_array = array();
-$file_paths_array = array();
-if ($type == '.cnt') $source_info = 'controller';
-else $source_info = 'ejsappid='.$ejsapp_id;
-$records = $DB->get_records_select('files', "component='user' AND filearea='private' AND userid='$USER->id' AND source='$source_info'");
+$filename = array();
+$filepath = array();
+$filenames = array();
+$filepaths = array();
+if ($type == '.cnt') {
+    $sourceinfo = 'controller';
+} else {
+    $sourceinfo = 'ejsappid='.$ejsappid;
+}
+$records = $DB->get_records_select('files', "component='user' AND filearea='private' AND " .
+    "userid='$USER->id' AND source='$sourceinfo'");
 
 foreach ($records as $record) {
-    $file_extension = pathinfo($record->filename, PATHINFO_EXTENSION);
-    if ( ($type == '.xml' && $file_extension == 'xml') || ($type == 'text' && $file_extension == 'txt') || ($type == '.cnt' && $file_extension == 'cnt') || ($type == '.rec' && $file_extension == 'rec') || ($type == '.blk' && $file_extension == 'blk') || ($type == '.json' && $file_extension == 'json')) {
-        $ejsapp_file_path = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' . $record->itemid . '/';
-        $file_name["file_name"] = $record->filename;
-        $file_names_array[] = $file_name;
-        $file_path["file_path"] = $ejsapp_file_path . $record->filename;
-        $file_paths_array[] = $file_path;
+    $extension = pathinfo($record->filename, PATHINFO_EXTENSION);
+    if ( ($type == '.xml' && $extension == 'xml') || ($type == 'text' && $extension == 'txt') ||
+        ($type == '.cnt' && $extension == 'cnt') || ($type == '.rec' && $extension == 'rec') ||
+        ($type == '.blk' && $extension == 'blk') || ($type == '.json' && $extension == 'json')) {
+        $ejsappfilepath = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' .
+            $record->itemid . '/';
+        $filename["file_name"] = $record->filename;
+        $filenames[] = $filename;
+        $filepath["file_path"] = $ejsappfilepath . $record->filename;
+        $filepaths[] = $filepath;
     }
 }
 
-$obj = array('file_names' => $file_names_array, 'file_paths' => $file_paths_array);
+$obj = array('file_names' => $filenames, 'file_paths' => $filepaths);
 echo json_encode($obj);

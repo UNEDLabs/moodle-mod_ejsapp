@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
@@ -12,22 +11,21 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 //
 // EJSApp has been developed by:
-//  - Luis de la Torre: ldelatorre@dia.uned.es
-//	- Ruben Heradio: rheradio@issi.uned.es
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
 //
-//  at the Computer Science and Automatic Control, Spanish Open University
-//  (UNED), Madrid, Spain
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain.
 
 
 /**
- * This page is used by Moodle when listing all the instances of your module that are in a
- * particular course with the course id being passed to this script
+ * Lists all ejsapp instances that are in a particular course with the course id being passed to this script
  *
- * @package    mod
- * @subpackage ejsapp
+ * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,7 +35,7 @@ require_once(dirname(__FILE__) . '/lib.php');
 
 global $DB, $PAGE, $OUTPUT;
 
-$id = required_param('id', PARAM_INT); // course
+$id = required_param('id', PARAM_INT); // Course.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('Course ID is incorrect');
@@ -52,16 +50,14 @@ $event = \mod_ejsapp\event\course_module_instance_list_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-/// Print the header
-
+// Print the header.
 $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $id));
 $PAGE->set_title($course->fullname);
 $PAGE->set_heading($course->shortname);
 
 echo $OUTPUT->header();
 
-/// Get all the appropriate data
-
+// Get all the appropriate data.
 if (!$ejsapps = get_all_instances_in_course('ejsapp', $course)) {
     echo $OUTPUT->heading(get_string('noejsapps', 'ejsapp'), 2);
     echo $OUTPUT->continue_button("view.php?id=$course->id");
@@ -69,8 +65,7 @@ if (!$ejsapps = get_all_instances_in_course('ejsapp', $course)) {
     die();
 }
 
-/// Print the list of instances
-
+// Print the list of instances.
 $timenow = time();
 $strname = get_string('name');
 $strweek = get_string('week');
@@ -91,11 +86,13 @@ if ($course->format == 'weeks') {
 
 foreach ($ejsapps as $ejsapp) {
     if (!$ejsapp->visible) {
-        //Show dimmed if the mod is hidden
-        $link = '<a class="dimmed" href="view.php?id=' . $ejsapp->coursemodule . '">' . format_string($ejsapp->name) . '</a>';
+        // Show dimmed if the mod is hidden.
+        $link = html_writer::tag('a', format_string($ejsapp->name),
+            array('class' => 'dimmed', 'href' => 'view.php?id=' . $ejsapp->coursemodule));
     } else {
-        //Show normal if the mod is visible
-        $link = '<a href="view.php?id=' . $ejsapp->coursemodule . '">' . format_string($ejsapp->name) . '</a>';
+        // Show normal if the mod is visible.
+        $link = html_writer::tag('a', format_string($ejsapp->name),
+            array('href' => 'view.php?id=' . $ejsapp->coursemodule));
     }
 
     if ($course->format == 'weeks' or $course->format == 'topics') {
@@ -108,6 +105,5 @@ foreach ($ejsapps as $ejsapp) {
 echo $OUTPUT->heading(get_string('modulenameplural', 'ejsapp'), 2);
 echo html_writer::table($table);
 
-/// Finish the page
-
+// Finish the page.
 echo $OUTPUT->footer();
