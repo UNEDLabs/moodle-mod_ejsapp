@@ -68,5 +68,18 @@ class observers {
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
         $DB->insert_record('ejsapp_log', $record);
     }
+    
+    /**
+     * A user needs to book to work with a EJSApp remote lab.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_book($event) {
+        // Write info in the db.
+        global $DB;
+        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
 
 }
