@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Class for logging the need to wait event of an EJSApp
+ * Class for logging the "free" remote lab booked in another course event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
@@ -34,19 +34,19 @@ namespace mod_ejsapp\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class for logging the need to wait event of an EJSApp
+ * Class for logging an access try to an open remote lab that has been booked in another course event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_module_wait extends \core\event\base {
+class ejsapp_booked extends \core\event\base {
 
     /**
      * Init function
      */
     protected function init() {
-        $this->data['crud'] = 'r'; // Meaning: c(reate), r(ead), u(pdate), d(elete).
+        $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'ejsapp';
     }
@@ -57,7 +57,7 @@ class course_module_wait extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_wait', 'ejsapp');
+        return get_string('event_booked', 'ejsapp');
     }
 
     /**
@@ -66,8 +66,8 @@ class course_module_wait extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' attempted to access the EJSApp remote lab with id ".
-            "'{$this->objectid}' but needed to wait.";
+        return "The user with id '{$this->userid}' attempted to access the free EJSApp remote lab with id
+         '{$this->objectid}' but it was already booked in a different course.";
     }
 
     /**

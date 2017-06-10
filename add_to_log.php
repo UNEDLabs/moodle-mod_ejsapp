@@ -45,21 +45,11 @@ $PAGE->set_url('/mod/ejsapp/add_to_log.php');
 
 $ejsappname = urldecode($ejsappname);
 $modulecontext = context_module::instance($cmid);
-$event = \mod_ejsapp\event\course_module_working::create(array(
+$event = \mod_ejsapp\event\ejsapp_working::create(array(
     'objectid' => $cmid,
     'courseid' => $courseid,
     'userid' => $userid,
     'context' => $modulecontext,
     'other' => $ejsappname,
 ));
-/*$ejsapp = $DB->get_record('ejsapp', array('id' => $cm->instance), '*', MUST_EXIST);
-$event->add_record_snapshot('course_modules', $cm);
-$event->add_record_snapshot('ejsapp', $ejsapp);
-$record = new stdClass();
-$record->id = $cmid;
-$record->time = time();
-$record->userid = $userid;
-$record->action = 'working';
-$record->info = $ejsappname;
-$event->add_record_snapshot('ejsapp_log', $record);*/
 $event->trigger();

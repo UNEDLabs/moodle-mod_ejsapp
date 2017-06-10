@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Class for logging the view all event of an EJSApp
+ * Class for logging the view event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
@@ -34,12 +34,58 @@ namespace mod_ejsapp\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class for logging the view all event of an EJSApp
+ * Class for logging the view event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
-    // No need for any code here as everything is handled by the parent class.
+class ejsapp_viewed extends \core\event\base {
+
+    /**
+     * Init function.
+     */
+    protected function init() {
+        $this->data['crud'] = 'r';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'ejsapp';
+    }
+
+    /**
+     * Get event's name
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('event_working', 'ejsapp');
+    }
+
+    /**
+     * Get event description
+     *
+     * @return string
+     */
+    public function get_description() {
+        return "The user with id '{$this->userid}' viewed the EJSApp activity with id '{$this->objectid}'.";
+    }
+
+    /**
+     * Get URL related to the action
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url('/mod/ejsapp/view.php', array('id' => $this->objectid));
+    }
+
+    /**
+     * Return the legacy event log data.
+     *
+     * @return array|null
+     */
+    protected function get_legacy_logdata() {
+        return array($this->courseid, 'ejsapp', 'view', 'view.php?id=' . $this->objectid,
+            $this->objectid, $this->contextinstanceid);
+    }
+
 }

@@ -153,9 +153,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         $hour = date("G", $time);
         $min = date("i", $time);
         $seg = date("s", $time);
-        $time = mktime($hour, $min, $seg, $month, $day, $year);
-        $DB->delete_records('block_remlab_manager_sb_keys',
-            array('user' => $USER->username)); // WARNING: This also deletes keys for collab sessions with Sarlab!!
         mt_srand(time());
         $random = mt_rand(0, 1000000);
         if ($sarlabinfo) {

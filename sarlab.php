@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Check conditions in order to allow or restrict the access to the remote lab applet when using Sarlab
+ * Authentication and privileges verification between Moodle and Sarlab for remote lab applications
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
@@ -30,7 +30,7 @@
  */
 
 require_once('../../config.php');
-require_login();
+//require_login();
 
 global $DB;
 
@@ -42,14 +42,14 @@ $time = array(strtotime(date('Y-m-d H:i:s')) + 180); // At least three minutes m
 
 if ($record = $DB->get_records_select('block_remlab_manager_sb_keys',
     'sarlabpass = ? AND expirationtime > ?', array($key, $time))) {
-    // Delete expired Sarlab keys.
-    $DB->delete_records_select('block_remlab_manager_sb_keys', "expirationtime < ?", $time);
+    // Delete the key so it can't be used later again.
+    $DB->delete_records('block_remlab_manager_sb_keys', array('sarlabpass' => $key));
     // Check permissions, expiration time, and grant access.
     $permissions = "labmanager=false\n";
     if (reset($record)->labmanager == 1) {
         $permissions = "labmanager=true\n";
     }
-    $expirationtime = "expiration_time=" . reset($record)->expirationtime . "\n";
+    $expirationtime = "expiration_time=" . floor((reset($record)->expirationtime - time()) / 60) . "\n";
     $obj .= "access=true\n".$permissions.$expirationtime;
     /*$obj->access = "true";
     $obj->lab_manager = $permissions;

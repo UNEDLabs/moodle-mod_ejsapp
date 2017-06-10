@@ -44,12 +44,77 @@ defined('MOODLE_INTERNAL') || die();
 class observers {
 
     /**
+     * A user tried to access an EJSApp remote lab but needs to book first.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_book($event) {
+        // Write info in the db.
+        global $DB;
+        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+    /**
+     * A user accessed an EJSApp remote lab but it was booked by another user.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_booked($event) {
+        // Write info in the db.
+        global $DB;
+        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+    /**
+     * A user accessed an EJSApp virtual or remote lab in collaborative mode.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_collab($event) {
+        // Write info in the db.
+        global $DB;
+        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+    /**
+     * A user accessed an EJSApp remote lab nut it was inactive.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_inactive($event) {
+        // Write info in the db.
+        global $DB;
+        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+    /**
      * A user accessed an EJSApp virtual or remote lab.
      *
      * @param \core\event\base $event The event.
      * @return void
      */
     public static function course_module_viewed($event) {
+        // Write info in the db.
+        global $DB;
+        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+        $DB->insert_record('ejsapp_log', $record);
+    }
+
+    /**
+     * A user tried to access an EJSApp remote lab but he needed to wait.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     */
+    public static function course_module_wait($event) {
         // Write info in the db.
         global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);

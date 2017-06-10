@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Authentication and privileges verification between Moodle and Sarlab.
+ * Authentication and privileges verification between Moodle and Sarlab for the experiences manager.
  *
  * Receives an encrypted username and password from Sarlab and checks whether that user exists in Moodle
  * and has, at least, a teacher role in, at least, one course.
@@ -64,22 +64,26 @@ foreach ($listsarlabips as $sarlabip) {
             if ($user != false) { // Only users registered in Moodle are allowed.
                 if ($user->id == 2) { // If admin user.
                     echo "access=true\n";
+                    // echo '{"access":"true"}';
                 } else {
                     $access = false;
                     $roles = $DB->get_records('role_assignments', array('userid' => $user->id));
                     foreach ($roles as $role) {
                         if ($role->roleid <= 3) { // User is teacher in, at least, one course.
                             echo "access=true\n";
+                            // echo '{"access":"true"}';
                             $access = true;
                             break;
                         }
                     }
                     if (!$access) {
                         echo "access=false\n";
+                        // echo '{"access":"false"}';
                     } // Otherwise, we don't let him in.
                 }
             } else {
                 echo "access=false\n";
+                // echo '{"access":"false"}';
             }
 
         }

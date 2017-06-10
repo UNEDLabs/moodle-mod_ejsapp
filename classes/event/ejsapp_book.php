@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_module_book extends \core\event\base {
+class ejsapp_book extends \core\event\base {
 
     /**
      * Init function

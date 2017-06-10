@@ -22,26 +22,24 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Checks if the specified user has an active booking for the specified remote ejsapp lab
+ * Class for logging the view all event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');
+namespace mod_ejsapp\event;
 
-global $DB;
+defined('MOODLE_INTERNAL') || die();
 
-$username = required_param('username', PARAM_TEXT);
-$ejsappid = required_param('ejsappid', PARAM_TEXT);
-
-if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $username, 'ejsappid' => $ejsappid, 'valid' => 1))) {
-    $bookings = $DB->get_records('ejsappbooking_remlab_access', array('username' => $username, 'ejsappid' => $ejsappid, 'valid' => 1));
-    foreach ($bookings as $booking) { // If the user has an active booking, check the time.
-        if (date('Y-m-d H:i:s') >= $booking->starttime && date('Y-m-d H:i:s') < $booking->endtime) {
-            echo "access=true\n";
-            break;
-        }
-    }
+/**
+ * Class for logging the view all event of an EJSApp
+ *
+ * @package    mod_ejsapp
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class ejsapp_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+    // No need for any code here as everything is handled by the parent class.
 }

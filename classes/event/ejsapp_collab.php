@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Class for logging the view event of an EJSApp
+ * Class for logging the collab work event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
@@ -34,16 +34,16 @@ namespace mod_ejsapp\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class for logging the view event of an EJSApp
+ * Class for logging the collab work event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_module_viewed extends \core\event\base {
+class ejsapp_collab extends \core\event\base {
 
     /**
-     * Init function.
+     * Init function
      */
     protected function init() {
         $this->data['crud'] = 'r';
@@ -57,7 +57,7 @@ class course_module_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_working', 'ejsapp');
+        return get_string('event_collab', 'ejsapp');
     }
 
     /**
@@ -66,7 +66,8 @@ class course_module_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' viewed the EJSApp activity with id '{$this->objectid}'.";
+        return "The user with id '{$this->userid}' accessed the EJSApp activity with id '{$this->objectid}'
+         in collaborative mode.";
     }
 
     /**
@@ -84,7 +85,7 @@ class course_module_viewed extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'ejsapp', 'view', 'view.php?id=' . $this->objectid,
+        return array($this->courseid, 'ejsapp', 'collab_view', 'view.php?id=' . $this->objectid,
             $this->objectid, $this->contextinstanceid);
     }
 

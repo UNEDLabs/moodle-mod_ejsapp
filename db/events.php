@@ -34,8 +34,38 @@ defined('MOODLE_INTERNAL') || die();
 $observers = array(
 
     array(
-        'eventname'   => '\mod_ejsapp\event\course_module_working',
-        'callback'    => 'mod_ejsapp\observers::course_module_working',
+        'eventname' => '\mod_ejsapp\event\ejsapp_book',
+        'callback' => 'mod_ejsapp\observers::ejsapp_book',
+    ),
+
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_booked',
+        'callback' => 'mod_ejsapp\observers::ejsapp_booked',
+    ),
+
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_collab',
+        'callback' => 'mod_ejsapp\observers::ejsapp_collab',
+    ),
+
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_inactive',
+        'callback' => 'mod_ejsapp\observers::ejsapp_inactive',
+    ),
+
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_viewed',
+        'callback' => 'mod_ejsapp\observers::ejsapp_viewed',
+    ),
+
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_wait',
+        'callback' => 'mod_ejsapp\observers::ejsapp_wait',
+    ),
+
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_working',
+        'callback' => 'mod_ejsapp\observers::ejsapp_working',
     ),
 
 );

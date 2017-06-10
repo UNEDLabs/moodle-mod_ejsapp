@@ -32,28 +32,27 @@ define(['jquery'], function() {
     var t = {
         SarlabWebSocket : function(host, command, IP, port, idExp, expTime, user, password, jarPath) {
             ws = new WebSocket("ws://127.0.0.1:8887");
-
             ws.onopen = function() {
                 // Websocket is connected, send data using send().
                 ws.send("Message to send \r\n");
                 var obj = '{'
-                    +'"command" : ' + command + ','
-                    +'"ip_server" : ' + IP + ','
-                    +'"port_server"  : ' + port + ','
-                    +'"id_exp" : ' + idExp + ','
-                    +'"expiration_time" : ' + expTime + ','
-                    +'"user" : ' + user + ','
-                    +'"password" : ' + password;
+                    +'"command":"' + command + '",'
+                    +'"ip_server":"' + IP + '",'
+                    +'"port_server":"' + port + '",'
+                    +'"id_exp":"' + idExp + '",'
+                    +'"expiration_time":"' + expTime + '",'
+                    +'"user":"' + user + '",'
+                    +'"password":"' + password + '"';
                 if (command === 'execjar') {
-                    obj += ',' + '"jar_file" : ' + jarPath;
+                    obj += ',' + '"jar_file":"' + jarPath + '"';
                 }
                 obj += '}';
                 ws.send(obj);
-                // console.log("Connected to Sarlab experience: " + idExp);
+                console.log("Connected to Sarlab experience: " + idExp);
             };
 
-            ws.onmessage = function () {
-                // console.log("Message from Sarlab server: " + evt.data);
+            ws.onmessage = function (evt) {
+                console.log("Message from Sarlab server: " + evt.data);
             };
 
             ws.onerror = function() {
@@ -72,38 +71,39 @@ define(['jquery'], function() {
 
             ws.onclose = function() {
                 // Websocket is closed.
-                // console.log("Connection has been closed.");
+                console.log("Connection has been closed.");
             };
         },
 
         connectExperience : function(command, IP, port, idExp, expTime, user, password, jarPath) {
             var obj = '{'
-                +'"command" : ' + command + ','
-                +'"ip_server" : ' + IP + ','
-                +'"port_server"  : ' + port + ','
-                +'"id_exp" : ' + idExp + ','
-                +'"expiration_time" : ' + expTime + ','
-                +'"user" : ' + user + ','
-                +'"password" : ' + password;
+                +'"command":"' + command + '",'
+                +'"ip_server":"' + IP + '",'
+                +'"port_server":"' + port + '",'
+                +'"id_exp":"' + idExp + '",'
+                +'"expiration_time":"' + expTime + '",'
+                +'"user":"' + user + '",'
+                +'"password":"' + password + '"';
             if (command === 'execjar') {
-                obj += ',' + '"jar_file" : ' + jarPath;
+                obj += ',' + '"jar_file":"' + jarPath + '"';
             }
             obj += '}';
             ws.send(obj);
         },
 
         stopExperience : function() {
-            ws.send("exit");
+            ws.send('{"command":"exit"}');
         },
 
         stopExperienceOnLeave : function() {
             window.onbeforeunload = function() {
-                ws.send("exit");
+                ws.send('{"command":"reset"}');
+                ws.send('{"command":"exit"}');
             };
         },
 
         resetExperience : function() {
-            ws.send("reset");
+            ws.send('{"command":"reset"}');
         }
     };
     return t;
