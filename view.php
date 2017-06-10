@@ -327,6 +327,10 @@ if (isset($collabsession)) {
     echo $button;
 }
 
+// Completion on view.
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
 // Javascript features for monitoring the time spent by a user in the activity.
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to
