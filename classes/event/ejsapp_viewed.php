@@ -57,7 +57,7 @@ class ejsapp_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_working', 'ejsapp');
+        return get_string('event_viewed', 'ejsapp');
     }
 
     /**
