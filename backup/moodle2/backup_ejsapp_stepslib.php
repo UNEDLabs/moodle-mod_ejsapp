@@ -101,17 +101,16 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // if ($userinfo) $log->set_source_table('ejsapp_log', array('ejsappid'  => '../id'));.
 
         // Remote labs.
-        $remlabmanagaer = $DB->get_records('block', array('name' => 'remlab_manager'));
-        $remlabmanagaer = !empty($remlabmanagaer);
-        if ($remlabmanagaer) {
+        $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
+        $remlabmanager = !empty($remlabmanager);
+        if ($remlabmanager) {
             $exp2prc->set_source_table('block_remlab_manager_exp2prc', array('ejsappid'  => '../../id'));
         }
 
         // Booking.
         if ($userinfo) {
-            $ejsappbooking = $DB->get_records('modules', array('name' => 'ejsappbooking'));
-            $ejsappbooking = !empty($ejsappbooking);
-            if ($ejsappbooking) {
+            $bookingsystem = $DB->get_records('modules', array('name' => 'ejsappbooking'));
+            if (!empty($bookingsystem)) {
                 $ejsappbooking->set_source_table('ejsappbooking', array('course' => '../../course'));
                 $usersaccess->set_source_table('ejsappbooking_usersaccess', array('ejsappid' => '../../id'));
                 $remlabaccess->set_source_table('ejsappbooking_remlab_access', array('ejsappid' => '../../id'));
