@@ -46,7 +46,7 @@ require_course_login($course);
 $params = array(
     'context' => context_course::instance($course->id)
 );
-$event = \mod_ejsapp\event\course_module_instance_list_viewed::create($params);
+$event = \mod_ejsapp\event\ejsapp_instance_list_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
