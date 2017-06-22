@@ -13,7 +13,7 @@
 	  ///////////// INIT CHART ///////////////////////////////
 	  //cleanChart(); // To initialize the chart;
 	  
-
+	  
 		workspace = Blockly.inject('blocklyDiv',{media: 'blockly/media/',toolbox: toolbox});
 		if(typeof initial != 'undefined'){
 			var xmlDom = Blockly.Xml.textToDom(initial);
@@ -54,6 +54,13 @@ myInterpreter = null;
         return interpreter.createPrimitive(rec(bool));
       };
       interpreter.setProperty(scope, 'rec',
+          interpreter.createNativeFunction(wrapper));
+		  
+       // Add an API function for the initialize block.
+      var wrapper = function() {
+        return interpreter.createPrimitive(initialize());
+      };
+      interpreter.setProperty(scope, 'initialize',
           interpreter.createNativeFunction(wrapper));
 		  
 	 // Add an API function for the createChart() block.
@@ -124,17 +131,10 @@ myInterpreter = null;
       };
       interpreter.setProperty(scope, 'pause',
           interpreter.createNativeFunction(wrapper));
-		  
-   // Add an API function for the initialize block.
-      var wrapper = function() {
-        return interpreter.createPrimitive(initialize());
-      };
-      interpreter.setProperty(scope, 'initialize',
-          interpreter.createNativeFunction(wrapper));
       
    // Add an API function for the reset block.
       var wrapper = function() {
-        return interpreter.createPrimitive(reset());
+        return interpreter.createPrimitive(_model.reset());
       };
       interpreter.setProperty(scope, 'reset',
           interpreter.createNativeFunction(wrapper));
@@ -146,8 +146,8 @@ myInterpreter = null;
         	p2=true;
         else if((p2.toString().localeCompare("false")==0))
         	p2=false;
-        else
-        	p2 = parseFloat(p2);
+        /*else
+        	p2 = parseFloat(p2);*/
         return interpreter.createPrimitive(setValueModel(text,p2));
       };
       interpreter.setProperty(scope, 'setValueModel',
@@ -161,6 +161,39 @@ myInterpreter = null;
       interpreter.setProperty(scope, 'highlightBlock',
           interpreter.createNativeFunction(wrapper));
 		  
+     // Add an API function for eval blocks.
+      var wrapper = function(text) {
+         text = text ? text.toString() : '';
+        return interpreter.createPrimitive(evaluate(text));
+      };
+      interpreter.setProperty(scope, 'evaluate',
+          interpreter.createNativeFunction(wrapper));
+		  
+	  // Add an API function for reInitLab blocks.
+      var wrapper = function() {
+        return interpreter.createPrimitive(reInitLab());
+      };
+      interpreter.setProperty(scope, 'reInitLab',
+          interpreter.createNativeFunction(wrapper));
+		  
+	 // Add an API function for the setTimeStep block.
+      var wrapper = function(number) {
+        return interpreter.createPrimitive(setTimeStep(number));
+      };
+      interpreter.setProperty(scope, 'setTimeStep',
+          interpreter.createNativeFunction(wrapper));
+		  
+       // Add an API function for reInitLab blocks.
+      var wrapper = function(a,b,c,d) {
+		  a = a ? a.toString() : '';
+		  b = b ? b.toString() : '';
+		  c = c ? c.toString() : '';
+        return interpreter.createPrimitive(replaceFunction(a,b,c,d));
+      };
+      interpreter.setProperty(scope, 'replaceFunction',
+          interpreter.createNativeFunction(wrapper));
+		 
+		  
 		//reateChart("+name+","+time+",[{"+c0name+":"+value_name+"}"+yaxis+"]);\n";
   // Add an API function for the createChart() block.
   var wrapper = function(text,number,columns) {
@@ -169,76 +202,39 @@ myInterpreter = null;
       };
       interpreter.setProperty(scope, 'createChart',
           interpreter.createNativeFunction(wrapper));
-		  
-   // Add an API function for the setTimeStep block.
-      var wrapper = function(number) {
-        return interpreter.createPrimitive(setTimeStep(number));
-      };
-      interpreter.setProperty(scope, 'setTimeStep',
-          interpreter.createNativeFunction(wrapper));
 
     }
+	
 
-// Save a program in blockly
-var saveCode = function () {
-    var xmlDom = Blockly.Xml.workspaceToDom(workspace);
-    var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
-    _model.saveText('blocks_diagram', 'blk', xmlText);
-};
-
-// Load a program in blockly
-var loadCode = function () {
-    _model.readText(null, '.blk',
-        function (xmlText) {
-            if (xmlText) {
-                workspace.clear();
-                xmlDom = Blockly.Xml.textToDom(xmlText);
-                Blockly.Xml.domToWorkspace(xmlDom, workspace);
-            }
-        });
-};
-
-
+	
 /////////////// INTERPRETER
 
  var highlightPause = false;
 
-function highlightBlock(id) {
+    function highlightBlock(id) {
       workspace.highlightBlock(id);
       highlightPause = true;
-}
+    }
 
-
-  var functions;
-  
-function parseCode() {
+window.LoopTrap = 10;
+    function parseCode() {
       // Generate JavaScript code and parse it.
       Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
       Blockly.JavaScript.addReservedWords('highlightBlock');
+      Blockly.JavaScript.addReservedWords('LoopTrap');
       var code = Blockly.JavaScript.workspaceToCode(workspace);
-	  
-		var code2 = code;
-		/// BUSCAR FUNCIONES /////
-		functions ="function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
-		var continueSearch=true;
-		while(continueSearch){
-			var pos = code2.search("function ");
-			if(pos==-1) continueSearch = false;
-			else{
-				var pos2 = code2.search("}\n");
-				functions = functions+"\n"+code2.slice(pos,pos2+1); 
-				code2=code2.slice(pos2+1,code2.length);
-			}
-		}
-		//////////////////////////
-	  console.log("Code: "+code);
       //Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+	  code = "reInitLab();\n" + code ;
+	  
       myInterpreter = new Interpreter(code, initApi);
+
+      alert('Ready to execute this code:\n\n' + code);
+      document.getElementById('stepButton').disabled = '';
       highlightPause = false;
       workspace.highlightBlock(null);
-}
-
-
+	  count_chart = 0;
+    }
+	
 function changeInterval() {
 	interval = false;
 	clearInterval(flags);
@@ -269,3 +265,29 @@ function stepCode() {
 
 var interval = false;
 var inter;
+function playCode() {
+	parseCode();
+	inter=setInterval(stepCode, time_step);
+}
+
+
+ 
+  
+  function saveWorkspace() {
+		var xmlDom = Blockly.Xml.workspaceToDom(workspace);
+		var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+		var file = (document.getElementById("myText").value+".xml");
+		localStorage.setItem(file, xmlText);
+	}
+
+	function loadWorkspace() {
+		var file = (document.getElementById("myText").value+".xml");
+		var xmlText = localStorage.getItem(file);
+		if (xmlText) {
+			workspace.clear();
+			xmlDom = Blockly.Xml.textToDom(xmlText);
+			Blockly.Xml.domToWorkspace(xmlDom,workspace);
+		}
+	}
+		
+	
