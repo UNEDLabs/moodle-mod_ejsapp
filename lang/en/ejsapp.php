@@ -127,6 +127,7 @@ $string['display_lab_help'] = 'This option allows showing blocks related to vari
 $string['display_lab_variables'] = 'Show the EjsS lab\'s variables';
 $string['display_lab_functions'] = 'Show the EjsS lab\'s functions';
 $string['display_lab_control'] = 'Show the EjsS lab\'s controls';
+$string['display_lab_charts'] = 'Show the EjsS lab\'s charts';
 $string['blocklyfile'] = 'Initial blocks';
 $string['blocklyfile_help'] = 'You can select a .blk file that specifies which blocks should be initially displayed in Blockly.';
 

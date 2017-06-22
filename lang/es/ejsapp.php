@@ -126,6 +126,7 @@ $string['display_lab_help'] = 'Esta opci&oacute;n permite mostrar bloques relaci
 $string['display_lab_variables'] = 'Mostrar variables del laboratorio EjsS';
 $string['display_lab_functions'] = 'Mostrar funciones del laboratorio EjsS';
 $string['display_lab_control'] = 'Mostrar controles del laboratorio EjsS';
+$string['display_lab_charts'] = 'Mostrar gráficas para laboratorio EjsS';
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
