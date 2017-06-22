@@ -236,6 +236,11 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('display_lab_control', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_control', 'display_lab', 'eq', 0);
         $mform->setDefault('display_lab_control', 0);
+		
+		$mform->addElement('selectyesno', 'display_lab_charts', get_string('display_lab_charts', 'ejsapp'));
+        $mform->disabledIf('display_lab_charts', 'use_blockly', 'eq', 0);
+        $mform->disabledIf('display_lab_charts', 'display_lab', 'eq', 0);
+        $mform->setDefault('display_lab_charts', 0);
 
         // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
@@ -381,6 +386,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $defaultvalues['display_lab_variables'] = $blocklyconf[9];
             $defaultvalues['display_lab_functions'] = $blocklyconf[10];
             $defaultvalues['display_lab_control'] = $blocklyconf[11];
+            $defaultvalues['display_lab_charts'] = $blocklyconf[12];
         }
 
         // Element listing EJS public variables.
