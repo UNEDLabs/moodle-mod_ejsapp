@@ -90,6 +90,10 @@ require_login($course, true, $cm);
 
 $modulecontext = context_module::instance($cm->id);
 
+// Completion on view.
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
 // Print the page header.
 $PAGE->set_cm($cm, $course, $ejsapp);
 $PAGE->set_context($modulecontext);
@@ -330,10 +334,6 @@ if (isset($collabsession)) {
         'onClick' => "window.location.href = '$url'"));
     echo $button;
 }
-
-// Completion on view.
-$completion = new completion_info($course);
-$completion->set_module_viewed($cm);
 
 // Javascript features for monitoring the time spent by a user in the activity.
 if ($accessed) {

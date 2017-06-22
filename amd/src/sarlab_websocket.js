@@ -30,7 +30,7 @@
 define(['jquery'], function() {
     var ws;
     var t = {
-        SarlabWebSocket : function(host, command, IP, port, idExp, expTime, user, password, jarPath) {
+        SarlabWebSocket : function(command, IP, port, idExp, expTime, user, password, jarPath) {
             ws = new WebSocket("ws://127.0.0.1:8887");
             ws.onopen = function() {
                 // Websocket is connected, send data using send().
@@ -59,10 +59,10 @@ define(['jquery'], function() {
                 if (ws.readyState === 1 || ws.readyState === 2) {
                     ws.send("exit");
                 }
-                alert("You need to download, install and/or run the Sarlab service. Use this password to open the zip: sarlab");
+                alert("You need to download, install and/or run the Sarlab service.");
                 var a = document.createElement("a");
-                a.download = "sarlabservice.zip";
-                a.href = host + "/mod/ejsapp/sarlabservice.zip";
+                a.download = "installsarlabservice_win64.exe";
+                a.href = "http://sarlab2.uhu.es/downloads/installsarlabservice_win64.exe";
                 a.target = "_blank";
                 document.body.appendChild(a);
                 a.click();

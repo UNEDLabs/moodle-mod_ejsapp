@@ -51,9 +51,9 @@ class observers {
      */
     public static function ejsapp_book($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
     /**
@@ -64,9 +64,9 @@ class observers {
      */
     public static function ejsapp_booked($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
     /**
@@ -77,9 +77,9 @@ class observers {
      */
     public static function ejsapp_collab($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
     /**
@@ -90,9 +90,9 @@ class observers {
      */
     public static function ejsapp_inactive($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
     /**
@@ -103,9 +103,9 @@ class observers {
      */
     public static function ejsapp_viewed($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
     /**
@@ -116,9 +116,9 @@ class observers {
      */
     public static function ejsapp_wait($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
     /**
@@ -129,9 +129,9 @@ class observers {
      */
     public static function ejsapp_working($event) {
         // Write info in the db.
-        global $DB;
+        /*global $DB;
         $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);
+        $DB->insert_record('ejsapp_log', $record);*/
     }
 
 }

@@ -445,7 +445,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         global $PAGE;
         $username = $USER->username . "@" . $CFG->wwwroot;
         $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-            array($CFG->wwwroot, $commandsarlab, $sarlabip, $sarlabport, $sarlabinfo->practice,
+            array($commandsarlab, $sarlabip, $sarlabport, $sarlabinfo->practice,
                 $sarlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
         $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
     }*/

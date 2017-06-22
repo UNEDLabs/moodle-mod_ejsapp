@@ -386,7 +386,9 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $defaultvalues['display_lab_variables'] = $blocklyconf[9];
             $defaultvalues['display_lab_functions'] = $blocklyconf[10];
             $defaultvalues['display_lab_control'] = $blocklyconf[11];
-            $defaultvalues['display_lab_charts'] = $blocklyconf[12];
+            if (array_key_exists(12, $blocklyconf)) {
+                $defaultvalues['display_lab_charts'] = $blocklyconf[12];
+            }
         }
 
         // Element listing EJS public variables.

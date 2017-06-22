@@ -1744,8 +1744,10 @@ function create_blockly_configuration($ejsapp) {
             if ($blocklyconf[11] == 1) {
                 $jsconfcode .= "\n" . 'toolbox += ' . $labcontrol . ';';
             }
-            if ($blocklyconf[12] == 1) {
-                $jsconfcode .= "\n" . 'toolbox += ' . $labcharts . ';';
+            if (array_key_exists(12, $blocklyconf)) {
+                if ($blocklyconf[12] == 1) {
+                    $jsconfcode .= "\n" . 'toolbox += ' . $labcharts . ';';
+                }
             }
             $jsconfcode .= "\n" . "toolbox += '</category>'"; // Closes the lab category if created.
         }
