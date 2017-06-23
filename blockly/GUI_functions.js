@@ -1,6 +1,84 @@
 ///////////////
 
+/**
+ * Construct the blocks required by the flyout for the colours category.
+ * @param {!Blockly.Workspace} workspace The workspace this flyout is for.
+ * @return {!Array.<!Element>} Array of XML block elements.
+ */
+strings = function(workspace) {
+  var xmlList = [];
+  if (keys_string.length>0) {
+	  var blockText = '<xml>' +  '<block type="set_model_variable_string"></block>' + '</xml>';
+	  var block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+	  blockText = '<xml>' +  '<block type="get_model_variable_string"></block>' + '</xml>';
+	  block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+  }
+  return xmlList;
+};
 
+numbers = function(workspace) {
+  var xmlList = [];
+  if (keys_number.length>0) {
+	  var blockText = '<xml>' +  '<block type="set_model_variable_number"></block>' + '</xml>';
+	  var block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+	  blockText = '<xml>' +  '<block type="get_model_variable_number"></block>' + '</xml>';
+	  block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+  }
+  return xmlList;
+};
+
+booleans = function(workspace) {
+  var xmlList = [];
+  if (keys_boolean.length>0) {
+	  var blockText = '<xml>' +  '<block type="set_model_variable_boolean"></block>' + '</xml>';
+	  var block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+	  blockText = '<xml>' +  '<block type="get_model_variable_boolean"></block>' + '</xml>';
+	  block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+  }
+  return xmlList;
+};
+
+others = function(workspace) {
+  var xmlList = [];
+  if (keys_others.length>0) {
+	  var blockText = '<xml>' +  '<block type="set_model_variable_others"></block>' + '</xml>';
+	  var block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+	  blockText = '<xml>' +  '<block type="get_model_variable_others"></block>' + '</xml>';
+	  block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+  }
+  return xmlList;
+};
+
+functions = function(workspace) {
+  var xmlList = [];
+  var blockText = '<xml>' +  '<block type="play_lab"></block>' + '</xml>';
+  var block = Blockly.Xml.textToDom(blockText).firstChild;
+  xmlList.push(block);
+  var blockText = '<xml>' +  '<block type="pause_lab"></block>' + '</xml>';
+  var block = Blockly.Xml.textToDom(blockText).firstChild;
+  xmlList.push(block);
+  var blockText = '<xml>' +  '<block type="reset_lab"></block>' + '</xml>';
+  var block = Blockly.Xml.textToDom(blockText).firstChild;
+  xmlList.push(block);
+  var blockText = '<xml>' +  '<block type="evaluation"><value name="expre"><shadow type="text"><field name="TEXT">abc</field></shadow></value></block>' + '</xml>';
+  var block = Blockly.Xml.textToDom(blockText).firstChild;
+  xmlList.push(block);
+  if (keys_others.length>0) {
+	  var blockText = '<xml>' +  '<block type="replacefunc"></block>' + '</xml>';
+	  var block = Blockly.Xml.textToDom(blockText).firstChild;
+	  xmlList.push(block);
+  }
+  return xmlList;
+};
+  
  window.onload = function() 
   {
 	if (typeof _model != 'undefined') // Any scope
@@ -12,9 +90,14 @@
   }
 	  ///////////// INIT CHART ///////////////////////////////
 	  //cleanChart(); // To initialize the chart;
-	  
-	  
+	    //alert(toolbox);
+		//toolbox = toolbox.replace("<category name="Boolean"><block type="set_model_variable_boolean"></block><block type="get_model_variable_boolean"></block></category>); 
 		workspace = Blockly.inject('blocklyDiv',{media: 'blockly/media/',toolbox: toolbox});
+		workspace.registerToolboxCategoryCallback('strings', strings);
+		workspace.registerToolboxCategoryCallback('numbers', numbers);
+		workspace.registerToolboxCategoryCallback('booleans', booleans);
+		workspace.registerToolboxCategoryCallback('others', others);
+		workspace.registerToolboxCategoryCallback('functions', functions);
 		if(typeof initial != 'undefined'){
 			var xmlDom = Blockly.Xml.textToDom(initial);
 			Blockly.Xml.domToWorkspace(xmlDom,workspace);

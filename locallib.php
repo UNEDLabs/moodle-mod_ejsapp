@@ -1674,25 +1674,11 @@ function create_blockly_configuration($ejsapp) {
         $lab = "'<category name=\"" . get_string('xml_lab', 'ejsapp') . "\" colour=\"44\">'";
         $labvariables = "'<category name=\"" . get_string('xml_lab_variables', 'ejsapp') .
             "\"><block type=\"get_model_variable\"></block><block type=\"set_model_variable\"></block>" .
-            "<category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\">" .
-            "<block type=\"set_model_variable_boolean\"></block>" .
-            "<block type=\"get_model_variable_boolean\"></block></category><category name=\"" .
-            get_string('xml_lab_var_string', 'ejsapp') . "\">" .
-            "<block type=\"set_model_variable_string\"></block>" .
-            "<block type=\"get_model_variable_string\"></block></category><category name=\"" .
-            get_string('xml_lab_var_number', 'ejsapp') . "\">" .
-            "<block type=\"set_model_variable_number\"></block>" .
-            "<block type=\"get_model_variable_number\"></block></category><category name=\"" .
-            get_string('xml_functions', 'ejsapp') . "\">" .
-            "<block type=\"set_model_variable_funs\"></block>" .
-            "<block type=\"get_model_variable_funs\"></block></category><category name=\"" .
-            get_string('xml_lab_var_others', 'ejsapp') . "\">" .
-            "<block type=\"set_model_variable_others\"></block>" .
-            "<block type=\"get_model_variable_others\"></block></category></category>'";
-        $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') .
-            "\"><block type=\"play_lab\"></block><block type=\"pause_lab\"></block>" .
-            "<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>" .
-            "<block type=\"replacefunc\"></block><block type=\"evaluation\"><value name=\"expre\"><shadow type=\"text\"><field name=\"TEXT\">abc</field></shadow></value></block></category>'";
+            "<category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\"custom=\"booleans\"></category>" .
+            "<category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\"custom=\"strings\"></category>" .
+			"<category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\"custom=\"numbers\"></category>" .
+			"<category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\"custom=\"others\"></category></category>";
+        $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\"custom=\"others\"></category>'";
         $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') .
             "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block>" .
             "<block type=\"wait\"></block></category>'";
@@ -1700,6 +1686,11 @@ function create_blockly_configuration($ejsapp) {
             "\"><block type=\"createChart\"></block><block type=\"start_rec\"></block>" .
             "<block type=\"stop_rec\"></block></category>'";
 
+			
+			
+			
+
+			
         // Now, create the configuration by adding the categories selected in the ejsapp activity configuration.
         // Categories.
         $jsconfcode = "
