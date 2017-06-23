@@ -174,6 +174,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     array_push($blocklyconf, $ejsapp->display_functions);
     array_push($blocklyconf, $ejsapp->display_lab);
     array_push($blocklyconf, $ejsapp->display_lab_variables);
+    array_push($blocklyconf, $ejsapp->display_lab_execution);
     array_push($blocklyconf, $ejsapp->display_lab_functions);
     array_push($blocklyconf, $ejsapp->display_lab_control);
     array_push($blocklyconf, $ejsapp->display_lab_charts);
