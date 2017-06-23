@@ -474,7 +474,7 @@ function loadModelBlocks(){
 	Blockly.Blocks['initialize_lab'] = {
     		  init: function() {
     		    this.appendDummyInput()
-    		        .appendField("initialize the lab");
+    		        .appendField(Blockly.Msg.ExpINITIALIZE);
     		    this.setPreviousStatement(true, null);
     		    this.setNextStatement(true, null);
     		    this.setColour(0);
