@@ -1674,11 +1674,11 @@ function create_blockly_configuration($ejsapp) {
         $lab = "'<category name=\"" . get_string('xml_lab', 'ejsapp') . "\" colour=\"44\">'";
         $labvariables = "'<category name=\"" . get_string('xml_lab_variables', 'ejsapp') .
             "\"><block type=\"get_model_variable\"></block><block type=\"set_model_variable\"></block>" .
-            "<category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\"custom=\"booleans\"></category>" .
-            "<category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\"custom=\"strings\"></category>" .
-			"<category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\"custom=\"numbers\"></category>" .
-			"<category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\"custom=\"others\"></category></category>";
-        $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\"custom=\"others\"></category>'";
+            "<category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\" custom=\"booleans\"></category>" .
+            "<category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\" custom=\"strings\"></category>" .
+			"<category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\" custom=\"numbers\"></category>" .
+			"<category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\" custom=\"others\"></category></category>";
+        $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\" custom=\"others\"></category>'";
         $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') .
             "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block>" .
             "<block type=\"wait\"></block></category>'";
