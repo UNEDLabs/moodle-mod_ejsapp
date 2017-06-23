@@ -1678,7 +1678,10 @@ function create_blockly_configuration($ejsapp) {
             "<category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\" custom=\"strings\"></category>" .
 			"<category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\" custom=\"numbers\"></category>" .
 			"<category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\" custom=\"others\"></category></category>'";
-        $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\" custom=\"others\"></category>'";
+		$labexecution = "'<category name=\"" . get_string('xml_lab_execution', 'ejsapp') .
+            "\"><block type=\"play_lab\"></block><block type=\"pause_lab\"></block>" .	
+			"<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block></category>'";
+        $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\" custom=\"functions\"></category>'";
         $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') .
             "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block>" .
             "<block type=\"wait\"></block></category>'";
@@ -1730,13 +1733,18 @@ function create_blockly_configuration($ejsapp) {
                 $jsconfcode .= "\n" . 'toolbox += ' . $labvariables . ';';
             }
             if ($blocklyconf[10] == 1) {
-                $jsconfcode .= "\n" . 'toolbox += ' . $labfunctions . ';';
+                $jsconfcode .= "\n" . 'toolbox += ' . $labexecution . ';';
             }
             if ($blocklyconf[11] == 1) {
-                $jsconfcode .= "\n" . 'toolbox += ' . $labcontrol . ';';
+                $jsconfcode .= "\n" . 'toolbox += ' . $labfunctions . ';';
             }
-            if (array_key_exists(12, $blocklyconf)) {
-                if ($blocklyconf[12] == 1) {
+			if (array_key_exists(12, $blocklyconf)) {
+				if ($blocklyconf[12] == 1) {
+					$jsconfcode .= "\n" . 'toolbox += ' . $labcontrol . ';';
+				}
+			}
+            if (array_key_exists(13, $blocklyconf)) {
+                if ($blocklyconf[13] == 1) {
                     $jsconfcode .= "\n" . 'toolbox += ' . $labcharts . ';';
                 }
             }

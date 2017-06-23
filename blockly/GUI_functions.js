@@ -59,15 +59,6 @@ others = function(workspace) {
 
 functions = function(workspace) {
   var xmlList = [];
-  var blockText = '<xml>' +  '<block type="play_lab"></block>' + '</xml>';
-  var block = Blockly.Xml.textToDom(blockText).firstChild;
-  xmlList.push(block);
-  var blockText = '<xml>' +  '<block type="pause_lab"></block>' + '</xml>';
-  var block = Blockly.Xml.textToDom(blockText).firstChild;
-  xmlList.push(block);
-  var blockText = '<xml>' +  '<block type="reset_lab"></block>' + '</xml>';
-  var block = Blockly.Xml.textToDom(blockText).firstChild;
-  xmlList.push(block);
   var blockText = '<xml>' +  '<block type="evaluation"><value name="expre"><shadow type="text"><field name="TEXT">abc</field></shadow></value></block>' + '</xml>';
   var block = Blockly.Xml.textToDom(blockText).firstChild;
   xmlList.push(block);

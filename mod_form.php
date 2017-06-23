@@ -227,6 +227,11 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('display_lab_variables', 'display_lab', 'eq', 0);
         $mform->setDefault('display_lab_variables', 0);
 
+		$mform->addElement('selectyesno', 'display_lab_execution', get_string('display_lab_execution', 'ejsapp'));
+        $mform->disabledIf('display_lab_execution', 'use_blockly', 'eq', 0);
+        $mform->disabledIf('display_lab_execution', 'display_lab', 'eq', 0);
+        $mform->setDefault('display_lab_execution', 0);
+		
         $mform->addElement('selectyesno', 'display_lab_functions', get_string('display_lab_functions', 'ejsapp'));
         $mform->disabledIf('display_lab_functions', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_functions', 'display_lab', 'eq', 0);
@@ -384,10 +389,13 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $defaultvalues['display_functions'] = $blocklyconf[7];
             $defaultvalues['display_lab'] = $blocklyconf[8];
             $defaultvalues['display_lab_variables'] = $blocklyconf[9];
-            $defaultvalues['display_lab_functions'] = $blocklyconf[10];
-            $defaultvalues['display_lab_control'] = $blocklyconf[11];
+            $defaultvalues['display_lab_execution'] = $blocklyconf[10];
+            $defaultvalues['display_lab_functions'] = $blocklyconf[11];
             if (array_key_exists(12, $blocklyconf)) {
-                $defaultvalues['display_lab_charts'] = $blocklyconf[12];
+				$defaultvalues['display_lab_control'] = $blocklyconf[12];
+			}
+            if (array_key_exists(12, $blocklyconf)) {
+                $defaultvalues['display_lab_charts'] = $blocklyconf[13];
             }
         }
 
