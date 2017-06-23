@@ -394,7 +394,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             if (array_key_exists(12, $blocklyconf)) {
 				$defaultvalues['display_lab_control'] = $blocklyconf[12];
 			}
-            if (array_key_exists(12, $blocklyconf)) {
+            if (array_key_exists(13, $blocklyconf)) {
                 $defaultvalues['display_lab_charts'] = $blocklyconf[13];
             }
         }
