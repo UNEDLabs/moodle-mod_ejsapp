@@ -1677,7 +1677,7 @@ function create_blockly_configuration($ejsapp) {
             "<category name=\"" . get_string('xml_lab_var_boolean', 'ejsapp') . "\" custom=\"booleans\"></category>" .
             "<category name=\"" . get_string('xml_lab_var_string', 'ejsapp') . "\" custom=\"strings\"></category>" .
 			"<category name=\"" . get_string('xml_lab_var_number', 'ejsapp') . "\" custom=\"numbers\"></category>" .
-			"<category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\" custom=\"others\"></category></category>";
+			"<category name=\"" . get_string('xml_lab_var_others', 'ejsapp') . "\" custom=\"others\"></category></category>'";
         $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\" custom=\"others\"></category>'";
         $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') .
             "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block>" .
