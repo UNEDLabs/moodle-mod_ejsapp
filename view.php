@@ -134,6 +134,10 @@ create_blockly_configuration($ejsapp);
 $action = 'view';
 $accessed = false;
 
+// Define the div section for charts.
+$containerdiv = html_writer::div(html_writer::tag('ul',''), 'charts', array('id' => 'container-1'));
+$chartsdiv = html_writer::div($containerdiv, 'charts', array('id' => 'chart_div'));
+
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
 // whether the ejsapp instance is a remote lab or not.
 $sarlabinfo = null;
@@ -141,7 +145,8 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
     $accessed = true;
     $maxusetime = 604800; // High enough number... although it is never used in the case of a virtual lab.
     prepare_ejs_file($ejsapp);
-    echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo));
+    echo html_writer::div(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+        $chartsdiv, 'labchart');
 } else { // Remote lab.
     $remlabaccess = remote_lab_access_info($ejsapp, $course);
     $remlabconf = $remlabaccess->remlab_conf;
@@ -167,7 +172,8 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             }
             $accessed = true;
             prepare_ejs_file($ejsapp);
-            echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo));
+            echo html_writer::div(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+                $chartsdiv, 'labchart');
         } else {
             if (($remlabconf->usingsarlab == 1 && $remlabconf->sarlabcollab == 1)) {
                 // Teacher can still access in collaborative mode.
@@ -175,7 +181,8 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 $sarlabinfo = define_sarlab($remlabconf->sarlabinstance, $remlabconf->sarlabcollab, 'NULL',
                     $remlabaccess->labmanager, $maxusetime);
                 prepare_ejs_file($ejsapp);
-                echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo));
+                echo html_writer::div(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+                    $chartsdiv, 'labchart');
                 $action = 'collab_view';
             } else { // No access.
                 echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
@@ -203,7 +210,8 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 if (!is_null($sarlabinfo)) { // The user has an active booking -> he can access the lab.
                     $accessed = true;
                     prepare_ejs_file($ejsapp);
-                    echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo));
+                    echo html_writer::div(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+                        $chartsdiv, 'labchart');
                 } else { // No active booking.
                     echo $OUTPUT->box(get_string('no_booking', 'ejsapp'));
                     if (($remlabconf->usingsarlab == 1 && $remlabconf->sarlabcollab == 1)) {
@@ -212,8 +220,8 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                         $sarlabinfo = define_sarlab($remlabconf->sarlabinstance, $remlabconf->sarlabcollab, 'NULL',
                             $remlabaccess->labmanager, $maxusetime);
                         prepare_ejs_file($ejsapp);
-                        echo $OUTPUT->box(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo,
-                            $personalvarsinfo));
+                        echo html_writer::div(generate_embedding_code($ejsapp, $sarlabinfo, $datafiles, $collabinfo,
+                                $personalvarsinfo) . $chartsdiv, 'labchart');
                         $action = 'collab_view';
                     } else { // No access.
                         echo $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
@@ -296,7 +304,7 @@ if ($ejsapp->appwording) {
 }
 
 // Blockly programming space for Javascript labs.
-if ($ejsapp->class_file == '') {
+if ($accessed && $ejsapp->class_file == '') {
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
         $PAGE->requires->js_call_amd('mod_ejsapp/jqueryui', 'init');

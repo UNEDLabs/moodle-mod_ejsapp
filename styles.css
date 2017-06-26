@@ -15,3 +15,19 @@
 .path-mod-ejsapp .injectionDiv {
     width: 100%;
 }
+
+.path-mod-ejsapp .labchart {
+    display: flex;
+    justify-content: center;
+}
+
+.path-mod-ejsapp #EJsS {
+    flex-basis: 100%;
+    flex-shrink: 5;
+}
+
+.path-mod-ejsapp #chart_div {
+    flex-shrink: 0;
+    flex-grow: 1;
+    align-self: center;
+}

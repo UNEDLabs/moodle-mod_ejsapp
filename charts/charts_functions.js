@@ -12,7 +12,7 @@ function addTab(textName){
     var current_idx = ul.find("li").length + 1;
     //$("<li><a href='#fragment-" + current_idx + "'>"+textName+"</a><span id='close' onclick='removeTab("+(current_idx-1)+");'>x</span></li>" ).appendTo( ul );
 	$("<li><a href='#fragment-" + current_idx + "'>"+textName+"</a></li>" ).appendTo( ul );
-    tabs.append("<div id='fragment-" + current_idx + "'><div style='max-height: 600px; max-width: 800px;'><canvas id='myChart"+current_idx+"'></canvas></div></div>");
+    tabs.append("<div id='fragment-" + current_idx + "'><div style='max-height: 600px; width: 600px;'><canvas id='myChart"+current_idx+"'></canvas></div></div>");
     tabs.tabs("refresh");
     tabs.tabs("select", 0);
 	return "myChart"+current_idx;
