@@ -526,7 +526,7 @@ function loadJavaScriptModelBlocks(){
 			 var dropdown_d = block.getFieldValue("modelvariables");
 			 var number_name = block.getFieldValue('NAME1');
           	code = "recordvar(\""+dropdown_d+"\","+number_name+");\n";
-          return [code, Blockly.JavaScript.NONE];
+          return code;
 	}; 
 	
 
@@ -553,7 +553,7 @@ function loadJavaScriptModelBlocks(){
 		  chartInfo.push(chartInfo2);
 		  var code = "createChart(\""+name+"\", "+time+", "+chartNumber+");\n";
 		  chartNumber++;
-		  return [code, Blockly.JavaScript.NONE];
+		  return code;
 		};
 	  
 	  
@@ -642,7 +642,7 @@ function loadJavaScriptModelBlocks(){
 			code = "setValueModel('"+dropdown_d+"', "+value_name+");\n";
 		  else
 				code = dropdown_d+" = "+value_name+";\n";
-          return [code,Blockly.JavaScript.NONE];
+          return code;
     	  
       };
     
