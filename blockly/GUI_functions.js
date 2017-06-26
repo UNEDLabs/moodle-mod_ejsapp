@@ -279,7 +279,26 @@ myInterpreter = null;
 
     }
 	
+	
+	
+// Save a program in blockly
+var saveCode = function (context_id, user_id, ejsapp_id) {
+    var xmlDom = Blockly.Xml.workspaceToDom(workspace);
+    var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+    _model.saveText('blocks_context_id_' + context_id + '_user_id_' + user_id + '_ejsapp_id_' + ejsapp_id, 'blk', xmlText);
+};
 
+// Load a program in blockly
+var loadCode = function () {
+    _model.readText(null, '.blk',
+        function (xmlText) {
+            if (xmlText) {
+                workspace.clear();
+                xmlDom = Blockly.Xml.textToDom(xmlText);
+                Blockly.Xml.domToWorkspace(xmlDom, workspace);
+            }
+        });
+};
 	
 /////////////// INTERPRETER
 
@@ -290,24 +309,36 @@ myInterpreter = null;
       highlightPause = true;
     }
 
+	var functions;
 window.LoopTrap = 10;
     function parseCode() {
-      // Generate JavaScript code and parse it.
+	  // Generate JavaScript code and parse it.
       Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
       Blockly.JavaScript.addReservedWords('highlightBlock');
       Blockly.JavaScript.addReservedWords('LoopTrap');
       var code = Blockly.JavaScript.workspaceToCode(workspace);
       //Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
 	  code = "reInitLab();\n" + code ;
-	  
+		var code2 = code;
+		functions ="function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
+		var continueSearch=true;
+		while(continueSearch){
+			var pos = code2.search("function ");
+			if(pos==-1) continueSearch = false;
+			else{
+				var pos2 = code2.search("}\n");
+				functions = functions+"\n"+code2.slice(pos,pos2+1); 
+				code2=code2.slice(pos2+1,code2.length);
+			}
+		}
+		//////////////////////////
+	  console.log("Code: "+code);
+      //Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
       myInterpreter = new Interpreter(code, initApi);
-
-      alert('Ready to execute this code:\n\n' + code);
-      document.getElementById('stepButton').disabled = '';
       highlightPause = false;
       workspace.highlightBlock(null);
 	  count_chart = 0;
-    }
+}
 	
 function changeInterval() {
 	interval = false;
