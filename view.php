@@ -314,12 +314,9 @@ if ($accessed && $ejsapp->class_file == '') {
             html_writer::tag('script', '', array('src' => 'blockly/blockly_compressed.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blocks_compressed.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/javascript_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
             html_writer::tag('script', '', array('src' => 'charts/Chart.bundle.js')) .
-            html_writer::tag('script', '', array('src' => 'charts/jquery.js')) .
-            html_writer::tag('script', '', array('src' => 'charts/jquery-ui-1.9.2.custom.min.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/GUI_functions.js')) .
-            html_writer::tag('script', '', array('src' => 'charts/charts_functions.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/API_functions.js'));
         if (strpos(current_language(), 'es') !== false) {
             $includejslibraries .= html_writer::tag('script', '', array('src' => 'blockly/es.js'));
