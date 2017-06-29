@@ -598,7 +598,7 @@ function loadJavaScriptModelBlocks() {
 		var dropdown_d = block.getFieldValue(text);
 		var code;
 		if (!condition)
-			code = "getValueModel(\"" + dropdown_d + "\")";
+			code = "getValueModel('" + dropdown_d + "')";
 		else
 			code = dropdown_d;
 		return [code, Blockly.JavaScript.NONE];

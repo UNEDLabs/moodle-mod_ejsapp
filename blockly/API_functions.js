@@ -98,8 +98,10 @@ function replaceFunction(dropdown_original, text_params, text_newvars, value_nam
 	statem.splice(0, 1);
 	var text_vars = "";
 	var array = text_newvars.split(',');
-	for (var i in array) {
-		text_vars = text_vars + "var " + array[i] + "; ";
+	if(text_newvars!==""){
+		for (var i in array) {
+			text_vars = text_vars + "var " + array[i] + "; ";
+		}
 	}
 	var fill = new Function(text_params, text_vars + statements_code + ' return ' + value_name + ';');
 	setValueModel(dropdown_original, fill);
