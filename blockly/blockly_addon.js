@@ -764,7 +764,7 @@ function loadJavaScriptModelBlocks() {
 
 ////////// CHARTS /////////////////////////////////////////////
 
-var tabs = $("#slideshow-wrapper");
+var tabs = document.getElementById('slideshow-wrapper');
 var charts_count = 0;
 var actual_chart = 0;
 
@@ -786,7 +786,13 @@ function prevChart() {
 
 function addTab(textName) {
 	charts_count++;
-	$("<div id='fragment-" + charts_count + "'style='max-height: 600px; max-width: 800px;'><canvas id='myChart" + charts_count + "'></canvas></div>").appendTo(tabs);
+	var iDiv = document.createElement('div');
+	iDiv.id = 'fragment-' + charts_count ;
+	iDiv.style = 'max-height: 600px; max-width: 800px;' ;
+	var iCanvas = document.createElement('canvas');
+	iCanvas.id = 'myChart' + charts_count ;
+	iDiv.appendChild(iCanvas);
+	tabs.appendChild(iDiv);
 	hideAllCharts();
 	showChart(document.getElementById('fragment-' + (charts_count)));
 	actual_chart = charts_count;
@@ -951,13 +957,12 @@ function toCSV(data) {
 	window.open(encodedUri);
 }
 
-function cleanCharts() {
+/*function cleanCharts() {
 	var ul = tabs.find("ul");
 	for (var i = ul.find("li").length - 1; i >= 0; i--) {
 		tabs.tabs('destroy').tabs();
 		tabs.tabs('remove', i);
 	}
-
 	chartInfo = new Array();
 	tabs = $("#container-1").tabs();
 	record = false;
@@ -965,8 +970,7 @@ function cleanCharts() {
 	chartArray = new Array();
 	titlesArray = new Array();
 	chartNumber = 0;
-
-}
+}*/
 
 function hideAllCharts() {
 	for (var k = 0; k < charts_count; k++) {
