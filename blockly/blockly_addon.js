@@ -3,22 +3,21 @@ var keys_number = [];
 var keys_string = [];
 var keys_others = [];
 var events_vars = [];
-var statem = new Array;
+var statem = [];
 var record = false;
-var timers = new Array();
-var chartArray = new Array();
-var titlesArray = new Array();
+var timers = [];
+var chartArray = [];
+var titlesArray = [];
 var count_chart = 0;
 var chartNumber = 0;
-var chartInfo = new Array();
+var chartInfo = [];
 var checkedValue;
 var functions;
-var events = [{}
-];
+var events = [{}];
 var fixedStatements = [];
 var num_events = 0;
 var arrayColumn = [1];
-var conditionFixed = []
+var conditionFixed = [];
 var workspace;
 var myInterpreter = null;
 var code;
@@ -31,10 +30,10 @@ function loadModelBlocks() {
 	var obj = _model._userSerialize();
 
 	var keys = [];
-	var condition = false;
 	var i = 1;
+    var dupla;
 	for (var k in obj) {
-		var dupla = []
+		dupla = [];
 		dupla.push(k);
 		dupla.push(k);
 		switch (typeof obj[k]) {
@@ -56,7 +55,7 @@ function loadModelBlocks() {
 	}
 
 	for (var e in _vars) {
-		var dupla = []
+		dupla = [];
 		dupla.push(_vars[e]);
 		dupla.push(_vars[e]);
 		events_vars.push(dupla);
@@ -84,6 +83,7 @@ function loadModelBlocks() {
 			this.setTooltip('');
 		}
 	};
+
 	Blockly.Blocks['get_model_variable_boolean'] = {
 		init: function () {
 			this.appendDummyInput()
@@ -131,6 +131,7 @@ function loadModelBlocks() {
 			this.setTooltip('');
 		}
 	};
+
 	Blockly.Blocks['get_model_variable_number'] = {
 		init: function () {
 			this.appendDummyInput()
@@ -154,6 +155,7 @@ function loadModelBlocks() {
 			this.setTooltip('');
 		}
 	};
+
 	Blockly.Blocks['get_model_variable_others'] = {
 		init: function () {
 			this.appendDummyInput()
@@ -169,7 +171,7 @@ function loadModelBlocks() {
 			this.appendValueInput("NAME")
 			.appendField(Blockly.Msg.LISTS_SET_INDEX_SET)
 			.appendField(new Blockly.FieldDropdown(keys_others), "model variables4")
-			.appendField(Blockly.Msg.TEXT_APPEND_TO)
+			.appendField(Blockly.Msg.TEXT_APPEND_TO);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
 			this.setColour(120);
@@ -385,7 +387,7 @@ function loadModelBlocks() {
 			// Disconnect any children that don't belong.
 			for (var i = 0; i < this.itemCount_; i++) {
 				var connection = this.getInput('ADD' + i).connection.targetConnection;
-				if (connection && connections.indexOf(connection) == -1) {
+				if (connection && connections.indexOf(connection) === -1) {
 					connection.disconnect();
 				}
 			}
@@ -488,7 +490,7 @@ function loadModelBlocks() {
 		init: function () {
 			this.appendDummyInput()
 			.appendField(Blockly.Msg.ExpREPLACE)
-			.appendField(new Blockly.FieldDropdown(keys_others), "original")
+			.appendField(new Blockly.FieldDropdown(keys_others), "original");
 			this.appendDummyInput()
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField(Blockly.Msg.ExpINPUT)
@@ -520,6 +522,7 @@ function loadJavaScriptModelBlocks() {
 	Blockly.JavaScript['start_rec'] = function (block) {
 		return "rec(true);\n";
 	};
+
 	Blockly.JavaScript['stop_rec'] = function (block) {
 		return "rec(false);\n";
 	};
@@ -532,7 +535,7 @@ function loadJavaScriptModelBlocks() {
 		var value_name = Blockly.JavaScript.valueToCode(block, 'x', Blockly.JavaScript.ORDER_ATOMIC);
 		var c0name = block.getFieldValue('cName0');
 		//alert(block.itemCount_);
-		var chartInfo2 = new Array();
+		var chartInfo2 = [];
 		chartInfo2.push({
 			"name": c0name,
 			"value": value_name,
@@ -565,11 +568,10 @@ function loadJavaScriptModelBlocks() {
 		condition = false;
 		// TODO: Assemble JavaScript into code variable.
 		var condString = statements_name1 + " - " + dropdown_d;
-		var actString = statements_name2;
 		events.push({
 			"num": num_events,
 			"cond": condString,
-			"act": actString
+			"act": statements_name2
 		});
 		code = "addEvent(" + num_events + ");\n";
 		num_events++;
@@ -589,9 +591,8 @@ function loadJavaScriptModelBlocks() {
 		var number_name = block.getFieldValue('TIME');
 		number_name = Number(number_name) * 1000;
 		//var statements_name = Blockly.JavaScript.statementToCode(block, 'CODE');
-		//var code = 'setTimeout(function() {\n'+statements_name+'\n}, '+number_name+');'+'\n';
-		var code = 'setTimeStep(' + number_name + ');\n';
-		return code;
+		//return 'setTimeout(function() {\n'+statements_name+'\n}, '+number_name+');'+'\n';
+		return 'setTimeStep(' + number_name + ');\n';
 	};
 
 	function getJS(block, text) {
@@ -603,7 +604,8 @@ function loadJavaScriptModelBlocks() {
 			code = dropdown_d;
 		return [code, Blockly.JavaScript.NONE];
 
-	};
+	}
+
 	/* function setJS(block,text){
 	var func = false;
 	var dropdown_d = block.getFieldValue(text);
@@ -634,7 +636,7 @@ function loadJavaScriptModelBlocks() {
 		var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
 		var code;
 		var obj = _model._userSerialize();
-		if ((typeof(obj[dropdown_d])).localeCompare("function") == 0) {
+		if ((typeof(obj[dropdown_d])).localeCompare("function") === 0) {
 			value_name = value_name.replace("()", "");
 		}
 		if (!condition)
@@ -643,11 +645,12 @@ function loadJavaScriptModelBlocks() {
 			code = dropdown_d + " = " + value_name + ";\n";
 		return code;
 
-	};
+	}
 
 	Blockly.JavaScript['get_model_variable_boolean'] = function (block) {
 		return getJS(block, "modelvariables1");
 	};
+
 	Blockly.JavaScript['set_model_variable_boolean'] = function (block) {
 		return setJS(block, "model variables1");
 	};
@@ -662,6 +665,7 @@ function loadJavaScriptModelBlocks() {
 	Blockly.JavaScript['get_model_variable_number'] = function (block) {
 		return getJS(block, "modelvariables3");
 	};
+
 	Blockly.JavaScript['set_model_variable_number'] = function (block) {
 		return setJS(block, "model variables3");
 	};
@@ -669,6 +673,7 @@ function loadJavaScriptModelBlocks() {
 	Blockly.JavaScript['get_model_variable_others'] = function (block) {
 		return getJS(block, "modelvariables4");
 	};
+
 	Blockly.JavaScript['set_model_variable_others'] = function (block) {
 		return setJS(block, "model variables4");
 	};
@@ -676,6 +681,7 @@ function loadJavaScriptModelBlocks() {
 	Blockly.JavaScript['get_model_variable'] = function (block) {
 		return getJS(block, "modelvariables");
 	};
+
 	Blockly.JavaScript['set_model_variable'] = function (block) {
 		return setJS(block, "model variables");
 	};
@@ -697,7 +703,6 @@ function loadJavaScriptModelBlocks() {
 	};
 
 	//Blockly.JavaScript.init=function(a){Blockly.JavaScript.definitions_=Object.create(null);Blockly.JavaScript.functionNames_=Object.create(null);Blockly.JavaScript.variableDB_?Blockly.JavaScript.variableDB_.reset():Blockly.JavaScript.variableDB_=new Blockly.Names(Blockly.JavaScript.RESERVED_WORDS_);var b=[];a=a.variableList;if(a.length){for(var c=0;c<a.length;c++)b[c]=Blockly.JavaScript.variableDB_.getName(a[c],Blockly.Variables.NAME_TYPE);Blockly.JavaScript.definitions_.variables="var "+b.join(", ")+";"}};
-
 
 	Blockly.JavaScript.init = function (a) {
 		Blockly.JavaScript.definitions_ = Object.create(null);
@@ -737,8 +742,7 @@ function loadJavaScriptModelBlocks() {
 
 	Blockly.JavaScript['evaluation'] = function (block) {
 		var value_name = Blockly.JavaScript.valueToCode(block, 'expre', Blockly.JavaScript.ORDER_ATOMIC);
-		var code = "evaluate(" + value_name + ");\n";
-		return code;
+		return "evaluate(" + value_name + ");\n";
 	};
 
 	Blockly.JavaScript['replacefunc'] = function (block) {
@@ -779,7 +783,7 @@ function nextChart() {
 function prevChart() {
 	hideAllCharts();
 	actual_chart--;
-	if (actual_chart == 0)
+	if (actual_chart === 0)
 		actual_chart = charts_count;
 	showChart(document.getElementById('fragment-' + (actual_chart)));
 }
@@ -823,7 +827,7 @@ function createChart(textName, time, chartNumber) {
 			break;
 		}
 	}
-	if (exists == -1) {
+    if (exists === -1) {
 		initChart(addTab(textName), textName, chartNumber, time);
 	} else {
 		toCSV(chartArray[0].data.datasets[0].data);
@@ -863,7 +867,7 @@ function initChart(place, textName, chartNumber, time) {
 				text: textName
 			},
 			tooltips: {
-				mode: 'index',
+				mode: 'index'
 			},
 			hover: {
 				mode: 'index'
@@ -889,7 +893,7 @@ function initChart(place, textName, chartNumber, time) {
 			}
 		}
 	};
-	chart = new Chart(ctx, config);
+	var chart = new Chart(ctx, config);
 	for (var i = 1; i < chartInfo[chartNumber].length; i++) {
 		var ejey = chartInfo[chartNumber][i];
 		var dataSet = {
@@ -914,11 +918,11 @@ var getData = function (number, inforNumber, dataSetNumber) {
 			var val = chartInfo[inforNumber][i];
 			var y = eval(val["value"]);
 			chartArray[number].data.datasets[i - 1 + dataSetNumber].data[chartArray[number].data.datasets[i - 1 + dataSetNumber].data.length] = {
-				x,
-				y
+				x:x,
+				y:y
 			};
 			if ((chartInfo[inforNumber][0]["checkBox"])) {
-				if (i == 1)
+				if (i === 1)
 					chartInfo[inforNumber][0]["number"] = chartInfo[inforNumber][0]["number"] - 1;
 				if (chartInfo[inforNumber][0]["number"] < 0)
 					chartArray[number].data.datasets[i - 1 + dataSetNumber].data.splice(0, 1); // remove first data point
@@ -926,7 +930,7 @@ var getData = function (number, inforNumber, dataSetNumber) {
 		}
 		chartArray[number].update();
 	}
-}
+};
 
 var randomScalingFactor = function () {
 	return Math.round(Math.random() * 255) + 1
@@ -1041,8 +1045,8 @@ functions = function (workspace) {
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	if (keys_others.length > 0) {
-		var blockText = '<xml>' + '<block type="replacefunc"></block>' + '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
+		blockText = '<xml>' + '<block type="replacefunc"></block>' + '</xml>';
+		block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block);
 	}
 	return xmlList;
@@ -1050,7 +1054,7 @@ functions = function (workspace) {
 
 ///////////////// ONLOAD //////////////////////
 window.onload = function () {
-	if (typeof _model != 'undefined') // Any scope
+	if (typeof _model !== 'undefined') // Any scope
 	{
 		///////////////////// BLOCKLY BLOCKS ///////////////////////////
 		loadModelBlocks();
@@ -1070,9 +1074,9 @@ window.onload = function () {
 	workspace.registerToolboxCategoryCallback('booleans', booleans);
 	workspace.registerToolboxCategoryCallback('others', others);
 	workspace.registerToolboxCategoryCallback('functions', functions);
-	if (typeof initial != 'undefined') {
+	if (typeof initial !== 'undefined') {
 		var xmlDom = Blockly.Xml.textToDom(initial);
 		Blockly.Xml.domToWorkspace(xmlDom, workspace);
 	}
 
-}
+};
