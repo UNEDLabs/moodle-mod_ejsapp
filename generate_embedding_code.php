@@ -287,7 +287,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
             $endmessage = get_string('end_message', 'ejsapp');
             $recfile = get_data_file($userrecfile, $initialrecfile);
             $search = "}, false);";
-            $replace = "_model.readText('$recfile','.rec',function(content){_model.playCapture(JSON.parse(content)," . 
+            $replace = "_model.readText('$recfile','.rec',function(content){_model.playCapture(JSON.parse(content)," .
                 "function(){alert('$endmessage')})});
             }, false);";
             $pos = strpos($code, $search);
@@ -304,7 +304,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
             if ($blocklyconf[0] == 1) {
                 $blkfile = get_data_file($userblkfile, $initialblkfile);
                 $search = "}, false);";
-                $replace = "_model.readText('$blkfile','.blk',function(xmlText){if (xmlText){workspace.clear();" . 
+                $replace = "_model.readText('$blkfile','.blk',function(xmlText){if (xmlText){workspace.clear();" .
                     "xmlDom = Blockly.Xml.textToDom(xmlText);Blockly.Xml.domToWorkspace(xmlDom, workspace);}});
                 }, false);";
                 $pos = strpos($code, $search);
@@ -321,7 +321,9 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
             $personalizevarscode = "'{";
             for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
                 $personalizevarscode .= '"' . $personalvarsinfo->name[$i] . '":' . $personalvarsinfo->value[$i];
-                if ($i < count($personalvarsinfo->name) - 1) $personalizevarscode .= ",";
+                if ($i < count($personalvarsinfo->name) - 1) {
+                    $personalizevarscode .= ",";
+                }
             }
             $personalizevarscode .= "}'";
             $replace = "," . '"' . bin2hex(base64_encode($personalizevarscode)) . '"';
@@ -333,7 +335,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         // End of loading state, controller, interaction and blockly programs files as well as personalized variables.
 
         // End message when the recording of the user interaction stops.
-        $endmessage = get_string('end_message','ejsapp');
+        $endmessage = get_string('end_message', 'ejsapp');
         $search = "window.alert(end_reproduction_message);";
         $replace = "window.alert(\"$endmessage\");";
         $code = str_replace($search, $replace, $code);
@@ -341,8 +343,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         // Embedding the js code in the html file in case there is a separated js file.
         if ($separatedjs) {
             $code = '<script type="text/javascript"><!--//--><![CDATA[//><!--' . "\n" . $code . '//--><!]]></script>';
-            $code = substr($htmlcode, 0, -strlen($htmlcode)
-                    + strpos($htmlcode, '<div id="_topFrame" style="text-align:center"')) .
+            $code = substr($htmlcode, 0, -strlen($htmlcode) +
+                    strpos($htmlcode, '<div id="_topFrame" style="text-align:center"')) .
                 '<div id="_topFrame" style="text-align:center"></div>' . $code . '</div>';
         }
 

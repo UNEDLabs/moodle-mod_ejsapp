@@ -428,6 +428,7 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
 
     // TODO: Replace links for user files.
 
+
     // Replace call for main function so we can later pass parameters to it.
     // TODO: Not needed in newest versions of EjsS.
     $search = "window.addEventListener('load', function () {  new " . $explodedname[0];
@@ -1692,15 +1693,9 @@ function create_blockly_configuration($ejsapp) {
             "\"><block type=\"createChart\"></block><block type=\"start_rec\"></block>" .
             "<block type=\"stop_rec\"></block></category>'";
 
-			
-			
-			
-
-			
         // Now, create the configuration by adding the categories selected in the ejsapp activity configuration.
         // Categories.
-        $jsconfcode = "
-        var time_step = 10; // INTERVAL BETWEEN ACTIONS
+        $jsconfcode = "var time_step = 10; // INTERVAL BETWEEN ACTIONS
         var buttonFunction = playCode;
         
         var playCode = function playCode() {
