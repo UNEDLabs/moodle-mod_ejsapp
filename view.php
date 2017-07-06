@@ -135,8 +135,17 @@ $action = 'view';
 $accessed = false;
 
 // Define the div section for charts.
-$containerdiv = html_writer::div(html_writer::tag('ul',''), 'charts', array('id' => 'container-1'));
-$chartsdiv = html_writer::div($containerdiv, 'charts', array('id' => 'chart_div'));
+$wrapper = html_writer::div('', 'charts', array('id' => 'slideshow-wrapper'));
+/*$prevchart = html_writer::img('blockly/media/prev.png', 'Previous graph', array('id' => 'prev_chart',
+    'onclick' => 'prevChart()'));
+$nextchart = html_writer::img('blockly/media/next.png', 'Next graph', array('id' => 'next_chart',
+    'onclick' => 'nextChart()'));*/
+$prevchart = html_writer::tag('i', '', array('class' => 'fa fa-chevron-left fa-2x', 'id' => 'prev_chart',
+        'onclick' => 'prevChart()'));
+$nextchart = html_writer::tag('i', '', array('class' => 'fa fa-chevron-right fa-2x', 'id' => 'next_chart',
+    'onclick' => 'nextChart()'));
+$buttonscharts = html_writer::div($prevchart . $nextchart, 'charts', array('id' => 'buttons_charts'));
+$chartsdiv = html_writer::div($wrapper . $buttonscharts, 'charts', array('id' => 'slideshow'));
 
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
 // whether the ejsapp instance is a remote lab or not.

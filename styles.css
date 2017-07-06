@@ -26,8 +26,22 @@
     flex-shrink: 5;
 }
 
-.path-mod-ejsapp #chart_div {
+.path-mod-ejsapp #slideshow {
     flex-shrink: 0;
     flex-grow: 1;
     align-self: center;
+    display: none;
+    flex-direction: column;
+    min-width: 40%;
+}
+
+.path-mod-ejsapp #prev_chart {
+    margin: 0 30px;
+}
+
+.path-mod-ejsapp #buttons_charts {
+    margin-top: 20px;
+    display: none;
+    flex-direction: row;
+    justify-content: center;
 }

@@ -412,7 +412,7 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
     $replace = '';
     $code = str_replace($search, $replace, $code);
 
-    // Replace link for common_script.js and textsizedetector.js.
+    // Replace links for common_script.js, textsizedetector.js and the ejss library file.
     $search = '<script src="_ejs_library/scripts/common_script.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/scripts/common_script.js"></script>';
     $code = str_replace($search, $replace, $code);
@@ -425,6 +425,8 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
     $search = '<script src="_ejs_library/ejsS.v1.max.js"></script>';
     $replace = '<script src="' . $path .'_ejs_library/ejsS.v1.max.js"></script>';
     $code = str_replace($search, $replace, $code);
+
+    // TODO: Replace links for user files.
 
     // Replace call for main function so we can later pass parameters to it.
     // TODO: Not needed in newest versions of EjsS.

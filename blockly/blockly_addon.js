@@ -800,9 +800,10 @@ function addTab(textName) {
 	hideAllCharts();
 	showChart(document.getElementById('fragment-' + (charts_count)));
 	actual_chart = charts_count;
-	if(charts_count>1){
-		document.getElementById("prev").style.display="block";
-		document.getElementById("next").style.display="block";
+    if (charts_count === 1) {
+        document.getElementById("slideshow").style.display = "flex";
+    } else if (charts_count === 2) {
+		document.getElementById("buttons_charts").style.display="flex";
 	}
 	return "myChart" + charts_count;
 }
