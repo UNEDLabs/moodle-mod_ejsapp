@@ -15,7 +15,7 @@ Set up your machine:
 
 Push to your fork and [submit a pull request](https://github.com/UNEDLabs/moodle-mod_ejsapp/compare/).
 
-At this point, as we say in Spain, the ball is in our roof. meaning that now its our turn to do something. You can probably expect us to comment on your pull requests within three business days. We may suggest some changes or improvements or alternatives.
+At this point, as we say in Spain, the ball is in our roof, meaning that now its our turn to do something. You can probably expect us to comment on your pull requests within three business days. We may suggest some changes or improvements or alternatives.
 
 A couple of things that will increase the chance that your pull request is accepted:
 
