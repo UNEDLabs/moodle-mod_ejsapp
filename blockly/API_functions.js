@@ -107,6 +107,14 @@ function replaceFunction(dropdown_original, text_params, text_newvars, value_nam
 	setValueModel(dropdown_original, fill);
 }
 
+function getVarExp(name){
+	return window[name];
+}
+
+function setVarExp(name,value){
+	window[name]=value;
+}
+
 //////// INTERPRETER ///////////////////
 
 function initApi(interpreter, scope) {
@@ -180,6 +188,27 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(addFixedRelation(number));
 	};
 	interpreter.setProperty(scope, 'addFixedRelation',
+		interpreter.createNativeFunction(wrapper));
+	
+	// Add an API function for the define() block.
+	var wrapper = function (name) {
+		return interpreter.createPrimitive(setVarExp(name,0));
+	};
+	interpreter.setProperty(scope, 'define',
+		interpreter.createNativeFunction(wrapper));
+	
+	// Add an API function for the setVarExp() block.
+	var wrapper = function (name,value) {
+		return interpreter.createPrimitive(setVarExp(name,value));
+	};
+	interpreter.setProperty(scope, 'setVarExp',
+		interpreter.createNativeFunction(wrapper));
+		
+	// Add an API function for the getVarExp() block.
+	var wrapper = function (name) {
+		return interpreter.createPrimitive(getVarExp(name));
+	};
+	interpreter.setProperty(scope, 'getVarExp',
 		interpreter.createNativeFunction(wrapper));
 
 	// Add an API function for the play block.

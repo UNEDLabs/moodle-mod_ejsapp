@@ -495,10 +495,10 @@ function loadModelBlocks() {
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField(Blockly.Msg.ExpINPUT)
 			.appendField(new Blockly.FieldTextInput(""), "params");
-			this.appendDummyInput()
+			/*this.appendDummyInput()
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField(Blockly.Msg.ExpNEWVAR)
-			.appendField(new Blockly.FieldTextInput(""), "newVars");
+			.appendField(new Blockly.FieldTextInput(""), "newVars");*/
 			this.appendStatementInput("code")
 			.setCheck(null)
 			.appendField(Blockly.Msg.ExpCODE);
@@ -713,11 +713,14 @@ function loadJavaScriptModelBlocks() {
 		if (a.length) {
 			for (var c = 0; c < a.length; c++)
 				b[c] = Blockly.JavaScript.variableDB_.getName(a[c], Blockly.Variables.NAME_TYPE);
-			Blockly.JavaScript.definitions_.variables = b.join("=0, ") + "=0;"
+			//Blockly.JavaScript.definitions_.variables = 'window["'+b.join('=0, ') + '"]=0;';
+			Blockly.JavaScript.definitions_.variables = "define('"+b+"')";
 		}
 	};
-
-	Blockly.JavaScript.variables_get = function (a) {
+	
+	Blockly.JavaScript.variables={};
+	
+	/*Blockly.JavaScript.variables_get = function (a) {
 		//if(!condition)
 		return [Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"), Blockly.Variables.NAME_TYPE), Blockly.JavaScript.ORDER_ATOMIC]
 		//else
@@ -731,6 +734,16 @@ function loadJavaScriptModelBlocks() {
 		return Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"), Blockly.Variables.NAME_TYPE) + " = " + b + ";\n"
 		//else
 		//return "window."+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+" = "+b+";\n"
+	};*/
+
+	Blockly.JavaScript.variables_get=function(a){
+		return["getVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"')",Blockly.JavaScript.ORDER_ATOMIC]
+	};
+	
+	Blockly.JavaScript.variables_set=function(a){
+		var b=Blockly.JavaScript.valueToCode(a,"VALUE",Blockly.JavaScript.ORDER_ASSIGNMENT)||"0"; 
+		//return "setVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+" = "+b+";\n"
+		return "setVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"',"+b+");\n";
 	};
 
 	Blockly.JavaScript['resultado'] = function (block) {
@@ -748,7 +761,7 @@ function loadJavaScriptModelBlocks() {
 	Blockly.JavaScript['replacefunc'] = function (block) {
 		var dropdown_original = block.getFieldValue('original');
 		var text_params = block.getFieldValue('params');
-		var text_newvars = block.getFieldValue('newVars');
+		var text_newvars = "";//block.getFieldValue('newVars');
 		var statements_code = Blockly.JavaScript.statementToCode(block, 'code');
 		var value_name = Blockly.JavaScript.valueToCode(block, 'return', Blockly.JavaScript.ORDER_ATOMIC);
 		// TODO: Assemble JavaScript into code variable.
@@ -831,7 +844,7 @@ function createChart(textName, time, chartNumber) {
     if (exists === -1) {
 		initChart(addTab(textName), textName, chartNumber, time);
 	} else {
-		toCSV(chartArray[0].data.datasets[0].data);
+		//toCSV(chartArray[0].data.datasets[0].data);
 		addtoChart(chartNumber, exists, time);
 	}
 }
@@ -950,7 +963,7 @@ function rec(bool) {
 /**
  * Exports and triggers download of chart data as CSV file
  */
-function toCSV(data) {
+/*function toCSV(data) {
 	var csvContent;
 	csvContent = "data:text/csv;charset=utf-8\n";
 	for (var i = 0; i < data.length; i++) {
@@ -960,7 +973,7 @@ function toCSV(data) {
 
 	var encodedUri = encodeURI(csvContent);
 	window.open(encodedUri);
-}
+}*/
 
 /*function cleanCharts() {
 	var ul = tabs.find("ul");
@@ -1040,13 +1053,14 @@ others = function (workspace) {
 	return xmlList;
 };
 
+
 functions = function (workspace) {
 	var xmlList = [];
 	var blockText = '<xml>' + '<block type="evaluation"><value name="expre"><shadow type="text"><field name="TEXT">abc</field></shadow></value></block>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	if (keys_others.length > 0) {
-		blockText = '<xml>' + '<block type="replacefunc"></block>' + '</xml>';
+		blockText = '<xml>' + '<block type="replacefunc"><value name="return"><shadow type="math_number"><field name="NUM">0</field></shadow></value></block>' + '</xml>';
 		block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block);
 	}
