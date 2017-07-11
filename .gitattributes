@@ -15,3 +15,10 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+#Vendored software
+charts/* linguist-vendored
+blockly/media/* linguist-vendored
+blockly/blockly_compressed.js linguist-vendored
+blockly/blocks_compressed.js linguist-vendored
+blockly/javascript_compressed.js linguist-vendored
