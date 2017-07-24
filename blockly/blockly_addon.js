@@ -5,12 +5,6 @@ var keys_others = [];
 var events_vars = [];
 var statem = [];
 var record = false;
-var timers = [];
-var chartArray = [];
-var titlesArray = [];
-var count_chart = 0;
-var chartNumber = 0;
-var chartInfo = [];
 var checkedValue;
 var functions;
 var events = [{}];
@@ -24,10 +18,16 @@ var code;
 var highlightPause = false;
 var interval = false;
 var inter;
+var paramsList = "";
+var replacing = false;
+var special = false;
+var declared_variables_remote = [];
+var function_code_remote = "";
+var remote = false;
 
 function loadModelBlocks() {
 	var _vars = _model.getOdes()[0]._getOdeVars();
-	var obj = _model._userSerialize();
+	var obj = _model._userSerializePublic();
 
 	var keys = [];
 	var i = 1;
@@ -292,13 +292,23 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['evaluation'] = {
 		init: function () {
-			this.appendValueInput("expre")
-			.setCheck("String")
-			.appendField(Blockly.Msg.ExpEVAL);
+			special = true;
+			this.appendDummyInput()
+			.appendField(Blockly.Msg.ExpEVAL)
+			.appendField(new Blockly.FieldTextInput("abc"), "expre");
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, "null");
 			this.setColour(0);
 			this.setTooltip('');
+			this.setCommentText("abc");
+			this.comment.setBubbleSize(300, 150);
+			special = false;
+		},
+		onchange: function(ev) {
+				if(ev.element==="comment")
+					this.setFieldValue(this.getCommentText(),"expre");
+				if(ev.element==="field")
+					this.setCommentText(this.getFieldValue('expre'));
 		}
 	};
 
@@ -493,8 +503,8 @@ function loadModelBlocks() {
 			.appendField(new Blockly.FieldDropdown(keys_others), "original");
 			this.appendDummyInput()
 			.setAlign(Blockly.ALIGN_RIGHT)
-			.appendField(Blockly.Msg.ExpINPUT)
-			.appendField(new Blockly.FieldTextInput(""), "params");
+			.appendField("", "aux")
+			.appendField("", "params")
 			/*this.appendDummyInput()
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField(Blockly.Msg.ExpNEWVAR)
@@ -511,7 +521,20 @@ function loadModelBlocks() {
 			this.setColour(0);
 			this.setTooltip('');
 			this.setHelpUrl('');
+		},
+		onchange: function(ev) {
+			var params = getParamNames(getValueModel(this.getFieldValue('original')));
+			paramsList = paramsList+params;
+			if (/\S/.test(params)){
+				this.setFieldValue(Blockly.Msg.ExpINPUT+":","aux");
+				this.setFieldValue(getParamNames(getValueModel(this.getFieldValue('original'))),"params");
+				}
+			else{
+				this.setFieldValue("","aux");
+				this.setFieldValue("","params");
+				}
 		}
+		
 	};
 }
 
@@ -540,7 +563,9 @@ function loadJavaScriptModelBlocks() {
 			"name": c0name,
 			"value": value_name,
 			"checkBox": check,
-			"number": numb
+			"number": numb,
+			"title": name,
+			"time": time
 		});
 		//var yaxis = "";
 		for (var i = 0; i < block.itemCount_; i++) {
@@ -555,8 +580,7 @@ function loadJavaScriptModelBlocks() {
 			});
 		}
 		chartInfo.push(chartInfo2);
-		var code = "createChart(\"" + name + "\", " + time + ", " + chartNumber + ");\n";
-		chartNumber++;
+		var code = "createChart();\n";
 		return code;
 	};
 
@@ -598,7 +622,7 @@ function loadJavaScriptModelBlocks() {
 	function getJS(block, text) {
 		var dropdown_d = block.getFieldValue(text);
 		var code;
-		if (!condition)
+		if ((!condition)&&(!remote))
 			code = "getValueModel('" + dropdown_d + "')";
 		else
 			code = dropdown_d;
@@ -635,11 +659,11 @@ function loadJavaScriptModelBlocks() {
 		var dropdown_d = block.getFieldValue(text);
 		var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
 		var code;
-		var obj = _model._userSerialize();
+		var obj = _model._userSerializePublic();
 		if ((typeof(obj[dropdown_d])).localeCompare("function") === 0) {
 			value_name = value_name.replace("()", "");
 		}
-		if (!condition)
+		if ((!condition)&&(!remote))
 			code = "setValueModel('" + dropdown_d + "', " + value_name + ");\n";
 		else
 			code = dropdown_d + " = " + value_name + ";\n";
@@ -712,9 +736,17 @@ function loadJavaScriptModelBlocks() {
 		a = a.variableList;
 		if (a.length) {
 			for (var c = 0; c < a.length; c++)
+			{
 				b[c] = Blockly.JavaScript.variableDB_.getName(a[c], Blockly.Variables.NAME_TYPE);
+				if(remoteLab){
+					var regex = new RegExp('\\b' + b[c] + '\\b');
+					if(paramsList.search(regex)===-1)
+						declared_variables_remote.push(b[c]);
+					}
+			}
 			//Blockly.JavaScript.definitions_.variables = 'window["'+b.join('=0, ') + '"]=0;';
 			Blockly.JavaScript.definitions_.variables = "define('"+b+"')";
+			
 		}
 	};
 	
@@ -737,13 +769,18 @@ function loadJavaScriptModelBlocks() {
 	};*/
 
 	Blockly.JavaScript.variables_get=function(a){
-		return["getVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"')",Blockly.JavaScript.ORDER_ATOMIC]
+		if(replacing){
+			return [Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"), Blockly.Variables.NAME_TYPE), Blockly.JavaScript.ORDER_ATOMIC]}
+		else
+			return["getVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"')",Blockly.JavaScript.ORDER_ATOMIC];
 	};
 	
 	Blockly.JavaScript.variables_set=function(a){
 		var b=Blockly.JavaScript.valueToCode(a,"VALUE",Blockly.JavaScript.ORDER_ASSIGNMENT)||"0"; 
-		//return "setVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+" = "+b+";\n"
-		return "setVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"',"+b+");\n";
+		if(replacing)
+			return Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"="+b+";\n";
+		else
+			return "setVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"',"+b+");\n";
 	};
 
 	Blockly.JavaScript['resultado'] = function (block) {
@@ -754,22 +791,31 @@ function loadJavaScriptModelBlocks() {
 	};
 
 	Blockly.JavaScript['evaluation'] = function (block) {
-		var value_name = Blockly.JavaScript.valueToCode(block, 'expre', Blockly.JavaScript.ORDER_ATOMIC);
-		return "evaluate(" + value_name + ");\n";
+		var value_name = block.getFieldValue('expre');
+		value_name = value_name.replace(/(\r\n|\n|\r)/gm, "");
+		return "evaluate(\"" + value_name + "\");\n";
 	};
 
 	Blockly.JavaScript['replacefunc'] = function (block) {
 		var dropdown_original = block.getFieldValue('original');
 		var text_params = block.getFieldValue('params');
-		var text_newvars = "";//block.getFieldValue('newVars');
+		replacing = true;
+		remote = true && remoteLab;
 		var statements_code = Blockly.JavaScript.statementToCode(block, 'code');
+		remote = false;
+		replacing = false;
+		paramsList = "";
 		var value_name = Blockly.JavaScript.valueToCode(block, 'return', Blockly.JavaScript.ORDER_ATOMIC);
 		// TODO: Assemble JavaScript into code variable.
 		statements_code = statements_code ? statements_code.toString() : '';
 		value_name = value_name ? value_name.toString() : '';
 		statements_code = statements_code.replace(/(\r\n|\n|\r)/gm, "");
 		statem.push(statements_code.toString());
-		var code = 'replaceFunction("' + dropdown_original + '","' + text_params + '","' + text_newvars + '","' + value_name + '");\n';
+		if(remoteLab)
+			var code = "";
+		else
+			var code = 'replaceFunction("' + dropdown_original + '","' + text_params + '","' + '","' + value_name + '");\n';
+		function_code_remote = statements_code ;//+' return ' + value_name + ';';
 		return code;
 	};
 
@@ -782,94 +828,83 @@ function loadJavaScriptModelBlocks() {
 ////////// CHARTS /////////////////////////////////////////////
 
 var tabs = document.getElementById('slideshow-wrapper');
-var charts_count = 0;
 var actual_chart = 0;
+var chartArray = [];
+var chartInfo = [];
+var id = 1;
 
 function nextChart() {
 	hideAllCharts();
 	actual_chart++;
-	if (actual_chart > charts_count)
-		actual_chart = 1;
-	showChart(document.getElementById('fragment-' + (actual_chart)));
+	if (actual_chart >= chartArray.length)
+		actual_chart = 0;
+	showChart(document.getElementById(chartArray[actual_chart]["fragment"]));
 }
 
 function prevChart() {
 	hideAllCharts();
 	actual_chart--;
-	if (actual_chart === 0)
-		actual_chart = charts_count;
-	showChart(document.getElementById('fragment-' + (actual_chart)));
+	if (actual_chart === -1)
+		actual_chart = chartArray.length-1;
+	showChart(document.getElementById(chartArray[actual_chart]["fragment"]));
 }
 
 function addTab(textName) {
-	charts_count++;
 	var iDiv = document.createElement('div');
-	iDiv.id = 'fragment-' + charts_count ;
+	iDiv.id = "fragment-"+id;
 	iDiv.style = 'max-height: 600px; max-width: 800px;' ;
 	var iCanvas = document.createElement('canvas');
-	iCanvas.id = 'myChart' + charts_count ;
+	iCanvas.id = 'myChart' + id;
 	iDiv.appendChild(iCanvas);
 	tabs.appendChild(iDiv);
 	hideAllCharts();
-	showChart(document.getElementById('fragment-' + (charts_count)));
-	actual_chart = charts_count;
+	showChart(document.getElementById("fragment-"+id));
     if (charts_count === 1) {
         document.getElementById("slideshow").style.display = "flex";
     } else if (charts_count === 2) {
 		document.getElementById("buttons_charts").style.display="flex";
 	}
-	return "myChart" + charts_count;
+	return iCanvas.id;
 }
 
-/*function removeTab(index){
-alert(index);
-tabs.tabs('destroy').tabs();
-tabs.tabs('remove', index);
-chartInfo.splice(index, 1);
-timers.splice(index, 1);
-chartArray.splice(index, 1);
-titlesArray.splice(index, 1);
-count_chart--;
-chartNumber--;
-}*/
 
-function createChart(textName, time, chartNumber) {
+function createChart() {
 	var exists = -1;
-	for (var n in titlesArray) {
-		if (textName === titlesArray[n]) {
+	var textName = chartInfo[chartInfo.length-1][0]["title"];
+	var time = chartInfo[chartInfo.length-1][0]["time"];
+	for (var n = 0;n<chartArray.length;n++) {
+		if (textName === chartArray[n]["name"]) {
 			exists = n;
 			break;
 		}
 	}
     if (exists === -1) {
-		initChart(addTab(textName), textName, chartNumber, time);
+		initChart(addTab(textName), textName, time);
 	} else {
-		//toCSV(chartArray[0].data.datasets[0].data);
-		addtoChart(chartNumber, exists, time);
+		addtoChart(exists, time);
 	}
 }
 
-function addtoChart(chartNumber, exists, time) {
-	var lengthData = chartArray[exists].data.datasets.length;
-	for (var i = 1; i < chartInfo[chartNumber].length; i++) {
-		var ejey = chartInfo[chartNumber][i];
+function addtoChart(exists, time) {
+	var lengthData = chartArray[exists]["chart"].data.datasets.length;
+	for (var i = 1; i < chartInfo[chartInfo.length-1].length; i++) {
+		var ejey = chartInfo[chartInfo.length-1][i];
 		var dataSet = {
 			fill: false,
 			borderColor: "rgba(" + randomScalingFactor() + "," + randomScalingFactor() + "," + randomScalingFactor() + ",1)",
 			label: ejey["name"],
 			data: []
 		};
-		chartArray[exists].data.datasets.push(dataSet);
+		chartArray[exists]["chart"].data.datasets.push(dataSet);
 	}
-	chartArray[exists].update();
-	var inter = setInterval(getData, time, exists, chartNumber, lengthData);
-	timers.push(inter);
+	chartArray[exists]["chart"].update();
+	var inter = setInterval(getData, time, chartArray[exists], chartInfo[chartInfo.length-1], lengthData);
+	chartArray[chartArray.length-1]["timer"]=inter;
 }
 
-function initChart(place, textName, chartNumber, time) {
-	titlesArray.push(textName);
+function initChart(place, textName, time) {
 	var ctx = document.getElementById(place).getContext('2d');
-	var ejex = chartInfo[chartNumber][0];
+	var ejex = chartInfo[chartInfo.length-1][0];
 	var config = {
 		type: 'line',
 		data: {},
@@ -908,8 +943,8 @@ function initChart(place, textName, chartNumber, time) {
 		}
 	};
 	var chart = new Chart(ctx, config);
-	for (var i = 1; i < chartInfo[chartNumber].length; i++) {
-		var ejey = chartInfo[chartNumber][i];
+	for (var i = 1; i < chartInfo[chartInfo.length-1].length; i++) {
+		var ejey = chartInfo[chartInfo.length-1][i];
 		var dataSet = {
 			fill: false,
 			borderColor: "rgba(" + randomScalingFactor() + "," + randomScalingFactor() + "," + randomScalingFactor() + ",1)",
@@ -919,31 +954,32 @@ function initChart(place, textName, chartNumber, time) {
 		chart.data.datasets.push(dataSet);
 		chart.update();
 	}
-	chartArray.push(chart);
-
-	var inter = setInterval(getData, time, chartArray.length - 1, chartNumber, 0);
-	timers.push(inter);
+	chartArray.push({"name":textName,"timer":null,"chart":chart,"fragment": ("fragment-"+id)});
+	actual_chart = chartArray.length-1;
+	id++;
+	var inter = setInterval(getData,time,chartArray[chartArray.length-1], chartInfo[chartInfo.length-1],0);
+	chartArray[chartArray.length-1]["timer"] = inter;
 }
 
-var getData = function (number, inforNumber, dataSetNumber) {
-	if (record) {
-		var x = eval(chartInfo[inforNumber][0]["value"]);
-		for (var i = 1; i < chartInfo[inforNumber].length; i++) {
-			var val = chartInfo[inforNumber][i];
-			var y = eval(val["value"]);
-			chartArray[number].data.datasets[i - 1 + dataSetNumber].data[chartArray[number].data.datasets[i - 1 + dataSetNumber].data.length] = {
-				x:x,
-				y:y
-			};
-			if ((chartInfo[inforNumber][0]["checkBox"])) {
-				if (i === 1)
-					chartInfo[inforNumber][0]["number"] = chartInfo[inforNumber][0]["number"] - 1;
-				if (chartInfo[inforNumber][0]["number"] < 0)
-					chartArray[number].data.datasets[i - 1 + dataSetNumber].data.splice(0, 1); // remove first data point
+var getData = function (chart,info,dataSetNumber) {
+		if(record){
+			var x = eval(info[0]["value"]);
+			for (var i = 1; i < info.length; i++) {
+				var val = info[i];
+				var y = eval(val["value"]);
+				chart["chart"].data.datasets[i - 1 + dataSetNumber].data[chart["chart"].data.datasets[i - 1 + dataSetNumber].data.length] = {
+					x:x,
+					y:y
+				};
+				if ((info[0]["checkBox"])) {
+					if (i === 1)
+						info[0]["number"] = info[0]["number"] - 1;
+					if (info[0]["number"] < 0)
+						chart["chart"].data.datasets[i - 1 + dataSetNumber].data.splice(0, 1); // remove first data point
+				}
 			}
+			chart["chart"].update();
 		}
-		chartArray[number].update();
-	}
 };
 
 var randomScalingFactor = function () {
@@ -953,10 +989,9 @@ var randomScalingFactor = function () {
 function rec(bool) {
 	record = bool;
 	if (!bool) {
-		for (var i in timers) {
-			clearInterval(timers[i]);
+		for (var i=0;i< chartArray.length;i++) {
+			clearInterval(chartArray[i]["timer"]);
 		}
-		timers = [];
 	}
 }
 
@@ -975,24 +1010,15 @@ function rec(bool) {
 	window.open(encodedUri);
 }*/
 
-/*function cleanCharts() {
-	var ul = tabs.find("ul");
-	for (var i = ul.find("li").length - 1; i >= 0; i--) {
-		tabs.tabs('destroy').tabs();
-		tabs.tabs('remove', i);
-	}
-	chartInfo = new Array();
-	tabs = $("#container-1").tabs();
-	record = false;
-	timers = new Array();
-	chartArray = new Array();
-	titlesArray = new Array();
-	chartNumber = 0;
-}*/
+
 
 function hideAllCharts() {
-	for (var k = 0; k < charts_count; k++) {
-		document.getElementById('fragment-' + (k + 1)).style.display = "none";
+	for (var k = 0; k < chartArray.length; k++) {
+		document.getElementById(chartArray[k]["fragment"]).style.display = "none";
+	}
+	if(chartArray.length<1){
+        document.getElementById("slideshow").style.display = "none";
+		document.getElementById("buttons_charts").style.display="none";
 	}
 }
 
@@ -1056,7 +1082,7 @@ others = function (workspace) {
 
 functions = function (workspace) {
 	var xmlList = [];
-	var blockText = '<xml>' + '<block type="evaluation"><value name="expre"><shadow type="text"><field name="TEXT">abc</field></shadow></value></block>' + '</xml>';
+	var blockText = '<xml>' + '<block type="evaluation"></block>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	if (keys_others.length > 0) {
@@ -1081,8 +1107,17 @@ window.onload = function () {
 	//alert(toolbox);
 	//toolbox = toolbox.replace("<category name="Boolean"><block type="set_model_variable_boolean"></block><block type="get_model_variable_boolean"></block></category>);
 	workspace = Blockly.inject('blocklyDiv', {
-			media: 'blockly/media/',
-			toolbox: toolbox
+		grid:
+          {spacing: 25,
+           length: 3,
+           colour: '#ccc',
+           snap: true},
+		media: 'blockly/media/',
+		toolbox: toolbox,
+		collapse : true, 
+		zoom:
+           {controls: true,
+            wheel: true}
 		});
 	workspace.registerToolboxCategoryCallback('strings', strings);
 	workspace.registerToolboxCategoryCallback('numbers', numbers);

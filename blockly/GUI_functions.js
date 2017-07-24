@@ -19,6 +19,8 @@ var loadCode = function () {
 };
 function playCode() {
 	parseCode();
+	if(remoteLab)
+		_model.sendToRemoteController(getRemoteCode());
 	inter = setInterval(stepCode, time_step);
 }
 
@@ -36,5 +38,41 @@ function loadWorkspace() {
 		workspace.clear();
 		xmlDom = Blockly.Xml.textToDom(xmlText);
 		Blockly.Xml.domToWorkspace(xmlDom, workspace);
+	}
+}
+
+function cleanCharts() {
+	if(chartArray.length>1){
+		var clean = actual_chart;
+		prevChart();
+		clearInterval(chartArray[clean]["timer"]);
+		var name = chartArray[clean]["title"];
+		chartArray.splice(clean,1);
+		for(var i = 0;i< chartInfo.length;i++){
+			if(chartInfo[i][0]["title"]==name)
+				chartInfo.splice(i,1);
+		}
+	}
+	else{
+		var clean = actual_chart;
+		hideAllCharts();
+		clearInterval(chartArray[clean]["timer"]);
+		var name = chartArray[clean]["title"];
+		chartArray.splice(clean,1);
+		for(var i = 0;i< chartInfo.length;i++){
+			if(chartInfo[i][0]["title"]==name)
+				chartInfo.splice(i,1);
+		}
+	}
+}
+
+function getRemoteCode() {
+	if(remoteLab){
+		var variables= "";
+		for(var i=0;i<declared_variables_remote.length;i++){
+			variables = variables + "var "+declared_variables_remote[i]+"; "
+		}
+		console.log("Remote Code: \n"+variables+function_code_remote);
+		return variables+function_code_remote;
 	}
 }

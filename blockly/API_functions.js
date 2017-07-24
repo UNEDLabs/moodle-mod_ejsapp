@@ -93,17 +93,34 @@ function setTimeStep(num) {
 	flags = setInterval(changeInterval, num);
 }
 
-function replaceFunction(dropdown_original, text_params, text_newvars, value_name) {
+
+var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+var ARGUMENT_NAMES = /([^\s,]+)/g;
+function getParamNames(func) {
+  var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+  var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+  result = result.toString().replace(/,/g , ' , ');
+  if(result === null)
+     result = [];
+  return result;
+}
+
+
+function replaceFunction(dropdown_original, text_params, value_name) {
 	var statements_code = statem[0].toString();
 	statem.splice(0, 1);
 	var text_vars = "";
-	var array = text_newvars.split(',');
-	if(text_newvars!==""){
-		for (var i in array) {
-			text_vars = text_vars + "var " + array[i] + "; ";
+	//var text_vars2 = "";
+	var array = text_params.split(',');
+	if(!remote){
+		if(text_params!==""){
+			for (var i in array) {
+				text_vars = text_vars + array[i]+"=getValueModel('"+array[i]+"');\n";
+				//text_vars2 = text_vars2 + "setValueModel('"+array[i]+"',"+array[i]+");\n";
+			}
 		}
 	}
-	var fill = new Function(text_params, text_vars + statements_code + ' return ' + value_name + ';');
+	var fill = new Function(text_params, text_vars + statements_code +' return ' + value_name + ';');
 	setValueModel(dropdown_original, fill);
 }
 
@@ -295,9 +312,9 @@ function initApi(interpreter, scope) {
 
 	//reateChart("+name+","+time+",[{"+c0name+":"+value_name+"}"+yaxis+"]);\n";
 	// Add an API function for the createChart() block.
-	var wrapper = function (text, number, columns) {
+	var wrapper = function (text, number) {
 		text = text ? text.toString() : '';
-		return interpreter.createPrimitive(createChart(text, number, columns));
+		return interpreter.createPrimitive(createChart(text, number));
 	};
 	interpreter.setProperty(scope, 'createChart',
 		interpreter.createNativeFunction(wrapper));
@@ -312,10 +329,13 @@ function highlightBlock(id) {
 var functions;
 window.LoopTrap = 10;
 function parseCode() {
+	declared_variables_remote = [];
 	// Generate JavaScript code and parse it.
-	Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
-	Blockly.JavaScript.addReservedWords('highlightBlock');
-	Blockly.JavaScript.addReservedWords('LoopTrap');
+	if(!remoteLab){
+		Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+		Blockly.JavaScript.addReservedWords('highlightBlock');
+		Blockly.JavaScript.addReservedWords('LoopTrap');
+	}
 	var code = Blockly.JavaScript.workspaceToCode(workspace);
 	//Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
 	code = "reInitLab();\n" + code;
