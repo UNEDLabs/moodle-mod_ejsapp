@@ -857,12 +857,14 @@ function addTab(textName) {
 	iCanvas.id = 'myChart' + id;
 	iDiv.appendChild(iCanvas);
 	tabs.appendChild(iDiv);
-	hideAllCharts();
 	showChart(document.getElementById("fragment-"+id));
-    if (charts_count === 1) {
+    if (chartArray.length === 1) {
         document.getElementById("slideshow").style.display = "flex";
-    } else if (charts_count === 2) {
+    } else if (chartArray.length === 2) {
 		document.getElementById("buttons_charts").style.display="flex";
+	}
+	if (chartArray.length >= 1) {
+		hideAllCharts();
 	}
 	return iCanvas.id;
 }
