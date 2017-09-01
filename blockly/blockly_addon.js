@@ -852,9 +852,9 @@ function prevChart() {
 
 function paintChart(){
     if (chartArray.length === 1) {
-        document.getElementById("slideshow").style.display = "block";
+        document.getElementById("slideshow").style.display = "flex";
     } else if (chartArray.length === 2) {
-		document.getElementById("buttons_charts").style.display="block";
+		document.getElementById("buttons_charts").style.display="flex";
 	}
 	if (chartArray.length >= 1) 
 		hideAllCharts();
@@ -869,15 +869,6 @@ function addTab(textName) {
 	iCanvas.id = 'myChart' + id;
 	iDiv.appendChild(iCanvas);
 	tabs.appendChild(iDiv);
-	showChart(document.getElementById("fragment-"+id));
-    if (chartArray.length === 1) {
-        document.getElementById("slideshow").style.display = "block";
-    } else if (chartArray.length === 2) {
-		document.getElementById("buttons_charts").style.display="block";
-	}
-	if (chartArray.length >= 1) {
-		hideAllCharts();
-	}
 	return iCanvas.id;
 }
 
