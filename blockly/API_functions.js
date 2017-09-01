@@ -102,6 +102,8 @@ function getParamNames(func) {
   result = result.toString().replace(/,/g , ' , ');
   if(result === null)
      result = [];
+  else
+	 result = result.toString().replace(/,/g , ' , ');
   return result;
 }
 
@@ -129,7 +131,16 @@ function getVarExp(name){
 }
 
 function setVarExp(name,value){
-	window[name]=value;
+	if(name.toString().includes(","))
+	{
+		var array = name.toString().split(',');
+		for (var i in array) {
+			window[array[i]]=value;
+		}
+	}
+	else{
+		window[name]=value;
+	}
 }
 
 //////// INTERPRETER ///////////////////
@@ -259,12 +270,30 @@ function initApi(interpreter, scope) {
 	// Add an API function for the setValueModel() block.
 	var wrapper = function (text, p2) {
 		text = text ? text.toString() : '';
-		if ((p2.toString().localeCompare("true") == 0))
-			p2 = true;
-		else if ((p2.toString().localeCompare("false") == 0))
-			p2 = false;
-		/*else
-		p2 = parseFloat(p2);*/
+		return interpreter.createPrimitive(setValueModel(text, p2));
+	};
+	interpreter.setProperty(scope, 'setValueModel',
+		interpreter.createNativeFunction(wrapper));
+		
+	// Add an API function for the setValueModel() block.
+	var wrapper = function (text, p2,type) {
+		text = text ? text.toString() : '';
+		
+		switch(type.toString()){
+				case "boolean":
+					if ((p2.toString().localeCompare("true") == 0))
+						p2 = true;
+					else if ((p2.toString().localeCompare("false") == 0))
+						p2 = false;
+					break;
+				case "number":
+					p2 = parseFloat(p2);
+					break;
+				case "string":
+					p2 = p2.toString();
+					
+			}
+		
 		return interpreter.createPrimitive(setValueModel(text, p2));
 	};
 	interpreter.setProperty(scope, 'setValueModel',
@@ -301,20 +330,19 @@ function initApi(interpreter, scope) {
 		interpreter.createNativeFunction(wrapper));
 
 	// Add an API function for reInitLab blocks.
-	var wrapper = function (a, b, c, d) {
+	var wrapper = function (a, b, c) {
 		a = a ? a.toString() : '';
 		b = b ? b.toString() : '';
 		c = c ? c.toString() : '';
-		return interpreter.createPrimitive(replaceFunction(a, b, c, d));
+		return interpreter.createPrimitive(replaceFunction(a, b, c));
 	};
 	interpreter.setProperty(scope, 'replaceFunction',
 		interpreter.createNativeFunction(wrapper));
 
 	//reateChart("+name+","+time+",[{"+c0name+":"+value_name+"}"+yaxis+"]);\n";
 	// Add an API function for the createChart() block.
-	var wrapper = function (text, number) {
-		text = text ? text.toString() : '';
-		return interpreter.createPrimitive(createChart(text, number));
+	var wrapper = function (number) {
+		return interpreter.createPrimitive(createChart(number));
 	};
 	interpreter.setProperty(scope, 'createChart',
 		interpreter.createNativeFunction(wrapper));

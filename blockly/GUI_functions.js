@@ -45,7 +45,7 @@ function cleanCharts() {
 	if(chartArray.length>1){
 		var clean = actual_chart;
 		prevChart();
-		clearInterval(chartArray[clean]["timer"]);
+		//clearInterval(chartArray[clean]["timer"]);
 		var name = chartArray[clean]["title"];
 		chartArray.splice(clean,1);
 		for(var i = 0;i< chartInfo.length;i++){
@@ -56,13 +56,16 @@ function cleanCharts() {
 	else{
 		var clean = actual_chart;
 		hideAllCharts();
-		clearInterval(chartArray[clean]["timer"]);
+		//clearInterval(chartArray[clean]["timer"]);
 		var name = chartArray[clean]["title"];
 		chartArray.splice(clean,1);
 		for(var i = 0;i< chartInfo.length;i++){
 			if(chartInfo[i][0]["title"]==name)
 				chartInfo.splice(i,1);
 		}
+	}
+	if (chartArray.length < 2) {
+		document.getElementById("buttons_charts").style.display="none";
 	}
 }
 

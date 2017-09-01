@@ -580,7 +580,7 @@ function loadJavaScriptModelBlocks() {
 			});
 		}
 		chartInfo.push(chartInfo2);
-		var code = "createChart();\n";
+		var code = "createChart("+(chartInfo.length-1)+");\n";
 		return code;
 	};
 
@@ -737,7 +737,7 @@ function loadJavaScriptModelBlocks() {
 		if (a.length) {
 			for (var c = 0; c < a.length; c++)
 			{
-				b[c] = Blockly.JavaScript.variableDB_.getName(a[c], Blockly.Variables.NAME_TYPE);
+				b[c] = "asdsdiuhsgiud"+Blockly.JavaScript.variableDB_.getName(a[c], Blockly.Variables.NAME_TYPE);
 				if(remoteLab){
 					var regex = new RegExp('\\b' + b[c] + '\\b');
 					if(paramsList.search(regex)===-1)
@@ -745,7 +745,7 @@ function loadJavaScriptModelBlocks() {
 					}
 			}
 			//Blockly.JavaScript.definitions_.variables = 'window["'+b.join('=0, ') + '"]=0;';
-			Blockly.JavaScript.definitions_.variables = "define('"+b+"')";
+			Blockly.JavaScript.definitions_.variables = "define('"+b+"');";
 			
 		}
 	};
@@ -770,17 +770,17 @@ function loadJavaScriptModelBlocks() {
 
 	Blockly.JavaScript.variables_get=function(a){
 		if(replacing){
-			return [Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"), Blockly.Variables.NAME_TYPE), Blockly.JavaScript.ORDER_ATOMIC]}
+			return ["asdsdiuhsgiud"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"), Blockly.Variables.NAME_TYPE), Blockly.JavaScript.ORDER_ATOMIC]}
 		else
-			return["getVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"')",Blockly.JavaScript.ORDER_ATOMIC];
+			return ["getVarExp('"+"asdsdiuhsgiud"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"')",Blockly.JavaScript.ORDER_ATOMIC];
 	};
 	
 	Blockly.JavaScript.variables_set=function(a){
 		var b=Blockly.JavaScript.valueToCode(a,"VALUE",Blockly.JavaScript.ORDER_ASSIGNMENT)||"0"; 
 		if(replacing)
-			return Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"="+b+";\n";
+			return "asdsdiuhsgiud"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"="+b+";\n";
 		else
-			return "setVarExp('"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"',"+b+");\n";
+			return "setVarExp('"+"asdsdiuhsgiud"+Blockly.JavaScript.variableDB_.getName(a.getFieldValue("VAR"),Blockly.Variables.NAME_TYPE)+"',"+b+");\n";
 	};
 
 	Blockly.JavaScript['resultado'] = function (block) {
@@ -814,7 +814,7 @@ function loadJavaScriptModelBlocks() {
 		if(remoteLab)
 			var code = "";
 		else
-			var code = 'replaceFunction("' + dropdown_original + '","' + text_params + '","' + '","' + value_name + '");\n';
+			var code = 'replaceFunction("' + dropdown_original + '","' + text_params + '","' + value_name + '");\n';
 		function_code_remote = statements_code ;//+' return ' + value_name + ';';
 		return code;
 	};
@@ -832,6 +832,7 @@ var actual_chart = 0;
 var chartArray = [];
 var chartInfo = [];
 var id = 1;
+var intervals = [];
 
 function nextChart() {
 	hideAllCharts();
@@ -849,6 +850,17 @@ function prevChart() {
 	showChart(document.getElementById(chartArray[actual_chart]["fragment"]));
 }
 
+function paintChart(){
+    if (chartArray.length === 1) {
+        document.getElementById("slideshow").style.display = "block";
+    } else if (chartArray.length === 2) {
+		document.getElementById("buttons_charts").style.display="block";
+	}
+	if (chartArray.length >= 1) 
+		hideAllCharts();
+	showChart(document.getElementById("fragment-"+id));
+}
+
 function addTab(textName) {
 	var iDiv = document.createElement('div');
 	iDiv.id = "fragment-"+id;
@@ -859,9 +871,9 @@ function addTab(textName) {
 	tabs.appendChild(iDiv);
 	showChart(document.getElementById("fragment-"+id));
     if (chartArray.length === 1) {
-        document.getElementById("slideshow").style.display = "flex";
+        document.getElementById("slideshow").style.display = "block";
     } else if (chartArray.length === 2) {
-		document.getElementById("buttons_charts").style.display="flex";
+		document.getElementById("buttons_charts").style.display="block";
 	}
 	if (chartArray.length >= 1) {
 		hideAllCharts();
@@ -870,10 +882,10 @@ function addTab(textName) {
 }
 
 
-function createChart() {
+function createChart(number) {
 	var exists = -1;
-	var textName = chartInfo[chartInfo.length-1][0]["title"];
-	var time = chartInfo[chartInfo.length-1][0]["time"];
+	var textName = chartInfo[number][0]["title"];
+	var time = chartInfo[number][0]["time"];
 	for (var n = 0;n<chartArray.length;n++) {
 		if (textName === chartArray[n]["name"]) {
 			exists = n;
@@ -881,16 +893,16 @@ function createChart() {
 		}
 	}
     if (exists === -1) {
-		initChart(addTab(textName), textName, time);
+		initChart(number, addTab(textName), textName, time);
 	} else {
-		addtoChart(exists, time);
+		addtoChart(number, exists, time);
 	}
 }
 
-function addtoChart(exists, time) {
+function addtoChart(number, exists, time) {
 	var lengthData = chartArray[exists]["chart"].data.datasets.length;
-	for (var i = 1; i < chartInfo[chartInfo.length-1].length; i++) {
-		var ejey = chartInfo[chartInfo.length-1][i];
+	for (var i = 1; i < chartInfo[number].length; i++) {
+		var ejey = chartInfo[number][i];
 		var dataSet = {
 			fill: false,
 			borderColor: "rgba(" + randomScalingFactor() + "," + randomScalingFactor() + "," + randomScalingFactor() + ",1)",
@@ -900,13 +912,13 @@ function addtoChart(exists, time) {
 		chartArray[exists]["chart"].data.datasets.push(dataSet);
 	}
 	chartArray[exists]["chart"].update();
-	var inter = setInterval(getData, time, chartArray[exists], chartInfo[chartInfo.length-1], lengthData);
-	chartArray[chartArray.length-1]["timer"]=inter;
+	var c =window.setInterval(getData, time, chartArray[exists], chartInfo[number], lengthData);
+	intervals.push(c);
 }
 
-function initChart(place, textName, time) {
+function initChart(number, place, textName, time) {
 	var ctx = document.getElementById(place).getContext('2d');
-	var ejex = chartInfo[chartInfo.length-1][0];
+	var ejex = chartInfo[number][0];
 	var config = {
 		type: 'line',
 		data: {},
@@ -945,8 +957,8 @@ function initChart(place, textName, time) {
 		}
 	};
 	var chart = new Chart(ctx, config);
-	for (var i = 1; i < chartInfo[chartInfo.length-1].length; i++) {
-		var ejey = chartInfo[chartInfo.length-1][i];
+	for (var i = 1; i < chartInfo[number].length; i++) {
+		var ejey = chartInfo[number][i];
 		var dataSet = {
 			fill: false,
 			borderColor: "rgba(" + randomScalingFactor() + "," + randomScalingFactor() + "," + randomScalingFactor() + ",1)",
@@ -958,9 +970,10 @@ function initChart(place, textName, time) {
 	}
 	chartArray.push({"name":textName,"timer":null,"chart":chart,"fragment": ("fragment-"+id)});
 	actual_chart = chartArray.length-1;
+	paintChart(); // Before change id
 	id++;
-	var inter = setInterval(getData,time,chartArray[chartArray.length-1], chartInfo[chartInfo.length-1],0);
-	chartArray[chartArray.length-1]["timer"] = inter;
+	var c = window.setInterval(getData,time,chartArray[chartArray.length-1], chartInfo[number],0);
+	intervals.push(c);
 }
 
 var getData = function (chart,info,dataSetNumber) {
@@ -989,11 +1002,13 @@ var randomScalingFactor = function () {
 };
 
 function rec(bool) {
+	document.getElementById('clean_chart').disabled = true;
 	record = bool;
 	if (!bool) {
-		for (var i=0;i< chartArray.length;i++) {
-			clearInterval(chartArray[i]["timer"]);
-		}
+		for (var i in intervals) 
+			 window.clearInterval(intervals[i]);
+		intervals = [];
+		document.getElementById('clean_chart').disabled = false;
 	}
 }
 
@@ -1020,6 +1035,10 @@ function hideAllCharts() {
 	}
 	if(chartArray.length<1){
         document.getElementById("slideshow").style.display = "none";
+		//document.getElementById("buttons_charts").style.display="none";
+	}
+	if(chartArray.length==1){
+        //document.getElementById("slideshow").style.display = "none";
 		document.getElementById("buttons_charts").style.display="none";
 	}
 }
@@ -1118,8 +1137,7 @@ window.onload = function () {
 		toolbox: toolbox,
 		collapse : true, 
 		zoom:
-           {controls: true,
-            wheel: true}
+           {controls: true}
 		});
 	workspace.registerToolboxCategoryCallback('strings', strings);
 	workspace.registerToolboxCategoryCallback('numbers', numbers);
