@@ -1703,7 +1703,7 @@ function create_blockly_configuration($ejsapp) {
             inter=setInterval(stepCode, time_step);
         };";
 		
-		if ($data['is_rem_lab'] == 1) {
+		if ($ejsapp->is_rem_lab == 1) {
 			$jsconfcode .= "\n" ."var remoteLab = true;";
 		}
         else{
