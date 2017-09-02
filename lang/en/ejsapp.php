@@ -131,7 +131,6 @@ $string['display_lab_control'] = 'Show the EjsS lab\'s controls';
 $string['display_lab_charts'] = 'Show the EjsS lab\'s charts';
 $string['blocklyfile'] = 'Initial blocks';
 $string['blocklyfile_help'] = 'You can select a .blk file that specifies which blocks should be initially displayed in Blockly.';
-$string['remote_execution'] = 'Execute the replace function code remotely';
 
 $string['rem_lab_conf'] = 'Remote lab configuration';
 

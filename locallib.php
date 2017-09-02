@@ -178,7 +178,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     array_push($blocklyconf, $ejsapp->display_lab_functions);
     array_push($blocklyconf, $ejsapp->display_lab_control);
     array_push($blocklyconf, $ejsapp->display_lab_charts);
-    array_push($blocklyconf, $ejsapp->remote_execution);
     $ejsapp->blockly_conf = json_encode($blocklyconf);
 
     $DB->update_record('ejsapp', $ejsapp);
@@ -1704,11 +1703,10 @@ function create_blockly_configuration($ejsapp) {
             inter=setInterval(stepCode, time_step);
         };";
 		
-		if (array_key_exists(14, $blocklyconf)) {
-			if ($blocklyconf[14] == 1) {
-				$jsconfcode .= "\n" ."var remoteLab = true;";
-			}
-        }else{
+		if ($data['is_rem_lab'] == 1) {
+			$jsconfcode .= "\n" ."var remoteLab = true;";
+		}
+        else{
 			$jsconfcode .= "\n" ."var remoteLab = false;";
 		}
 		
