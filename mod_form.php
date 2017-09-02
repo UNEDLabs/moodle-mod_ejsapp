@@ -246,6 +246,10 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('display_lab_charts', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_charts', 'display_lab', 'eq', 0);
         $mform->setDefault('display_lab_charts', 0);
+		
+		$mform->addElement('selectyesno', 'remote_execution', get_string('remote_execution', 'ejsapp'));
+        $mform->disabledIf('remote_execution', 'use_blockly', 'eq', 0);
+        $mform->setDefault('remote_execution', 0);
 
         // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
@@ -396,6 +400,9 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 			}
             if (array_key_exists(13, $blocklyconf)) {
                 $defaultvalues['display_lab_charts'] = $blocklyconf[13];
+            }
+            if (array_key_exists(14, $blocklyconf)) {
+                $defaultvalues['remote_execution'] = $blocklyconf[14];
             }
         }
 
