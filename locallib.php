@@ -888,27 +888,27 @@ function ping($host, $port=80, $usingsarlab, $expid=null, $timeout=3) {
  * Creates a default record for the block_remlab_manager_conf table
  *
  * @param stdClass $ejsapp
- * @return stdClass $defaulconf
+ * @return stdClass $defaultconf
  *
  */
 function default_rem_lab_conf($ejsapp) {
     global $USER;
 
-    $defaulconf = new stdClass();
+    $defaultconf = new stdClass();
     // Get experiences from Sarlab and check whether this practice is in a Sarlab server or not.
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     $listexperiences = get_experiences_sarlab($USER->username, $sarlabips);
     $sarlabexperiences = explode(";", $listexperiences);
     $completelistpract = explode(';', $ejsapp->list_practices);
-    $defaulconf->practiceintro = $completelistpract[$ejsapp->practiceintro];
-    $defaulconf->usingsarlab = 0;
+    $defaultconf->practiceintro = $completelistpract[$ejsapp->practiceintro];
+    $defaultconf->usingsarlab = 0;
     if (in_array($ejsapp->practiceintro, $sarlabexperiences)) {
-        $defaulconf->usingsarlab = 1;
+        $defaultconf->usingsarlab = 1;
     }
-    if ($defaulconf->usingsarlab == 1) {
+    if ($defaultconf->usingsarlab == 1) {
         $sarlabinstance = 0;
-        $defaulconf->sarlabinstance = $sarlabinstance;
-        $defaulconf->sarlabcollab = 0;
+        $defaultconf->sarlabinstance = $sarlabinstance;
+        $defaultconf->sarlabcollab = 0;
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
         $sarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
         $initchar = strrpos($sarlabips[intval($sarlabinstance)], "'");
@@ -916,23 +916,23 @@ function default_rem_lab_conf($ejsapp) {
             $initchar++;
         }
         $ip = substr($sarlabips[intval($sarlabinstance)], $initchar);
-        $defaulconf->ip = $ip;
-        $defaulconf->port = $sarlabports[intval($sarlabinstance)];
+        $defaultconf->ip = $ip;
+        $defaultconf->port = $sarlabports[intval($sarlabinstance)];
     } else {
-        $defaulconf->sarlabinstance = 0;
-        $defaulconf->sarlabcollab = 0;
-        $defaulconf->ip = '127.0.0.1';
-        $defaulconf->port = 443;
+        $defaultconf->sarlabinstance = 0;
+        $defaultconf->sarlabcollab = 0;
+        $defaultconf->ip = '127.0.0.1';
+        $defaultconf->port = 443;
     }
-    $defaulconf->slotsduration = 1;
-    $defaulconf->totalslots = 18;
-    $defaulconf->weeklyslots = 9;
-    $defaulconf->dailyslots = 3;
-    $defaulconf->reboottime = 2;
-    $defaulconf->active = 1;
-    $defaulconf->free_access = 0;
+    $defaultconf->slotsduration = 1;
+    $defaultconf->totalslots = 18;
+    $defaultconf->weeklyslots = 9;
+    $defaultconf->dailyslots = 3;
+    $defaultconf->reboottime = 2;
+    $defaultconf->active = 1;
+    $defaultconf->free_access = 0;
 
-    return $defaulconf;
+    return $defaultconf;
 }
 
 /**
@@ -1706,10 +1706,10 @@ function create_blockly_configuration($ejsapp) {
 		
 		if (array_key_exists(14, $blocklyconf)) {
 			if ($blocklyconf[14] == 0) {
-				$jsconfcode .= "var remoteLab = false;"
+				$jsconfcode .= "var remoteLab = false;";
 			}
 			else{
-				$jsconfcode .= "var remoteLab = true;"
+				$jsconfcode .= "var remoteLab = true;";
 			}
         }
 		

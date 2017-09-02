@@ -134,17 +134,15 @@ create_blockly_configuration($ejsapp);
 $action = 'view';
 $accessed = false;
 
-// Define the div section for charts.
+// Define the div section for charts and related buttons.
 $wrapper = html_writer::div('', 'charts', array('id' => 'slideshow-wrapper'));
-/*$prevchart = html_writer::img('blockly/media/prev.png', 'Previous graph', array('id' => 'prev_chart',
-    'onclick' => 'prevChart()'));
-$nextchart = html_writer::img('blockly/media/next.png', 'Next graph', array('id' => 'next_chart',
-    'onclick' => 'nextChart()'));*/
 $prevchart = html_writer::tag('i', '', array('class' => 'fa fa-chevron-left fa-2x', 'id' => 'prev_chart',
         'onclick' => 'prevChart()'));
+$cleancharts = html_writer::tag('i', '', array('class' => 'fa fa-window-close-o fa-2x', 'id' => 'clean_chart',
+    'onclick' => 'cleanCharts()'));
 $nextchart = html_writer::tag('i', '', array('class' => 'fa fa-chevron-right fa-2x', 'id' => 'next_chart',
     'onclick' => 'nextChart()'));
-$buttonscharts = html_writer::div($prevchart . $nextchart, 'charts', array('id' => 'buttons_charts'));
+$buttonscharts = html_writer::div($prevchart . $cleancharts . $nextchart, 'charts', array('id' => 'buttons_charts'));
 $chartsdiv = html_writer::div($wrapper . $buttonscharts, 'charts', array('id' => 'slideshow'));
 
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
@@ -312,10 +310,19 @@ if ($ejsapp->appwording) {
     echo $OUTPUT->box($content, 'generalbox center clearfix');
 }
 
-// Blockly programming space for Javascript labs.
+// Blockly stuff
 if ($accessed && $ejsapp->class_file == '') {
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
+        // Button for running the Blockly code
+        $content = html_writer::empty_tag('input',
+            array('class' => 'blockly_button', 'type' => 'submit',
+                'name' => 'runCode', 'id' => 'runCodeButEJSApp',
+                'value' => get_string('run_code', 'block_ejsapp_file_browser'),
+                'onclick' => 'playCode()'));
+        $content = html_writer::div($content, 'runCodeEJSApp');
+        echo $content;
+        // Blockly programming space for Javascript labs.
         $PAGE->requires->js_call_amd('mod_ejsapp/jqueryui', 'init');
         $includejslibraries = html_writer::tag('script', '',
                 array('src' => $ejsapp->codebase . 'configuration.js')) .

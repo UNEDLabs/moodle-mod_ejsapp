@@ -22,8 +22,19 @@
 }
 
 .path-mod-ejsapp #EJsS {
-    flex-basis: 100%;
-    flex-shrink: 5;
+     flex-basis: 100%;
+     flex-shrink: 5;
+}
+
+.path-mod-ejsapp .runCodeEJSApp {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.path-mod-ejsapp #runCodeButEJSApp {
+    text-align: center;
+    margin: 0 0 0 0;
 }
 
 .path-mod-ejsapp #slideshow {

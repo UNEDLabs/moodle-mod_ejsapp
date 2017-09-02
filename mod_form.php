@@ -297,11 +297,11 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         }
         $mform->addElement('hidden', 'list_practices', null);
         $mform->setType('list_practices', PARAM_TEXT);
-        $showableexperiences = '';
+        $experiencelist = '';
         foreach ($showableexperiences as $experience) {
-            $showableexperiences .= $experience . ';';
+            $experiencelist .= $experience . ';';
         }
-        $mform->setDefault('list_practices', $showableexperiences);
+        $mform->setDefault('list_practices', $experiencelist);
 
         // Adding standard grading elements.
         $this->standard_grading_coursemodule_elements();
