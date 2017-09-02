@@ -1705,13 +1705,12 @@ function create_blockly_configuration($ejsapp) {
         };";
 		
 		if (array_key_exists(14, $blocklyconf)) {
-			if ($blocklyconf[14] == 0) {
-				$jsconfcode .= "var remoteLab = false;";
+			if ($blocklyconf[14] == 1) {
+				$jsconfcode .= "\n" ."var remoteLab = true;";
 			}
-			else{
-				$jsconfcode .= "var remoteLab = true;";
-			}
-        }
+        }else{
+			$jsconfcode .= "\n" ."var remoteLab = false;";
+		}
 		
 
         $jsconfcode .= "\n" . "var toolbox = '<xml>';";

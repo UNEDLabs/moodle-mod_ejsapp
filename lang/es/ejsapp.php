@@ -128,7 +128,7 @@ $string['display_lab_execution'] = 'Mostrar funciones de ejecución del laborato
 $string['display_lab_functions'] = 'Mostrar funciones del laboratorio EjsS';
 $string['display_lab_control'] = 'Mostrar controles del laboratorio EjsS';
 $string['display_lab_charts'] = 'Mostrar gráficas para laboratorio EjsS';
-$string['remote_execution'] = 'Enviar código del remplazo de funciones a el controlador remoto';
+$string['remote_execution'] = 'Ejecutar el código del remplazo de funciones en remoto';
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 

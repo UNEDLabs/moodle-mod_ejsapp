@@ -50,6 +50,10 @@
     margin: 0 30px;
 }
 
+.path-mod-ejsapp #clean_chart {
+    margin: 0 30px;
+}
+
 .path-mod-ejsapp #buttons_charts {
     margin-top: 20px;
     display: none;
