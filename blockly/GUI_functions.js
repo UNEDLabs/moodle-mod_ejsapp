@@ -20,7 +20,8 @@ var loadCode = function () {
 function playCode() {
 	parseCode();
 	if(remoteLab)
-		_model.sendToRemoteController(getRemoteCode());
+		if( _model.sendToRemoteController()!== undefined)
+			_model.sendToRemoteController(getRemoteCode());
 	inter = setInterval(stepCode, time_step);
 }
 

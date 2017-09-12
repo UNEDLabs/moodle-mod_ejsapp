@@ -1686,9 +1686,7 @@ function create_blockly_configuration($ejsapp) {
             "\"><block type=\"play_lab\"></block><block type=\"pause_lab\"></block>" .	
 			"<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block></category>'";
         $labfunctions = "'<category name=\"" . get_string('xml_lab_functions', 'ejsapp') . "\" custom=\"functions\"></category>'";
-        $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp') .
-            "\"><block type=\"event\"></block><block type=\"fixedRelation\"></block>" .
-            "<block type=\"wait\"></block></category>'";
+        $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp')  . "\" custom=\"controls\"></category>'";
 		$labcharts = "'<category name=\"" . get_string('xml_lab_charts', 'ejsapp') .
             "\"><block type=\"createChart\"></block><block type=\"start_rec\"></block>" .
             "<block type=\"stop_rec\"></block></category>'";

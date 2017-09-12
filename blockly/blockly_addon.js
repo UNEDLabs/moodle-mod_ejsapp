@@ -26,7 +26,11 @@ var function_code_remote = "";
 var remote = false;
 
 function loadModelBlocks() {
-	var _vars = _model.getOdes()[0]._getOdeVars();
+	var _vars;
+	if( _model.getOdes()[0]!== undefined)
+		_vars = _model.getOdes()[0]._getOdeVars();
+	else
+		_vars = "";
 	var obj = _model._userSerializePublic();
 
 	var keys = [];
@@ -54,12 +58,13 @@ function loadModelBlocks() {
 		i++;
 	}
 
-	for (var e in _vars) {
-		dupla = [];
-		dupla.push(_vars[e]);
-		dupla.push(_vars[e]);
-		events_vars.push(dupla);
-	}
+	if(_vars!=="")
+		for (var e in _vars) {
+			dupla = [];
+			dupla.push(_vars[e]);
+			dupla.push(_vars[e]);
+			events_vars.push(dupla);
+		}
 
 	Blockly.Blocks['get_model_variable'] = {
 		init: function () {
@@ -658,16 +663,14 @@ function loadJavaScriptModelBlocks() {
 	function setJS(block, text) {
 		var dropdown_d = block.getFieldValue(text);
 		var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-		var code;
 		var obj = _model._userSerializePublic();
 		if ((typeof(obj[dropdown_d])).localeCompare("function") === 0) {
 			value_name = value_name.replace("()", "");
 		}
 		if ((!condition)&&(!remote))
-			code = "setValueModel('" + dropdown_d + "', " + value_name + ");\n";
+			return "setValueModel('" + dropdown_d +"',"+ value_name + ",'"+typeof(obj[dropdown_d])+"');\n";
 		else
-			code = dropdown_d + " = " + value_name + ";\n";
-		return code;
+			return dropdown_d + " = " + value_name + ";\n";
 
 	}
 
@@ -969,10 +972,10 @@ function initChart(number, place, textName, time) {
 
 var getData = function (chart,info,dataSetNumber) {
 		if(record){
-			var x = eval(info[0]["value"]);
+			var x = Number(eval(info[0]["value"]));
 			for (var i = 1; i < info.length; i++) {
 				var val = info[i];
-				var y = eval(val["value"]);
+				var y = Number(eval(val["value"]));
 				chart["chart"].data.datasets[i - 1 + dataSetNumber].data[chart["chart"].data.datasets[i - 1 + dataSetNumber].data.length] = {
 					x:x,
 					y:y
@@ -1105,6 +1108,21 @@ functions = function (workspace) {
 	return xmlList;
 };
 
+controls = function (workspace) {
+	var xmlList = [];
+	if(events_vars.length > 0){
+		var blockText = '<xml>' + '<block type="event"></block>' + '</xml>';
+		var block = Blockly.Xml.textToDom(blockText).firstChild;
+		xmlList.push(block);
+	}
+	blockText = '<xml>' + '<block type="fixedRelation"></block>' + '</xml>';
+	block = Blockly.Xml.textToDom(blockText).firstChild;
+	xmlList.push(block);
+	blockText = '<xml>' + '<block type="wait"></block>' + '</xml>';
+	block = Blockly.Xml.textToDom(blockText).firstChild;
+	xmlList.push(block);
+	return xmlList;
+};
 ///////////////// ONLOAD //////////////////////
 window.onload = function () {
 	if (typeof _model !== 'undefined') // Any scope
@@ -1135,6 +1153,7 @@ window.onload = function () {
 	workspace.registerToolboxCategoryCallback('booleans', booleans);
 	workspace.registerToolboxCategoryCallback('others', others);
 	workspace.registerToolboxCategoryCallback('functions', functions);
+	workspace.registerToolboxCategoryCallback('controls', controls);
 	if (typeof initial !== 'undefined') {
 		var xmlDom = Blockly.Xml.textToDom(initial);
 		Blockly.Xml.domToWorkspace(xmlDom, workspace);
