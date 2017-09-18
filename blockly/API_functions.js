@@ -364,6 +364,8 @@ function parseCode() {
 		Blockly.JavaScript.addReservedWords('highlightBlock');
 		Blockly.JavaScript.addReservedWords('LoopTrap');
 	}
+	else
+		function_code_remote ="";
 	var code = Blockly.JavaScript.workspaceToCode(workspace);
 	//Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
 	code = "reInitLab();\n" + code;

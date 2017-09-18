@@ -24,6 +24,7 @@ var special = false;
 var declared_variables_remote = [];
 var function_code_remote = "";
 var remote = false;
+var notComment = false;
 
 function loadModelBlocks() {
 	var _vars;
@@ -662,7 +663,7 @@ function loadJavaScriptModelBlocks() {
 
 	function setJS(block, text) {
 		var dropdown_d = block.getFieldValue(text);
-		var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+		var value_name=Blockly.JavaScript.valueToCode(block,"NAME",Blockly.JavaScript.ORDER_ATOMIC)||"0"; 
 		var obj = _model._userSerializePublic();
 		if ((typeof(obj[dropdown_d])).localeCompare("function") === 0) {
 			value_name = value_name.replace("()", "");
@@ -794,9 +795,14 @@ function loadJavaScriptModelBlocks() {
 	};
 
 	Blockly.JavaScript['evaluation'] = function (block) {
+		notComment = true;
 		var value_name = block.getFieldValue('expre');
 		value_name = value_name.replace(/(\r\n|\n|\r)/gm, "");
-		return "evaluate(\"" + value_name + "\");\n";
+		
+		if(remoteLab)
+			return  value_name;
+		else
+			return "evaluate(\"" + value_name + "\");\n";
 	};
 
 	Blockly.JavaScript['replacefunc'] = function (block) {
@@ -812,6 +818,7 @@ function loadJavaScriptModelBlocks() {
 		// TODO: Assemble JavaScript into code variable.
 		statements_code = statements_code ? statements_code.toString() : '';
 		value_name = value_name ? value_name.toString() : '';
+		statements_code = cleanFromComments(statements_code);
 		statements_code = statements_code.replace(/(\r\n|\n|\r)/gm, "");
 		statem.push(statements_code.toString());
 		if(remoteLab)
@@ -826,6 +833,18 @@ function loadJavaScriptModelBlocks() {
 		return "initialize();\n";
 	};
 
+}
+
+
+function cleanFromComments(textblock){
+	var lines = textblock.split('\n');
+	// remove one line, starting at the first position
+	for(var i = lines.length-1;i>=0;i--){
+		if(lines[i].indexOf('//') >= 0 )
+			lines.splice(i,1);
+	}
+	// join the array back into a single string
+	return lines.join('\n');
 }
 
 ////////// CHARTS /////////////////////////////////////////////
