@@ -141,6 +141,11 @@ $string['practiceintro'] = 'Practice identifier';
 $string['practiceintro_help'] = 'The identifier of the practice you want to use with this experimental system. NOTE: You need the Remlab Manager block for this option to be available.';
 $string['practiceintro_required'] = 'WARNING: If you want to configure this activity as a remote lab, you need to specify a practice identifier previously defined in the Remlab Manager block.';
 
+$string['record_interactions'] = 'Record user interactions';
+$string['record_interactions_help'] = 'When this option is marked as \'yes\', Moodle will store the user interactions with the EjsS lab: pressed buttons, changes of parameters, and so on. Enable it if you want to apply learning analytics.';
+$string['record_mouse_events'] = 'Record mouse events';
+$string['record_mouse_events_help'] = 'Recording mouse movement events will generate larger sets of data. You may want to leave this option as \'no\' if you do not find this information useful for performing learning analysis in this lab.';
+
 $string['file_error'] = "Can't open file from the server";
 $string['manifest_error'] = " > Can't find or open manifest .mf. Check the file you uploaded.";
 $string['EJS_version'] = "WARNING: The applet file was not generated with EjsS 4.37 (build 121201), or higher. Recompile it with a newer version of EjsS.";

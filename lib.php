@@ -122,12 +122,7 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab.
             if ($ejsapp->remlab_manager) {
                 $practiceslist = explode(';', $ejsapp->list_practices);
-                $remlabinfo = $DB->get_record('block_remlab_manager_conf',
-                    array('practiceintro' => $practiceslist[$ejsapp->practiceintro]));
-                if ($remlabinfo == null) {
-                    $remlabinfo = default_rem_lab_conf($ejsapp);
-                    $DB->insert_record('block_remlab_manager_conf', $remlabinfo);
-                }
+                check_create_remlab_conf($practiceslist[$ejsapp->practiceintro]);
             }
             ejsapp_expsyst2pract($ejsapp);
             update_booking_table($ejsapp);
@@ -174,12 +169,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
         if ($ejsapp->is_rem_lab == 1) { // Remote lab.
             if ($ejsapp->remlab_manager) {
                 $practiceslist = explode(';', $ejsapp->list_practices);
-                $remlabinfo = $DB->get_record('block_remlab_manager_conf',
-                    array('practiceintro' => $practiceslist[$ejsapp->practiceintro]));
-                if ($remlabinfo == null) {
-                    $remlabinfo = default_rem_lab_conf($ejsapp);
-                    $DB->insert_record('block_remlab_manager_conf', $remlabinfo);
-                }
+                check_create_remlab_conf($practiceslist[$ejsapp->practiceintro]);
                 $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
                 ejsapp_expsyst2pract($ejsapp);
             }
@@ -218,7 +208,9 @@ function ejsapp_delete_instance($id) {
         return false;
     }
 
-    $cmid = $DB->get_field('course_modules', 'id', array('course' => $ejsapp->course, 'instance' => $id));
+    $moduleid = $DB->get_field('modules', 'id', array('name' => 'ejsapp'));
+    $cmid = $DB->get_field('course_modules', 'id', array('course' => $ejsapp->course, 'instance' => $id,
+        'module' => $moduleid));
     $context = context_module::instance($cmid);
 
     $fs = get_file_storage();

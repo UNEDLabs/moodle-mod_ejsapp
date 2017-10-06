@@ -316,5 +316,39 @@ function xmldb_ejsapp_upgrade($oldversion) {
         $dbman->drop_field($table, $field);
     }
 
+    if ($oldversion < '2017092104') {
+        // Create "ejsapp_records" table.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_records');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            true, null);
+        $table->add_field('time', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_field('ejsappid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_field('actions', XMLDB_TYPE_TEXT, '400000', null, XMLDB_NOTNULL,
+            null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    }
+
+    if ($oldversion < '2017092201') {
+        // Create "record" and "mouse_events" fields in ejsapp table.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('record', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL,
+            null, '0', 'blockly_conf');
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('mouse_events', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL,
+            null, '0', 'record');
+        $dbman->add_field($table, $field);
+    }
+
     return true;
 }

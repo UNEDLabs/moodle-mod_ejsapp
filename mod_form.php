@@ -51,7 +51,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
         $mform = & $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are showed.
@@ -246,7 +246,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('display_lab_charts', 'use_blockly', 'eq', 0);
         $mform->disabledIf('display_lab_charts', 'display_lab', 'eq', 0);
         $mform->setDefault('display_lab_charts', 0);
-		
 
         // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
@@ -266,7 +265,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('is_rem_lab', 'remlab_manager', 'eq', 0);
 
         if ($remlabmanagerinstalled) {
-            $showableexperiences = get_showable_experiences();
+            $showableexperiences = get_showable_experiences($USER->username);
         } else {
             $showableexperiences = array();
         }
@@ -299,6 +298,16 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $experiencelist .= $experience . ';';
         }
         $mform->setDefault('list_practices', $experiencelist);
+
+        // Select the users interaction recording options.
+        $mform->addElement('header', 'record_interactions_title', get_string('record_interactions', 'ejsapp'));
+        $mform->addElement('selectyesno', 'record', get_string('record_interactions', 'ejsapp'));
+        $mform->addHelpButton('record', 'record_interactions', 'ejsapp');
+        $mform->setDefault('record', 0);
+        $mform->addElement('selectyesno', 'mouseevents', get_string('record_mouse_events', 'ejsapp'));
+        $mform->addHelpButton('mouseevents', 'record_mouse_events', 'ejsapp');
+        $mform->disabledIf('mouseevents', 'record_interactions', 'eq', 0);
+        $mform->setDefault('mouseevents', 0);
 
         // Adding standard grading elements.
         $this->standard_grading_coursemodule_elements();

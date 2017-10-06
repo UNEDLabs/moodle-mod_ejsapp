@@ -138,6 +138,11 @@ $string['practiceintro'] = 'Identificador de pr&aacute;ctica';
 $string['practiceintro_help'] = 'El identificador de la pr&aacute;ctica, que desea usar con este sistema experimental.';
 $string['practiceintro_required'] = 'ATENCI&Oacute;N: Si desea configurar esta actividad como un laboratorio remoto, necesita especificar un identificador de pr&aacute; que est&eacute; previamente definido en el bloque Remlab Manager.';
 
+$string['record_interactions'] = 'Registrar las acciones de los usuarios';
+$string['record_interactions_help'] = 'Cuando esta opci&oacute;n se marca como \'s&iacute;\', Moodle almacenar&aacute; las interacciones de los usuarios con el laboratorio EjsS: pulsaciones en botones, cambios de par&aacute;metros, etc. Activar si se desea aplicar t&eacute;cnicas de learning analytics.';
+$string['record_mouse_events'] = 'Registrar los eventos del rat&aacute;n';
+$string['record_mouse_events_help'] = 'Registrar los eventos de movimiento del rat&oacute;n generar&aacute; conjuntos de datos m&aacute;s grandes. Puede que desee dejar esta opci&oacute;n como \'no\' si no cree que esta informaci&oacute;n resulte &uacute;til para realizar learning analytics sobre este laboratorio.';
+
 $string['file_error'] = "No pudo abrirse el fichero en el servidor";
 $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto .mf. Revise el fichero que ha cargado.";
 $string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EjsS 4.37 (build 121201), o superior. Recomp&iacute;lelo con una versi&oacute;n m&aacute;s moderna de EjsS.";

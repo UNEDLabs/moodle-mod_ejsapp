@@ -141,8 +141,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         $userblkfile = null;
     }
 
-    $code = '';
-
     // Sarlab is used to access this remote lab or to establish communication between users participating in a
     // collaborative session.
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {
@@ -195,6 +193,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
     $language = current_language();
 
     if ($ejsapp->class_file == '') { // EjsS Javascript.
+        global $PAGE;
 
         if (count(explode('/', $CFG->wwwroot)) <= 3) {
             $path = $CFG->wwwroot . $ejsapp->codebase;
@@ -225,37 +224,29 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
             $htmlcode = file_get_contents($path . $ejsapp->applet_name);
         }
 
-        // Pass the needed parameters to the javascript application.
-        $search = "}, false);";
-        $replace = '_model.setStatusParams("' . $context->id . '", "' . $USER->id . '", "' . $ejsapp->id . '", "' .
-            $CFG->wwwroot . '/mod/ejsapp/upload_file.php", "' . $CFG->wwwroot .
-            '/mod/ejsapp/send_files_list.php", function(){document.getElementById("refreshEJSAppFBBut").click();});
-            }, false);';
-        $pos = strpos($code, $search);
-        if ($pos !== false) {
-            $code = substr_replace($code, $replace, $pos, strlen($search));
-        }
-
-        // For remote labs and collaborative sessions, make sure the application keeps running even when the focus is
-        // not in the browser window.
+        // For remote labs and collaborative sessions only
         if ($ejsapp->is_rem_lab || $collabinfo) {
-            $search = "_model.addToInitialization(function() {";
-            if ($collabinfo && !isset($collabinfo->director)) { // Collaborative session with an invited user.
+            if ($sarlabinfo) { // For remote labs accessed through Sarlab, pass authentication params to the app.
+                $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
+                    array($USER->username, $sarlabkey));
+            }
+            // Make sure the Javascript application doesn't stop when losing focus.
+            $sseuri = '';
+            $port = '';
+            if ($collabinfo && !isset($collabinfo->director)) {
+                // Collaborative session with an invited user.
                 $f = @fopen("actions.log", "rb");
                 $collsessid = 1;
                 $_SESSION["file_actions_session_$collsessid"] = $f;
                 // $sseuri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?id=$collsessid";.
                 $sseuri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?";
-                $replace = "_model.addToInitialization(function() { _model.setRunAlways(true); " .
-                    "_model.playCaptureStream('$sseuri');";
+
             } else if ($collabinfo && isset($collabinfo->director)) {
                 // Collaborative session with the director of the session.
-                $replace = "_model.addToInitialization(function() { _model.setRunAlways(true); " .
-                    "_model.startCaptureStream(8000);";
-            } else { // Remote lab.
-                $replace = "_model.addToInitialization(function() { _model.setRunAlways(true);";
+                $port = 8000;
             }
-            $code = str_replace($search, $replace, $code);
+            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'addToInitialization',
+                array($sseuri, $port));
         }
 
         // Init of loading state, controller, interaction and blockly programs files as well as personalized variables.
@@ -263,13 +254,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         $initialstatefile = initial_data_file($ejsapp, 'xmlfiles');
         if ($userstatefile || (isset($initialstatefile->filename)) && $initialstatefile->filename != '.') {
             $statefile = get_data_file($userstatefile, $initialstatefile);
-            $search = "}, false);";
-            $replace = "_model.readState('$statefile','.json');
-            }, false);";
-            $pos = strpos($code, $search);
-            if ($pos !== false) {
-                $code = substr_replace($code, $replace, $pos, strlen($search));
-            }
+            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readStateFile', $statefile);
         }
         // End of loading state files.
 
@@ -286,14 +271,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         if ($userrecfile || (isset($initialrecfile->filename) && $initialrecfile->filename != '.')) {
             $endmessage = get_string('end_message', 'ejsapp');
             $recfile = get_data_file($userrecfile, $initialrecfile);
-            $search = "}, false);";
-            $replace = "_model.readText('$recfile','.rec',function(content){_model.playCapture(JSON.parse(content)," .
-                "function(){alert('$endmessage')})});
-            }, false);";
-            $pos = strpos($code, $search);
-            if ($pos !== false) {
-                $code = substr_replace($code, $replace, $pos, strlen($search));
-            }
+            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'playRecFile',
+                array($recfile, $endmessage));
         }
         // End of loading interaction recording files.
 
@@ -303,14 +282,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
             $blocklyconf = json_decode($ejsapp->blockly_conf);
             if ($blocklyconf[0] == 1) {
                 $blkfile = get_data_file($userblkfile, $initialblkfile);
-                $search = "}, false);";
-                $replace = "_model.readText('$blkfile','.blk',function(xmlText){if (xmlText){workspace.clear();" .
-                    "xmlDom = Blockly.Xml.textToDom(xmlText);Blockly.Xml.domToWorkspace(xmlDom, workspace);}});
-                }, false);";
-                $pos = strpos($code, $search);
-                if ($pos !== false) {
-                    $code = substr_replace($code, $replace, $pos, strlen($search));
-                }
+                $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readBlocklyFile',
+                    array($blkfile));
             }
         }
         // End of loading blockly program files.

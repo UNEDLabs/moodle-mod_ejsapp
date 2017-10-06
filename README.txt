@@ -31,7 +31,7 @@ The GNU General Public License is available on <http://www.gnu.org/licenses/>
 If you downloaded this plugin from github, you will need to change the folder's name to ejsapp. If you downloaded it
 from Moodle.org, then you are fine.
 
-This is a module plugin for Moodle so you should place the ejsapp folder in your /mod folder,inside your Moodle
+This is a module plugin for Moodle so you should place the ejsapp folder in your /mod folder, inside your Moodle
 installation directory.
 
 This module enhances its functionality when used along with the ejsappbooking module and/or the ejsapp_file_browser,
@@ -84,22 +84,13 @@ https://github.com/UNEDLabs.
 4. Configuration
 ================
 
-When installing ejsapp for the first time, you will need to set a few variables:
+When installing ejsapp for the first time, you may need to set a few variables (in case you want to use applets):
 
    certificate_path:	This variable defines the absolute path to the trust certificate file.
 
    certificate_password:This variable must contain the password of the trust certificate.
 
    certificate_alias: 	This variable stores the alias given to your trust certificate.
-
-   sarlab_IP:	  	This variable defines the IP(s) address(es) of the SARLAB system(s) used for managing the access to
-                    the remote laboratories. If left empty, the plugin understands that SARLAB is not used.
-
-   sarlab_port:		This variable defines the port(s) used to communicate with the SARLAB system(s). If left empty, the
-                    plugin understands that SARLAB is not used.
-
-   sarlab_enc_key:	This 16 characters long variable must be configure to match exactly the key set in the SARLAB
-                    system(s).
 
 5. Authors
 ==========

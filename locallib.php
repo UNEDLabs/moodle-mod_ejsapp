@@ -256,14 +256,16 @@ function delete_recursively($dir) {
 
 
 /**
- * Creates the list of all Sarlab experiences accessible by a particular user.
+ * Creates the list of all Sarlab experiences. If a username is provided, it only returns those practices accessible by
+ * this particular user.
  *
- * @param string $username
  * @param array $sarlabips
+ * @param string $username
  * @return string $listexperiences
  *
  */
-function get_experiences_sarlab($username, $sarlabips) {
+function get_experiences_sarlab($sarlabips, $username = "") {
+    global $DB;
     $listexperiences = '';
 
     foreach ($sarlabips as $sarlabip) {
@@ -275,23 +277,38 @@ function get_experiences_sarlab($username, $sarlabips) {
         if ($ip != '127.0.0.1' && $ip != '') {
             if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 1)) { // IP is alive.
                 fclose($fp);
-                $uri = 'http://' . $ip . '/';
+                $uri = 'http://' . $ip . '/SARLABV8.0/gexlab';
                 $headers = get_headers($uri);
                 if (substr($headers[0], 9, 3) == 200) { // Valid file.
                     if ($xml = simplexml_load_file($uri)) {
-                        $listexperiences = $xml->Experience; // Get list of experiences.
-                        foreach ($listexperiences as $experience) {
-                            // Get list of users who can access the experience.
-                            $ownerusers = $experience->owneUser;
-                            foreach ($ownerusers as $owneruser) {
-                                // Check whether the required user has access to the experience.
-                                if ($username == $owneruser || is_siteadmin()) {
-                                    $expideriences = $experience->idExperience;
-                                    foreach ($expideriences as $expiderience) {
-                                        // Add the experience to the user's list of accessible experiences.
-                                        $listexperiences .= $expiderience . ';';
+                        $map = $xml->MapExperience;
+                        $listsarlabexperiences = $map->Experience; // Get list of experiences.
+                        foreach ($listsarlabexperiences as $experience) {
+                            $experimentsettings = $experience->ExperimentSettings;
+                            // Get list of Moodle servers and users who can access the experience.
+                            $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
+                            // Get list of users in this Moodle server who can access the experience
+                            $moodleservers = $listownermoodleusers->ServerMoodle;
+                            foreach ($moodleservers as $moodleserver) {
+                                // Check whether this Moodle server is registered in the experience.
+                                if ($moodleserver['IdMoodle'] == 'UNED') { //TODO: replace by server id.
+                                    if ($username != "") {
+                                        // If username is provided, check users permissions both in Moodle and Sarlab.
+                                        $ownerusers = $moodleserver->Owner;
+                                        foreach ($ownerusers as $owneruser) {
+                                            $userid = $DB->get_field('user', 'id', array('username' => $username));
+                                            // Check whether the required user has access to the experience.
+                                            if (strcasecmp($username, $owneruser) == 0 && has_capability(
+                                                    'ltisource/sarlab:useexp', context_system::instance(), $userid)) {
+                                                $listexperiences .= $experience['IdExp'] . ';';
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        // If not, the whole list of Sarlab experiences must be returned, so add it.
+                                        $listexperiences .= $experience['IdExp'] . ';';
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
@@ -308,31 +325,32 @@ function get_experiences_sarlab($username, $sarlabips) {
 
 
 /**
- * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
+ * Gets the local experiences (defined without sarlab) and combines them with those in Sarlab in a unique, ordered list.
  *
- * @param array $sarlabexperiences
+ * @param array $usersarlabexperiences
+ * @param array $allsarlabexperiences
  * @return array $combinedexperiences
  *
  */
-function combine_experiences($sarlabexperiences) {
+function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
     global $DB;
     $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
     $remlabmanager = !empty($remlabmanager);
 
     if ($remlabmanager) {
-        $listexperienceswithoutsarlab = $DB->get_records('block_remlab_manager_conf',
+        $localexperiences = $DB->get_records('block_remlab_manager_conf',
             array('usingsarlab' => '0'));
         $combinedexperiences = array();
-        if ($sarlabexperiences[0] != '') {
-            $combinedexperiences = $sarlabexperiences;
+        if ($usersarlabexperiences[0] != '') {
+            $combinedexperiences = $usersarlabexperiences;
         }
-        foreach ($listexperienceswithoutsarlab as $listexperienceswithoutsarlab) {
-            if (!in_array($listexperienceswithoutsarlab->practiceintro, $sarlabexperiences)) {
-                $combinedexperiences[] = $listexperienceswithoutsarlab->practiceintro;
+        foreach ($localexperiences as $localexperience) {
+            if (!in_array($localexperience->practiceintro, $allsarlabexperiences)) {
+                $combinedexperiences[] = $localexperience->practiceintro;
             }
         }
     } else {
-        $combinedexperiences = $sarlabexperiences;
+        $combinedexperiences = $usersarlabexperiences;
     }
 
     // Order the list alphabetically.
@@ -345,17 +363,19 @@ function combine_experiences($sarlabexperiences) {
 /**
  * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
  *
+ * @param string $username
  * @return array $showableexperiences
  *
  */
-function get_showable_experiences() {
-    global $USER;
+function get_showable_experiences($username = "") {
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     // Get experiences from Sarlab.
-    $listexperiences = get_experiences_sarlab($USER->username, $sarlabips);
-    $sarlabexperiences = explode(";", $listexperiences);
+    $userlistexperiences = get_experiences_sarlab($sarlabips, $username);
+    $alllistexperiences = get_experiences_sarlab($sarlabips, "");
+    $usersarlabexperiences = explode(";", $userlistexperiences);
+    $allsarlabexperiences = explode(";", $alllistexperiences);
     // Also get experiences NOT in Sarlab and add them to the list.
-    $showableexperiences = combine_experiences($sarlabexperiences);
+    $showableexperiences = combine_experiences($usersarlabexperiences, $allsarlabexperiences);
 
     return $showableexperiences;
 }
@@ -884,24 +904,22 @@ function ping($host, $port=80, $usingsarlab, $expid=null, $timeout=3) {
 }
 
 /**
- * Creates a default record for the block_remlab_manager_conf table
+ * Creates a default practice record for the block_remlab_manager_conf table
  *
- * @param stdClass $ejsapp
+ * @param string $practice
+ * @param string $username
  * @return stdClass $defaultconf
  *
  */
-function default_rem_lab_conf($ejsapp) {
-    global $USER;
-
+function default_rem_lab_conf($practice, $username = "") {
     $defaultconf = new stdClass();
     // Get experiences from Sarlab and check whether this practice is in a Sarlab server or not.
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-    $listexperiences = get_experiences_sarlab($USER->username, $sarlabips);
+    $listexperiences = get_experiences_sarlab($sarlabips, $username);
     $sarlabexperiences = explode(";", $listexperiences);
-    $completelistpract = explode(';', $ejsapp->list_practices);
-    $defaultconf->practiceintro = $completelistpract[$ejsapp->practiceintro];
+    $defaultconf->practiceintro = $practice;
     $defaultconf->usingsarlab = 0;
-    if (in_array($ejsapp->practiceintro, $sarlabexperiences)) {
+    if (in_array($practice, $sarlabexperiences)) {
         $defaultconf->usingsarlab = 1;
     }
     if ($defaultconf->usingsarlab == 1) {
@@ -932,6 +950,27 @@ function default_rem_lab_conf($ejsapp) {
     $defaultconf->free_access = 0;
 
     return $defaultconf;
+}
+
+/**
+ * Checks whether the lab experience has a local configuration defined, creates a default configuration if not, and
+ * returns the data.
+ *
+ * @param string $practice
+ * @return stdClass $remlab_conf
+ *
+ */
+function check_create_remlab_conf($practice) {
+    global $DB;
+
+    if ($DB->record_exists('block_remlab_manager_conf', array('practiceintro' => $practice))) {
+        $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
+    } else {
+        $remlab_conf = default_rem_lab_conf($practice);
+        $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
+    }
+
+    return $remlab_conf;
 }
 
 /**
@@ -1355,7 +1394,7 @@ function remote_lab_access_info($ejsapp, $course) {
     $remlabaccess = new stdClass;
 
     $practice = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsapp->id));
-    $remlabaccess->remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
+    $remlabaccess->remlab_conf = check_create_remlab_conf($practice);
 
     // Check if the remote lab is operative.
     $remlabaccess->operative = true;
@@ -1703,11 +1742,9 @@ function create_blockly_configuration($ejsapp) {
 		
 		if ($ejsapp->is_rem_lab == 1) {
 			$jsconfcode .= "\n" ."var remoteLab = true;";
-		}
-        else{
+		} else{
 			$jsconfcode .= "\n" ."var remoteLab = false;";
 		}
-		
 
         $jsconfcode .= "\n" . "var toolbox = '<xml>';";
         if ($blocklyconf[1] == 1) {

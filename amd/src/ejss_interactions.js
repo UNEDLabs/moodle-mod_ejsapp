@@ -1,0 +1,106 @@
+// This file is part of the Moodle module "EJSApp"
+//
+// EJSApp is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either moodle_version 3 of the License, or
+// (at your option) any later moodle_version.
+//
+// EJSApp is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// The GNU General Public License is available on <http://www.gnu.org/licenses/>
+//
+// EJSApp has been developed by:
+// - Luis de la Torre: ldelatorre@dia.uned.es
+// - Ruben Heradio: rheradio@issi.uned.es
+//
+// at the Computer Science and Automatic Control, Spanish Open University
+// (UNED), Madrid, Spain
+
+/**
+ * Interactions with EjsS applications.
+ *
+ * @package    mod
+ * @subpackage ejsapp
+ * @copyright  2016 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+define(['jquery'], function($) {
+    var t = {
+        recording : function(mouseevents) {
+            $(window).on('load', function() {
+                setInterval(function () {
+                    // Start recording of users interaction
+                    _model.startRegister(mouseevents);
+                    // Save record every 30 seconds
+                    _model.sendRegister(true);
+                }, 30000);
+                // Also save before the user leaves the EJSApp activity
+                window.onbeforeunload = function () {
+                    _model.sendRegister(true);
+                };
+            });
+        },
+
+        sarlabCredentials : function(username, password) {
+            $(window).on('load', function() {
+                sarlab.setSarlabCredentials(username, password);
+            });
+        },
+
+        setCommonParameters : function(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, elementid) {
+            $(window).on('load', function() {
+                _model.setStatusParams(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl,
+                    function(){document.getElementById(elementid).click();});
+            });
+        },
+
+        addToInitialization : function(sseuri, port) {
+            $(window).on('load', function() {
+                if (sseuri !== '') {
+                    _model.addToInitialization(function() {
+                        _model.setRunAlways(true);
+                        _model.playCaptureStream(sseuri);
+                    });
+                } else if (port !== '') {
+                    _model.addToInitialization(function() {
+                        _model.setRunAlways(true);
+                        _model.startCaptureStream(port);
+                    });
+                }
+            });
+        },
+
+        readStateFile : function(statefile) {
+            $(window).on('load', function() {
+                _model.readState(statefile + '.json');
+            });
+        },
+
+        playRecFile : function(recfile, endmessage) {
+            $(window).on('load', function() {
+                _model.readText(recfile, '.rec', function (content) {
+                    _model.playCapture(JSON.parse(content), function () {
+                        alert(endmessage)
+                    });
+                });
+            });
+        },
+
+        readBlocklyFile : function(blkfile) {
+            $(window).on('load', function() {
+                _model.readText(blkfile, '.blk', function (xmlText) {
+                    if (xmlText) {
+                        workspace.clear();
+                        xmlDom = Blockly.Xml.textToDom(xmlText);
+                        Blockly.Xml.domToWorkspace(xmlDom, workspace);
+                    }
+                });
+            });
+        }
+    };
+    return t;
+});

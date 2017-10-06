@@ -48,7 +48,13 @@
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="width" NEXT="blockly_conf"/>
                 <FIELD NAME="blockly_conf" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
-                       COMMENT="Blockly configuration parameters encoded in json" PREVIOUS="personalvars"/>
+                       COMMENT="Blockly configuration parameters encoded in json" PREVIOUS="personalvars"
+                       NEXT="record"/>
+                <FIELD NAME="record" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0"
+                       COMMENT="Whether to record the users interactions or not" PREVIOUS="blockly_conf"
+                       NEXT="mouseevents"/>
+                <FIELD NAME="mouseevents" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0"
+                       COMMENT="Whether to record mouse events or not" PREVIOUS="record"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -80,7 +86,7 @@
             </INDEXES>
         </TABLE>
         <TABLE NAME="ejsapp_log" COMMENT="Contains logs to track the EJSApp labs usage"
-               PREVIOUS="ejsapp_personal_vars">
+               PREVIOUS="ejsapp_personal_vars" NEXT="ejsapp_records">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="time"/>
                 <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
@@ -91,6 +97,25 @@
                        PREVIOUS="userid" NEXT="info"/>
                 <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
                        PREVIOUS="action"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="ejsapp_records" COMMENT="Contains users interactions with the EjsS applications"
+               PREVIOUS="ejsapp_log">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="time"/>
+                <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
+                       NEXT="userid"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
+                       PREVIOUS="time" NEXT="ejsappid"/>
+                <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"
+                       PREVIOUS="userid" NEXT="sessionsid"/>
+                <FIELD NAME="sessionsid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"
+                       PREVIOUS="ejsappid" NEXT="actions"/>
+                <FIELD NAME="actions" TYPE="char" LENGTH="8000" NOTNULL="true" SEQUENCE="false"
+                       PREVIOUS="sessionid"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

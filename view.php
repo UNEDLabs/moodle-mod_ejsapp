@@ -118,6 +118,23 @@ if (file_exists($CFG->dirroot . $customcss)) {
     $PAGE->requires->css($originalcss);
 }
 
+if ($ejsapp->class_file == '') {
+    $context = context_user::instance($USER->id);
+    // Pass the needed common parameters to the javascript application.
+    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'setCommonParameters',
+        array($context->id, $USER->id, $ejsapp->id, $CFG->wwwroot . '/mod/ejsapp/upload_file.php', $CFG->wwwroot .
+            '/mod/ejsapp/send_files_list.php', 'refreshEJSAppFBBut'));
+    // If enabled, start recording of users interactions.
+    if ($ejsapp->record == 1) {
+        if ($DB->get_field('ejsapp', 'mouse_events', array('id' => $ejsapp->id)) == 1) {
+            $mouseevents = true;
+        } else {
+            $mouseevents = false;
+        }
+        $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'recording', $mouseevents);
+    }
+}
+
 // Output starts here.
 echo $OUTPUT->header();
 if ($ejsapp->intro) { // If some text was written, show the intro.
@@ -323,7 +340,6 @@ if ($accessed && $ejsapp->class_file == '') {
         $content = html_writer::div($content, 'runCodeEJSApp');
         echo $content;
         // Blockly programming space for Javascript labs.
-        $PAGE->requires->js_call_amd('mod_ejsapp/jqueryui', 'init');
         $includejslibraries = html_writer::tag('script', '',
                 array('src' => $ejsapp->codebase . 'configuration.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/acorn_interpreter.js')) .
