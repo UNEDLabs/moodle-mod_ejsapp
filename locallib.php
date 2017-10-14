@@ -297,6 +297,9 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                                         $ownerusers = $moodleserver->Owner;
                                         foreach ($ownerusers as $owneruser) {
                                             $userid = $DB->get_field('user', 'id', array('username' => $username));
+                                            var_dump($username);
+                                            var_dump($owneruser);
+                                            var_dump(strcasecmp($username, $owneruser));
                                             // Check whether the required user has access to the experience.
                                             if (strcasecmp($username, $owneruser) == 0 && has_capability(
                                                     'ltisource/sarlab:useexp', context_system::instance(), $userid)) {
@@ -338,8 +341,7 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
     $remlabmanager = !empty($remlabmanager);
 
     if ($remlabmanager) {
-        $localexperiences = $DB->get_records('block_remlab_manager_conf',
-            array('usingsarlab' => '0'));
+        $localexperiences = $DB->get_records('block_remlab_manager_conf');
         $combinedexperiences = array();
         if ($usersarlabexperiences[0] != '') {
             $combinedexperiences = $usersarlabexperiences;
