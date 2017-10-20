@@ -336,11 +336,9 @@ function get_experiences_sarlab($sarlabips, $username = "") {
  *
  */
 function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
-    global $DB, $USER;
+    global $DB;
     $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
     $remlabmanager = !empty($remlabmanager);
-    $context = context_user::instance($USER->id);
-    $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
 
     if ($remlabmanager) {
         $localexperiences = $DB->get_records('block_remlab_manager_conf');
@@ -350,7 +348,7 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
         }
         foreach ($localexperiences as $localexperience) {
             if (!in_array($localexperience->practiceintro, $allsarlabexperiences)) {
-                $combinedexperiences[] = $multilang->filter($localexperience->practiceintro);
+                $combinedexperiences[] = $localexperience->practiceintro;
             }
         }
     } else {

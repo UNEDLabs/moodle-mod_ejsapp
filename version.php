@@ -31,7 +31,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017093000;         // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2017101000;         // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2013111800;
 $plugin->cron     = 3600;               // Period for cron to check this module (secs).
 $plugin->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place.
