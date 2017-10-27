@@ -30,7 +30,7 @@
 define(['jquery'], function() {
     var ws;
     var t = {
-        SarlabWebSocket : function(command, IP, port, idExp, expTime, user, password, jarPath) {
+        SarlabWebSocket: function(command, IP, port, idExp, expTime, user, password, jarPath) {
             ws = new WebSocket("ws://127.0.0.1:8887");
             ws.onopen = function() {
                 // Websocket is connected, send data using send().
@@ -75,7 +75,7 @@ define(['jquery'], function() {
             };
         },
 
-        connectExperience : function(command, IP, port, idExp, expTime, user, password, jarPath) {
+        connectExperience: function(command, IP, port, idExp, expTime, user, password, jarPath) {
             var obj = '{'
                 +'"command":"' + command + '",'
                 +'"ip_server":"' + IP + '",'
@@ -91,18 +91,18 @@ define(['jquery'], function() {
             ws.send(obj);
         },
 
-        stopExperience : function() {
+        stopExperience: function() {
             ws.send('{"command":"exit"}');
         },
 
-        stopExperienceOnLeave : function() {
+        stopExperienceOnLeave: function() {
             window.onbeforeunload = function() {
                 ws.send('{"command":"reset"}');
                 ws.send('{"command":"exit"}');
             };
         },
 
-        resetExperience : function() {
+        resetExperience: function() {
             ws.send('{"command":"reset"}');
         }
     };

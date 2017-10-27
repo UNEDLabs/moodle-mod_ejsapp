@@ -187,6 +187,9 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
 
         $commandsarlab = 'sarlab';
         $jarpath = '';
+
+        // Set credentials for Sarlab proxy
+
     }
 
     $context = context_user::instance($USER->id);
@@ -240,7 +243,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
                 $_SESSION["file_actions_session_$collsessid"] = $f;
                 // $sseuri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?id=$collsessid";.
                 $sseuri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?";
-
             } else if ($collabinfo && isset($collabinfo->director)) {
                 // Collaborative session with the director of the session.
                 $port = 8000;

@@ -30,7 +30,7 @@
 
 define(['jquery'], function($) {
     var t = {
-        recording : function(mouseevents) {
+        recording: function(mouseevents) {
             $(window).on('load', function() {
                 setInterval(function () {
                     // Start recording of users interaction
@@ -45,20 +45,20 @@ define(['jquery'], function($) {
             });
         },
 
-        sarlabCredentials : function(username, password) {
+        sarlabCredentials: function(username, password) {
             $(window).on('load', function() {
-                sarlab.setSarlabCredentials(username, password);
+                _model._sarlab.setSarlabCredentials({username:username, password:password});
             });
         },
 
-        setCommonParameters : function(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, elementid) {
+        setCommonParameters: function(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, elementid) {
             $(window).on('load', function() {
                 _model.setStatusParams(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl,
                     function(){document.getElementById(elementid).click();});
             });
         },
 
-        addToInitialization : function(sseuri, port) {
+        addToInitialization: function(sseuri, port) {
             $(window).on('load', function() {
                 if (sseuri !== '') {
                     _model.addToInitialization(function() {
@@ -74,23 +74,23 @@ define(['jquery'], function($) {
             });
         },
 
-        readStateFile : function(statefile) {
+        readStateFile: function(statefile) {
             $(window).on('load', function() {
                 _model.readState(statefile + '.json');
             });
         },
 
-        playRecFile : function(recfile, endmessage) {
+        playRecFile: function(recfile, endmessage) {
             $(window).on('load', function() {
                 _model.readText(recfile, '.rec', function (content) {
                     _model.playCapture(JSON.parse(content), function () {
-                        alert(endmessage)
+                        alert(endmessage);
                     });
                 });
             });
         },
 
-        readBlocklyFile : function(blkfile) {
+        readBlocklyFile: function(blkfile) {
             $(window).on('load', function() {
                 _model.readText(blkfile, '.blk', function (xmlText) {
                     if (xmlText) {
