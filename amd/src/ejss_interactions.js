@@ -31,75 +31,97 @@
 define(['jquery'], function($) {
     var t = {
         recording: function(mouseevents) {
-            $(window).on('load', function() {
-                setInterval(function () {
-                    // Start recording of users interaction
-                    _model.startRegister(mouseevents);
-                    // Save record every 30 seconds
-                    _model.sendRegister(true);
-                }, 30000);
-                // Also save before the user leaves the EJSApp activity
-                window.onbeforeunload = function () {
-                    _model.sendRegister(true);
-                };
-            });
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                        setInterval(function () {
+                        // Start recording of users interaction
+                        _model.startRegister(mouseevents);
+                        // Save record every 30 seconds
+                        _model.sendRegister(true);
+                    }, 30000);
+                    // Also save before the user leaves the EJSApp activity
+                    window.onbeforeunload = function () {
+                        _model.sendRegister(true);
+                    };
+                    clearInterval(doit);
+                }
+            }, 200);
         },
 
         sarlabCredentials: function(username, password) {
-            $(window).on('load', function() {
-                _model._sarlab.setSarlabCredentials({username:username, password:password});
-            });
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                    _model._sarlab.setSarlabCredentials({"username": username, "password": password});
+                    clearInterval(doit);
+                }
+            }, 200);
         },
 
         setCommonParameters: function(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, elementid) {
-            $(window).on('load', function() {
-                _model.setStatusParams(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl,
-                    function(){document.getElementById(elementid).click();});
-            });
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                    _model.setStatusParams(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, function() {
+                        document.getElementById(elementid).click();
+                    });
+                    clearInterval(doit);
+                }
+            }, 200);
         },
 
         addToInitialization: function(sseuri, port) {
-            $(window).on('load', function() {
-                if (sseuri !== '') {
-                    _model.addToInitialization(function() {
-                        _model.setRunAlways(true);
-                        _model.playCaptureStream(sseuri);
-                    });
-                } else if (port !== '') {
-                    _model.addToInitialization(function() {
-                        _model.setRunAlways(true);
-                        _model.startCaptureStream(port);
-                    });
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                    if (sseuri !== '') {
+                        _model.addToInitialization(function() {
+                            _model.setRunAlways(true);
+                            _model.playCaptureStream(sseuri);
+                        });
+                    } else if (port !== '') {
+                        _model.addToInitialization(function() {
+                            _model.setRunAlways(true);
+                            _model.startCaptureStream(port);
+                        });
+                    }
+                    clearInterval(doit);
                 }
-            });
+            }, 200);
         },
 
         readStateFile: function(statefile) {
-            $(window).on('load', function() {
-                _model.readState(statefile + '.json');
-            });
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                    _model.readState(statefile + '.json');
+                    clearInterval(doit);
+                }
+            }, 200);
         },
 
         playRecFile: function(recfile, endmessage) {
-            $(window).on('load', function() {
-                _model.readText(recfile, '.rec', function (content) {
-                    _model.playCapture(JSON.parse(content), function () {
-                        alert(endmessage);
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                    _model.readText(recfile, '.rec', function(content) {
+                        _model.playCapture(JSON.parse(content), function() {
+                            alert(endmessage);
+                        });
                     });
-                });
-            });
+                    clearInterval(doit);
+                }
+            }, 200);
         },
 
         readBlocklyFile: function(blkfile) {
-            $(window).on('load', function() {
-                _model.readText(blkfile, '.blk', function (xmlText) {
-                    if (xmlText) {
-                        workspace.clear();
-                        xmlDom = Blockly.Xml.textToDom(xmlText);
-                        Blockly.Xml.domToWorkspace(xmlDom, workspace);
-                    }
-                });
-            });
+            var doit = setInterval(function () {
+                if (typeof _model !== "undefined") {
+                    _model.readText(blkfile, '.blk', function(xmlText) {
+                        if (xmlText) {
+                            workspace.clear();
+                            xmlDom = Blockly.Xml.textToDom(xmlText);
+                            Blockly.Xml.domToWorkspace(xmlDom, workspace);
+                        }
+                    });
+                    clearInterval(doit);
+                }
+            }, 200);
         }
     };
     return t;

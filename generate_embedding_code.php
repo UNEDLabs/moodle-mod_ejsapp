@@ -188,8 +188,6 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         $commandsarlab = 'sarlab';
         $jarpath = '';
 
-        // Set credentials for Sarlab proxy
-
     }
 
     $context = context_user::instance($USER->id);
@@ -231,7 +229,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         if ($ejsapp->is_rem_lab || $collabinfo) {
             if ($sarlabinfo) { // For remote labs accessed through Sarlab, pass authentication params to the app.
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
-                    array($USER->username, $sarlabkey));
+                    array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace CFG->wwwroot by Server id
             }
             // Make sure the Javascript application doesn't stop when losing focus.
             $sseuri = '';
