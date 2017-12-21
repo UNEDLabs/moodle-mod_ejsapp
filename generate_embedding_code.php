@@ -230,6 +230,8 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
             if ($sarlabinfo) { // For remote labs accessed through Sarlab, pass authentication params to the app.
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
                     array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace CFG->wwwroot by Server id
+                $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
+                    array($sarlabip, 'SARLABV8.0', '80', $sarlabinfo->practice));
             }
             // Make sure the Javascript application doesn't stop when losing focus.
             $sseuri = '';

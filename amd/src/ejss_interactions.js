@@ -31,16 +31,16 @@
 define(['jquery'], function($) {
     var t = {
         recording: function(mouseevents) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
-                        setInterval(function () {
+                        setInterval(function() {
                         // Start recording of users interaction
                         _model.startRegister(mouseevents);
                         // Save record every 30 seconds
                         _model.sendRegister(true);
                     }, 30000);
                     // Also save before the user leaves the EJSApp activity
-                    window.onbeforeunload = function () {
+                    window.onbeforeunload = function() {
                         _model.sendRegister(true);
                     };
                     clearInterval(doit);
@@ -49,7 +49,7 @@ define(['jquery'], function($) {
         },
 
         sarlabCredentials: function(username, password) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
                     _model._sarlab.setSarlabCredentials({"username": username, "password": password});
                     clearInterval(doit);
@@ -57,8 +57,18 @@ define(['jquery'], function($) {
             }, 200);
         },
 
+        sarlabRun: function(sarlabIP, sarlabPath, sarlabPort, sarlabExperience) {
+            var doit = setInterval(function() {
+                if (typeof _model !== "undefined") {
+                    _model._sarlab.setSarlabInfo(sarlabIP, sarlabPath, sarlabPort, sarlabExperience);
+                    _model._sarlab.connect();
+                    clearInterval(doit);
+                }
+            }, 200);
+        },
+
         setCommonParameters: function(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, elementid) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
                     _model.setStatusParams(contextid, userid, ejsappid, uploadfilesurl, sendfilesurl, function() {
                         document.getElementById(elementid).click();
@@ -69,7 +79,7 @@ define(['jquery'], function($) {
         },
 
         addToInitialization: function(sseuri, port) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
                     if (sseuri !== '') {
                         _model.addToInitialization(function() {
@@ -88,7 +98,7 @@ define(['jquery'], function($) {
         },
 
         readStateFile: function(statefile) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
                     _model.readState(statefile + '.json');
                     clearInterval(doit);
@@ -97,7 +107,7 @@ define(['jquery'], function($) {
         },
 
         playRecFile: function(recfile, endmessage) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
                     _model.readText(recfile, '.rec', function(content) {
                         _model.playCapture(JSON.parse(content), function() {
@@ -110,7 +120,7 @@ define(['jquery'], function($) {
         },
 
         readBlocklyFile: function(blkfile) {
-            var doit = setInterval(function () {
+            var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
                     _model.readText(blkfile, '.blk', function(xmlText) {
                         if (xmlText) {
