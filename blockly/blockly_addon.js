@@ -3,6 +3,19 @@ var keys_number = [];
 var keys_string = [];
 var keys_others = [];
 var events_vars = [];
+
+		var keys_string_input = [];
+		var keys_string_output = [];
+		var keys_number_input = [];
+		var keys_number_output = [];
+		var keys_string_input = [];
+		var keys_string_output = [];
+		var keys_boolean_input = [];
+		var keys_boolean_output = [];
+		var keys_others_input = [];
+		var keys_others_output = [];
+		var keys_input = [];
+		var keys_output = [];
 var statem = [];
 var record = false;
 var checkedValue;
@@ -25,52 +38,109 @@ var declared_variables_remote = [];
 var function_code_remote = "";
 var remote = false;
 var notComment = false;
+var newImplement = false;
 
 function loadModelBlocks() {
-	var _vars;
-	if( _model.getOdes()[0]!== undefined)
-		_vars = _model.getOdes()[0]._getOdeVars();
-	else
-		_vars = "";
-	var obj = _model._userSerializePublic();
+	var _vars  = "";
+	if( _model.getOdes()!== undefined){
+		if( _model.getOdes()[0]!== undefined)
+			_vars = _model.getOdes()[0]._getOdeVars();
+	}		
+	if(_model._userSerializePublic!==undefined&&_model._userSerializePublic!==null){
+		newImplement = false;
+		var obj = _model._userSerializePublic();
 
-	var keys = [];
-	var i = 1;
-    var dupla;
-	for (var k in obj) {
-		dupla = [];
-		dupla.push(k);
-		dupla.push(k);
-		switch (typeof obj[k]) {
-		case 'string':
-			keys_string.push(dupla);
-			break;
-		case 'number':
-			keys_number.push(dupla);
-			break;
-		case 'boolean':
-			keys_boolean.push(dupla);
-			break;
-		default:
-			keys_others.push(dupla);
-			break;
-		}
-		keys.push(dupla);
-		i++;
-	}
-
-	if(_vars!=="")
-		for (var e in _vars) {
+		var keys = [];
+		var dupla;
+		for (var k in obj) {
 			dupla = [];
-			dupla.push(_vars[e]);
-			dupla.push(_vars[e]);
-			events_vars.push(dupla);
+			dupla.push(k);
+			dupla.push(k);
+			switch (typeof obj[k]) {
+			case 'string':
+				keys_string.push(dupla);
+				break;
+			case 'number':
+				keys_number.push(dupla);
+				break;
+			case 'boolean':
+				keys_boolean.push(dupla);
+				break;
+			default:
+				keys_others.push(dupla);
+				break;
+			}
+			keys.push(dupla);
 		}
+
+		
+	}
+	else{ // NUEVA IMPLEMENTACION
+		newImplement = true;
+		var inputAux = _model._inputAndPublicParameters;
+		var outputAux = _model._outputAndPublicParameters;
+		var dupla;
+		for(var k in inputAux){
+			dupla = [];
+			dupla.push(inputAux[k]);
+			dupla.push(inputAux[k]);
+			switch (typeof getValueModel(inputAux[k])) {
+			case 'string':
+				keys_string_input.push(dupla);
+				break;
+			case 'number':
+				keys_number_input.push(dupla);
+				break;
+			case 'boolean':
+				keys_boolean_input.push(dupla);
+				break;
+			default:
+				keys_others_input.push(dupla);
+				break;
+			}
+			keys_input.push(dupla);
+		}
+		for(k in outputAux){
+			dupla = [];
+			dupla.push(outputAux[k]);
+			dupla.push(outputAux[k]);
+			switch (typeof getValueModel(outputAux[k])) {
+			case 'string':
+				keys_string_output.push(dupla);
+				break;
+			case 'number':
+				keys_number_output.push(dupla);
+				break;
+			case 'boolean':
+				keys_boolean_output.push(dupla);
+				break;
+			default:
+				keys_others_output.push(dupla);
+				break;
+			}
+			keys_output.push(dupla);
+		}
+	}
+	
+	
+	if(_vars!=="")
+			for (var e in _vars) {
+				dupla = [];
+				dupla.push(_vars[e]);
+				dupla.push(_vars[e]);
+				events_vars.push(dupla);
+			}
 
 	Blockly.Blocks['get_model_variable'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys;
+			else
+				addition = keys_output;
+					
 			this.appendDummyInput()
-			.appendField(new Blockly.FieldDropdown(keys), "modelvariables");
+			.appendField(new Blockly.FieldDropdown(addition), "modelvariables");
 			this.setOutput(true, null);
 			this.setColour(290);
 			this.setTooltip('');
@@ -79,9 +149,14 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['set_model_variable'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys;
+			else
+				addition = keys_input;
 			this.appendValueInput("NAME")
 			.appendField(Blockly.Msg.LISTS_SET_INDEX_SET)
-			.appendField(new Blockly.FieldDropdown(keys), "model variables")
+			.appendField(new Blockly.FieldDropdown(addition), "model variables")
 			.appendField(Blockly.Msg.TEXT_APPEND_TO);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
@@ -92,8 +167,13 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['get_model_variable_boolean'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_boolean;
+			else
+				addition = keys_boolean_output;
 			this.appendDummyInput()
-			.appendField(new Blockly.FieldDropdown(keys_boolean), "modelvariables1");
+			.appendField(new Blockly.FieldDropdown(addition), "modelvariables1");
 			this.setOutput(true, "Boolean");
 			this.setColour(290);
 			this.setTooltip('');
@@ -102,9 +182,14 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['set_model_variable_boolean'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_boolean;
+			else
+				addition = keys_boolean_input;
 			this.appendValueInput("NAME")
 			.appendField(Blockly.Msg.LISTS_SET_INDEX_SET)
-			.appendField(new Blockly.FieldDropdown(keys_boolean), "model variables1")
+			.appendField(new Blockly.FieldDropdown(addition), "model variables1")
 			.appendField(Blockly.Msg.TEXT_APPEND_TO)
 			.setCheck("Boolean");
 			this.setPreviousStatement(true, null);
@@ -116,8 +201,13 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['get_model_variable_string'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_string;
+			else
+				addition = keys_string_output;
 			this.appendDummyInput()
-			.appendField(new Blockly.FieldDropdown(keys_string), "modelvariables2");
+			.appendField(new Blockly.FieldDropdown(addition), "modelvariables2");
 			this.setOutput(true, "Text");
 			this.setColour(290);
 			this.setTooltip('');
@@ -126,9 +216,14 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['set_model_variable_string'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_string;
+			else
+				addition = keys_string_input;
 			this.appendValueInput("NAME")
 			.appendField(Blockly.Msg.LISTS_SET_INDEX_SET)
-			.appendField(new Blockly.FieldDropdown(keys_string), "model variables2")
+			.appendField(new Blockly.FieldDropdown(addition), "model variables2")
 			.appendField(Blockly.Msg.TEXT_APPEND_TO)
 			.setCheck("Text");
 			this.setPreviousStatement(true, null);
@@ -140,8 +235,13 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['get_model_variable_number'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_number;
+			else
+				addition = keys_number_output;
 			this.appendDummyInput()
-			.appendField(new Blockly.FieldDropdown(keys_number), "modelvariables3");
+			.appendField(new Blockly.FieldDropdown(addition), "modelvariables3");
 			this.setOutput(true, "Number");
 			this.setColour(290);
 			this.setTooltip('');
@@ -150,9 +250,14 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['set_model_variable_number'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_number;
+			else
+				addition = keys_number_input;
 			this.appendValueInput("NAME")
 			.appendField(Blockly.Msg.LISTS_SET_INDEX_SET)
-			.appendField(new Blockly.FieldDropdown(keys_number), "model variables3")
+			.appendField(new Blockly.FieldDropdown(addition), "model variables3")
 			.appendField(Blockly.Msg.TEXT_APPEND_TO)
 			.setCheck("Number");
 			this.setPreviousStatement(true, null);
@@ -164,8 +269,13 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['get_model_variable_others'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_others;
+			else
+				addition = keys_others_output;
 			this.appendDummyInput()
-			.appendField(new Blockly.FieldDropdown(keys_others), "modelvariables4");
+			.appendField(new Blockly.FieldDropdown(addition), "modelvariables4");
 			this.setOutput(true, null);
 			this.setColour(290);
 			this.setTooltip('');
@@ -174,9 +284,14 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['set_model_variable_others'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_others;
+			else
+				addition = keys_others_input;
 			this.appendValueInput("NAME")
 			.appendField(Blockly.Msg.LISTS_SET_INDEX_SET)
-			.appendField(new Blockly.FieldDropdown(keys_others), "model variables4")
+			.appendField(new Blockly.FieldDropdown(addition), "model variables4")
 			.appendField(Blockly.Msg.TEXT_APPEND_TO);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
@@ -664,7 +779,7 @@ function loadJavaScriptModelBlocks() {
 	function setJS(block, text) {
 		var dropdown_d = block.getFieldValue(text);
 		var value_name=Blockly.JavaScript.valueToCode(block,"NAME",Blockly.JavaScript.ORDER_ATOMIC)||"0"; 
-		var obj = _model._userSerializePublic();
+		var obj = _model._userSerialize();
 		if ((typeof(obj[dropdown_d])).localeCompare("function") === 0) {
 			value_name = value_name.replace("()", "");
 		}
