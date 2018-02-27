@@ -45,10 +45,10 @@ function loadModelBlocks() {
 	if( _model.getOdes()!== undefined){
 		if( _model.getOdes()[0]!== undefined)
 			_vars = _model.getOdes()[0]._getOdeVars();
-	}		
+	}	
+var obj = _model._userSerialize();
 	if(_model._userSerializePublic!==undefined&&_model._userSerializePublic!==null){
 		newImplement = false;
-		var obj = _model._userSerializePublic();
 
 		var keys = [];
 		var dupla;
@@ -80,11 +80,12 @@ function loadModelBlocks() {
 		var inputAux = _model._inputAndPublicParameters;
 		var outputAux = _model._outputAndPublicParameters;
 		var dupla;
+		
 		for(var k in inputAux){
 			dupla = [];
 			dupla.push(inputAux[k]);
 			dupla.push(inputAux[k]);
-			switch (typeof getValueModel(inputAux[k])) {
+			switch (typeof obj[inputAux[k]]) {
 			case 'string':
 				keys_string_input.push(dupla);
 				break;
@@ -104,7 +105,7 @@ function loadModelBlocks() {
 			dupla = [];
 			dupla.push(outputAux[k]);
 			dupla.push(outputAux[k]);
-			switch (typeof getValueModel(outputAux[k])) {
+			switch (typeof obj[outputAux[k]]) {
 			case 'string':
 				keys_string_output.push(dupla);
 				break;
@@ -138,7 +139,6 @@ function loadModelBlocks() {
 				addition = keys;
 			else
 				addition = keys_output;
-					
 			this.appendDummyInput()
 			.appendField(new Blockly.FieldDropdown(addition), "modelvariables");
 			this.setOutput(true, null);
@@ -619,9 +619,14 @@ function loadModelBlocks() {
 
 	Blockly.Blocks['replacefunc'] = {
 		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_others;
+			else
+				addition = keys_others_input;
 			this.appendDummyInput()
 			.appendField(Blockly.Msg.ExpREPLACE)
-			.appendField(new Blockly.FieldDropdown(keys_others), "original");
+			.appendField(new Blockly.FieldDropdown(addition), "original");
 			this.appendDummyInput()
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField("", "aux")
@@ -1178,52 +1183,112 @@ function showChart(elem) {
 /////////////////////// TOOLBOX CONFIGURATION
 strings = function (workspace) {
 	var xmlList = [];
-	if (keys_string.length > 0) {
-		var blockText = '<xml>' + '<block type="set_model_variable_string"></block>' + '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
-		blockText = '<xml>' + '<block type="get_model_variable_string"></block>' + '</xml>';
-		block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
+	if(!newImplement){
+		if (keys_string.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_string"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+			blockText = '<xml>' + '<block type="get_model_variable_string"></block>' + '</xml>';
+			block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+	}
+	else{
+		if (keys_string_input.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_string"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		if (keys_string_output.length > 0) {
+			var blockText = '<xml>' + '<block type="get_model_variable_string"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		
 	}
 	return xmlList;
 };
 
 numbers = function (workspace) {
 	var xmlList = [];
-	if (keys_number.length > 0) {
-		var blockText = '<xml>' + '<block type="set_model_variable_number"></block>' + '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
-		blockText = '<xml>' + '<block type="get_model_variable_number"></block>' + '</xml>';
-		block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
+	if(!newImplement){
+		if (keys_number.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_number"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+			blockText = '<xml>' + '<block type="get_model_variable_number"></block>' + '</xml>';
+			block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+	}
+	else{
+		if (keys_number_input.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_number"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		if (keys_number_output.length > 0) {
+			var blockText = '<xml>' + '<block type="get_model_variable_number"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		
 	}
 	return xmlList;
 };
 
 booleans = function (workspace) {
 	var xmlList = [];
-	if (keys_boolean.length > 0) {
-		var blockText = '<xml>' + '<block type="set_model_variable_boolean"></block>' + '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
-		blockText = '<xml>' + '<block type="get_model_variable_boolean"></block>' + '</xml>';
-		block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
+	if(!newImplement){
+		if (keys_boolean.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_boolean"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+			blockText = '<xml>' + '<block type="get_model_variable_boolean"></block>' + '</xml>';
+			block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+	}
+	else{
+		if (keys_boolean_input.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_boolean"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		if (keys_boolean_output.length > 0) {
+			var blockText = '<xml>' + '<block type="get_model_variable_boolean"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		
 	}
 	return xmlList;
 };
 
 others = function (workspace) {
 	var xmlList = [];
-	if (keys_others.length > 0) {
-		var blockText = '<xml>' + '<block type="set_model_variable_others"></block>' + '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
-		blockText = '<xml>' + '<block type="get_model_variable_others"></block>' + '</xml>';
-		block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block);
+	if(!newImplement){
+		if (keys_others.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_others"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+			blockText = '<xml>' + '<block type="get_model_variable_others"></block>' + '</xml>';
+			block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+	}
+	else{
+		if (keys_others_input.length > 0) {
+			var blockText = '<xml>' + '<block type="set_model_variable_others"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		if (keys_others_output.length > 0) {
+			var blockText = '<xml>' + '<block type="get_model_variable_others"></block>' + '</xml>';
+			var block = Blockly.Xml.textToDom(blockText).firstChild;
+			xmlList.push(block);
+		}
+		
 	}
 	return xmlList;
 };
