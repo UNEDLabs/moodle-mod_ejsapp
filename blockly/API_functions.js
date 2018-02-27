@@ -7,15 +7,9 @@ function playStop(number) {
 }
 
 function evaluate(code) {
-	eval(code);
+	evaluarConContexto(code);
 }
 
-function makeEvalContext(declarations) {
-	eval(declarations);
-	return function (str) {
-		eval(str);
-	}
-}
 
 function initialize() {
 	_model.initialize();
@@ -64,11 +58,54 @@ function setValueModel(p1, p2) {
 	_model._userUnserialize(aux);
 }
 
+
+
+function evaluarConContexto(code){
+	try{
+		// VARIABLES FROM BLOCKLY
+		var varsUsed = Blockly.Variables.allUsedVariables(workspace);
+		var context = {};
+		for(var i=0; i<varsUsed.length; i++) {
+			window[varsUsed[i]] = getVarExp('asdsdiuhsgiud'+varsUsed[i]);
+		}
+		//VARIABLES FROM EJSS
+		var obj = _model._userSerialize();
+		var values = [];
+		for (var k in obj) {
+			if(typeof obj[k] === 'string')
+				window[k] = obj[k].toString();
+			else
+				window[k] = obj[k];
+			values[k] = obj[k];
+		}
+		
+		// CODIGO BLOCKLY A EJECUTAR
+		eval(code.toString());
+		
+		// DEVOLVEMOS VARIABLES
+		var aux = {};
+		for(var k in obj){
+			var value = window[k];
+			if(values[k]!==value){
+				aux[k] = value;
+			}
+		}
+		_model._readParameters(aux);
+		_model.resetSolvers();
+	} catch (e) {
+      if (e instanceof ReferenceError){
+		pause();
+		alert("ERROR: "+e);
+	  }
+	  else alert("ERROR: "+e);
+	}
+}
+
 function addFixedRelation(number) {
 	conditionFixed.push(true);
 	var text2 = fixedStatements[number];
 	var text = "if(conditionFixed[" + (conditionFixed.length - 1) + "])" + "{" + text2 + "}";
-	_model.addFixedRel(text);
+	_model.addToEvolution(function() { evaluarConContexto(text); });
 }
 
 function play() {
