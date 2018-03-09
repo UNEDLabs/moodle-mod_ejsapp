@@ -1310,7 +1310,7 @@ functions = function (workspace) {
 controls = function (workspace) {
 	var xmlList = [];
 	if(events_vars.length > 0){
-		var blockText = '<xml>' + '<block type="event"></block>' + '</xml>';
+		var blockText = '<xml>' + '<block type="event"><next><block type="reset_lab"></block></next></block>' + '</xml>';
 		var block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block);
 	}
