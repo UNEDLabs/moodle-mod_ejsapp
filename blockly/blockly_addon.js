@@ -1016,6 +1016,7 @@ function addTab(textName) {
 
 
 function createChart(number) {
+	setTimeStep(10);
 	var exists = -1;
 	var textName = chartInfo[number][0]["title"];
 	var time = chartInfo[number][0]["time"];
