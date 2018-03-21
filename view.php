@@ -153,11 +153,11 @@ $accessed = false;
 
 // Define the div section for charts and related buttons.
 $wrapper = html_writer::div('', 'charts', array('id' => 'slideshow-wrapper'));
-$prevchart = html_writer::tag('i', '', array('class' => 'fa fa-chevron-left fa-2x', 'id' => 'prev_chart',
-        'onclick' => 'prevChart()'));
-$cleancharts = html_writer::tag('i', '', array('class' => 'fa fa-window-close-o fa-2x', 'id' => 'clean_chart',
+$prevchart = html_writer::div('', 'fa fa-chevron-left fa-2x', array('id' => 'prev_chart',
+    'onclick' => 'prevChart()'));
+$cleancharts = html_writer::div('', 'fa fa-window-close-o fa-2x', array( 'id' => 'clean_chart',
     'onclick' => 'cleanCharts()'));
-$nextchart = html_writer::tag('i', '', array('class' => 'fa fa-chevron-right fa-2x', 'id' => 'next_chart',
+$nextchart = html_writer::div('', 'fa fa-chevron-right fa-2x', array('id' => 'next_chart',
     'onclick' => 'nextChart()'));
 $buttonscharts = html_writer::div($prevchart . $cleancharts . $nextchart, 'charts', array('id' => 'buttons_charts'));
 $chartsdiv = html_writer::div($wrapper . $buttonscharts, 'charts', array('id' => 'slideshow'));

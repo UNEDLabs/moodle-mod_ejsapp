@@ -1082,8 +1082,7 @@ function initChart(number, place, textName, time) {
 				yAxes: [{
 						display: true,
 						scaleLabel: {
-							display: true,
-							labelString: 'Value'
+							display: true
 						}
 					}
 				]

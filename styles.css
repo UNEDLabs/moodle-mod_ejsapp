@@ -22,8 +22,8 @@
 }
 
 .path-mod-ejsapp #EJsS {
-     flex-basis: 100%;
-     flex-shrink: 5;
+    flex-basis: 100%;
+    flex-shrink: 5;
 }
 
 .path-mod-ejsapp .runCodeEJSApp {
@@ -43,7 +43,7 @@
     align-self: center;
     display: none;
     flex-direction: column;
-    min-width: 40%;
+    min-width: 38%;
 }
 
 .path-mod-ejsapp #prev_chart {
@@ -58,5 +58,5 @@
     margin-top: 20px;
     display: none;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-around;
 }

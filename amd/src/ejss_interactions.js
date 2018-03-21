@@ -50,7 +50,7 @@ define(['jquery'], function($) {
 
         sarlabCredentials: function(username, password) {
             var doit = setInterval(function() {
-                if (typeof _model !== "undefined") {
+                if (typeof _model._sarlab !== "undefined") {
                     _model._sarlab.setSarlabCredentials({"username": username, "password": password});
                     clearInterval(doit);
                 }
@@ -59,7 +59,7 @@ define(['jquery'], function($) {
 
         sarlabRun: function(sarlabIP, sarlabPath, sarlabPort, sarlabExperience) {
             var doit = setInterval(function() {
-                if (typeof _model !== "undefined") {
+                if (typeof _model._sarlab !== "undefined") {
                     _model._sarlab.setSarlabInfo(sarlabIP, sarlabPath, sarlabPort, sarlabExperience);
                     _model._sarlab.connect();
                     clearInterval(doit);
