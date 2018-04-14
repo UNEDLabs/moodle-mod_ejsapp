@@ -950,19 +950,29 @@ function default_rem_lab_conf($practice, $username = "") {
 }
 
 /**
- * Checks whether a user-accessible practice is defined in an operative Sarlab server
+ * Checks whether a user-accessible practice is defined in an operative Sarlab server and returns the Sarlab instance if
+ * it is or false if it is not.
  *
  * @param array $sarlabips
  * @param string $practice
- * @return false|int|string $sarlabinstance
+ * @return false|int $sarlabinstance
  * @throws
  *
  */
 function is_practice_in_sarlab($practice, $username = "") {
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-    $listexperiences = get_experiences_sarlab($sarlabips, $username);
-    $sarlabexperiences = explode(";", $listexperiences);
-    $sarlabinstance = array_search($practice, $sarlabexperiences);
+    $sarlabinstance = false;
+    $instance = 0;
+    foreach ($sarlabips as $sarlabip) { // TODO: This will take the first Sarlab instance where there is a match in!
+        $sarlabiparray[] = $sarlabip;
+        $listexperiences = get_experiences_sarlab($sarlabiparray, $username);
+        $sarlabexperiences = explode(";", $listexperiences);
+        if (in_array($practice, $sarlabexperiences)) {
+            $sarlabinstance = $instance;
+            break;
+        }
+        $instance++;
+    }
     return $sarlabinstance;
 }
 
@@ -1101,7 +1111,7 @@ function check_booking_system($ejsapp) {
  * @param object $USER
  * @param stdClass $ejsapp
  * @param string $currenttime
- * @param int $sarlabinstance
+ * @param boolean|string|int $sarlabinstance
  * @param int $labmanager
  * @param int $maxusetime
  * param int $maxusetime
@@ -1479,7 +1489,7 @@ function remote_lab_use_time_info($remlabconf, $repeatedlabs) {
 /**
  * Defines a new sarlab object with all the needed information
  *
- * @param int $instance sarlab instance
+ * @param false|int $instance sarlab instance
  * @param boolean $collab false if not a collab session, true if collaborative
  * @param string $practice the practice identifier in sarlab
  * @param int $labmanager whether the user is a laboratory manager or not

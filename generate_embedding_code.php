@@ -48,7 +48,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param stdClass|null $sarlabinfo
- *                                  $sarlabinfo->instance: int sarlab id,
+ *                                  $sarlabinfo->instance: false|int sarlab id,
  *                                  $sarlabinfo->practice: int practice id,
  *                                  $sarlabinfo->collab: int collab whether sarlab offers collab access to this remote
  *                                      lab (1) or not (0),
@@ -82,6 +82,7 @@ defined('MOODLE_INTERNAL') || die();
  *                                  Null if no personal variables were defined for this EJSApp
 
  * @return string code that embeds an EjsS application in Moodle
+ * @throws
  *
  */
 function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
@@ -94,6 +95,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
      * @param stdClass $ejsapp
      * @param string $datatype
      * @return stdClass $initialdatafile
+     * @throws
      */
     function initial_data_file($ejsapp, $datatype) {
         global $DB;

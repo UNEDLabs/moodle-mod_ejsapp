@@ -175,6 +175,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
     $remlabaccess = remote_lab_access_info($ejsapp, $course);
     $remlabconf = $remlabaccess->remlab_conf;
     $repeatedlabs = $remlabaccess->repeated_ejsapp_labs;
+    $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);
     if ($remlabaccess->allow_free_access && $remlabaccess->operative) {
         // Admins and teachers, not using ejsappbooking or free access remote lab, AND the remote lab is operative.
         $remlabtime = remote_lab_use_time_info($remlabconf, $repeatedlabs);
@@ -183,15 +184,14 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
         $labstatus = get_lab_status($remlabtime->time_information, $remlabconf->reboottime,
             get_config('mod_ejsapp', 'check_activity'));
         if ($labstatus == 'available') {
-            $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);
             if ($sarlabinstance !== false) {
                 // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
-                $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlabconf->sarlabinstance,
+                $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
                     $remlabaccess->labmanager, $maxusetime);
                 if (is_null($sarlabinfo)) {
                     $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id,
                         'practiceid' => 1));
-                    $sarlabinfo = define_sarlab($remlabconf->sarlabinstance, 0, $expsyst2pract->practiceintro,
+                    $sarlabinfo = define_sarlab($sarlabinstance, 0, $expsyst2pract->practiceintro,
                         $remlabaccess->labmanager, $maxusetime);
                 }
             }
@@ -203,7 +203,6 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             if (false) { // TODO: Check if the lab supports collaborative access.
                 // Teacher can still access in collaborative mode.
                 echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
-                $sarlabinstance = is_practice_in_sarlab($remlabconf->practice);
                 $sarlabinfo = define_sarlab($sarlabinstance, true, 'NULL',
                     $remlabaccess->labmanager, $maxusetime);
                 prepare_ejs_file($ejsapp);
@@ -231,7 +230,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 $currenttime = time();
                 $maxusetime = $bookingendtimeunix - $currenttime; // In seconds.
                 // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
-                $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $remlabconf->sarlabinstance,
+                $sarlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
                     $remlabaccess->labmanager, $maxusetime);
                 if (!is_null($sarlabinfo)) { // The user has an active booking -> he can access the lab.
                     $accessed = true;
@@ -243,7 +242,6 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                     if (false) {    // TODO: Check if the lab supports collaborative access.
                         // Student can still access in collaborative mode.
                         echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
-                        $sarlabinstance = is_practice_in_sarlab($remlabconf->practice);
                         $sarlabinfo = define_sarlab($sarlabinstance, true, 'NULL',
                             $remlabaccess->labmanager, $maxusetime);
                         prepare_ejs_file($ejsapp);
