@@ -389,23 +389,25 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $jsonblocklyconf = $DB->get_field('ejsapp', 'blockly_conf',
                 array('id' => $this->current->instance));
             $blocklyconf = json_decode($jsonblocklyconf);
-            $defaultvalues['use_blockly'] = $blocklyconf[0];
-            $defaultvalues['display_logic'] = $blocklyconf[1];
-            $defaultvalues['display_loops'] = $blocklyconf[2];
-            $defaultvalues['display_math'] = $blocklyconf[3];
-            $defaultvalues['display_text'] = $blocklyconf[4];
-            $defaultvalues['display_lists'] = $blocklyconf[5];
-            $defaultvalues['display_variables'] = $blocklyconf[6];
-            $defaultvalues['display_functions'] = $blocklyconf[7];
-            $defaultvalues['display_lab'] = $blocklyconf[8];
-            $defaultvalues['display_lab_variables'] = $blocklyconf[9];
-            $defaultvalues['display_lab_execution'] = $blocklyconf[10];
-            $defaultvalues['display_lab_functions'] = $blocklyconf[11];
-            if (array_key_exists(12, $blocklyconf)) {
-				$defaultvalues['display_lab_control'] = $blocklyconf[12];
-			}
-            if (array_key_exists(13, $blocklyconf)) {
-                $defaultvalues['display_lab_charts'] = $blocklyconf[13];
+            if (is_array($blocklyconf)) {
+                $defaultvalues['use_blockly'] = $blocklyconf[0];
+                $defaultvalues['display_logic'] = $blocklyconf[1];
+                $defaultvalues['display_loops'] = $blocklyconf[2];
+                $defaultvalues['display_math'] = $blocklyconf[3];
+                $defaultvalues['display_text'] = $blocklyconf[4];
+                $defaultvalues['display_lists'] = $blocklyconf[5];
+                $defaultvalues['display_variables'] = $blocklyconf[6];
+                $defaultvalues['display_functions'] = $blocklyconf[7];
+                $defaultvalues['display_lab'] = $blocklyconf[8];
+                $defaultvalues['display_lab_variables'] = $blocklyconf[9];
+                $defaultvalues['display_lab_execution'] = $blocklyconf[10];
+                $defaultvalues['display_lab_functions'] = $blocklyconf[11];
+                if (array_key_exists(12, $blocklyconf)) {
+                    $defaultvalues['display_lab_control'] = $blocklyconf[12];
+                }
+                if (array_key_exists(13, $blocklyconf)) {
+                    $defaultvalues['display_lab_charts'] = $blocklyconf[13];
+                }
             }
         }
 

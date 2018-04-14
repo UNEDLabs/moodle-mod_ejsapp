@@ -39,6 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param stdClass $ejsapp record from table ejsapp
  * @param object $context context module
  * @return boolean ejs_ok
+ * @throws
  *
  */
 function update_ejsapp_files_and_tables($ejsapp, $context) {
@@ -262,6 +263,7 @@ function delete_recursively($dir) {
  * @param array $sarlabips
  * @param string $username
  * @return string $listexperiences
+ * @throws
  *
  */
 function get_experiences_sarlab($sarlabips, $username = "") {
@@ -275,7 +277,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
         }
         $ip = substr($sarlabip, $lastquotemark);
         if ($ip != '127.0.0.1' && $ip != '') {
-            if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 1)) { // IP is alive.
+            if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 3)) { // IP is alive.
                 fclose($fp);
                 $uri = 'http://' . $ip . '/SARLABV8.0/gexlab';
                 $headers = get_headers($uri);
@@ -298,10 +300,11 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                                         foreach ($ownerusers as $owneruser) {
                                             $userid = $DB->get_field('user', 'id', array('username' => $username));
                                             // Check whether the required user has access to the experience.
-                                            if (strcasecmp($username, $owneruser) == 0 && has_capability(
-                                                    'ltisource/sarlab:useexp', context_system::instance(), $userid)) {
-                                                $listexperiences .= $experience['IdExp'] . ';';
-                                                break;
+                                            if  (get_capability_info('ltisource/sarlab:useexp')) {
+                                                if (strcasecmp($username, $owneruser) == 0) {
+                                                    $listexperiences .= $experience['IdExp'] . ';';
+                                                    break;
+                                                }
                                             }
                                         }
                                     } else {
@@ -330,6 +333,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
  * @param array $usersarlabexperiences
  * @param array $allsarlabexperiences
  * @return array $combinedexperiences
+ * @throws
  *
  */
 function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
@@ -364,6 +368,7 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
  *
  * @param string $username
  * @return array $showableexperiences
+ * @throws
  *
  */
 function get_showable_experiences($username = "") {
@@ -464,6 +469,7 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
  * @param stdClass $user
  * @param boolean $shuffle
  * @return stdClass $personalvarsinfo
+ * @throws
  *
  */
 function personalize_vars($ejsapp, $user, $shuffle) {
@@ -506,6 +512,7 @@ function personalize_vars($ejsapp, $user, $shuffle) {
  *
  * @param stdClass $ejsapp
  * @return array $userspersonalvarsinfo
+ * @throws
  *
  */
 function users_personalized_vars($ejsapp) {
@@ -534,6 +541,7 @@ function users_personalized_vars($ejsapp) {
  * @param stdClass $filerecord
  * @param boolean $alert
  * @return boolean $ejsok
+ * @throws
  *
  */
 function modifications_for_java($filepath, $ejsapp, $file, $filerecord, $alert) {
@@ -808,18 +816,18 @@ function chmod_r($path) {
  *
  * @param string $host
  * @param int $port
- * @param int $usingsarlab
+ * @param boolean|string|int $sarlabinstance
  * @param string $expid
  * @param int $timeout
  * @return int 0, not alive; 1, alive; 2, not checkable
  *
  */
-function ping($host, $port=80, $usingsarlab, $expid=null, $timeout=3) {
+function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
     global $infodevices;
 
     $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
     $notcheckable = false;
-    if ($alive && $usingsarlab) {
+    if ($alive && $sarlabinstance !== false) {
         // Obtain the xml filename from idExp.
         $uri = 'http://' . $host . '/';
         $headers = @get_headers($uri);
@@ -908,23 +916,15 @@ function ping($host, $port=80, $usingsarlab, $expid=null, $timeout=3) {
  * @param string $practice
  * @param string $username
  * @return stdClass $defaultconf
+ * @throws
  *
  */
 function default_rem_lab_conf($practice, $username = "") {
-    $defaultconf = new stdClass();
     // Get experiences from Sarlab and check whether this practice is in a Sarlab server or not.
-    $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-    $listexperiences = get_experiences_sarlab($sarlabips, $username);
-    $sarlabexperiences = explode(";", $listexperiences);
+    $sarlabinstance = is_practice_in_sarlab($practice, $username);
+    $defaultconf = new stdClass();
     $defaultconf->practiceintro = $practice;
-    $defaultconf->usingsarlab = 0;
-    if (in_array($practice, $sarlabexperiences)) {
-        $defaultconf->usingsarlab = 1;
-    }
-    if ($defaultconf->usingsarlab == 1) {
-        $sarlabinstance = 0;
-        $defaultconf->sarlabinstance = $sarlabinstance;
-        $defaultconf->sarlabcollab = 0;
+    if ($sarlabinstance !== false) { // Practice is defined in a Sarlab server
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
         $sarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
         $initchar = strrpos($sarlabips[intval($sarlabinstance)], "'");
@@ -935,8 +935,6 @@ function default_rem_lab_conf($practice, $username = "") {
         $defaultconf->ip = $ip;
         $defaultconf->port = $sarlabports[intval($sarlabinstance)];
     } else {
-        $defaultconf->sarlabinstance = 0;
-        $defaultconf->sarlabcollab = 0;
         $defaultconf->ip = '127.0.0.1';
         $defaultconf->port = 443;
     }
@@ -952,11 +950,29 @@ function default_rem_lab_conf($practice, $username = "") {
 }
 
 /**
+ * Checks whether a user-accessible practice is defined in an operative Sarlab server
+ *
+ * @param array $sarlabips
+ * @param string $practice
+ * @return false|int|string $sarlabinstance
+ * @throws
+ *
+ */
+function is_practice_in_sarlab($practice, $username = "") {
+    $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+    $listexperiences = get_experiences_sarlab($sarlabips, $username);
+    $sarlabexperiences = explode(";", $listexperiences);
+    $sarlabinstance = array_search($practice, $sarlabexperiences);
+    return $sarlabinstance;
+}
+
+/**
  * Checks whether the lab experience has a local configuration defined, creates a default configuration if not, and
  * returns the data.
  *
  * @param string $practice
  * @return stdClass $remlab_conf
+ * @throws
  *
  */
 function check_create_remlab_conf($practice) {
@@ -977,6 +993,7 @@ function check_create_remlab_conf($practice) {
  *
  * @param stdClass $ejsapp
  * @return void
+ * @throws
  *
  */
 function ejsapp_expsyst2pract($ejsapp) {
@@ -996,6 +1013,7 @@ function ejsapp_expsyst2pract($ejsapp) {
  *
  * @param stdClass $ejsapp
  * @return void
+ * @throws
  *
  */
 function update_booking_table($ejsapp) {
@@ -1007,6 +1025,7 @@ function update_booking_table($ejsapp) {
      * @param int $ejsappbookingid
      * @param object $usersaccess
      * @param int $ejsappid
+     * @throws
      *
      */
     function update_or_insert_record($ejsappbookingid, $usersaccess, $ejsappid) {
@@ -1052,6 +1071,7 @@ function update_booking_table($ejsapp) {
  *
  * @param stdClass $ejsapp
  * @return bool $usingbookings
+ * @throws
  *
  */
 function check_booking_system($ejsapp) {
@@ -1182,6 +1202,7 @@ function check_anyones_booking($DB, $ejsapp, $currenttime) {
  * @param array $slotsduration
  * @param int $currenttime
  * @return array $timeinfo
+ * @throws
  *
  */
 function get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $currenttime) {
@@ -1308,6 +1329,7 @@ function get_remaining_time($bookinginfo, $status, $timeinfo, $idletime, $checka
  *
  * @param stdClass $remlabconf
  * @return array $repeatedlabs
+ * @throws
  *
  */
 function get_repeated_remlabs($remlabconf) {
@@ -1384,6 +1406,7 @@ function check_active_booking($repeatedlabs, $courseid) {
  * @param stdClass $ejsapp
  * @param stdClass $course
  * @return stdClass $remote_lab_info
+ * @throws
  *
  */
 function remote_lab_access_info($ejsapp, $course) {
@@ -1457,7 +1480,7 @@ function remote_lab_use_time_info($remlabconf, $repeatedlabs) {
  * Defines a new sarlab object with all the needed information
  *
  * @param int $instance sarlab instance
- * @param int $collab 0 if not a collab session, 1 if collaborative
+ * @param boolean $collab false if not a collab session, true if collaborative
  * @param string $practice the practice identifier in sarlab
  * @param int $labmanager whether the user is a laboratory manager or not
  * @param int $maxusetime maximum time for using the remote lab
@@ -1483,6 +1506,7 @@ function define_sarlab($instance, $collab, $practice, $labmanager, $maxusetime) 
  *
  * @param stdClass $ejsapp
  * @return void
+ * @throws
  *
  */
 function prepare_ejs_file($ejsapp) {
@@ -1522,6 +1546,7 @@ function prepare_ejs_file($ejsapp) {
      * @param file_storage $fs
      * @param string $tempfilepath
      * @return stored_file $tempfile
+     * @throws
      *
      */
     function create_temp_file($contextid, $ejsappid, $filename, $fs, $tempfilepath) {
@@ -1627,6 +1652,7 @@ function prepare_ejs_file($ejsapp) {
  *
  * @param stdClass $ejsapp
  * @return void
+ * @throws
  *
  */
 function create_blockly_configuration($ejsapp) {

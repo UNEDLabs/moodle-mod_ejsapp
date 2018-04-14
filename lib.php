@@ -419,13 +419,9 @@ function ejsapp_cron() {
     if (date('H') >= 8) {
         $remlabsconf = $DB->get_records('block_remlab_manager_conf');
         foreach ($remlabsconf as $remlabconf) {
-            $practiceintro = null;
-            if ($remlabconf->usingsarlab) {
-                $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
-                    array('ejsappid' => $remlabconf->ejsappid));
-            }
+            $sarlabinstance = is_practice_in_sarlab($remlabconf->practice);
             $devicesinfo = new stdClass();
-            $labstate = ping($remlabconf->ip, $remlabconf->port, $remlabconf->usingsarlab, $practiceintro);
+            $labstate = ping($remlabconf->ip, $remlabconf->port, $sarlabinstance, $remlabconf->practiceintro);
             // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive.
             $remlab = $DB->get_record('ejsapp', array('id' => $remlabconf->ejsappid));
             $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
