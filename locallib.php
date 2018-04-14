@@ -293,7 +293,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                             $moodleservers = $listownermoodleusers->ServerMoodle;
                             foreach ($moodleservers as $moodleserver) {
                                 // Check whether this Moodle server is registered in the experience.
-                                if ($moodleserver['IdMoodle'] == 'UNED') { //TODO: replace by server id.
+                                if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
                                     if ($username != "") {
                                         // If username is provided, check users permissions both in Moodle and Sarlab.
                                         $ownerusers = $moodleserver->Owner;

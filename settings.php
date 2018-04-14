@@ -51,6 +51,15 @@ if ($ADMIN->fulltree) {
         '8'
     ));
 
+    $settings->add(new admin_setting_configtext(
+        'mod_ejsapp/server_id',
+        get_string('server_id', 'ejsapp'),
+        get_string('server_id_description', 'ejsapp'),
+        '',
+        PARAM_TEXT,
+        '20'
+    ));
+
     $settings->add(new admin_setting_heading(
         'mod_ejsapp/certificatesettings',
         get_string('default_certificate_set', 'ejsapp'),
