@@ -301,7 +301,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                                             $userid = $DB->get_field('user', 'id', array('username' => $username));
                                             // Check whether the required user has access to the experience.
                                             if  (get_capability_info('ltisource/sarlab:useexp')) {
-                                                if (strcasecmp($username, $owneruser) == 0) {
+                                                if (strcasecmp($username, $owneruser) == 0) { // TODO: replace with userid
                                                     $listexperiences .= $experience['IdExp'] . ';';
                                                     break;
                                                 }

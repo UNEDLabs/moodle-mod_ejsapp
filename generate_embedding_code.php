@@ -329,7 +329,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
 
         $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $ejsappname = $ejsapp->applet_name;
-        //if (!$sarlabinfo) { // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
+        if (!$sarlabinfo) { // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
             if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
                 $ejsappname = substr($ejsapp->applet_name, 0, -4);
             }
@@ -412,22 +412,20 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
                 if (is_chrome) document.getElementById('EJsS').src = url;
                 else deployJava.launchWebStartApplication(url);
             </script>";
-        /*} else {
+        } else {
+            $code = '';
             $commandsarlab = 'execjar';
-            $jarpath = $dirpath . $ejsappname . ".jar";
-        }*/
+            $jarpath = $CFG->wwwroot. '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $ejsappname;
+            // Launching the websocket service for Sarlab.
+            global $PAGE;
+            $username = $USER->username . "@" . $CFG->wwwroot;
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
+                array($commandsarlab, $sarlabip, $sarlabport, $sarlabinfo->practice,
+                    $sarlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
+        }
 
     }
-
-    // Launching the websocket service for Sarlab.
-    /*if ($sarlabinfo) {
-        global $PAGE;
-        $username = $USER->username . "@" . $CFG->wwwroot;
-        $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-            array($commandsarlab, $sarlabip, $sarlabport, $sarlabinfo->practice,
-                $sarlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
-        $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
-    }*/
 
     return $code;
 

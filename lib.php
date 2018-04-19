@@ -100,6 +100,7 @@ function ejsapp_get_post_actions() {
  * @param object $ejsapp An object from the form in mod_form.php
  * @param object $mform
  * @return int The id of the newly inserted ejsapp record
+ * @throws
  *
  */
 function ejsapp_add_instance($ejsapp, $mform = null) {
@@ -139,6 +140,7 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
  * @param object $ejsapp An object from the form in mod_form.php
  * @param object $mform
  * @return boolean Success/Fail
+ * @throws
  *
  */
 function ejsapp_update_instance($ejsapp, $mform=null) {
@@ -198,6 +200,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
  *
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
+ * @throws
  *
  */
 function ejsapp_delete_instance($id) {
@@ -303,6 +306,7 @@ function ejsapp_grade_item_delete($ejsapp) {
  *
  * $return->time = the time they did it
  * $return->info = a short text description
+ * @throws
  *
  */
 function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
@@ -333,6 +337,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
  * @param object $ejsapp
  *
  * @return boolean
+ * @throws
  *
  */
 function ejsapp_user_complete($course, $user, $mod, $ejsapp) {
@@ -514,6 +519,7 @@ function ejsapp_get_participants($ejsappid) {
  * @param settings_navigation $settings
  * @param navigation_node $ejsappnode
  * @return void
+ * @throws
  *
  */
 function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
@@ -593,6 +599,7 @@ function ejsapp_get_file_info($browser, $areas, $course, $cm, $context, $fileare
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  * @return null
+ * @throws
  *
  */
 function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, $options=null) {
@@ -641,6 +648,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
  *
  * @param int $courseid
  * @return array $result
+ * @throws
  */
 function get_ejsapp_instances($courseid=null) {
     global $DB, $USER;
@@ -672,6 +680,7 @@ function get_ejsapp_instances($courseid=null) {
  *
  * @param int $ejsappid
  * @return array $statefiles
+ * @throws
  */
 function get_ejsapp_states($ejsappid) {
     global $DB, $USER;
@@ -709,6 +718,7 @@ function get_ejsapp_states($ejsappid) {
  * @param int $ejsappid the course object
  * @param array|null $datafiles
  * @return string $code
+ * @throws
  */
 function draw_ejsapp_instance($ejsappid, $datafiles=null) {
     global $DB, $CFG;
