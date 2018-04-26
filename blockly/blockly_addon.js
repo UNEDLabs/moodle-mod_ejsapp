@@ -432,6 +432,27 @@ var obj = _model._userSerialize();
 					this.setCommentText(this.getFieldValue('expre'));
 		}
 	};
+	
+	Blockly.Blocks['evaluation2'] = {
+		init: function () {
+			special = true;
+			this.appendDummyInput()
+			.appendField(Blockly.Msg.ExpEVAL)
+			.appendField(new Blockly.FieldTextInput("abc"), "expre");
+			this.setOutput(true, null);
+			this.setColour(0);
+			this.setTooltip('');
+			this.setCommentText("abc");
+			this.comment.setBubbleSize(300, 150);
+			special = false;
+		},
+		onchange: function(ev) {
+				if(ev.element==="comment")
+					this.setFieldValue(this.getCommentText(),"expre");
+				if(ev.element==="field")
+					this.setCommentText(this.getFieldValue('expre'));
+		}
+	};
 
 	Blockly.Blocks['createChart'] = {
 		init: function () {
@@ -642,6 +663,47 @@ var obj = _model._userSerialize();
 			.setCheck(null)
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+			this.setPreviousStatement(true, null);
+			this.setNextStatement(true, null);
+			this.setColour(0);
+			this.setTooltip('');
+			this.setHelpUrl('');
+		},
+		onchange: function(ev) {
+			var params = getParamNames(getValueModel(this.getFieldValue('original')));
+			paramsList = paramsList+params;
+			if (/\S/.test(params)){
+				this.setFieldValue(Blockly.Msg.ExpINPUT+":","aux");
+				this.setFieldValue(getParamNames(getValueModel(this.getFieldValue('original'))),"params");
+				}
+			else{
+				this.setFieldValue("","aux");
+				this.setFieldValue("","params");
+				}
+		}
+		
+	};
+	Blockly.Blocks['replacefunc2'] = {
+		init: function () {
+			var addition;
+			if(!newImplement)
+				addition = keys_others;
+			else
+				addition = keys_others_input;
+			this.appendDummyInput()
+			.appendField(Blockly.Msg.ExpREPLACE)
+			.appendField(new Blockly.FieldDropdown(addition), "original");
+			this.appendDummyInput()
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("", "aux")
+			.appendField("", "params")
+			/*this.appendDummyInput()
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField(Blockly.Msg.ExpNEWVAR)
+			.appendField(new Blockly.FieldTextInput(""), "newVars");*/
+			this.appendStatementInput("code")
+			.setCheck(null)
+			.appendField(Blockly.Msg.ExpCODE);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
 			this.setColour(0);
@@ -924,6 +986,18 @@ function loadJavaScriptModelBlocks() {
 		else
 			return "evaluate(\"" + value_name + "\");\n";
 	};
+	
+	Blockly.JavaScript['evaluation2'] = function (block) {
+		notComment = true;
+		var value_name = block.getFieldValue('expre');
+		value_name = value_name.replace(/(\r\n|\n|\r)/gm, "");
+		console.log("value_name "+value_name);
+		if(remoteLab)
+			return  [value_name, Blockly.JavaScript.ATOMIC];
+		else
+			return ["evaluate(\"" + value_name + "\")", Blockly.JavaScript.ATOMIC];
+		
+	};
 
 	Blockly.JavaScript['replacefunc'] = function (block) {
 		var dropdown_original = block.getFieldValue('original');
@@ -946,6 +1020,32 @@ function loadJavaScriptModelBlocks() {
 		else
 			var code = 'replaceFunction("' + dropdown_original + '","' + text_params + '","' + value_name + '");\n';
 		function_code_remote = statements_code ;//+' return ' + value_name + ';';
+		return code;
+	};
+	
+	Blockly.JavaScript['replacefunc2'] = function (block) {
+		var dropdown_original = block.getFieldValue('original');
+		var text_params = block.getFieldValue('params');
+		replacing = true;
+		remoteLab = true;
+		remote = true && remoteLab;
+		var statements_code = Blockly.JavaScript.statementToCode(block, 'code');
+		remote = false;
+		replacing = false;
+		remoteLab = false;
+		paramsList = "";
+		// TODO: Assemble JavaScript into code variable.
+		statements_code = statements_code ? statements_code.toString() : '';
+		statements_code = cleanFromComments(statements_code);
+		console.log("codecodecode "+statements_code);
+		statements_code = statements_code.replace(/(\r\n|\n|\r)/gm, "");
+		statem.push(statements_code.toString());
+		if(remoteLab)
+			var code = "";
+		else
+			var code = 'replaceFunction2("' + dropdown_original + '","' + text_params +'");\n';
+		function_code_remote = statements_code ;//+' return ' + value_name + ';';
+		console.log(function_code_remote);
 		return code;
 	};
 
@@ -1299,8 +1399,14 @@ functions = function (workspace) {
 	var blockText = '<xml>' + '<block type="evaluation"></block>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
+	var blockText = '<xml>' + '<block type="evaluation2"></block>' + '</xml>';
+	var block = Blockly.Xml.textToDom(blockText).firstChild;
+	xmlList.push(block);
 	if (keys_others.length > 0) {
 		blockText = '<xml>' + '<block type="replacefunc"><value name="return"><shadow type="math_number"><field name="NUM">0</field></shadow></value></block>' + '</xml>';
+		block = Blockly.Xml.textToDom(blockText).firstChild;
+		xmlList.push(block);
+		blockText = '<xml>' + '<block type="replacefunc2"></block>' + '</xml>';
 		block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block);
 	}

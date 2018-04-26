@@ -7,7 +7,7 @@ function playStop(number) {
 }
 
 function evaluate(code) {
-	evaluarConContexto(code);
+	return evaluarConContexto(code);
 }
 
 
@@ -61,6 +61,7 @@ function setValueModel(p1, p2) {
 
 
 function evaluarConContexto(code){
+	var resultado = -1000;
 	try{
 		// VARIABLES FROM BLOCKLY
 		var varsUsed = Blockly.Variables.allUsedVariables(workspace);
@@ -80,7 +81,7 @@ function evaluarConContexto(code){
 		}
 		
 		// CODIGO BLOCKLY A EJECUTAR
-		eval(code.toString());
+		resultado = eval(code.toString());
 		
 		// DEVOLVEMOS VARIABLES
 		var aux = {};
@@ -99,6 +100,7 @@ function evaluarConContexto(code){
 	  }
 	  else alert("ERROR: "+e);
 	}
+	return resultado;
 }
 
 function addFixedRelation(number) {
@@ -154,12 +156,30 @@ function replaceFunction(dropdown_original, text_params, value_name) {
 	if(!remote){
 		if(text_params!==""){
 			for (var i in array) {
-				text_vars = text_vars + array[i]+"=getValueModel('"+array[i]+"');\n";
+				//text_vars = text_vars + array[i]+"=getValueModel('"+array[i]+"');\n";
 				//text_vars2 = text_vars2 + "setValueModel('"+array[i]+"',"+array[i]+");\n";
 			}
 		}
 	}
 	var fill = new Function(text_params, text_vars + statements_code +' return ' + value_name + ';');
+	
+	setValueModel(dropdown_original, fill);
+}
+
+function replaceFunction2(dropdown_original, text_params) {
+	var statements_code = statem[0].toString();
+	statem.splice(0, 1);
+	var text_vars = "";
+	var array = text_params.split(',');
+	if(!remote){
+		if(text_params!==""){
+			for (var i in array) {
+				//text_vars = text_vars + array[i]+"=getValueModel('"+array[i]+"');\n";
+				//text_vars2 = text_vars2 + "setValueModel('"+array[i]+"',"+array[i]+");\n";
+			}
+		}
+	}
+	var fill = new Function(text_params, text_vars + statements_code + ';');
 	setValueModel(dropdown_original, fill);
 }
 
@@ -374,6 +394,13 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(replaceFunction(a, b, c));
 	};
 	interpreter.setProperty(scope, 'replaceFunction',
+		interpreter.createNativeFunction(wrapper));
+	var wrapper = function (a, b) {
+		a = a ? a.toString() : '';
+		b = b ? b.toString() : '';
+		return interpreter.createPrimitive(replaceFunction2(a, b));
+	};
+	interpreter.setProperty(scope, 'replaceFunction2',
 		interpreter.createNativeFunction(wrapper));
 
 	//reateChart("+name+","+time+",[{"+c0name+":"+value_name+"}"+yaxis+"]);\n";
