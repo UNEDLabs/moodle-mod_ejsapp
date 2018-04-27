@@ -28,7 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery', 'mod_ejsapp/screenfull'], function($) {
     var t = {
         recording: function(mouseevents) {
             var doit = setInterval(function() {
@@ -132,6 +132,21 @@ define(['jquery'], function($) {
                     clearInterval(doit);
                 }
             }, 200);
+        },
+
+        fullScreen: function() {
+            const chart = $('#slideshow-wrapper')[0];
+            $('#full_screen_chart').click(function() {
+                if (screenfull.enabled) {
+                    screenfull.request(chart);
+                }
+            });
+            const blockly = $('.injectionDiv:first')[0];
+            $('#full_screen_blockly').click(function() {
+                if (screenfull.enabled) {
+                    screenfull.request(blockly);
+                }
+            });
         }
     };
     return t;

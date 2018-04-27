@@ -140,12 +140,12 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $file->copy_content_to($filepath);
 
     // Codebase.
-    $codebase = '';
+    /*$codebase = '';
     preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $matchresult);
     if (!empty($matchresult) and $matchresult[1]) {
         $codebase .= '/' . $matchresult[1];
-    }
-    $codebase .= '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+    }*/
+    $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
     // Initialize the mod_form elements.
     $ejsapp->class_file = '';
@@ -291,6 +291,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                             $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
                             // Get list of users in this Moodle server who can access the experience
                             $moodleservers = $listownermoodleusers->ServerMoodle;
+                            if (!is_array($moodleservers)) $moodleservers[0] = $moodleservers;
                             foreach ($moodleservers as $moodleserver) {
                                 // Check whether this Moodle server is registered in the experience.
                                 if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {

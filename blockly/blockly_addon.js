@@ -479,7 +479,7 @@ var obj = _model._userSerialize();
 			.setCheck(null)
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField(Blockly.Msg.ExpXAXIS)
-			.appendField(new Blockly.FieldTextInput("Column Title"), "cName0");
+			.appendField(new Blockly.FieldTextInput("Label"), "cName0");
 			this.setInputsInline(false);
 			this.setColour(200);
 			this.setTooltip('');
@@ -581,7 +581,7 @@ var obj = _model._userSerialize();
 
 					var input = this.appendValueInput('ADD' + i);
 					input.appendField((i + 1) + ". " + Blockly.Msg.ExpYAXIS);
-					input.appendField(new Blockly.FieldTextInput("Column Title" + (i + 1)), "nameY" + i);
+					input.appendField(new Blockly.FieldTextInput("Label" + (i + 1)), "nameY" + i);
 					input.setAlign(Blockly.ALIGN_RIGHT)
 				}
 			}
@@ -1100,13 +1100,13 @@ function paintChart(){
 	}
 	if (chartArray.length >= 1) 
 		hideAllCharts();
-	showChart(document.getElementById("fragment-"+id));
+    var iDiv = document.getElementById("fragment-"+id);
+	showChart(iDiv);
 }
 
 function addTab(textName) {
 	var iDiv = document.createElement('div');
 	iDiv.id = "fragment-"+id;
-	iDiv.style = 'max-height: 600px; max-width: 800px;' ;
 	var iCanvas = document.createElement('canvas');
 	iCanvas.id = 'myChart' + id;
 	iDiv.appendChild(iCanvas);

@@ -10,40 +10,65 @@
     margin-top: 10px;
     height: 450px;
     width: 99%;
+    display: flex;
 }
 
 .path-mod-ejsapp .injectionDiv {
+    height: 100%;
     width: 100%;
 }
 
 .path-mod-ejsapp .labchart {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .path-mod-ejsapp #EJsS {
-    flex-basis: 100%;
+    min-width: 700px;
+    max-width: 100%;
+    flex-basis: 50%;
     flex-shrink: 5;
+    flex-grow: 2;
 }
 
 .path-mod-ejsapp .runCodeEJSApp {
     text-align: center;
     margin-top: 5px;
     margin-bottom: 0;
-}
-
-.path-mod-ejsapp #runCodeButEJSApp {
-    text-align: center;
-    margin: 0 0 0 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
 .path-mod-ejsapp #slideshow {
-    flex-shrink: 0;
+    min-width: 35%;
+    max-width: 100%;
+    flex-basis: 35%;
+    flex-shrink: 1;
     flex-grow: 1;
-    align-self: center;
     display: none;
     flex-direction: column;
-    min-width: 38%;
+    justify-content: center;
+}
+
+.path-mod-ejsapp #slideshow-wrapper {
+    width: 100%;
+}
+
+.path-mod-ejsapp div[id^="fragment-"] {
+    width: 100%;
+    margin: auto;
+    text-align: center;
+}
+
+.path-mod-ejsapp #full_screen_chart,
+.path-mod-ejsapp #full_screen_blockly {
+    margin-right: 0;
+    margin-bottom: 0;
+    text-align: right;
 }
 
 .path-mod-ejsapp #prev_chart {

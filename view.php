@@ -133,6 +133,8 @@ if ($ejsapp->class_file == '') {
         }
         $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'recording', $mouseevents);
     }
+    // Full screen features
+    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'fullScreen');
 }
 
 // Output starts here.
@@ -152,6 +154,7 @@ $action = 'view';
 $accessed = false;
 
 // Define the div section for charts and related buttons.
+$fullscreencharts = html_writer::div('', 'fa fa-arrows-alt fa-1g', array( 'id' => 'full_screen_chart'));
 $wrapper = html_writer::div('', 'charts', array('id' => 'slideshow-wrapper'));
 $prevchart = html_writer::div('', 'fa fa-chevron-left fa-2x', array('id' => 'prev_chart',
     'onclick' => 'prevChart()'));
@@ -160,7 +163,7 @@ $cleancharts = html_writer::div('', 'fa fa-window-close-o fa-2x', array( 'id' =>
 $nextchart = html_writer::div('', 'fa fa-chevron-right fa-2x', array('id' => 'next_chart',
     'onclick' => 'nextChart()'));
 $buttonscharts = html_writer::div($prevchart . $cleancharts . $nextchart, 'charts', array('id' => 'buttons_charts'));
-$chartsdiv = html_writer::div($wrapper . $buttonscharts, 'charts', array('id' => 'slideshow'));
+$chartsdiv = html_writer::div($fullscreencharts . $wrapper . $buttonscharts, 'charts', array('id' => 'slideshow'));
 
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
 // whether the ejsapp instance is a remote lab or not.
@@ -333,24 +336,27 @@ if ($accessed && $ejsapp->class_file == '') {
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
         // Button for running the Blockly code
-        $content = html_writer::empty_tag('input',
+        $fullscreenblockly = html_writer::div('', 'fa fa-arrows-alt fa-2g', array( 'id' => 'full_screen_blockly'));
+        $runcodebutton = html_writer::empty_tag('input',
             array('class' => 'blockly_button', 'type' => 'submit',
                 'name' => 'runCode', 'id' => 'runCodeButEJSApp',
                 'value' => get_string('run_code', 'block_ejsapp_file_browser'),
                 'onclick' => 'playCode()'));
-        $content = html_writer::div($content, 'runCodeEJSApp');
+        $emptyelement = html_writer::tag('a', '');
+        $content = html_writer::div($emptyelement . $runcodebutton . $fullscreenblockly, 'runCodeEJSApp');
         echo $content;
         // Blockly programming space for Javascript labs.
         $includejslibraries = html_writer::tag('script', '',
-                array('src' => $ejsapp->codebase . 'configuration.js')) .
+                array('src' => (new moodle_url($CFG->wwwroot . $ejsapp->codebase . 'configuration.js')))) .
             html_writer::tag('script', '', array('src' => 'blockly/acorn_interpreter.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blockly_compressed.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blocks_compressed.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/javascript_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'charts/Chart.bundle.js')) .
+            html_writer::tag('script', '', array('src' => '../../lib/amd/src/chartjs-lazy.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/GUI_functions.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js'));
+            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js')) .
+            html_writer::tag('script', '', array('src' => 'blockly/screenfull.min.js'));
         if (strpos(current_language(), 'es') !== false) {
             $includejslibraries .= html_writer::tag('script', '', array('src' => 'blockly/es.js'));
         } else {

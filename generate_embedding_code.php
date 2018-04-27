@@ -198,11 +198,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
     if ($ejsapp->class_file == '') { // EjsS Javascript.
         global $PAGE;
 
-        if (count(explode('/', $CFG->wwwroot)) <= 3) {
-            $path = $CFG->wwwroot . $ejsapp->codebase;
-        } else {
-            $path = substr($CFG->wwwroot, 0, strrpos( $CFG->wwwroot, '/') ) . $ejsapp->codebase;
-        }
+        $path = new moodle_url($ejsapp->codebase);
 
         $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
         $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
@@ -334,16 +330,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
                 $ejsappname = substr($ejsapp->applet_name, 0, -4);
             }
 
-            if (count(explode('/', $CFG->wwwroot)) <= 3) {
-                $wwwpath = $CFG->wwwroot . $ejsapp->codebase;
-            } else {
-                $wwwpath = substr($CFG->wwwroot, 0, strrpos($CFG->wwwroot, '/')) . $ejsapp->codebase;
-            }
-            /*$records = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles',
-                'itemid' => ($ejsapp->id), 'filename' => ($ejsapp->applet_name)));
-            $record = reset($records);
-            $wwwpath = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/jarfiles/' . $record->itemid . '/';*/
-
+            $wwwpath = new moodle_url($ejsapp->codebase);
             $mainclass = substr($ejsapp->class_file, 0, -12);
 
             // Create the JNLP file.
