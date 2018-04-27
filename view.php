@@ -33,7 +33,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('generate_embedding_code.php');
 
 global $USER, $DB, $CFG, $PAGE, $OUTPUT;
-
+$CFG->cachejs = false;
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
 $statefile = optional_param('state_file', null, PARAM_TEXT);
 $cntfile = optional_param('cnt_file', null, PARAM_TEXT);
@@ -134,6 +134,7 @@ if ($ejsapp->class_file == '') {
         $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'recording', $mouseevents);
     }
     // Full screen features
+    $PAGE->requires->js_call_amd('mod_ejsapp/screenfull', 'init');
     $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'fullScreen');
 }
 
@@ -355,8 +356,7 @@ if ($accessed && $ejsapp->class_file == '') {
             html_writer::tag('script', '', array('src' => '../../lib/amd/src/chartjs-lazy.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
             html_writer::tag('script', '', array('src' => 'blockly/GUI_functions.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/screenfull.min.js'));
+            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js'));
         if (strpos(current_language(), 'es') !== false) {
             $includejslibraries .= html_writer::tag('script', '', array('src' => 'blockly/es.js'));
         } else {

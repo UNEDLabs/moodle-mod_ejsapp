@@ -1,5 +1,4 @@
 define([], function() {
-    'use strict';
     var t = {
         init: function() {
             var document = typeof window !== 'undefined' && typeof window.document !== 'undefined' ? window.document : {};
