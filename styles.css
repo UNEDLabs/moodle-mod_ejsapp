@@ -9,7 +9,7 @@
 .path-mod-ejsapp #blocklyDiv {
     margin-top: 10px;
     height: 450px;
-    width: 99%;
+    width: 100%;
     display: flex;
 }
 

@@ -65,9 +65,18 @@ function cleanCharts() {
 			if(chartInfo[i][0]["title"] === name) chartInfo.splice(i,1);
 		}
 	}
-	if (chartArray.length < 2) {
-		document.getElementById("buttons_charts").style.display = "none";
-	}
+    if (chartArray.length < 2) {
+		document.getElementById("prev_chart").style.display = "none";
+        document.getElementById("next_chart").style.display = "none";
+        if (chartArray.length < 1) {
+            document.getElementById("buttons_charts").style.display = "none";
+            document.getElementById("slideshow").style.display = "none";
+        }
+    } else {
+        document.getElementById("buttons_charts").style.display = "flex";
+        document.getElementById("prev_chart").style.display = "inline";
+        document.getElementById("next_chart").style.display = "inline";
+    }
 }
 
 function getRemoteCode() {

@@ -1202,14 +1202,18 @@ function hideAllCharts() {
 	for (var k = 0; k < chartArray.length; k++) {
 		document.getElementById(chartArray[k].fragment).style.display = "none";
 	}
-	if (chartArray.length < 1) {
-        document.getElementById("slideshow").style.display = "none";
-		// Document.getElementById("buttons_charts").style.display="none";
-	}
-	if (chartArray.length == 1) {
-        // Document.getElementById("slideshow").style.display = "none";
-		document.getElementById("buttons_charts").style.display = "none";
-	}
+    if (chartArray.length < 2) {
+        document.getElementById("prev_chart").style.display = "none";
+        document.getElementById("next_chart").style.display = "none";
+        if (chartArray.length < 1) {
+            document.getElementById("buttons_charts").style.display = "none";
+            document.getElementById("slideshow").style.display = "none";
+        }
+    } else {
+        document.getElementById("buttons_charts").style.display = "flex";
+        document.getElementById("prev_chart").style.display = "inline";
+        document.getElementById("next_chart").style.display = "inline";
+    }
 }
 
 function showChart(elem) {
