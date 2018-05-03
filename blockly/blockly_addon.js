@@ -1030,9 +1030,8 @@ function prevChart() {
 function paintChart() {
     if (chartArray.length === 1) {
         document.getElementById("slideshow").style.display = "flex";
-    } else if (chartArray.length === 2) {
-		document.getElementById("buttons_charts").style.display = "flex";
-	}
+        document.getElementById("buttons_charts").style.display = "flex";
+    }
 	if (chartArray.length >= 1) {
     	hideAllCharts();
     }
