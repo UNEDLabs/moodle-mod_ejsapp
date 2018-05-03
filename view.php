@@ -362,7 +362,8 @@ if ($accessed && $ejsapp->class_file == '') {
         } else {
             $includejslibraries .= html_writer::tag('script', '', array('src' => 'blockly/en.js'));
         }
-        echo html_writer::div($includejslibraries, 'blockly', array('id' => 'blocklyDiv'));
+        echo html_writer::div(html_writer::div($includejslibraries, 'blockly', array('id' => 'injectionDiv')),
+            'blockly', array('id' => 'blocklyDiv'));
     }
 }
 

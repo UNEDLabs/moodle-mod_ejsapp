@@ -141,7 +141,7 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
                     screenfull.request(chart);
                 }
             });
-            const blockly = $('.injectionDiv:first')[0];
+            const blockly = $('#injectionDiv')[0];
             $('#full_screen_blockly').click(function() {
                 if (screenfull.enabled) {
                     screenfull.request(blockly);
