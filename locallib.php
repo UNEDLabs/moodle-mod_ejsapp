@@ -291,7 +291,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                             $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
                             // Get list of users in this Moodle server who can access the experience
                             $moodleservers = $listownermoodleusers->ServerMoodle;
-                            if (!is_array($moodleservers)) $moodleservers[0] = $moodleservers;
+                            if (!is_array($moodleservers)) $moodleservers = array($moodleservers);
                             foreach ($moodleservers as $moodleserver) {
                                 // Check whether this Moodle server is registered in the experience.
                                 if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
@@ -302,7 +302,7 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                                             $userid = $DB->get_field('user', 'id', array('username' => $username));
                                             // Check whether the required user has access to the experience.
                                             if  (get_capability_info('ltisource/sarlab:useexp')) {
-                                                if (strcasecmp($username, $owneruser) == 0) { // TODO: replace with userid
+                                                if (strcasecmp($username, $owneruser) == 0) { // TODO: replace $username with userid
                                                     $listexperiences .= $experience['IdExp'] . ';';
                                                     break;
                                                 }
