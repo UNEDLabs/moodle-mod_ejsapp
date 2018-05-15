@@ -36,12 +36,11 @@ global $USER, $DB, $CFG, $PAGE, $OUTPUT;
 $CFG->cachejs = false;
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
 $statefile = optional_param('state_file', null, PARAM_TEXT);
-$cntfile = optional_param('cnt_file', null, PARAM_TEXT);
 $recfile = optional_param('rec_file', null, PARAM_TEXT);
 $blkfile = optional_param('blk_file', null, PARAM_TEXT);
 $sessionid = optional_param('colsession', null, PARAM_INT);
 
-$datafiles = array($statefile, $cntfile, $recfile, $blkfile);
+$datafiles = array($statefile, $recfile, $blkfile);
 
 if (!is_null($sessionid)) {
     $collabsession = $DB->get_record('ejsapp_collab_sessions', array('id' => $sessionid));

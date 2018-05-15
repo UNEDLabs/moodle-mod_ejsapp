@@ -127,14 +127,8 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Adding an optional state file to be read when the lab loads.
         $mform->addElement('header', 'state_file', get_string('state_file', 'ejsapp'));
         $mform->addElement('filemanager', 'statefile', get_string('file'), null, array('subdirs' => 0,
-            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('application/xml', 'application/json')));
+            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.json'));
         $mform->addHelpButton('statefile', 'statefile', 'ejsapp');
-
-        // Adding an optional text file with a controller code to be load when the lab is run.
-        $mform->addElement('header', 'controller_file', get_string('controller_file', 'ejsapp'));
-        $mform->addElement('filemanager', 'controllerfile', get_string('file'), null, array('subdirs' => 0,
-            'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.cnt'));
-        $mform->addHelpButton('controllerfile', 'controllerfile', 'ejsapp');
 
         // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('header', 'recording_file', get_string('recording_file', 'ejsapp'));
@@ -349,14 +343,8 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             
             $draftitemidstate = file_get_submitted_draft_itemid('statefile');
             file_prepare_draft_area($draftitemidstate, $this->context->id, 'mod_ejsapp', 'xmlfiles',
-                $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1,
-                    'accepted_types' => 'application/xml'));
-            $defaultvalues['statefile'] = $draftitemidstate;
-
-            $draftitemidcontroller = file_get_submitted_draft_itemid('controllerfile');
-            file_prepare_draft_area($draftitemidcontroller, $this->context->id, 'mod_ejsapp', 'cntfiles',
                 $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-            $defaultvalues['controllerfile'] = $draftitemidcontroller;
+            $defaultvalues['statefile'] = $draftitemidstate;
 
             $draftitemidrecording = file_get_submitted_draft_itemid('recordingfile');
             file_prepare_draft_area($draftitemidrecording, $this->context->id, 'mod_ejsapp', 'recfiles',

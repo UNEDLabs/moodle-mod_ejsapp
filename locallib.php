@@ -61,12 +61,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
                 'accepted_types' => 'application/xml'));
     }
 
-    // Creating the controller file in dataroot and updating the files table in the database.
-    if ($ejsapp->controllerfile) {
-        file_save_draft_area_files($ejsapp->controllerfile, $context->id, 'mod_ejsapp', 'cntfiles',
-            $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
-    }
-
     // Creating the recording file in dataroot and updating the files table in the database.
     if ($ejsapp->recordingfile) {
         file_save_draft_area_files($ejsapp->recordingfile, $context->id, 'mod_ejsapp', 'recfiles',

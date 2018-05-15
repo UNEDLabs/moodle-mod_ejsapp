@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Receives any .xml, .rec, .blk, .cnt, .json, text or image file saved by an EJS applet or an EjsS javascript
+ * Receives any .rec, .blk, .json, text or image file saved by an EjsS javascript lab
  * application and decides what to do with it:
  *  1) store it in the users' private files
  *  2) store it in the database (for users interactions only).
@@ -49,22 +49,13 @@ if ($_POST['type'] == 'actions') { // Users interactions: store in the database 
     $data->actions = $_POST['file'];
     $DB->insert_record('ejsapp_records', $data);
 } else { // Store the file in the user private repository.
-    // Distinguish between a file sent by EJS and EjsS.
-    $originalname = null;
-    if ($_FILES['user_file']['name'] != null) { // Receiving from EJS (java client).
-        $method = true;
-        $originalname = $_FILES['user_file']['name'];
-        $filename = replace_characters($originalname);
-    } else { // Receiving from EjsS (javascript client).
-        $method = false;
-        $originalname = $_POST['user_file'];
-        $filename = replace_characters($originalname);
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        if (!$extension) {
-            $extension = $_POST['type'];
-            $extension = str_replace(".", "", $extension);
-            $filename = $filename . '.' . $extension;
-        }
+    $originalname = $_POST['user_file'];
+    $filename = replace_characters($originalname);
+    $extension = pathinfo($filename, PATHINFO_EXTENSION);
+    if (!$extension) {
+        $extension = $_POST['type'];
+        $extension = str_replace(".", "", $extension);
+        $filename = $filename . '.' . $extension;
     }
 
     $contextid = $_POST['context_id'];
@@ -74,11 +65,7 @@ if ($_POST['type'] == 'actions') { // Users interactions: store in the database 
     // Prepare the file info data.
     $fs = get_file_storage();
     // Prepare file record object.
-    if ($extension == 'cnt') {
-        $sourceinfo = 'controller';
-    } else {
-        $sourceinfo = 'ejsappid=' . $ejsappid;
-    }
+    $sourceinfo = 'ejsappid=' . $ejsappid;
     $fileinfo = array(
         'contextid' => $contextid, // ID of context.
         'component' => 'user', // Usually = table name.
@@ -96,18 +83,14 @@ if ($_POST['type'] == 'actions') { // Users interactions: store in the database 
         $oldfile->delete();
     }
 
-    if ($method) { // From EJS.
-        $fs->create_file_from_pathname($fileinfo, $_FILES['user_file']['tmp_name']);
-    } else { // From EjsS.
-        if ($_POST['type'] != 'png') {
-            $fs->create_file_from_string($fileinfo, rawurldecode($_POST['file']));
-        } else {
-            $data = rawurldecode($_POST['file']);
-            list($type, $data) = explode(';', $data);
-            list(, $data) = explode(',', $data);
-            $data = base64_decode($data);
-            $fs->create_file_from_string($fileinfo, $data);
-        }
+    if ($_POST['type'] != 'png') {
+        $fs->create_file_from_string($fileinfo, rawurldecode($_POST['file']));
+    } else {
+        $data = rawurldecode($_POST['file']);
+        list($type, $data) = explode(';', $data);
+        list(, $data) = explode(',', $data);
+        $data = base64_decode($data);
+        $fs->create_file_from_string($fileinfo, $data);
     }
 }
 

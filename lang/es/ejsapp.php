@@ -75,15 +75,10 @@ $string['css_style'] = 'Hoja de estilos CSS para una aplicaci&oacute;n Javascrip
 $string['css_rules'] = 'Crea tus propias reglas css para cambiar el aspecto visual de la aplicaci&oacute;n javascript';
 $string['css_rules_help'] = '¡Importante! Escriba cada selector y el comienzo de su declaraci&oacute;n (la llave) en la misma l&iacute;nnea.';
 
-$string['state_file'] = 'Archivo .xml o .json con el estado que este laboratorio EjsS debe leer';
+$string['state_file'] = 'Archivo .json con el estado que este laboratorio EjsS debe leer';
 
 $string['statefile'] = 'Estado del Easy Java(script) Simulation';
-$string['statefile_help'] = 'Seleccione el archivo .xml (para Java) o .json (para Javascript) con el estado que la aplicaci&oacute;n EjsS debe cargar al ejecutarse.';
-
-$string['controller_file'] = 'Archivo .cnt con el controlador que la aplicaci&oacute;n EjsS debe cargar al iniciarse';
-
-$string['controllerfile'] = 'Controlador para el Easy Java/Javascript Simulations';
-$string['controllerfile_help'] = 'Seleccione el archivo .cnt con el c&oacute;digo del controlador que la aplicaci&oacute;n EjsS debe ejecutar al iniciarse.';
+$string['statefile_help'] = 'Seleccione el archivo .json con el estado que la aplicaci&oacute;n Javascript EjsS debe cargar al ejecutarse.';
 
 $string['recording_file'] = 'Archivo .rec con la grabaci&oacute;n que la aplicaci&oacute;n EjsS debe ejecutar al cargarse';
 

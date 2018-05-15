@@ -76,15 +76,10 @@ $string['css_style'] = 'CSS stylesheet for a Javascript application';
 $string['css_rules'] = 'Create your own css rules to change the visual aspect of the javascript application';
 $string['css_rules_help'] = 'Important! Write each selector and the beginning of its declaration (the opening curly bracket) in the same line.';
 
-$string['state_file'] = '.xml or .json file with the state to be read when this EJjS lab loads';
+$string['state_file'] = '.json file with the state to be read when this EjsS lab loads';
 
 $string['statefile'] = 'Easy Java(script) Simulation State';
-$string['statefile_help'] = 'Select the .xml (for Java) or .json (for Javascript) file with the state the EJsS application should load.';
-
-$string['controller_file'] = '.cnt file with the controller to be load when the EjsS application is initialized';
-
-$string['controllerfile'] = 'Easy Java(script) Simulation Controller';
-$string['controllerfile_help'] = 'Select the .cnt file with the code of the controller to be load when the the EJS application is initialized.';
+$string['statefile_help'] = 'Select the .json file with the state the EjsS Javascript application should load.';
 
 $string['recording_file'] = '.rec file with the recording to be run when this EjsS lab loads';
 

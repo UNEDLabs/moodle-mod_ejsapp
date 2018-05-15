@@ -37,14 +37,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Returns the code that embeds an EJS applet into Moodle
+ * Returns the code that embeds an EjsS application into Moodle
  *
- * This function returns the HTML and JavaScript code that embeds an EJS applet into Moodle
+ * This function returns the HTML and JavaScript code that embeds an EjsS application into Moodle
  * It is used for four different cases:
  *      1) when only the EJSApp activity is being used
- *      2) when the EJSApp File Browser is used to load a state, a controller or a recording file
+ *      2) when the EJSApp File Browser is used to load a state, recording or blockly file
  *      3) when the EJSApp Collab Session is used
- *      4) when third party plugins want to display EJS applets in their own activities by means of the EJSApp external interface
+ *      4) when third party plugins want to display EjsS labs in their own activities by means of the EJSApp external interface
  *
  * @param stdClass $ejsapp record from table ejsapp
  * @param stdClass|null $sarlabinfo
@@ -57,15 +57,12 @@ defined('MOODLE_INTERNAL') || die();
  *                                      Null if sarlab is not used
  * @param array|null $userdatafiles
  *                                  $userdatafiles[0]: user_state_file, if generate_embedding_code is called from
- *                                      block ejsapp_file_browser, this is the name of the .xml or .json file that stores
- *                                      the state of an EJS applet, elsewhere it is null
- *                                  $userdatafiles[1]: user_cnt_file, if generate_embedding_code is called from
- *                                      block ejsapp_file_browser, this is the name of the .cnt file that stores the code
- *                                      of the controller used within an EJS applet, elsewhere it is null
- *                                  $userdatafiles[2]: user_rec_file, if generate_embedding_code is called from
+ *                                      block ejsapp_file_browser, this is the name of the .json file that stores
+ *                                      the state of an EjsS lab, elsewhere it is null
+ *                                  $userdatafiles[1]: user_rec_file, if generate_embedding_code is called from
  *                                      block ejsapp_file_browser, this is the name of the .rec file that stores the script
  *                                      with the recording of the interaction with an EJS applet, elsewhere it is null
- *                                  $userdatafiles[3]: user_blk_file, if generate_embedding_code is called from block
+ *                                  $userdatafiles[2]: user_blk_file, if generate_embedding_code is called from block
  *                                      ejsapp_file_browser, this is the name of the .blk file that stores a blockly
  *                                      program, elsewhere it is null
  * @param stdClass|null $collabinfo
@@ -89,7 +86,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
     global $DB, $USER, $CFG;
 
     /**
-     * If a state, controller or recording file has been configured in the ejsapp activity, this function returns the
+     * If a state, recording or blockly file has been configured in the ejsapp activity, this function returns the
      * information of such file
      *
      * @param stdClass $ejsapp
@@ -113,7 +110,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
     }
 
     /**
-     * Return either the initial or the user-saved data file (state, controller or interaction recording)
+     * Return either the initial or the user-saved data file (state, interaction recording or blockly)
      *
      * @param string $userdatafile
      * @param stdClass $initialdatafile
@@ -133,12 +130,10 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
 
     if (!is_null($userdatafiles)) {
         $userstatefile = $userdatafiles[0];
-        $usercntfile = $userdatafiles[1];
-        $userrecfile = $userdatafiles[2];
-        $userblkfile = $userdatafiles[3];
+        $userrecfile = $userdatafiles[1];
+        $userblkfile = $userdatafiles[2];
     } else {
         $userstatefile = null;
-        $usercntfile = null;
         $userrecfile = null;
         $userblkfile = null;
     }
@@ -249,22 +244,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
                 array($sseuri, $port));
         }
 
-        // Init of loading state, controller, interaction and blockly programs files as well as personalized variables.
+        // Init of loading state, interaction and blockly programs files as well as personalized variables.
         // Init of loading state files.
         $initialstatefile = initial_data_file($ejsapp, 'xmlfiles');
         if ($userstatefile || (isset($initialstatefile->filename)) && $initialstatefile->filename != '.') {
             $statefile = get_data_file($userstatefile, $initialstatefile);
-            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readStateFile', $statefile);
+            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readStateFile', array($statefile));
         }
         // End of loading state files.
-
-        // Init of loading controller files.
-        $initialcntfile = initial_data_file($ejsapp, 'cntfiles');
-        if ($usercntfile || (isset($initialcntfile->filename) && $initialcntfile->filename != '.')) {
-            $cntfile = get_data_file($usercntfile, $initialcntfile);
-            // TODO.
-        }
-        // End of loading controller files.
 
         // Init of loading interaction recording files.
         $initialrecfile = initial_data_file($ejsapp, 'recfiles');
@@ -305,7 +292,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         }
         $code = str_replace($search, $replace, $code);
         // End of loading personalized variables.
-        // End of loading state, controller, interaction and blockly programs files as well as personalized variables.
+        // End of loading state, interaction and blockly programs files as well as personalized variables.
 
         // End message when the recording of the user interaction stops.
         $endmessage = get_string('end_message', 'ejsapp');

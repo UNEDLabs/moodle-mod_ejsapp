@@ -564,7 +564,6 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
 function ejsapp_get_file_areas($course, $cm, $context) {
     return array('jarfiles' => 'Applets and Javascript files with the virtual or remote labs',
                  'xmlfile'  => 'Text files containing all the information to define the state of a lab',
-                 'cntfiles' => 'Text files containing a code (typically, a controller)',
                  'recfiles' => 'Text files containing a script recording the interaction of a user with a lab',
                  'blkfiles' => 'Text files containing a blockly program or a configuration of blocks');
 }
@@ -611,7 +610,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' && $filearea !== 'cntfiles' &&
+    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' &&
         $filearea !== 'recfiles' && $filearea !== 'blkfiles') {
         return false;
     }

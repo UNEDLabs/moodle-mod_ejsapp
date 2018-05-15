@@ -241,8 +241,8 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
         // Add ejsapp related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
-        $this->add_related_files('mod_ejsapp', 'cntfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'recfiles', 'ejsapp');
+        $this->add_related_files('mod_ejsapp', 'blkfiles', 'ejsapp');
     }
 
 }

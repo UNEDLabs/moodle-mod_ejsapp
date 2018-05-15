@@ -100,7 +100,7 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
         readStateFile: function(statefile) {
             var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
-                    _model.readState(statefile + '.json');
+                    _model.readState(statefile);
                     clearInterval(doit);
                 }
             }, 200);
