@@ -36,7 +36,8 @@ require_login(0, false);
 global $PAGE;
 
 $courseid = required_param('courseid', PARAM_INT);
-$cmid = required_param('activityid', PARAM_INT);
+$cmid = required_param('cmid', PARAM_INT);
+$objectid = required_param('activityid', PARAM_INT);
 $ejsappname = required_param('ejsappname', PARAM_TEXT);
 $userid = required_param('userid', PARAM_INT);
 
@@ -46,7 +47,7 @@ $PAGE->set_url('/mod/ejsapp/add_to_log.php');
 $ejsappname = urldecode($ejsappname);
 $modulecontext = context_module::instance($cmid);
 $event = \mod_ejsapp\event\ejsapp_working::create(array(
-    'objectid' => $cmid,
+    'objectid' => $objectid,
     'courseid' => $courseid,
     'userid' => $userid,
     'context' => $modulecontext,

@@ -83,7 +83,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  */
 function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
-    global $DB, $USER, $CFG;
+    global $DB, $USER, $CFG, $COURSE;
 
     /**
      * If a state, recording or blockly file has been configured in the ejsapp activity, this function returns the
@@ -142,20 +142,14 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
     // collaborative session.
     if ($sarlabinfo || isset($collabinfo->sarlabport)) {
         $time = time();
-        $year = date("Y", $time);
-        $month = date("n", $time);
-        $day = date("j", $time);
-        $hour = date("G", $time);
         $min = date("i", $time);
         $seg = date("s", $time);
         mt_srand(time());
         $random = mt_rand(0, 1000000);
         if ($sarlabinfo) {
-            $sarlabkey = sha1($year . $month . $day . $hour . $min . $seg . $sarlabinfo->practice .
-                fullname($USER) . $USER->username . $random);
+            $sarlabkey = sha1($min . $seg . $sarlabinfo->practice . fullname($USER) . $USER->username . $random);
         } else {
-            $sarlabkey = sha1($year . $month . $day . $hour . $min . $seg . "EJS Collab" . fullname($USER) .
-                $USER->username . $random);
+            $sarlabkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
         }
 
         $newsarlabkey = new stdClass();
@@ -222,11 +216,11 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         if ($ejsapp->is_rem_lab || $collabinfo) {
             if ($sarlabinfo) { // For remote labs accessed through Sarlab, pass authentication params to the app.
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
-                    array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace CFG->wwwroot by Server id
+                    array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
-                    array($sarlabip, 'SARLABV8.0', '80', $sarlabinfo->practice));
+                    array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $sarlabinfo->practice, $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
             }
-            // Make sure the Javascript application doesn't stop when losing focus.
+            // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
             $sseuri = '';
             $port = '';
             if ($collabinfo && !isset($collabinfo->director)) {
@@ -275,7 +269,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         }
         // End of loading blockly program files.
 
-        // Init of loading personalized variables.
+        // Init of loading personalized variables. TODO: call webUserInput from Javascript with ejss_interactions
         $search = ',"webUserInput"';
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
             $personalizevarscode = "'{";
@@ -294,7 +288,7 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         // End of loading personalized variables.
         // End of loading state, interaction and blockly programs files as well as personalized variables.
 
-        // End message when the recording of the user interaction stops.
+        // End message when the recording of the user interaction stops. TODO: do it from Javascript with ejss_interactions
         $endmessage = get_string('end_message', 'ejsapp');
         $search = "window.alert(end_reproduction_message);";
         $replace = "window.alert(\"$endmessage\");";

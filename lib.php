@@ -154,14 +154,13 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
         $ejsapp->appwordingformat = $ejsapp->ejsappwording['format'];
     }
 
+    $moduleid = $DB->get_field('modules', 'id', array('name' => 'ejsapp'));
     $cmid = $DB->get_field('course_modules', 'id', array('course' => $ejsapp->course,
-        'instance' => $ejsapp->id));
+        'module' => $moduleid, 'instance' => $ejsapp->id));
     $context = context_module::instance($cmid);
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
     $ejsok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejsok) {
@@ -218,9 +217,10 @@ function ejsapp_delete_instance($id) {
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'xmlfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'recfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'blkfiles', $id);
 
     $DB->delete_records('ejsapp', array('id' => $id));
     if ($ejsapp->is_rem_lab == 1) {
@@ -424,56 +424,59 @@ function ejsapp_cron() {
     if (date('H') >= 8) {
         $remlabsconf = $DB->get_records('block_remlab_manager_conf');
         foreach ($remlabsconf as $remlabconf) {
-            $sarlabinstance = is_practice_in_sarlab($remlabconf->practice);
+            $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);
             $devicesinfo = new stdClass();
             $labstate = ping($remlabconf->ip, $remlabconf->port, $sarlabinstance, $remlabconf->practiceintro);
             // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive.
-            $remlab = $DB->get_record('ejsapp', array('id' => $remlabconf->ejsappid));
             $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
             // TODO: Allow configuring which roles receive the e-mails? (managers, non-editing teacher...) Use Moodle capabilities.
-            $context = context_course::instance($remlab->course);
-            $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
-            $sendmail = false;
-            // Prepare e-mails' content and update lab state when checkable.
-            $subject = '';
-            $messagebody = '';
-            if ($labstate == 2) {  // Not checkable.
-                $subject = get_string('mail_subject_lab_not_checkable', 'ejsapp');
-                $messagebody = get_string('mail_content1_lab_not_checkable', 'ejsapp') .
-                    $multilang->filter($remlab->name) .
-                    get_string('mail_content2_lab_not_checkable', 'ejsapp') . $remlabconf->ip .
-                    get_string('mail_content3_lab_not_checkable', 'ejsapp');
-                $sendmail = true;
-            } else {                // Active or inactive.
-                if ($remlabconf->active == 1 && $labstate == 0) {  // Lab has passed from active to inactive.
-                    $subject = get_string('mail_subject_lab_down', 'ejsapp');
-                    $messagebody = get_string('mail_content1_lab_down', 'ejsapp') .
+            $remlabs = get_repeated_remlabs($remlabconf);
+            foreach ($remlabs as $remlab) {
+                // $remlab = $DB->get_record('ejsapp', array('id' => $remlabconf->ejsappid));
+                $context = context_course::instance($remlab->course);
+                $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
+                $sendmail = false;
+                // Prepare e-mails' content and update lab state when checkable.
+                $subject = '';
+                $messagebody = '';
+                if ($labstate == 2) {  // Not checkable.
+                    $subject = get_string('mail_subject_lab_not_checkable', 'ejsapp');
+                    $messagebody = get_string('mail_content1_lab_not_checkable', 'ejsapp') .
                         $multilang->filter($remlab->name) .
-                        get_string('mail_content2_lab_down', 'ejsapp') . $remlabconf->ip .
-                        get_string('mail_content3_lab_down', 'ejsapp') .
-                        get_string('mail_content4_lab_down', 'ejsapp');
-                    foreach ($devicesinfo as $deviceinfo) {
-                        if (!$deviceinfo->alive) {
-                            $messagebody .= $deviceinfo->name . ', ' . $deviceinfo->ip . "\r\n";
+                        get_string('mail_content2_lab_not_checkable', 'ejsapp') . $remlabconf->ip .
+                        get_string('mail_content3_lab_not_checkable', 'ejsapp');
+                    $sendmail = true;
+                } else {                // Active or inactive.
+                    if ($remlabconf->active == 1 && $labstate == 0) {  // Lab has passed from active to inactive.
+                        $subject = get_string('mail_subject_lab_down', 'ejsapp');
+                        $messagebody = get_string('mail_content1_lab_down', 'ejsapp') .
+                            $multilang->filter($remlab->name) .
+                            get_string('mail_content2_lab_down', 'ejsapp') . $remlabconf->ip .
+                            get_string('mail_content3_lab_down', 'ejsapp') .
+                            get_string('mail_content4_lab_down', 'ejsapp');
+                        foreach ($devicesinfo as $deviceinfo) {
+                            if (!$deviceinfo->alive) {
+                                $messagebody .= $deviceinfo->name . ', ' . $deviceinfo->ip . "\r\n";
+                            }
                         }
+                        $sendmail = true;
+                    } else if ($remlabconf->active == 0 && $labstate == 1) { // Lab has passed from inactive to active.
+                        $subject = get_string('mail_subject_lab_up', 'ejsapp');
+                        $messagebody = get_string('mail_content1_lab_up', 'ejsapp') .
+                            $multilang->filter($remlab->name) .
+                            get_string('mail_content2_lab_up', 'ejsapp') . $remlabconf->ip .
+                            get_string('mail_content3_lab_up', 'ejsapp');
+                        $sendmail = true;
                     }
-                    $sendmail = true;
-                } else if ($remlabconf->active == 0 && $labstate == 1) { // Lab has passed from inactive to active.
-                    $subject = get_string('mail_subject_lab_up', 'ejsapp');
-                    $messagebody = get_string('mail_content1_lab_up', 'ejsapp') .
-                        $multilang->filter($remlab->name) .
-                        get_string('mail_content2_lab_up', 'ejsapp') . $remlabconf->ip .
-                        get_string('mail_content3_lab_up', 'ejsapp');
-                    $sendmail = true;
+                    $remlabconf->active = $labstate;
+                    $DB->update_record('block_remlab_manager_conf', $remlabconf);
                 }
-                $remlabconf->active = $labstate;
-                $DB->update_record('block_remlab_manager_conf', $remlabconf);
-            }
-            // Send e-mails.
-            if ($sendmail) {
-                $teachers = get_role_users($role->id, $context);
-                foreach ($teachers as $teacher) {
-                    email_to_user($teacher, $teacher, $subject, $messagebody);
+                // Send e-mails.
+                if ($sendmail) {
+                    $teachers = get_role_users($role->id, $context);
+                    foreach ($teachers as $teacher) {
+                        email_to_user($teacher, $teacher, $subject, $messagebody);
+                    }
                 }
             }
         }

@@ -48,12 +48,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_book($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
     /**
@@ -61,12 +65,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_booked($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
     /**
@@ -74,12 +82,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_collab($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
     /**
@@ -87,12 +99,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_inactive($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
     /**
@@ -100,12 +116,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_viewed($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
     /**
@@ -113,12 +133,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_wait($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
     /**
@@ -126,12 +150,16 @@ class observers {
      *
      * @param \core\event\base $event The event.
      * @return void
+     * @throws
      */
     public static function ejsapp_working($event) {
-        // Write info in the db.
-        /*global $DB;
-        $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-        $DB->insert_record('ejsapp_log', $record);*/
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('logstore_standard_log')) {
+            // Write info in custom table.
+            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
+            $DB->insert_record('ejsapp_log', $record);
+        }
     }
 
 }

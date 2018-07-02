@@ -30,7 +30,7 @@
 
 M.mod_ejsapp = {};
 
-M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, htmlid, frequency, max_time){
+M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, htmlid, frequency, max_time) {
     var handleSuccessAddLog = function(o) {
         /*success handler code*/
     };
@@ -52,30 +52,28 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
         success:handleSuccessKickOut,
         failure:handleFailureKickOut
     };
-    var max_times = 7200;
-    if (is_rem_lab === 1) {
+    if (typeof max_time !== 'undefined') {
         max_times = Math.round(max_time/frequency); // A user can occupy a remote lab just for max_times seconds.
     }
     var counter = 0;
     var checkActivity = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
-            if (counter < max_times) { // on time
-                // Call php code to insert log in Moodle table.
-                Y.YUI2.util.Connect.asyncRequest('GET', url_add_log, callbackAddLog);
-                counter++;
-            } else { // Time is up.
-                if (is_rem_lab == 1) {
+            // Call php code to insert log in Moodle table.
+            Y.YUI2.util.Connect.asyncRequest('GET', url_add_log, callbackAddLog);
+            counter++;
+            if (typeof max_time !== 'undefined') {
+                if (counter >= max_times) {
                     // Call php code to refresh view.php and kick the user from the remote lab.
                     Y.YUI2.util.Connect.asyncRequest('GET', url_max_time, callbackKickOut);
+                    clearInterval(checkUserActivity);
                 }
-                clearInterval(checkUserActivity);
             }
         });
     };
     // Call a first time.
     checkActivity();
     // Call periodically.
-    var checkUserActivity = setInterval(checkActivity,1000*frequency);
+    var checkUserActivity = setInterval(checkActivity, 1000 * frequency);
 };
 
 M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, check_activity, seconds_label, refresh_label){

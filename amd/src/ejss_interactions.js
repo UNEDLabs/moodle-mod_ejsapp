@@ -57,11 +57,17 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
             }, 200);
         },
 
-        sarlabRun: function(sarlabIP, sarlabPath, sarlabPort, sarlabExperience) {
+        sarlabRun: function(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen) {
             var doit = setInterval(function() {
                 if (typeof _model._sarlab !== "undefined") {
-                    _model._sarlab.setSarlabInfo(sarlabIP, sarlabPath, sarlabPort, sarlabExperience);
-                    _model._sarlab.connect();
+                    _model._sarlab.setSarlabInfo(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen);
+                    if (typeof _model._rip !== "undefined") {
+                        _model._sarlab.connect(function() {
+                            _model._rip.connect();
+                        });
+                    } else {
+                        _model._sarlab.connect();
+                    }
                     clearInterval(doit);
                 }
             }, 200);

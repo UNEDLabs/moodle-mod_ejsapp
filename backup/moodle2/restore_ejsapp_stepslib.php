@@ -66,6 +66,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
     /**
      * Process table ejsapp
      * @param stdClass $data
+     * @throws
      */
     protected function process_ejsapp($data) {
         global $DB, $CFG;
@@ -77,8 +78,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         // Insert the ejsapp record.
         $newitemid = $DB->insert_record('ejsapp', $data);
-
-        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
 
         // Copy files.
@@ -135,18 +134,10 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
                     unlink($filepath);
                 }
 
-                // Codebase.
-                $completecodebase = '';
-                preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $match);
-                if (!empty($match) and $match[1]) {
-                    $completecodebase .= '/' . $match[1];
-                }
-                $completecodebase .= $codebase;
-
                 // Update ejsapp table.
                 $record = new stdClass();
                 $record->id = $newitemid;
-                $record->codebase = $completecodebase;
+                $record->codebase = $codebase;
                 $DB->update_record('ejsapp', $record);
             }
         }
@@ -158,6 +149,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
     /**
      * Process table ejsapp_personal_vars
      * @param stdClass $data
+     * @throws
      */
     protected function process_ejsapp_personal_vars($data) {
         global $DB;
@@ -170,6 +162,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
     /**
      * Process table ejsapp_log
      * @param stdClass $data
+     * @throws
      */
     protected function process_ejsapp_log($data) {
         global $DB;
@@ -182,6 +175,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
     /**
      * Process table process_remlab_manager_exp2prc
      * @param stdClass $data
+     * @throws
      */
     protected function process_remlab_manager_exp2prc($data) {
         global $DB;
@@ -194,6 +188,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
     /**
      * Process table ejsappbooking
      * @param stdClass $data
+     * @throws
      */
     protected function process_ejsappbooking($data) {
         global $DB;
@@ -210,6 +205,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
     /**
      * Process table process_ejsappbooking_usersaccess
      * @param stdClass $data
+     * @throws
      */
     protected function process_ejsappbooking_usersaccess($data) {
         global $DB;
@@ -224,6 +220,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
     /**
      * Process table process_ejsappbooking_remlab_access
      * @param stdClass $data
+     * @throws
      */
     protected function process_ejsappbooking_remlab_access($data) {
         global $DB;

@@ -35,28 +35,44 @@ require_once('../../config.php');
 global $DB;
 
 $key = required_param('key', PARAM_TEXT);
-$obj = "key=$key\n";
-// $obj->key = $key;
+$version = optional_param('version', 0, PARAM_FLOAT);
 
-$time = array(strtotime(date('Y-m-d H:i:s')) + 180); // At least three minutes margin for working with the lab.
+if ($version < 8) {
+    $obj = "key=$key\n";
+} else {
+    $obj = new stdClass;
+    $obj->key = $key;
+}
+
+$time = array(strtotime(date('Y-m-d H:i:s')) + 120); // At least two minutes margin for working with the lab.
 
 if ($record = $DB->get_records_select('block_remlab_manager_sb_keys',
     'sarlabpass = ? AND expirationtime > ?', array($key, $time))) {
     // Delete the key so it can't be used later again.
     $DB->delete_records('block_remlab_manager_sb_keys', array('sarlabpass' => $key));
     // Check permissions, expiration time, and grant access.
-    $permissions = "labmanager=false\n";
+    $permissions = "false";
     if (reset($record)->labmanager == 1) {
-        $permissions = "labmanager=true\n";
+        $permissions = "true";
     }
-    $expirationtime = "expiration_time=" . floor((reset($record)->expirationtime - time()) / 60) . "\n";
-    $obj .= "access=true\n".$permissions.$expirationtime;
-    /*$obj->access = "true";
-    $obj->lab_manager = $permissions;
-    $obj->expiration_time = $expiration_time;*/
+    $expirationtime = floor((reset($record)->expirationtime - time()) / 60); // This reduces available lab time in up to 59 seconds.
+    if ($version < 8) {
+        $obj .= "access=true\n" . "labmanager=$permissions\n" . "expiration_time=$expirationtime\n";
+    } else {
+        $obj->access = true;
+        $obj->lab_manager = ($permissions === "true");
+        $obj->expiration_time = $expirationtime;
+    }
 } else {
-    $obj .= "access=false\n";
-} //$obj->access = "false";
+    if ($version < 8) {
+        $obj .= "access=false\n";
+    } else {
+        $obj->access = false;
+    }
+}
 
-echo $obj;
-// echo json_encode($obj);
+if ($version < 8) {
+    echo $obj;
+} else {
+    echo json_encode($obj);
+}

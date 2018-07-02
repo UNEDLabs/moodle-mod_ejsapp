@@ -51,11 +51,10 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // Define each element separately.
 
         // Parameter 'course' is needed in $ejsapp to get ejsappbooking.
-        $ejsapp = new backup_nested_element('ejsapp', array('id'), array(
-            'course', 'name', 'intro', 'introformat', 'appwording', 'appwordingformat', 'css', 'timecreated',
-            'timemodified', 'applet_name', 'class_file', 'codebase',
-            'mainframe', 'is_collaborative', 'applet_size_conf', 'preserve_aspect_ratio',
-            'custom_width', 'custom_height', 'is_rem_lab', 'height', 'width', 'personalvars', 'blockly_conf'));
+        $ejsapp = new backup_nested_element('ejsapp', array('id'),
+            array('course', 'name', 'intro', 'introformat', 'appwording', 'appwordingformat', 'css', 'timecreated',
+            'timemodified', 'applet_name', 'class_file', 'codebase', 'mainframe', 'is_collaborative', 'is_rem_lab',
+            'personalvars', 'blockly_conf', 'record', 'mouseevents'));
 
         $personalvars = new backup_nested_element('ejsapp_personal_vars', array('id'),
             array('name', 'type', 'minval', 'maxval'));
@@ -65,8 +64,8 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         // Remote labs configuration.
         $exp2practs = new backup_nested_element('remlab_manager_exp2practs');
-        $exp2prc = new backup_nested_element('block_remlab_manager_exp2prc',
-            array('id'), array('ejsappid', 'practiceid', 'practiceintro'));
+        $exp2prc = new backup_nested_element('block_remlab_manager_exp2prc', array('id'),
+            array('practiceid', 'practiceintro'));
 
         // Booking.
         $ejsappbookings = new backup_nested_element('ejsappbookings');
@@ -74,12 +73,12 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             array('course', 'name', 'intro', 'introformat', 'timecreated', 'timemodified'));
 
         $remlabaccesses = new backup_nested_element('ejsappbooking_remlab_accesses');
-        $remlabaccess = new backup_nested_element('ejsappbooking_remlab_access',
-            array('id'), array('username', 'practiceid', 'starttime', 'endtime', 'valid'));
+        $remlabaccess = new backup_nested_element('ejsappbooking_remlab_access', array('id'),
+            array('username', 'practiceid', 'starttime', 'endtime', 'valid'));
 
         $usersaccesses = new backup_nested_element('ejsappbooking_usersaccesses');
-        $usersaccess = new backup_nested_element('ejsappbooking_usersaccess',
-            array('id'), array('bookingid', 'userid', 'allowremaccess'));
+        $usersaccess = new backup_nested_element('ejsappbooking_usersaccess', array('id'),
+            array('bookingid', 'userid', 'allowremaccess'));
 
         // Build the tree.
         $ejsapp->add_child($personalvars);
@@ -102,8 +101,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         // Remote labs.
         $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
-        $remlabmanager = !empty($remlabmanager);
-        if ($remlabmanager) {
+        if (!empty($remlabmanager)) {
             $exp2prc->set_source_table('block_remlab_manager_exp2prc', array('ejsappid'  => '../../id'));
         }
 
@@ -125,6 +123,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         $ejsapp->annotate_files('mod_ejsapp', 'tmp_jarfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'xmlfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'recfiles', null);
+        $ejsapp->annotate_files('mod_ejsapp', 'blkfiles', null);
 
         // Return the root element (ejsapp), wrapped into standard activity structure.
         return $this->prepare_activity_structure($ejsapp);
