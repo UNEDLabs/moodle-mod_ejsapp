@@ -249,7 +249,6 @@ function delete_recursively($dir) {
     return false;
 }
 
-
 /**
  * Creates the list of all Sarlab experiences. If a username is provided, it only returns those practices accessible by
  * this particular user.
@@ -321,7 +320,6 @@ function get_experiences_sarlab($sarlabips, $username = "") {
     return $listexperiences;
 }
 
-
 /**
  * Gets the local experiences (defined without sarlab) and combines them with those in Sarlab in a unique, ordered list.
  *
@@ -357,7 +355,6 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
     return $combinedexperiences;
 }
 
-
 /**
  * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
  *
@@ -379,7 +376,6 @@ function get_showable_experiences($username = "") {
     return $showableexperiences;
 }
 
-
 /**
  * Modifies links to libraries and images used by the EjsS javascript applications.
  *
@@ -391,7 +387,8 @@ function get_showable_experiences($username = "") {
  *
  */
 function update_links($codebase, $ejsapp, $code, $usecss) {
-    global $CFG; // TODO: Create javascript functions in EjsS and call them here to do all these replacements
+    global $CFG;
+    // TODO: Create javascript functions in EjsS and call them here to do all these replacements
 
     $path = $CFG->wwwroot . $codebase;
     $explodedname = explode("_Simulation", $ejsapp->applet_name);
@@ -493,7 +490,6 @@ function personalize_vars($ejsapp, $user, $shuffle) {
     return $personalvarsinfo;
 }
 
-
 /**
  * Generates the values of the personalized variables in a particular EJS application for all the users in the course
  * that ejsapp activity is.
@@ -518,7 +514,6 @@ function users_personalized_vars($ejsapp) {
 
     return $userspersonalvarsinfo;
 }
-
 
 /**
  * For EjsS java applications.
@@ -941,8 +936,8 @@ function default_rem_lab_conf($practice, $username = "") {
  * Checks whether a user-accessible practice is defined in an operative Sarlab server and returns the Sarlab instance if
  * it is or false if it is not.
  *
- * @param array $sarlabips
  * @param string $practice
+ * @param string $username
  * @return false|int $sarlabinstance
  * @throws
  *
@@ -1093,7 +1088,7 @@ function check_booking_system($ejsapp) {
 }
 
 /**
- * Checks if there is an active booking made by the current user and gets the information needed by sarlab
+ * Checks if there is an active booking made by the current user for the remote lab and gets information needed by sarlab
  *
  * @param object $DB
  * @param object $USER
@@ -1103,11 +1098,11 @@ function check_booking_system($ejsapp) {
  * @param int $labmanager
  * @param int $maxusetime
  * param int $maxusetime
- * @return stdClass $sarlabinfo
+ * @return stdClass $remlabinfo
  *
  */
 function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance, $labmanager, $maxusetime) {
-    $sarlabinfo = null;
+    $remlabinfo = null;
 
     if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id,
         'valid' => 1))) {
@@ -1120,13 +1115,13 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance,
                 $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id,
                     'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;
-                $sarlabinfo = define_sarlab($sarlabinstance, 0, $practice, $labmanager, $maxusetime);
+                $remlabinfo = define_remlab($sarlabinstance, 0, $practice, $labmanager, $maxusetime);
                 break;
             }
         }
     }
 
-    return $sarlabinfo;
+    return $remlabinfo;
 }
 
 /**
@@ -1136,7 +1131,7 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance,
  * @param object $DB
  * @param string $username
  * @param int $ejsappid
- * @return boolean $active_booking
+ * @return string $endtime
  *
  */
 function check_last_valid_booking($DB, $username, $ejsappid) {
@@ -1176,15 +1171,15 @@ function check_last_valid_booking($DB, $username, $ejsappid) {
  *
  * @param object $DB
  * @param stdClass $ejsapp
- * @param string $currenttime
  * @return string $username
  *
  */
-function check_anyones_booking($DB, $ejsapp, $currenttime) {
+function check_anyones_booking($DB, $ejsapp) {
     $username = '';
 
     if ($DB->record_exists('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id, 'valid' => 1))) {
         $bookings = $DB->get_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id, 'valid' => 1));
+        $currenttime = date('Y-m-d H:i:s');
         foreach ($bookings as $booking) { // If the user has an active booking, use that info.
             if ($currenttime >= $booking->starttime && $currenttime < $booking->endtime) {
                 $username = $booking->username;
@@ -1198,15 +1193,12 @@ function check_anyones_booking($DB, $ejsapp, $currenttime) {
 /**
  * Gets information about the first and last access a user made to the remote lab and the allowed maximum time of use.
  *
- * @param stdClass $repeatedlabs
- * @param array $slotsduration
- * @param int $currenttime
- * @param int $maxusetime
- * @return array $timeinfo
+ * @param array $repeatedlabs
+ * @return stdClass $timeinfo
  * @throws
  *
  */
-function get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $currenttime, $maxusetime) {
+function remote_lab_use_time_info($repeatedlabs) {
     global $DB, $USER;
 
     $timefirstaccess = 0;
@@ -1241,16 +1233,18 @@ function get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $cu
             }
             $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
                 array('ejsappid' => $repeatedlab->id));
+            $slotsdurationconf = $DB->get_field('block_remlab_manager_conf',
+                'slotsduration', array('practiceintro' => $practiceintro));
+            if ($slotsdurationconf > 4) {
+                $slotsdurationconf = 0;
+            }
+            $maxslots = $DB->get_field('block_remlab_manager_conf',
+                'dailyslots', array('practiceintro' => $practiceintro));
+            $slotsduration = array(60, 30, 15, 5, 2);
+            $currenttime =  time();
             foreach ($viewedlogs as $viewedlog) {
                 if ($viewedlog->userid != $USER->id) {
                     if ($viewedlog->userid == $userid) { // Accesses of the user that is currently working with the rem lab.
-                        $slotsdurationconf = $DB->get_field('block_remlab_manager_conf',
-                            'slotsduration', array('practiceintro' => $practiceintro));
-                        if ($slotsdurationconf > 4) {
-                            $slotsdurationconf = 0;
-                        }
-                        $maxslots = $DB->get_field('block_remlab_manager_conf',
-                            'dailyslots', array('practiceintro' => $practiceintro));
                         $maxusetime = $maxslots * 60 * $slotsduration[$slotsdurationconf];
                         if (isset($workinglog->timecreated)) {
                             $timecreated = $workinglog->timecreated;
@@ -1263,15 +1257,17 @@ function get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $cu
                         }
                     }
                 }
+
             }
         }
     }
     if ($timefirstaccess == 0) {
         $timefirstaccess = INF;
     }
-    $timeinfo['time_first_access'] = $timefirstaccess;
-    $timeinfo['time_last_access'] = $timelastaccess;
-    $timeinfo['occupied_ejsapp_max_use_time'] = $maxusetime;
+    $timeinfo = new stdClass;
+    $timeinfo->time_first_access = $timefirstaccess;
+    $timeinfo->time_last_access = $timelastaccess;
+    $timeinfo->max_use_time = $maxusetime;
 
     return $timeinfo;
 }
@@ -1279,7 +1275,7 @@ function get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $cu
 /**
  * Checks whether a remote lab is available, in use or rebooting.
  *
- * @param array $timeinfo
+ * @param stdClass $timeinfo
  * @param int $idletime
  * @param int $checkactivity
  * @return string $status
@@ -1287,11 +1283,10 @@ function get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $cu
  */
 function get_lab_status($timeinfo, $idletime, $checkactivity) {
     $status = 'in_use';
-    $currenttime = time();
-    if ($currenttime - $timeinfo['time_last_access'] - 60 * $idletime - $checkactivity > 0) {
+    if (time() - $timeinfo->time_last_access - 60 * $idletime - $checkactivity > 0) {
         // We need -$checkactivity because the last 'working' log doesn't get recorded.
         $status = 'available';
-    } else if ($currenttime - $timeinfo['time_last_access'] - $checkactivity > 0) {
+    } else if (time() - $timeinfo->time_last_access - $checkactivity > 0) {
         // We need -$checkactivity because the last 'working' log doesn't get recorded.
         $status = 'rebooting';
     }
@@ -1302,8 +1297,8 @@ function get_lab_status($timeinfo, $idletime, $checkactivity) {
  * Gets the remaining time till the lab is available again.
  *
  * @param array $bookinginfo
- * @param array $status
- * @param array $timeinfo
+ * @param string $status
+ * @param stdClass $timeinfo
  * @param int $idletime
  * @param int $checkactivity
  * @return string $remainingtime
@@ -1319,23 +1314,22 @@ function get_remaining_time($bookinginfo, $status, $timeinfo, $idletime, $checka
             $endingtime = strtotime($endingtime);
             $remainingtime = 60 * $idletime + $endingtime - $currenttime;
         } else { // In use.
-            if ($timeinfo['time_first_access'] == INF) {
-                $timeinfo['time_first_access'] = time();
+            if ($timeinfo->time_first_access == INF) {
+                $timeinfo->time_first_access = time();
             }
-            $remainingtime = 60 * $idletime + $timeinfo['occupied_ejsapp_max_use_time']
-                - ($currenttime - $timeinfo['time_first_access']);
+            $remainingtime = 60 * $idletime + $timeinfo->max_use_time
+                - ($currenttime - $timeinfo->time_first_access);
         }
     } else {
         if ($status == 'available') {
             $remainingtime = 0;
         } else if ($status == 'rebooting') {
-            $remainingtime = 60 * $idletime + $checkactivity - ($currenttime - $timeinfo['time_last_access']);
+            $remainingtime = 60 * $idletime + $checkactivity - ($currenttime - $timeinfo->time_last_access);
         } else { // In use.
-            if ($timeinfo['time_first_access'] == INF) {
-                $timeinfo['time_first_access'] = time();
+            if ($timeinfo->time_first_access == INF) {
+                $timeinfo->time_first_access = time();
             }
-            $remainingtime = 60 * $idletime + $timeinfo['occupied_ejsapp_max_use_time']
-                - ($currenttime - $timeinfo['time_first_access']);
+            $remainingtime = $timeinfo->time_first_access + $timeinfo->max_use_time - $currenttime - 60 * $idletime;
         }
     }
 
@@ -1402,7 +1396,7 @@ function check_active_booking($repeatedlabs, $courseid) {
         if (count($repeatedlabswithbs) > 0) {
             foreach ($repeatedlabswithbs as $repeatedlabwithbs) {
                 if ($repeatedlabwithbs->course != $courseid) {
-                    $bookinfo['username_with_booking'] = check_anyones_booking($DB, $repeatedlabwithbs, date('Y-m-d H:i:s'));
+                    $bookinfo['username_with_booking'] = check_anyones_booking($DB, $repeatedlabwithbs);
                     if (!empty($bookinfo['username_with_booking'])) {
                         $bookinfo['active_booking'] = true;
                         $bookinfo['ejsappid'] = $repeatedlabwithbs->id;
@@ -1468,53 +1462,25 @@ function remote_lab_access_info($ejsapp, $course) {
 }
 
 /**
- * Returns some the time use information regarding a particular remote lab.
- *
- * @param stdClass $remlabconf
- * @param stdClass $repeatedlabs
- * @return stdClass $remlabtimeinfo
- *
- */
-function remote_lab_use_time_info($remlabconf, $repeatedlabs) {
-    $remlabtimeinfo = new stdClass;
-
-    // Getting the maximum time the user is allowed to use the remote lab.
-    $maxslots = $remlabconf->dailyslots;
-    $slotsdurationconf = $remlabconf->slotsduration;
-    if ($slotsdurationconf > 4) {
-        $slotsdurationconf = 4;
-    }
-    $slotsduration = array(60, 30, 15, 5, 2);
-    $maxusetime = $maxslots * 60 * $slotsduration[$slotsdurationconf]; // In seconds.
-    $remlabtimeinfo->max_use_time = $maxusetime;
-
-    // Search past accesses to this ejsapp lab or to the same remote lab added as a different ejsapp activity in this or
-    // any other course.
-    $remlabtimeinfo->time_information = get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, time(), $maxusetime);
-
-    return $remlabtimeinfo;
-}
-
-/**
- * Defines a new sarlab object with all the needed information
+ * Defines a new remlab object with all the needed information
  *
  * @param false|int $instance sarlab instance
  * @param boolean $collab false if not a collab session, true if collaborative
  * @param string $practice the practice identifier in sarlab
  * @param int $labmanager whether the user is a laboratory manager or not
  * @param int $maxusetime maximum time for using the remote lab
- * @return stdClass $sarlabinfo
+ * @return stdClass $remlabinfo
  *
  */
-function define_sarlab($instance, $collab, $practice, $labmanager, $maxusetime) {
-    $sarlabinfo = new stdClass();
-    $sarlabinfo->instance = $instance;
-    $sarlabinfo->collab = $collab;
-    $sarlabinfo->practice = $practice;
-    $sarlabinfo->labmanager = $labmanager;
-    $sarlabinfo->max_use_time = $maxusetime;
+function define_remlab($instance, $collab, $practice, $labmanager, $maxusetime) {
+    $remlabinfo = new stdClass();
+    $remlabinfo->instance = $instance;
+    $remlabinfo->collab = $collab;
+    $remlabinfo->practice = $practice;
+    $remlabinfo->labmanager = $labmanager;
+    $remlabinfo->max_use_time = $maxusetime;
 
-    return $sarlabinfo;
+    return $remlabinfo;
 }
 
 /**

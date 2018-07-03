@@ -47,16 +47,14 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/countdown.php');
 
 if ($remainingtime > 0) {
-    $slotsduration = array(60, 30, 15, 5, 2);
     $currenttime = time();
     $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
     $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsappid));
     $remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
     $idletime = $remlabconf->reboottime;
     $repeatedlabs = get_repeated_remlabs($remlabconf);
-    $timeinfo = get_occupied_ejsapp_time_information($repeatedlabs, $slotsduration, $currenttime);
+    $timeinfo = get_occupied_ejsapp_time_information($repeatedlabs);
     $labstatus = get_lab_status($timeinfo, $idletime, $check);
-    $repeatedlabs = get_repeated_remlabs($remlabconf);
     $bookinginfo = check_active_booking($repeatedlabs, $courseid);
     $remainingtime = get_remaining_time($bookinginfo, $labstatus, $timeinfo, $idletime, $check);
     echo $remainingtime . ' ' . get_string('seconds', 'ejsapp');

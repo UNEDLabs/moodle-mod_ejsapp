@@ -47,14 +47,14 @@ defined('MOODLE_INTERNAL') || die();
  *      4) when third party plugins want to display EjsS labs in their own activities by means of the EJSApp external interface
  *
  * @param stdClass $ejsapp record from table ejsapp
- * @param stdClass|null $sarlabinfo
- *                                  $sarlabinfo->instance: false|int sarlab id,
- *                                  $sarlabinfo->practice: int practice id,
- *                                  $sarlabinfo->collab: int collab whether sarlab offers collab access to this remote
+ * @param stdClass|null $remlabinfo
+ *                                  $remlabinfo->instance: false|int sarlab id,
+ *                                  $remlabinfo->practice: int practice id,
+ *                                  $remlabinfo->collab: int collab whether sarlab offers collab access to this remote
  *                                      lab (1) or not (0),
- *                                  $sarlabinfo->labmanager: int laboratory manager (1) or student (0)
- *                                  $sarlabinfo->max_use_time: int maximum time the remote lab can be connected (in seconds)
- *                                      Null if sarlab is not used
+ *                                  $remlabinfo->labmanager: int laboratory manager (1) or student (0)
+ *                                  $remlabinfo->max_use_time: int maximum time the remote lab can be connected (in seconds)
+ *                                  Null if virtual lab
  * @param array|null $userdatafiles
  *                                  $userdatafiles[0]: user_state_file, if generate_embedding_code is called from
  *                                      block ejsapp_file_browser, this is the name of the .json file that stores
@@ -82,7 +82,7 @@ defined('MOODLE_INTERNAL') || die();
  * @throws
  *
  */
-function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
+function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
     global $DB, $USER, $CFG, $COURSE;
 
     /**
@@ -140,45 +140,46 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
 
     // Sarlab is used to access this remote lab or to establish communication between users participating in a
     // collaborative session.
-    if ($sarlabinfo || isset($collabinfo->sarlabport)) {
-        $time = time();
-        $min = date("i", $time);
-        $seg = date("s", $time);
-        mt_srand(time());
-        $random = mt_rand(0, 1000000);
-        if ($sarlabinfo) {
-            $sarlabkey = sha1($min . $seg . $sarlabinfo->practice . fullname($USER) . $USER->username . $random);
-        } else {
-            $sarlabkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
-        }
-
-        $newsarlabkey = new stdClass();
-        $newsarlabkey->user = $USER->username;
-        $newsarlabkey->sarlabpass = $sarlabkey;
-        $newsarlabkey->labmanager = $sarlabinfo->labmanager;
-        $newsarlabkey->creationtime = $time;
-        $newsarlabkey->expirationtime = $time + $sarlabinfo->max_use_time;
-
-        $DB->insert_record('block_remlab_manager_sb_keys', $newsarlabkey);
-
-        if ($sarlabinfo) {
-            $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-            $sarlabip = $listsarlabips[$sarlabinfo->instance];
-            $initpos = strpos($sarlabip, "'");
-            $endpos = strrpos($sarlabip, "'");
-            if (!(($initpos === false) || ($initpos === $endpos)) ) {
-                $sarlabip = substr($sarlabip, $endpos + 1);
+    if ($remlabinfo) {
+        if ($remlabinfo->instance !== false || isset($collabinfo->sarlabport)) {
+            $time = time();
+            $min = date("i", $time);
+            $seg = date("s", $time);
+            mt_srand(time());
+            $random = mt_rand(0, 1000000);
+            if ($remlabinfo) {
+                $sarlabkey = sha1($min . $seg . $remlabinfo->practice . fullname($USER) . $USER->username . $random);
+            } else {
+                $sarlabkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
             }
-            $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
-            $sarlabport = $listsarlabports[$sarlabinfo->instance];
-        } else {
-            $sarlabip = $collabinfo->ip;
-            $sarlabport = $collabinfo->sarlabport;
+
+            $newsarlabkey = new stdClass();
+            $newsarlabkey->user = $USER->username;
+            $newsarlabkey->sarlabpass = $sarlabkey;
+            $newsarlabkey->labmanager = $remlabinfo->labmanager;
+            $newsarlabkey->creationtime = $time;
+            $newsarlabkey->expirationtime = $time + $remlabinfo->max_use_time;
+
+            $DB->insert_record('block_remlab_manager_sb_keys', $newsarlabkey);
+
+            if ($remlabinfo->instance !== false) {
+                $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+                $sarlabip = $listsarlabips[$remlabinfo->instance];
+                $initpos = strpos($sarlabip, "'");
+                $endpos = strrpos($sarlabip, "'");
+                if (!(($initpos === false) || ($initpos === $endpos))) {
+                    $sarlabip = substr($sarlabip, $endpos + 1);
+                }
+                $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
+                $sarlabport = $listsarlabports[$remlabinfo->instance];
+            } else {
+                $sarlabip = $collabinfo->ip;
+                $sarlabport = $collabinfo->sarlabport;
+            }
+
+            $commandsarlab = 'sarlab';
+            $jarpath = '';
         }
-
-        $commandsarlab = 'sarlab';
-        $jarpath = '';
-
     }
 
     $context = context_user::instance($USER->id);
@@ -213,12 +214,12 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
         }
 
         // For remote labs and collaborative sessions only
-        if ($ejsapp->is_rem_lab || $collabinfo) {
-            if ($sarlabinfo) { // For remote labs accessed through Sarlab, pass authentication params to the app.
+        if (($ejsapp->is_rem_lab || $collabinfo) && $remlabinfo) {
+            if ($remlabinfo->instance !== false ) { // For remote labs accessed through Sarlab, pass authentication params to the app.
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
                     array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
-                    array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $sarlabinfo->practice, $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
+                    array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $remlabinfo->practice, $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
             }
             // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
             $sseuri = '';
@@ -306,16 +307,17 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
 
         $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $ejsappname = $ejsapp->applet_name;
-        if (!$sarlabinfo) { // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
-            if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
-                $ejsappname = substr($ejsapp->applet_name, 0, -4);
-            }
+        if ($remlabinfo) {
+            if (!$remlabinfo->instance === false) { // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
+                if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
+                    $ejsappname = substr($ejsapp->applet_name, 0, -4);
+                }
 
-            $wwwpath = new moodle_url($ejsapp->codebase);
-            $mainclass = substr($ejsapp->class_file, 0, -12);
+                $wwwpath = new moodle_url($ejsapp->codebase);
+                $mainclass = substr($ejsapp->class_file, 0, -12);
 
-            // Create the JNLP file.
-            $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+                // Create the JNLP file.
+                $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
                         <jnlp spec=\"1.0+\"
                             codebase=\"$wwwpath\"
                             href=\"$ejsappname.jnlp\">
@@ -345,52 +347,39 @@ function generate_embedding_code($ejsapp, $sarlabinfo, $userdatafiles, $collabin
                                 <argument>-password_moodle</argument>
                                 <argument>password</argument>
                                 <argument>-moodle_upload_file</argument>
-                                <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file</argument>";
-            if ($sarlabinfo) {
-                $content .= "<argument>-ipserver</argument>
-                                <argument>$sarlabip</argument>
-                                <argument>-portserver</argument>
-                                <argument>$sarlabport</argument>
-                                <argument>-idExp</argument>
-                                <argument>$sarlabinfo->practice</argument>
-                                <argument>-user</argument>
-                                <argument>{$USER->username}@{$CFG->wwwroot}</argument>
-                                <argument>-passwd</argument>
-                                <argument>$sarlabkey</argument>
-                                <argument>-max_time</argument>
-                                <argument>$sarlabinfo->max_use_time</argument>";
-            }
-            $content .= "</application-desc>
+                                <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file</argument>
+                            </application-desc>
                             <security>
                                 <all-permissions/>
                             </security>
                             <update check=\"background\"/>
                         </jnlp>";
 
-            $jnlp = fopen($dirpath . $ejsappname . '.jnlp', 'w');
-            fwrite($jnlp, $content);
-            fclose($jnlp);
+                $jnlp = fopen($dirpath . $ejsappname . '.jnlp', 'w');
+                fwrite($jnlp, $content);
+                fclose($jnlp);
 
-            // Run or download JNLP.
-            $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
-            <script src=\"https://www.java.com/js/deployJava.js\"></script>
-            <script>
-                var url = '$wwwpath$ejsappname.jnlp';
-                var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                if (is_chrome) document.getElementById('EJsS').src = url;
-                else deployJava.launchWebStartApplication(url);
-            </script>";
-        } else {
-            $code = '';
-            $commandsarlab = 'execjar';
-            $jarpath = $CFG->wwwroot. '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $ejsappname;
-            // Launching the websocket service for Sarlab.
-            global $PAGE;
-            $username = $USER->username . "@" . $CFG->wwwroot;
-            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                array($commandsarlab, $sarlabip, $sarlabport, $sarlabinfo->practice,
-                    $sarlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
-            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
+                // Run or download JNLP.
+                $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
+                        <script src=\"https://www.java.com/js/deployJava.js\"></script>
+                        <script>
+                            var url = '$wwwpath$ejsappname.jnlp';
+                            var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                            if (is_chrome) document.getElementById('EJsS').src = url;
+                            else deployJava.launchWebStartApplication(url);
+                        </script>";
+            } else {
+                $code = '';
+                $commandsarlab = 'execjar';
+                $jarpath = $CFG->wwwroot. '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $ejsappname;
+                // Launching the websocket service for Sarlab.
+                global $PAGE;
+                $username = $USER->username . "@" . $CFG->wwwroot;
+                $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
+                    array($commandsarlab, $sarlabip, $sarlabport, $remlabinfo->practice,
+                        $remlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
+                $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
+            }
         }
 
     }

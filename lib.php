@@ -421,11 +421,12 @@ function ejsapp_cron() {
     $DB->delete_records_select('block_remlab_manager_sb_keys', "creationtime < ?", $time);
 
     // Checking whether remote labs are operative or not (once per day).
-    if (date('H') >= 8) {
+    if (date('H') >= 8 && date('H') <= 12) {
         $remlabsconf = $DB->get_records('block_remlab_manager_conf');
         foreach ($remlabsconf as $remlabconf) {
             $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);
             $devicesinfo = new stdClass();
+            // TODO: Do the ping with Sarlab in between too!
             $labstate = ping($remlabconf->ip, $remlabconf->port, $sarlabinstance, $remlabconf->practiceintro);
             // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive.
             $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
