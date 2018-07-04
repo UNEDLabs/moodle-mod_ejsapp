@@ -1225,36 +1225,52 @@ function remote_lab_use_time_info($repeatedlabs) {
         $ids[] = $repeatedlab->id;
         $names[] = $repeatedlab->name;
     }
+    $currenttime = time();
 
     // Retrieve information from Moodle's or ejsapp's logging table.
     // TODO: Change queries when we stop resetting time when a user in a remote lab refreshes the page.
     if ($moodlelog) {
-        $select = 'component = :component AND action = :action AND userid <> :userid AND timecreated > :timecreated AND objectid ';
+        $select = 'component = :component AND action = :action AND timecreated > :timecreated AND objectid ';
         list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
         $select .= $sql;
-        $workingqueryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'userid' => $USER->id, 'timecreated' => time()-$maxusetime];
+        $workingqueryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $currenttime - $maxusetime];
         $workingqueryparams += $params;
         $timelastaccess = $DB->get_field_select('logstore_standard_log', 'MAX(timecreated)', $select, $workingqueryparams);
-        $viewedqueryparams = ['component' => 'mod_ejsapp', 'action' => 'viewed', 'userid' => $USER->id, 'timecreated' => time()-$maxusetime];
+        $viewedqueryparams = ['component' => 'mod_ejsapp', 'action' => 'viewed', 'timecreated' => $currenttime - $maxusetime];
         $viewedqueryparams += $params;
         $timefirstaccess = $DB->get_field_select('logstore_standard_log', 'MIN(timecreated)', $select, $viewedqueryparams);
+        //Get last user:
+        $select = 'component = :component AND action = :action AND timecreated = :timecreated AND objectid ';
+        list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        $select .= $sql;
+        $userqueryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $timelastaccess];
+        $userqueryparams += $params;
+        $lastuserid = $DB->get_field_select('logstore_standard_log', 'userid', $select, $userqueryparams);
     } else {
         if (isset($repeatedlab->name)) {
-            $select = 'action = :action AND userid <> :userid AND time > :time AND info ';
+            $select = 'action = :action AND time > :time AND info ';
             list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
             $select .= $sql;
-            $workingqueryparams = ['action' => 'working', 'userid' => $USER->id, 'time' => time()-$maxusetime];
+            $workingqueryparams = ['action' => 'working', 'time' => $currenttime - $maxusetime];
             $workingqueryparams += $params;
             $timelastaccess = $DB->get_field_select('ejsapp_log', 'MAX(time)', $select, $workingqueryparams);
-            $viewedqueryparams = ['action' => 'viewed', 'userid' => $USER->id, 'time' => time()-$maxusetime];
+            $viewedqueryparams = ['action' => 'viewed', 'time' => $currenttime - $maxusetime];
             $viewedqueryparams += $params;
             $timefirstaccess = $DB->get_field_select('ejsapp_log', 'MIN(time)', $select, $viewedqueryparams);
+            //Get last user:
+            $select = 'action = :action AND time = :time AND info ';
+            list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
+            $select .= $sql;
+            $userqueryparams = ['action' => 'working', 'time' => $timelastaccess];
+            $userqueryparams += $params;
+            $lastuserid = $DB->get_field_select('ejsapp_log', 'userid', $select, $userqueryparams);
         }
     }
 
     $timeinfo = new stdClass;
     $timeinfo->time_first_access = $timefirstaccess;
     $timeinfo->time_last_access = $timelastaccess;
+    $timeinfo->last_user_id = $lastuserid;
     $timeinfo->max_use_time = $maxusetime;
 
     return $timeinfo;
@@ -1270,11 +1286,13 @@ function remote_lab_use_time_info($repeatedlabs) {
  *
  */
 function get_lab_status($timeinfo, $idletime, $checkactivity) {
+    global $USER;
+
     $status = 'in_use';
     if (time() - $timeinfo->time_last_access - 60 * $idletime - $checkactivity > 0) {
         // We need -$checkactivity because the last 'working' log doesn't get recorded.
         $status = 'available';
-    } else if (time() - $timeinfo->time_last_access - $checkactivity > 0) {
+    } else if (time() - $timeinfo->time_last_access - $checkactivity > 0 || $timeinfo->last_user_id == $USER->id) {
         // We need -$checkactivity because the last 'working' log doesn't get recorded.
         $status = 'rebooting';
     }
