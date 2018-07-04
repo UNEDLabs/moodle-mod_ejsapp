@@ -215,8 +215,10 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 $action = 'collab_view';
             } else { // No access.
                 $userwithbooking = check_anyones_booking($DB, $ejsapp);
-                $endtime = check_last_valid_booking($DB, $userwithbooking, $ejsapp->id);
-                $remlabtime->max_use_time = strtotime($endtime) - time();
+                if ($userwithbooking !== '') {
+                    $endtime = check_last_valid_booking($DB, $userwithbooking, $ejsapp->id);
+                    $remlabtime->max_use_time = strtotime($endtime) - time();
+                }
                 echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
                 $action = 'need_to_wait';
             }

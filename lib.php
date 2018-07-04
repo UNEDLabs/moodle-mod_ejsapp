@@ -421,7 +421,7 @@ function ejsapp_cron() {
     $DB->delete_records_select('block_remlab_manager_sb_keys', "creationtime < ?", $time);
 
     // Checking whether remote labs are operative or not (once per day).
-    if (date('H') >= 8 && date('H') <= 12) {
+    if (date('H') >= 8 && date('H') < 10) {
         $remlabsconf = $DB->get_records('block_remlab_manager_conf');
         foreach ($remlabsconf as $remlabconf) {
             $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);

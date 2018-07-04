@@ -1201,69 +1201,57 @@ function check_anyones_booking($DB, $ejsapp) {
 function remote_lab_use_time_info($repeatedlabs) {
     global $DB, $USER;
 
-    $timefirstaccess = 0;
-    // TODO: Make $timefirstaccess INF when we stop resetting time when a user in a remote lab refreshes the page.
     $timelastaccess = 0;
-    foreach ($repeatedlabs as $repeatedlab) {
-        if (isset($repeatedlab->name)) {
-            // Retrieve information from ejsapp's logging table.
-            $dbman = $DB->get_manager();
-            if ($dbman->table_exists('logstore_standard_log')) {
-                $workinglogs = $DB->get_records('logstore_standard_log', array('component' => 'mod_ejsapp',
-                    'objectid' => $repeatedlab->id, 'action' => 'working'));
-                $viewedlogs = $DB->get_records('logstore_standard_log', array('component' => 'mod_ejsapp',
-                    'objectid' => $repeatedlab->id, 'action' => 'viewed'));
-            } else {
-                $workinglogs = $DB->get_records('ejsapp_log', array('info' => $repeatedlab->name, 'action' => 'working'));
-                $viewedlogs = $DB->get_records('ejsapp_log', array('info' => $repeatedlab->name, 'action' => 'working'));
-            }
-            $userid = $USER->id;
-            foreach ($workinglogs as $workinglog) {
-                if ($workinglog->userid != $USER->id) {
-                    if (isset($workinglog->timecreated)) {
-                        $timecreated = $workinglog->timecreated;
-                    } else {
-                        $timecreated = $workinglog->time;
-                    }
-                    if ($timecreated > $timelastaccess) {
-                        $timelastaccess = $workinglog->timecreated;
-                        $userid = $workinglog->userid;
-                    }
-                }
-            }
-            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
-                array('ejsappid' => $repeatedlab->id));
-            $slotsdurationconf = $DB->get_field('block_remlab_manager_conf',
-                'slotsduration', array('practiceintro' => $practiceintro));
-            if ($slotsdurationconf > 4) {
-                $slotsdurationconf = 0;
-            }
-            $maxslots = $DB->get_field('block_remlab_manager_conf',
-                'dailyslots', array('practiceintro' => $practiceintro));
-            $slotsduration = array(60, 30, 15, 5, 2);
-            $currenttime =  time();
-            foreach ($viewedlogs as $viewedlog) {
-                if ($viewedlog->userid != $USER->id) {
-                    if ($viewedlog->userid == $userid) { // Accesses of the user that is currently working with the rem lab.
-                        $maxusetime = $maxslots * 60 * $slotsduration[$slotsdurationconf];
-                        if (isset($workinglog->timecreated)) {
-                            $timecreated = $workinglog->timecreated;
-                        } else {
-                            $timecreated = $workinglog->time;
-                        }
-                        if ($timecreated > $currenttime - $maxusetime) {
-                            $timefirstaccess = max($timefirstaccess, $timecreated);
-                            // TODO: Change to min when we stop resetting time when a user in a remote lab refreshes the page.
-                        }
-                    }
-                }
+    $timefirstaccess = INF;
+    $dbman = $DB->get_manager();
+    $moodlelog = $dbman->table_exists('logstore_standard_log');
 
-            }
+    $repeatedlab = reset($repeatedlabs);
+    $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
+        array('ejsappid' => $repeatedlab->id));
+    $slotsdurationconf = $DB->get_field('block_remlab_manager_conf',
+        'slotsduration', array('practiceintro' => $practiceintro));
+    if ($slotsdurationconf > 4) {
+        $slotsdurationconf = 0;
+    }
+    $maxslots = $DB->get_field('block_remlab_manager_conf',
+        'dailyslots', array('practiceintro' => $practiceintro));
+    $slotsduration = array(60, 30, 15, 5, 2);
+    $maxusetime = $maxslots * 60 * $slotsduration[$slotsdurationconf];
+
+    $ids = array();
+    $names = array();
+    foreach ($repeatedlabs as $repeatedlab) {
+        $ids[] = $repeatedlab->id;
+        $names[] = $repeatedlab->name;
+    }
+
+    // Retrieve information from Moodle's or ejsapp's logging table.
+    // TODO: Change queries when we stop resetting time when a user in a remote lab refreshes the page.
+    if ($moodlelog) {
+        $select = 'component = :component AND action = :action AND userid <> :userid AND timecreated > :timecreated AND objectid ';
+        list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        $select .= $sql;
+        $workingqueryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'userid' => $USER->id, 'timecreated' => time()-$maxusetime];
+        $workingqueryparams += $params;
+        $timelastaccess = $DB->get_field_select('logstore_standard_log', 'MAX(timecreated)', $select, $workingqueryparams);
+        $viewedqueryparams = ['component' => 'mod_ejsapp', 'action' => 'viewed', 'userid' => $USER->id, 'timecreated' => time()-$maxusetime];
+        $viewedqueryparams += $params;
+        $timefirstaccess = $DB->get_field_select('logstore_standard_log', 'MIN(timecreated)', $select, $viewedqueryparams);
+    } else {
+        if (isset($repeatedlab->name)) {
+            $select = 'action = :action AND userid <> :userid AND time > :time AND info ';
+            list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
+            $select .= $sql;
+            $workingqueryparams = ['action' => 'working', 'userid' => $USER->id, 'time' => time()-$maxusetime];
+            $workingqueryparams += $params;
+            $timelastaccess = $DB->get_field_select('ejsapp_log', 'MAX(time)', $select, $workingqueryparams);
+            $viewedqueryparams = ['action' => 'viewed', 'userid' => $USER->id, 'time' => time()-$maxusetime];
+            $viewedqueryparams += $params;
+            $timefirstaccess = $DB->get_field_select('ejsapp_log', 'MIN(time)', $select, $viewedqueryparams);
         }
     }
-    if ($timefirstaccess == 0) {
-        $timefirstaccess = INF;
-    }
+
     $timeinfo = new stdClass;
     $timeinfo->time_first_access = $timefirstaccess;
     $timeinfo->time_last_access = $timelastaccess;
@@ -1317,19 +1305,18 @@ function get_remaining_time($bookinginfo, $status, $timeinfo, $idletime, $checka
             if ($timeinfo->time_first_access == INF) {
                 $timeinfo->time_first_access = time();
             }
-            $remainingtime = 60 * $idletime + $timeinfo->max_use_time
-                - ($currenttime - $timeinfo->time_first_access);
+            $remainingtime = $timeinfo->time_first_access + $timeinfo->max_use_time + 60 * $idletime - $currenttime;
         }
     } else {
         if ($status == 'available') {
             $remainingtime = 0;
         } else if ($status == 'rebooting') {
-            $remainingtime = 60 * $idletime + $checkactivity - ($currenttime - $timeinfo->time_last_access);
+            $remainingtime = $timeinfo->time_last_access + 60 * $idletime + $checkactivity - $currenttime;
         } else { // In use.
             if ($timeinfo->time_first_access == INF) {
                 $timeinfo->time_first_access = time();
             }
-            $remainingtime = $timeinfo->time_first_access + $timeinfo->max_use_time - $currenttime - 60 * $idletime;
+            $remainingtime = $timeinfo->time_first_access + $timeinfo->max_use_time + 60 * $idletime - $currenttime;
         }
     }
 
