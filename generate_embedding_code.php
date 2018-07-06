@@ -223,8 +223,9 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         if (($ejsapp->is_rem_lab || $collabinfo) && $remlabinfo) {
             if ($remlabinfo->instance !== false ) { // For remote labs accessed through Sarlab, pass authentication params to the app.
                 $practice = explode("@", $remlabinfo->practice, 2);
+                // TODO: Replace $USER->username by $USER->id and $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
-                    array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')
+                    array($USER->username . "@" . $CFG->wwwroot, $sarlabkey));
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
                     array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $practice[0], $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
             }
@@ -277,7 +278,7 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         }
         // End of loading blockly program files.
 
-        // Init of loading personalized variables. TODO: call webUserInput from Javascript with ejss_interactions
+        // Init of loading personalized variables.
         $search = ',"webUserInput"';
         if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value) && isset($personalvarsinfo->type)) {
             $personalizevarscode = "'{";
@@ -295,12 +296,6 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         $code = str_replace($search, $replace, $code);
         // End of loading personalized variables.
         // End of loading state, interaction and blockly programs files as well as personalized variables.
-
-        // End message when the recording of the user interaction stops. TODO: do it from Javascript with ejss_interactions
-        $endmessage = get_string('end_message', 'ejsapp');
-        $search = "window.alert(end_reproduction_message);";
-        $replace = "window.alert(\"$endmessage\");";
-        $code = str_replace($search, $replace, $code);
 
         // Embedding the js code in the html file in case there is a separated js file.
         if ($separatedjs) {

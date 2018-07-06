@@ -428,18 +428,15 @@ function ejsapp_cron() {
             $devicesinfo = new stdClass();
             // TODO: Do the ping with Sarlab in between too!
             $labstate = ping($remlabconf->ip, $remlabconf->port, $sarlabinstance, $remlabconf->practiceintro);
-            // Send e-mail to teachers if the remote lab state is not checkable or if it has passed from active to inactive.
-            $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
-            // TODO: Allow configuring which roles receive the e-mails? (managers, non-editing teacher...) Use Moodle capabilities.
             $remlabs = get_repeated_remlabs($remlabconf);
             foreach ($remlabs as $remlab) {
-                // $remlab = $DB->get_record('ejsapp', array('id' => $remlabconf->ejsappid));
                 $context = context_course::instance($remlab->course);
                 $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
                 $sendmail = false;
                 // Prepare e-mails' content and update lab state when checkable.
                 $subject = '';
                 $messagebody = '';
+                // E-mails are sent only if the remote lab state is not checkable or if it has passed from active to inactive
                 if ($labstate == 2) {  // Not checkable.
                     $subject = get_string('mail_subject_lab_not_checkable', 'ejsapp');
                     $messagebody = get_string('mail_content1_lab_not_checkable', 'ejsapp') .
@@ -447,7 +444,7 @@ function ejsapp_cron() {
                         get_string('mail_content2_lab_not_checkable', 'ejsapp') . $remlabconf->ip .
                         get_string('mail_content3_lab_not_checkable', 'ejsapp');
                     $sendmail = true;
-                } else {                // Active or inactive.
+                } else {               // Active or inactive.
                     if ($remlabconf->active == 1 && $labstate == 0) {  // Lab has passed from active to inactive.
                         $subject = get_string('mail_subject_lab_down', 'ejsapp');
                         $messagebody = get_string('mail_content1_lab_down', 'ejsapp') .
@@ -472,7 +469,9 @@ function ejsapp_cron() {
                     $remlabconf->active = $labstate;
                     $DB->update_record('block_remlab_manager_conf', $remlabconf);
                 }
-                // Send e-mails.
+                // Send e-mails to teachers if conditions are met.
+                $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+                // TODO: Allow configuring which roles receive the e-mails? (managers, non-editing teacher...) Use Moodle capabilities.
                 if ($sendmail) {
                     $teachers = get_role_users($role->id, $context);
                     foreach ($teachers as $teacher) {

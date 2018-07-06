@@ -256,26 +256,20 @@ function delete_recursively($dir) {
  */
 function update_links($codebase, $ejsapp, $code, $usecss) {
     global $CFG;
-    // TODO: Create javascript functions in EjsS and call them here to do all these replacements
 
     $path = $CFG->wwwroot . $codebase;
-    $explodedname = explode("_Simulation", $ejsapp->applet_name);
 
-    // In case it exists, change the content of the separated .js file to make it work.
+    // Replace links for images and stuff and insert a placeholder for future purposes.
     // TODO: Do it for all languages .js files.
     $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
     $filepath = $CFG->dirroot . $codebase . $filename . '.js';
+    $search = '("_topFrame","_ejs_library/",null);';
+    $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
     if (file_exists($filepath)) { // Javascript code included in a separated .js file.
-        // Replace links for images and stuff and insert a placeholder for future purposes.
         $jscode = file_get_contents($filepath);
-        $search = '("_topFrame","_ejs_library/",null);';
-        $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
         $jscode = str_replace($search, $replace, $jscode);
         file_put_contents($filepath, $jscode);
     } else { // If the .js file does not exists, then this part is inside the $code variable.
-        // Replace links for images and stuff and insert a placeholder for future purposes.
-        $search = '("_topFrame","_ejs_library/",null);';
-        $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
         $code = str_replace($search, $replace, $code);
     }
 
