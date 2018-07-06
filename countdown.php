@@ -53,7 +53,7 @@ if ($remainingtime > 0) {
     $remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
     $idletime = $remlabconf->reboottime;
     $repeatedlabs = get_repeated_remlabs($remlabconf);
-    $timeinfo = get_occupied_ejsapp_time_information($repeatedlabs);
+    $timeinfo = remote_lab_use_time_info($repeatedlabs);
     $labstatus = get_lab_status($timeinfo, $idletime, $check);
     $bookinginfo = check_active_booking($repeatedlabs, $courseid);
     $remainingtime = get_remaining_time($bookinginfo, $labstatus, $timeinfo, $idletime, $check);

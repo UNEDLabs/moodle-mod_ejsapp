@@ -58,7 +58,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     if ($ejsapp->statefile) {
         file_save_draft_area_files($ejsapp->statefile, $context->id, 'mod_ejsapp', 'xmlfiles',
             $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1,
-                'accepted_types' => 'application/xml'));
+                'accepted_types' => array('text/xml', 'application/xml', 'application/json')));
     }
 
     // Creating the recording file in dataroot and updating the files table in the database.
@@ -134,11 +134,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $file->copy_content_to($filepath);
 
     // Codebase.
-    /*$codebase = '';
-    preg_match('/http:\/\/.+?\/(.+)/', $CFG->wwwroot, $matchresult);
-    if (!empty($matchresult) and $matchresult[1]) {
-        $codebase .= '/' . $matchresult[1];
-    }*/
     $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
     // Initialize the mod_form elements.
@@ -247,133 +242,6 @@ function delete_recursively($dir) {
         return @rmdir($dir);
     }
     return false;
-}
-
-/**
- * Creates the list of all Sarlab experiences. If a username is provided, it only returns those practices accessible by
- * this particular user.
- *
- * @param array $sarlabips
- * @param string $username
- * @return string $listexperiences
- * @throws
- *
- */
-function get_experiences_sarlab($sarlabips, $username = "") {
-    global $DB;
-    $listexperiences = '';
-
-    foreach ($sarlabips as $sarlabip) {
-        $lastquotemark = strrpos($sarlabip, "'");
-        if ($lastquotemark != 0) {
-            $lastquotemark++;
-        }
-        $ip = substr($sarlabip, $lastquotemark);
-        if ($ip != '127.0.0.1' && $ip != '') {
-            if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 3)) { // IP is alive.
-                fclose($fp);
-                $uri = 'http://' . $ip . '/SARLABV8.0/gexlab';
-                $headers = get_headers($uri);
-                if (substr($headers[0], 9, 3) == 200) { // Valid file.
-                    if ($xml = simplexml_load_file($uri)) {
-                        $map = $xml->MapExperience;
-                        $listsarlabexperiences = $map->Experience; // Get list of experiences.
-                        foreach ($listsarlabexperiences as $experience) {
-                            $experimentsettings = $experience->ExperimentSettings;
-                            // Get list of Moodle servers and users who can access the experience.
-                            $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
-                            // Get list of users in this Moodle server who can access the experience
-                            $moodleservers = $listownermoodleusers->ServerMoodle;
-                            if (!is_array($moodleservers)) $moodleservers = array($moodleservers);
-                            foreach ($moodleservers as $moodleserver) {
-                                // Check whether this Moodle server is registered in the experience.
-                                if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
-                                    if ($username != "") {
-                                        // If username is provided, check users permissions both in Moodle and Sarlab.
-                                        $ownerusers = $moodleserver->Owner;
-                                        foreach ($ownerusers as $owneruser) {
-                                            $userid = $DB->get_field('user', 'id', array('username' => $username));
-                                            // Check whether the required user has access to the experience.
-                                            if  (get_capability_info('ltisource/sarlab:useexp')) {
-                                                if (strcasecmp($username, $owneruser) == 0) { // TODO: replace $username with userid
-                                                    $listexperiences .= $experience['IdExp'] . ';';
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        // If not, the whole list of Sarlab experiences must be returned, so add it.
-                                        $listexperiences .= $experience['IdExp'] . ';';
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    $listexperiences = substr($listexperiences, 0, -1);
-
-    return $listexperiences;
-}
-
-/**
- * Gets the local experiences (defined without sarlab) and combines them with those in Sarlab in a unique, ordered list.
- *
- * @param array $usersarlabexperiences
- * @param array $allsarlabexperiences
- * @return array $combinedexperiences
- * @throws
- *
- */
-function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
-    global $DB;
-    $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
-    $remlabmanager = !empty($remlabmanager);
-
-    if ($remlabmanager) {
-        $localexperiences = $DB->get_records('block_remlab_manager_conf');
-        $combinedexperiences = array();
-        if ($usersarlabexperiences[0] != '') {
-            $combinedexperiences = $usersarlabexperiences;
-        }
-        foreach ($localexperiences as $localexperience) {
-            if (!in_array($localexperience->practiceintro, $allsarlabexperiences)) {
-                $combinedexperiences[] = $localexperience->practiceintro;
-            }
-        }
-    } else {
-        $combinedexperiences = $usersarlabexperiences;
-    }
-
-    // Order the list alphabetically.
-    sort($combinedexperiences);
-
-    return $combinedexperiences;
-}
-
-/**
- * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
- *
- * @param string $username
- * @return array $showableexperiences
- * @throws
- *
- */
-function get_showable_experiences($username = "") {
-    $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-    // Get experiences from Sarlab.
-    $userlistexperiences = get_experiences_sarlab($sarlabips, $username);
-    $alllistexperiences = get_experiences_sarlab($sarlabips, "");
-    $usersarlabexperiences = explode(";", $userlistexperiences);
-    $allsarlabexperiences = explode(";", $alllistexperiences);
-    // Also get experiences NOT in Sarlab and add them to the list.
-    $showableexperiences = combine_experiences($usersarlabexperiences, $allsarlabexperiences);
-
-    return $showableexperiences;
 }
 
 /**
@@ -894,6 +762,142 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
 }
 
 /**
+ * Creates the list of all Sarlab experiences. If a username is provided, it only returns those practices accessible by
+ * this particular user.
+ *
+ * @param array $sarlabips
+ * @param string $username
+ * @return string $listexperiences
+ * @throws
+ *
+ */
+function get_experiences_sarlab($sarlabips, $username = "") {
+    global $DB;
+    $listexperiences = '';
+
+    foreach ($sarlabips as $sarlabip) {
+        $lastquotemark = strrpos($sarlabip, "'");
+        if ($lastquotemark != 0) {
+            $lastquotemark++;
+        }
+        $ip = substr($sarlabip, $lastquotemark);
+        $firstquotemark = strpos($sarlabip, "'");
+        if ($firstquotemark !== false) {
+            $firstquotemark++;
+            $name = substr($sarlabip, $firstquotemark, $lastquotemark - 1 - $firstquotemark);
+        } else {
+            $name = $ip;
+        }
+        if ($ip != '127.0.0.1' && $ip != '') {
+            if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+                fclose($fp);
+                $uri = 'http://' . $ip . '/SARLABV8.0/gexlab';
+                $headers = get_headers($uri);
+                if (substr($headers[0], 9, 3) == 200) { // Valid file.
+                    if ($xml = simplexml_load_file($uri)) {
+                        $map = $xml->MapExperience;
+                        $listsarlabexperiences = $map->Experience; // Get list of experiences.
+                        foreach ($listsarlabexperiences as $experience) {
+                            $experimentsettings = $experience->ExperimentSettings;
+                            // Get list of Moodle servers and users who can access the experience.
+                            $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
+                            // Get list of users in this Moodle server who can access the experience
+                            $moodleservers = $listownermoodleusers->ServerMoodle;
+                            if (!is_array($moodleservers)) $moodleservers = array($moodleservers);
+                            foreach ($moodleservers as $moodleserver) {
+                                // Check whether this Moodle server is registered in the experience.
+                                if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
+                                    if ($username != "") {
+                                        // If username is provided, check users permissions both in Moodle and Sarlab.
+                                        $userid = $DB->get_field('user', 'id', array('username' => $username));
+                                        $ownerusers = $moodleserver->Owner;
+                                        if  (get_capability_info('ltisource/sarlab:useexp')) {
+                                            foreach ($ownerusers as $owneruser) {
+                                                // Check whether the required user has access to the experience.
+                                                if (strcasecmp($username, $owneruser) == 0) { // TODO: replace $username with userid
+                                                    $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // If not, the whole list of Sarlab experiences must be returned, so add it.
+                                        $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $listexperiences = substr($listexperiences, 0, -1);
+
+    return $listexperiences;
+}
+
+/**
+ * Gets the local experiences (defined without sarlab) and combines them with those in Sarlab in a unique, ordered list.
+ *
+ * @param array $usersarlabexperiences
+ * @param array $allsarlabexperiences
+ * @return array $combinedexperiences
+ * @throws
+ *
+ */
+function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
+    global $DB;
+    $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
+    $remlabmanager = !empty($remlabmanager);
+
+    if ($remlabmanager) {
+        $localexperiences = $DB->get_records('block_remlab_manager_conf');
+        $combinedexperiences = array();
+        if ($usersarlabexperiences[0] != '') {
+            $combinedexperiences = $usersarlabexperiences;
+        }
+        foreach ($localexperiences as $localexperience) {
+            if (!in_array($localexperience->practiceintro, $allsarlabexperiences)) {
+                $combinedexperiences[] = $localexperience->practiceintro;
+            }
+        }
+    } else {
+        $combinedexperiences = $usersarlabexperiences;
+    }
+
+    // Order the list alphabetically.
+    sort($combinedexperiences);
+
+    return $combinedexperiences;
+}
+
+/**
+ * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
+ *
+ * @param string $username
+ * @return array $showableexperiences
+ * @throws
+ *
+ */
+function get_showable_experiences($username = "") {
+    $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+    if (empty($sarlabips)) {
+        $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+    }
+    // Get experiences from Sarlab.
+    $userlistexperiences = get_experiences_sarlab($sarlabips, $username);
+    $alllistexperiences = get_experiences_sarlab($sarlabips, "");
+    $usersarlabexperiences = explode(";", $userlistexperiences);
+    $allsarlabexperiences = explode(";", $alllistexperiences);
+    // Also get experiences NOT in Sarlab and add them to the list.
+    $showableexperiences = combine_experiences($usersarlabexperiences, $allsarlabexperiences);
+
+    return $showableexperiences;
+}
+
+/**
  * Creates a default practice record for the block_remlab_manager_conf table
  *
  * @param string $practice
@@ -909,7 +913,13 @@ function default_rem_lab_conf($practice, $username = "") {
     $defaultconf->practiceintro = $practice;
     if ($sarlabinstance !== false) { // Practice is defined in a Sarlab server
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+        if (empty($sarlabips)) {
+            $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+        }
         $sarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
+        if (empty($sarlabports)) {
+            $sarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+        }
         $initchar = strrpos($sarlabips[intval($sarlabinstance)], "'");
         if ($initchar != 0) {
             $initchar++;
@@ -934,7 +944,7 @@ function default_rem_lab_conf($practice, $username = "") {
 
 /**
  * Checks whether a user-accessible practice is defined in an operative Sarlab server and returns the Sarlab instance if
- * it is or false if it is not.
+ * it is, or false if it is not.
  *
  * @param string $practice
  * @param string $username
@@ -944,10 +954,13 @@ function default_rem_lab_conf($practice, $username = "") {
  */
 function is_practice_in_sarlab($practice, $username = "") {
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+    if (empty($sarlabips)) {
+        $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+    }
     $sarlabinstance = false;
     $instance = 0;
-    foreach ($sarlabips as $sarlabip) { // TODO: This will take the first Sarlab instance where there is a match in!
-        $sarlabiparray[] = $sarlabip;
+    foreach ($sarlabips as $sarlabip) {
+        $sarlabiparray = array($sarlabip);
         $listexperiences = get_experiences_sarlab($sarlabiparray, $username);
         $sarlabexperiences = explode(";", $listexperiences);
         if (in_array($practice, $sarlabexperiences)) {
@@ -1199,12 +1212,7 @@ function check_anyones_booking($DB, $ejsapp) {
  *
  */
 function remote_lab_use_time_info($repeatedlabs) {
-    global $DB, $USER;
-
-    $timelastaccess = 0;
-    $timefirstaccess = INF;
-    $dbman = $DB->get_manager();
-    $moodlelog = $dbman->table_exists('logstore_standard_log');
+    global $DB;
 
     $repeatedlab = reset($repeatedlabs);
     $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
@@ -1225,6 +1233,9 @@ function remote_lab_use_time_info($repeatedlabs) {
         $ids[] = $repeatedlab->id;
         $names[] = $repeatedlab->name;
     }
+
+    $dbman = $DB->get_manager();
+    $moodlelog = $dbman->table_exists('logstore_standard_log');
     $currenttime = time();
 
     // Retrieve information from Moodle's or ejsapp's logging table.
@@ -1233,38 +1244,36 @@ function remote_lab_use_time_info($repeatedlabs) {
         $select = 'component = :component AND action = :action AND timecreated > :timecreated AND objectid ';
         list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
         $select .= $sql;
-        $workingqueryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $currenttime - $maxusetime];
-        $workingqueryparams += $params;
-        $timelastaccess = $DB->get_field_select('logstore_standard_log', 'MAX(timecreated)', $select, $workingqueryparams);
-        $viewedqueryparams = ['component' => 'mod_ejsapp', 'action' => 'viewed', 'timecreated' => $currenttime - $maxusetime];
-        $viewedqueryparams += $params;
-        $timefirstaccess = $DB->get_field_select('logstore_standard_log', 'MIN(timecreated)', $select, $viewedqueryparams);
-        //Get last user:
+        $queryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $currenttime - $maxusetime];
+        $queryparams += $params;
+        $timelastaccess = $DB->get_field_select('logstore_standard_log', 'MAX(timecreated)', $select, $queryparams);
+        $queryparams = ['component' => 'mod_ejsapp', 'action' => 'viewed', 'timecreated' => $currenttime - $maxusetime];
+        $queryparams += $params;
+        $timefirstaccess = $DB->get_field_select('logstore_standard_log', 'MIN(timecreated)', $select, $queryparams);
+        // Get last user:
         $select = 'component = :component AND action = :action AND timecreated = :timecreated AND objectid ';
         list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
         $select .= $sql;
-        $userqueryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $timelastaccess];
-        $userqueryparams += $params;
-        $lastuserid = $DB->get_field_select('logstore_standard_log', 'userid', $select, $userqueryparams);
+        $queryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $timelastaccess];
+        $queryparams += $params;
+        $lastuserid = $DB->get_field_select('logstore_standard_log', 'userid', $select, $queryparams);
     } else {
-        if (isset($repeatedlab->name)) {
-            $select = 'action = :action AND time > :time AND info ';
-            list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
-            $select .= $sql;
-            $workingqueryparams = ['action' => 'working', 'time' => $currenttime - $maxusetime];
-            $workingqueryparams += $params;
-            $timelastaccess = $DB->get_field_select('ejsapp_log', 'MAX(time)', $select, $workingqueryparams);
-            $viewedqueryparams = ['action' => 'viewed', 'time' => $currenttime - $maxusetime];
-            $viewedqueryparams += $params;
-            $timefirstaccess = $DB->get_field_select('ejsapp_log', 'MIN(time)', $select, $viewedqueryparams);
-            //Get last user:
-            $select = 'action = :action AND time = :time AND info ';
-            list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
-            $select .= $sql;
-            $userqueryparams = ['action' => 'working', 'time' => $timelastaccess];
-            $userqueryparams += $params;
-            $lastuserid = $DB->get_field_select('ejsapp_log', 'userid', $select, $userqueryparams);
-        }
+        $select = 'action = :action AND time > :time AND info ';
+        list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
+        $select .= $sql;
+        $queryparams = ['action' => 'working', 'time' => $currenttime - $maxusetime];
+        $queryparams += $params;
+        $timelastaccess = $DB->get_field_select('ejsapp_log', 'MAX(time)', $select, $queryparams);
+        $queryparams = ['action' => 'viewed', 'time' => $currenttime - $maxusetime];
+        $queryparams += $params;
+        $timefirstaccess = $DB->get_field_select('ejsapp_log', 'MIN(time)', $select, $queryparams);
+        // Get last user:
+        $select = 'action = :action AND time = :time AND info ';
+        list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
+        $select .= $sql;
+        $queryparams = ['action' => 'working', 'time' => $timelastaccess];
+        $queryparams += $params;
+        $lastuserid = $DB->get_field_select('ejsapp_log', 'userid', $select, $queryparams);
     }
 
     $timeinfo = new stdClass;
@@ -1292,8 +1301,10 @@ function get_lab_status($timeinfo, $idletime, $checkactivity) {
     if (time() - $timeinfo->time_last_access - 60 * $idletime - $checkactivity > 0) {
         // We need -$checkactivity because the last 'working' log doesn't get recorded.
         $status = 'available';
-    } else if (time() - $timeinfo->time_last_access - $checkactivity > 0 || $timeinfo->last_user_id == $USER->id) {
+    } else if (time() - $timeinfo->time_last_access - $checkactivity > 0) {
         // We need -$checkactivity because the last 'working' log doesn't get recorded.
+        $status = 'rebooting';
+    } else if ($timeinfo->last_user_id == $USER->id) {
         $status = 'rebooting';
     }
     return $status;
@@ -1317,12 +1328,8 @@ function get_remaining_time($bookinginfo, $status, $timeinfo, $idletime, $checka
     if ($bookinginfo["active_booking"]) {
         if (array_key_exists('username_with_booking', $bookinginfo) && array_key_exists('ejsappid', $bookinginfo)) {
             $endingtime = check_last_valid_booking($DB, $bookinginfo['username_with_booking'], $bookinginfo['ejsappid']);
-            $endingtime = strtotime($endingtime);
-            $remainingtime = 60 * $idletime + $endingtime - $currenttime;
+            $remainingtime = strtotime($endingtime) + 60 * $idletime - $currenttime;
         } else { // In use.
-            if ($timeinfo->time_first_access == INF) {
-                $timeinfo->time_first_access = time();
-            }
             $remainingtime = $timeinfo->time_first_access + $timeinfo->max_use_time + 60 * $idletime - $currenttime;
         }
     } else {
@@ -1331,9 +1338,6 @@ function get_remaining_time($bookinginfo, $status, $timeinfo, $idletime, $checka
         } else if ($status == 'rebooting') {
             $remainingtime = $timeinfo->time_last_access + 60 * $idletime + $checkactivity - $currenttime;
         } else { // In use.
-            if ($timeinfo->time_first_access == INF) {
-                $timeinfo->time_first_access = time();
-            }
             $remainingtime = $timeinfo->time_first_access + $timeinfo->max_use_time + 60 * $idletime - $currenttime;
         }
     }

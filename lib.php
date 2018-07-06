@@ -71,7 +71,7 @@ function ejsapp_supports($feature) {
  *
  */
 function ejsapp_reset_userdata($data) {
-    return array();
+    return array(); // TODO
 }
 
 /**
@@ -336,7 +336,6 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
  * @param object $mod
  * @param object $ejsapp
  *
- * @return boolean
  * @throws
  *
  */
@@ -392,7 +391,7 @@ function ejsapp_get_recent_mod_activity(&$activities, &$index, $timestart, $cour
 }
 
 /**
- * Prints single activity item prepared by newmodule_get_recent_mod_activity().
+ * Prints single activity item prepared by ejsapp_get_recent_mod_activity().
  *
  * @param object $activity the activity object the forum resides in
  * @param int $courseid the id of the course the forum resides in
@@ -410,6 +409,7 @@ function ejsapp_print_recent_mod_activity($activity, $courseid, $detail, $modnam
  * such as sending out mail, toggling flags etc.
  *
  * @return boolean
+ * @throws
  *
  **/
 function ejsapp_cron() {
@@ -567,7 +567,7 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
  */
 function ejsapp_get_file_areas($course, $cm, $context) {
     return array('jarfiles' => 'Applets and Javascript files with the virtual or remote labs',
-                 'xmlfile'  => 'Text files containing all the information to define the state of a lab',
+                 'xmlfiles' => 'Text files containing all the information to define the state of a lab',
                  'recfiles' => 'Text files containing a script recording the interaction of a user with a lab',
                  'blkfiles' => 'Text files containing a blockly program or a configuration of blocks');
 }
@@ -679,7 +679,7 @@ function get_ejsapp_instances($courseid=null) {
 }
 
 /**
- * Returns a list of xml files saved by a particular ejsapp activity for the current user.
+ * Returns a list of xml and json files saved by a particular ejsapp activity for the current user.
  *
  * @param int $ejsappid
  * @return array $statefiles
@@ -688,13 +688,25 @@ function get_ejsapp_instances($courseid=null) {
 function get_ejsapp_states($ejsappid) {
     global $DB, $USER;
 
-    // Get private state files.
+    // Get private xml state files.
     $allstatefiles = $DB->get_records('files', array('userid' => $USER->id, 'mimetype' => 'application/xml',
-            'filearea' => 'private', 'component' => 'mod_ejsapp')); // TODO: Get json files too.
+            'filearea' => 'private', 'component' => 'mod_ejsapp'));
+    $allstatefiles = array_merge($allstatefiles, $DB->get_records('files', array('userid' => $USER->id,
+        'mimetype' => 'text/xml', 'filearea' => 'private', 'component' => 'mod_ejsapp')));
 
-    // Get initial state files.
+    // Get initial xml state files.
     $allstatefiles = array_merge($allstatefiles, $DB->get_records('files', array('mimetype' => 'application/xml',
-            'filearea' => 'xmlfiles', 'component' => 'mod_ejsapp'))); // TODO: Get json files too.
+            'filearea' => 'xmlfiles', 'component' => 'mod_ejsapp')));
+    $allstatefiles = array_merge($allstatefiles, $DB->get_records('files', array('mimetype' => 'text/xml',
+        'filearea' => 'xmlfiles', 'component' => 'mod_ejsapp')));
+
+    // Get private json state files.
+    $allstatefiles = array_merge($allstatefiles, $DB->get_records('files', array('userid' => $USER->id,
+        'mimetype' => 'application/json', 'filearea' => 'private', 'component' => 'mod_ejsapp')));
+
+    // Get initial json state files.
+    $allstatefiles = array_merge($allstatefiles, $DB->get_records('files', array('mimetype' => 'application/json',
+        'filearea' => 'xmlfiles', 'component' => 'mod_ejsapp')));
 
     // Filter state files by ejsappid.
     $source = 'ejsappid='.$ejsappid;

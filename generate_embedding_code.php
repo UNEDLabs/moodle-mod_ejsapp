@@ -164,6 +164,9 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
 
             if ($remlabinfo->instance !== false) {
                 $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
+                if (empty($sarlabips)) {
+                    $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+                }
                 $sarlabip = $listsarlabips[$remlabinfo->instance];
                 $initpos = strpos($sarlabip, "'");
                 $endpos = strrpos($sarlabip, "'");
@@ -171,6 +174,9 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
                     $sarlabip = substr($sarlabip, $endpos + 1);
                 }
                 $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
+                if (empty($listsarlabports)) {
+                    $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+                }
                 $sarlabport = $listsarlabports[$remlabinfo->instance];
             } else {
                 $sarlabip = $collabinfo->ip;
@@ -216,10 +222,11 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         // For remote labs and collaborative sessions only
         if (($ejsapp->is_rem_lab || $collabinfo) && $remlabinfo) {
             if ($remlabinfo->instance !== false ) { // For remote labs accessed through Sarlab, pass authentication params to the app.
+                $practice = explode("@", $remlabinfo->practice, 2);
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
                     array($USER->username . "@" . $CFG->wwwroot, $sarlabkey)); // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
-                    array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $remlabinfo->practice, $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
+                    array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $practice[0], $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
             }
             // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
             $sseuri = '';
@@ -308,7 +315,8 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $ejsappname = $ejsapp->applet_name;
         if ($remlabinfo) {
-            if (!$remlabinfo->instance === false) { // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
+            if (!$remlabinfo->instance === false) {
+                // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
                 if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
                     $ejsappname = substr($ejsapp->applet_name, 0, -4);
                 }

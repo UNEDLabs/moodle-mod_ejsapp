@@ -79,9 +79,10 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
 M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, check_activity, seconds_label, refresh_label){
     var handleSuccess = function(o) {
         var response = o.responseText;
-        remaining_time = response.substring(0,response.indexOf(' '));
+        remaining_time = response.substring(0, response.indexOf(' '));
         remaining_time_client = remaining_time;
         if (remaining_time > 0) {
+            var div = Y.YUI2.util.Dom.get(htmlid);
             div.innerHTML = response;
         }
     };
@@ -108,7 +109,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
         });
     };
     updateRemainingTimeServer();
-    var intervalServer = setInterval(updateRemainingTimeServer,1000*check_activity);
+    var intervalServer = setInterval(updateRemainingTimeServer, 1000 * check_activity);
     var updateRemainingTimeClient = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
             var div = Y.YUI2.util.Dom.get(htmlid);
@@ -122,5 +123,5 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
         });
     };
     updateRemainingTimeClient();
-    var intervalClient = setInterval(updateRemainingTimeClient,1000);
+    var intervalClient = setInterval(updateRemainingTimeClient, 1000);
 };
