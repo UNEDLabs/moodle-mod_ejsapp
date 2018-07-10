@@ -171,6 +171,12 @@ $string['mail_content1_lab_up'] = 'Uno de tus laboratorios remotos previamente i
 $string['mail_content2_lab_up'] = ' - IP: ';
 $string['mail_content3_lab_up'] = ') vuelve a estar operativo.';
 
+$string['deletedlogs'] = 'Borrar todas las entradas del log';
+$string['deletedlegacylogs'] = 'Borrar todas las entradas del log antiguo';
+$string['deletedrecords'] = 'Borrar todas acciones grabadas de usuario en actividades ejsapp';
+$string['deletedpersonalvars'] = 'Borrar todas las variables personalizadas';
+$string['deletedgrades'] = 'Borrar todas las calificaciones de actividades ejsapp';
+
 // Strings in personalized_vars_values.php.
 $string['personalVars_pageTitle'] = 'Valores de las variables personalizadas';
 $string['users_ejsapp_selection'] = 'Seleccione los usuarios y la actividad EJSApp';
@@ -182,7 +188,7 @@ $string['export_this_data'] = 'Exportar datos para esta actividad EJSApp';
 $string['no_ejsapps'] = 'La actividad EJSApp seleccionada no tiene variables personalizadas';
 $string['personalized_values'] = 'valores_personalizdos_';
 
-// Strings in kick_out.php.
+// Strings in leave_or_kick_out.php.
 $string['time_is_up'] = 'Se ha agotado su tiempo con el laboratorio remoto. Si desea seguir trabajando con &eacute;l, haga una nueva reserva y/o refresque esta p&aacute;gina.';
 
 // Strings in countdown.php.
@@ -227,6 +233,7 @@ $string['event_book'] = "Need to make a booking";
 $string['event_collab'] = "Working with the EJSApp activity in collaborative mode";
 $string['event_inactive'] = "Lab is inactive";
 $string['event_booked'] = "Lab is booked in a different course";
+$string['event_left'] = "Left the EJSApp activity";
 
 // Settings.
 $string['default_general_set'] = "Opciones generales";

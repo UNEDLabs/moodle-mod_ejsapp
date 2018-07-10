@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Class for logging the inactive lab event of an EJSApp
+ * Class for logging the left event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
@@ -34,19 +34,19 @@ namespace mod_ejsapp\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class for logging the inactive lab event of an EJSApp
+ * Class for logging the left event of an EJSApp
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ejsapp_inactive extends \core\event\base {
+class ejsapp_left extends \core\event\base {
 
     /**
      * Init function
      */
     protected function init() {
-        $this->data['crud'] = 'r';
+        $this->data['crud'] = 'r'; // Meaning: c(reate), r(ead), u(pdate), d(elete).
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'ejsapp';
     }
@@ -58,17 +58,16 @@ class ejsapp_inactive extends \core\event\base {
      * @throws
      */
     public static function get_name() {
-        return get_string('event_inactive', 'ejsapp');
+        return get_string('event_left', 'ejsapp');
     }
 
     /**
-     * Get event description
+     * Get URL related to the action
      *
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}'' attempted to access the EJSApp remote lab with id '{$this->objectid}'
-         but it was inactive.";
+        return "The user with id '{$this->userid}' left the EJSApp activity with id '{$this->objectid}'.";
     }
 
     /**
@@ -78,6 +77,16 @@ class ejsapp_inactive extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/ejsapp/view.php', array('id' => $this->objectid));
+    }
+
+    /**
+     * Return the legacy event log data.
+     *
+     * @return array|null
+     */
+    protected function get_legacy_logdata() {
+        return array($this->courseid, 'ejsapp', 'left', 'view.php?id=' . $this->objectid,
+            $this->objectid, $this->contextinstanceid);
     }
 
 }

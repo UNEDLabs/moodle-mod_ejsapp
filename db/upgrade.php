@@ -350,5 +350,12 @@ function xmldb_ejsapp_upgrade($oldversion) {
         $dbman->add_field($table, $field);
     }
 
+    if ($oldversion < '2018070700') {
+        // Create "record" and "mouse_events" fields in ejsapp table.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp_log');
+        $dbman->drop_table($table);
+    }
+
     return true;
 }

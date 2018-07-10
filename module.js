@@ -38,8 +38,8 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
         /*failure handler code*/
     };
     var callbackAddLog = {
-        success:handleSuccessAddLog,
-        failure:handleFailureAddLog
+        success: handleSuccessAddLog,
+        failure: handleFailureAddLog
     };
     var handleSuccessKickOut = function(o) {
         var div = Y.YUI2.util.Dom.get(htmlid);
@@ -49,8 +49,8 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
         /*failure handler code*/
     };
     var callbackKickOut = {
-        success:handleSuccessKickOut,
-        failure:handleFailureKickOut
+        success: handleSuccessKickOut,
+        failure: handleFailureKickOut
     };
     if (typeof max_time !== 'undefined') {
         max_times = Math.round(max_time/frequency); // A user can occupy a remote lab just for max_times seconds.
@@ -76,7 +76,7 @@ M.mod_ejsapp.init_add_log = function(Y, url_add_log, url_max_time, is_rem_lab, h
     var checkUserActivity = setInterval(checkActivity, 1000 * frequency);
 };
 
-M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, check_activity, seconds_label, refresh_label){
+M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, frequency, seconds_label, refresh_label) {
     var handleSuccess = function(o) {
         var response = o.responseText;
         remaining_time = response.substring(0, response.indexOf(' '));
@@ -90,8 +90,8 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
         /*failure handler code*/
     };
     var callback = {
-        success:handleSuccess,
-        failure:handleFailure
+        success: handleSuccess,
+        failure: handleFailure
     };
     var counter = 0;
     var remaining_time =  initial_remaining_time;
@@ -108,8 +108,7 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
             }
         });
     };
-    updateRemainingTimeServer();
-    var intervalServer = setInterval(updateRemainingTimeServer, 1000 * check_activity);
+    var intervalServer = setInterval(updateRemainingTimeServer, 1000 * frequency);
     var updateRemainingTimeClient = function() {
         Y.use('yui2-connection', 'yui2-dom', function(Y) {
             var div = Y.YUI2.util.Dom.get(htmlid);
@@ -122,6 +121,5 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, c
             }
         });
     };
-    updateRemainingTimeClient();
     var intervalClient = setInterval(updateRemainingTimeClient, 1000);
 };

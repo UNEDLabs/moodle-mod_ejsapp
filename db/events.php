@@ -68,4 +68,9 @@ $observers = array(
         'callback' => 'mod_ejsapp\observers::ejsapp_working',
     ),
 
+    array(
+        'eventname' => '\mod_ejsapp\event\ejsapp_left',
+        'callback' => 'mod_ejsapp\observers::ejsapp_left',
+    ),
+
 );

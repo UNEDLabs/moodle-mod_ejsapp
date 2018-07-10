@@ -128,6 +128,8 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         return $datafile;
     }
 
+    prepare_ejs_file($ejsapp);
+
     if (!is_null($userdatafiles)) {
         $userstatefile = $userdatafiles[0];
         $userrecfile = $userdatafiles[1];

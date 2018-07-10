@@ -35,7 +35,28 @@ require_login(0, false);
 
 global $PAGE;
 
+$courseid = required_param('courseid', PARAM_INT);
+$cmid = required_param('cmid', PARAM_INT);
+$objectid = required_param('activityid', PARAM_INT);
+$ejsappname = required_param('ejsappname', PARAM_TEXT);
+$userid = required_param('userid', PARAM_INT);
+
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/mod/ejsapp/kick_out.php');
+$PAGE->set_url('/mod/ejsapp/leave_or_kick_out.php');
+
+if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
+    if ($DB->get_field('ejsapp', 'is_rem_lab', array('id' => $objectid)) == 1) {
+        $ejsappname = urldecode($ejsappname);
+        $modulecontext = context_module::instance($cmid);
+        $event = \mod_ejsapp\event\ejsapp_left::create(array(
+            'objectid' => $objectid,
+            'courseid' => $courseid,
+            'userid' => $userid,
+            'context' => $modulecontext,
+            'other' => $ejsappname,
+        ));
+        $event->trigger();
+    }
+}
 
 echo get_string('time_is_up', 'ejsapp');

@@ -65,35 +65,6 @@ function ejsapp_supports($feature) {
 }
 
 /**
- * This function is used by the reset_course_userdata function in moodlelib.
- * @param string $data the data submitted from the reset course.
- * @return array status array
- *
- */
-function ejsapp_reset_userdata($data) {
-    return array(); // TODO
-}
-
-/**
- * List of view style log actions.
- * @return array
- *
- */
-function ejsapp_get_view_actions() {
-    return array('view', 'view all');
-}
-
-/**
- *
- * List of update style log actions
- * @return array
- *
- */
-function ejsapp_get_post_actions() {
-    return array('update', 'add');
-}
-
-/**
  * Given an object containing all the necessary data, (defined by the form in mod_form.php) this function will create a
  * new instance and return the id number of the new instance.
  *
@@ -312,9 +283,20 @@ function ejsapp_grade_item_delete($ejsapp) {
 function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
     global $DB;
 
-    if ($logs = $DB->get_records('log', array('userid' => $user->id, 'module' => 'ejsapp',
-        'info' => $ejsapp->name), 'time ASC')) {
+    if ($logs = $DB->get_records('logstore_standard_log', array('userid' => $user->id,
+        'component' => 'mod_ejsapp', 'objectid' => $ejsapp->id), 'time ASC')) {
+        // Standard logstore
+        $numviews = count($logs);
+        $lastlog = array_pop($logs);
 
+        $result = new stdClass();
+        $result->info = get_string('numviews', '', $numviews);
+        $result->time = $lastlog->time;
+
+        return $result;
+    } else if ($logs = $DB->get_records('log', array('userid' => $user->id, 'module' => 'ejsapp',
+        'info' => $ejsapp->name), 'time ASC')) {
+        // Legacy log
         $numviews = count($logs);
         $lastlog = array_pop($logs);
 
@@ -324,6 +306,7 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
 
         return $result;
     }
+
     return null;
 }
 
@@ -342,8 +325,9 @@ function ejsapp_user_outline($course, $user, $mod, $ejsapp) {
 function ejsapp_user_complete($course, $user, $mod, $ejsapp) {
     global $DB;
 
-    if ($logs = $DB->get_records('log', array('userid' => $user->id, 'module' => 'ejsapp',
-        'info' => $ejsapp->name), 'time ASC')) {
+    if ($logs = $DB->get_records('logstore_standard_log', array('userid' => $user->id,
+        'component' => 'mod_ejsapp', 'objectid' => $ejsapp->id), 'time ASC')) {
+        // Standard logstore
         $numviews = count($logs);
         $lastlog = array_pop($logs);
 
@@ -351,10 +335,75 @@ function ejsapp_user_complete($course, $user, $mod, $ejsapp) {
         $strnumviews = get_string('numviews', '', $numviews);
 
         echo "$strnumviews - $strmostrecently ".userdate($lastlog->time);
+    } else if ($logs = $DB->get_records('log', array('userid' => $user->id, 'module' => 'ejsapp',
+        'info' => $ejsapp->name), 'time ASC')) {
+        // Legacy log
+        $numviews = count($logs);
+        $lastlog = array_pop($logs);
 
+        $strmostrecently = get_string('mostrecently');
+        $strnumviews = get_string('numviews', '', $numviews);
+
+        echo "$strnumviews - $strmostrecently ".userdate($lastlog->time);
     } else {
         print_string('neverseen', 'ejsapp');
     }
+}
+
+/**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ * @param stdClass $data the data submitted from the reset course.
+ * @return array status array
+ * @throws
+ *
+ */
+function ejsapp_reset_userdata($data) {
+    global $DB;
+
+    $status = array();
+    $componentstr = get_string('modulenameplural', 'ejsapp');
+
+    $dbman = $DB->get_manager();
+    $moodlelog = $dbman->table_exists('logstore_standard_log');
+    if ($moodlelog) {
+        $DB->delete_records('logstore_standard_log', array('component' => 'mod_ejsapp', 'courseid' => $data->courseid));
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deletedlogs', 'ejsapp'), 'error' => false);
+    } else {
+        $DB->delete_records('log', array('module' => 'mod_ejsapp', 'course' => $data->courseid));
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deletedlegacylogs', 'ejsapp'), 'error' => false);
+    }
+
+    $select = "course = ?";
+    $ejsapps = $DB->get_records_select('ejsapp', $select, array($data->courseid));
+    foreach ($ejsapps as $ejsapp) {
+        $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $ejsapp->id));
+        $DB->delete_records('ejsapp_records', array('ejsappid' => $ejsapp->id));
+        ejsapp_grade_item_delete($ejsapp);
+    }
+
+    $status[] = array('component'=>$componentstr, 'item'=>get_string('deletedrecords', 'ejsapp'), 'error' => false);
+    $status[] = array('component'=>$componentstr, 'item'=>get_string('deletedpersonalvars', 'ejsapp'), 'error' => false);
+    $status[] = array('component'=>$componentstr, 'item'=>get_string('deletedgrades', 'ejsapp'), 'error' => false);
+    return $status;
+}
+
+/**
+ * List of view style log actions.
+ * @return array
+ *
+ */
+function ejsapp_get_view_actions() {
+    return array('view', 'view all');
+}
+
+/**
+ *
+ * List of update style log actions
+ * @return array
+ *
+ */
+function ejsapp_get_post_actions() {
+    return array('update', 'add');
 }
 
 /**
@@ -428,7 +477,7 @@ function ejsapp_cron() {
             $devicesinfo = new stdClass();
             // TODO: Do the ping with Sarlab in between too!
             $labstate = ping($remlabconf->ip, $remlabconf->port, $sarlabinstance, $remlabconf->practiceintro);
-            $remlabs = get_repeated_remlabs($remlabconf);
+            $remlabs = get_repeated_remlabs($remlabconf->practiceintro);
             foreach ($remlabs as $remlab) {
                 $context = context_course::instance($remlab->course);
                 $multilang = new filter_multilang($context, array('filter_multilang_force_old' => 0));
@@ -481,6 +530,8 @@ function ejsapp_cron() {
             }
         }
     }
+
+    // TODO: Get 'working' records from logstore_standard_log and transform them into one single 'exited' record per session
 
     return true;
 }
@@ -678,7 +729,7 @@ function get_ejsapp_instances($courseid=null) {
 }
 
 /**
- * Returns a list of xml and json files saved by a particular ejsapp activity for the current user.
+ * Returns a list of .xml and .json files saved in a particular ejsapp activity for the current user.
  *
  * @param int $ejsappid
  * @return array $statefiles
@@ -724,17 +775,45 @@ function get_ejsapp_states($ejsappid) {
     return $statefiles;
 }
 
-// TODO: get .rec files (get_ejsapp_recordings) and .blk files (get_ejsapp_blockly_programs).
+/**
+ * Returns a list of .rec files saved in a particular ejsapp activity for the current user.
+ *
+ * @param int $ejsappid
+ * @return array $recordingfiles
+ * @throws
+ */
+function get_ejsapp_recordings($ejsappid) {
+    global $DB, $USER;
+
+    $recordingfiles = array();
+    // TODO
+    return $recordingfiles;
+}
 
 /**
- * Returns the embedding code for the EjsS application.
+ * Returns a list of .blk files saved in a particular ejsapp activity for the current user.
+ *
+ * @param int $ejsappid
+ * @return array $experimentfiles
+ * @throws
+ */
+function get_ejsapp_blockly_programs($ejsappid) {
+    global $DB, $USER;
+
+    $experimentfiles = array();
+    // TODO
+    return $experimentfiles;
+}
+
+/**
+ * Returns the embedding code for an virtual lab EjsS application.
  *
  * @param int $ejsappid the course object
  * @param array|null $datafiles
  * @return string $code
  * @throws
  */
-function draw_ejsapp_instance($ejsappid, $datafiles=null) {
+function draw_ejsapp_instance($ejsappid, $datafiles = null) {
     global $DB, $CFG;
 
     if ($DB->record_exists('ejsapp', array('id' => $ejsappid))) {

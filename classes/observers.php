@@ -32,6 +32,8 @@
 
 namespace mod_ejsapp;
 
+use block_remlab_manager\task\refresh_adhoc_usestate_field;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -51,13 +53,6 @@ class observers {
      * @throws
      */
     public static function ejsapp_book($event) {
-        global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
-        }
     }
 
     /**
@@ -68,13 +63,6 @@ class observers {
      * @throws
      */
     public static function ejsapp_booked($event) {
-        global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
-        }
     }
 
     /**
@@ -85,13 +73,6 @@ class observers {
      * @throws
      */
     public static function ejsapp_collab($event) {
-        global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
-        }
     }
 
     /**
@@ -102,13 +83,6 @@ class observers {
      * @throws
      */
     public static function ejsapp_inactive($event) {
-        global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
-        }
     }
 
     /**
@@ -119,13 +93,6 @@ class observers {
      * @throws
      */
     public static function ejsapp_viewed($event) {
-        global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
-        }
     }
 
     /**
@@ -136,13 +103,6 @@ class observers {
      * @throws
      */
     public static function ejsapp_wait($event) {
-        global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
-        }
     }
 
     /**
@@ -153,13 +113,28 @@ class observers {
      * @throws
      */
     public static function ejsapp_working($event) {
+    }
+
+    /**
+     * A user left an EJSApp remote lab.
+     *
+     * @param \core\event\base $event The event.
+     * @return void
+     * @throws
+     */
+    public static function ejsapp_left($event) {
         global $DB;
-        $dbman = $DB->get_manager();
-        if (!$dbman->table_exists('logstore_standard_log')) {
-            // Write info in custom table.
-            $record = $event->get_record_snapshot('ejsapp_log', $event->objectid);
-            $DB->insert_record('ejsapp_log', $record);
+
+        // Mark the remote lab as 'available' again
+        $practice = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
+            array('ejsappid' => $event->objectid));
+        $remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
+        if ($remlabconf->reboottime == 0) {
+            $remlabconf->usestate = 'available';
+        } else {
+            $remlabconf->usestate = 'rebooting';
         }
+        $DB->update_record('block_remlab_manager_conf', $remlabconf);
     }
 
 }

@@ -37,7 +37,6 @@ require_once('locallib.php');
 require_login(0, false);
 
 $ejsappid = required_param('ejsappid', 'int');
-$courseid = required_param('courseid', 'int');
 $check = required_param('check_activity', 'int');
 $remainingtime = required_param('remaining_time', 'int');
 
@@ -46,18 +45,19 @@ global $PAGE, $DB;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/ejsapp/countdown.php');
 
+$ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
+$practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsappid));
+$remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
+
 if ($remainingtime > 0) {
-    $currenttime = time();
-    $ejsapp = $DB->get_record('ejsapp', array('id' => $ejsappid));
-    $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro', array('ejsappid' => $ejsappid));
-    $remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
-    $idletime = $remlabconf->reboottime;
-    $repeatedlabs = get_repeated_remlabs($remlabconf);
-    $timeinfo = remote_lab_use_time_info($repeatedlabs);
-    $labstatus = get_lab_status($timeinfo, $idletime, $check);
-    $bookinginfo = check_active_booking($repeatedlabs, $courseid);
-    $remainingtime = get_remaining_time($bookinginfo, $labstatus, $timeinfo, $idletime, $check);
-    echo $remainingtime . ' ' . get_string('seconds', 'ejsapp');
+    $repeatedlabs = get_repeated_remlabs($practiceintro);
+    $timeinfo = remote_lab_use_time_info($repeatedlabs, $ejsapp);
+    $checkactivity = get_config('mod_ejsapp', 'check_activity');
+    $waittime = get_wait_time($remlabconf->usestate, $timeinfo->time_first_access, $timeinfo->time_last_access,
+        $timeinfo->max_use_time, $timeinfo->reboottime, $checkactivity);
+    make_lab_available($remainingtime, $remlabconf);
+    echo $waittime . ' ' . get_string('seconds', 'ejsapp');
 } else {
+    make_lab_available($remainingtime, $remlabconf);
     echo get_string('refresh', 'ejsapp');
 }

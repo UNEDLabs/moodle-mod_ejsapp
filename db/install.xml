@@ -64,7 +64,7 @@
             </INDEXES>
         </TABLE>
         <TABLE NAME="ejsapp_personal_vars" COMMENT="Contains information for generating personalized values for EJS variables"
-               PREVIOUS="ejsapp" NEXT="ejsapp_log">
+               PREVIOUS="ejsapp" NEXT="ejsapp_records">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ejsappid"/>
                 <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
@@ -85,25 +85,8 @@
                 <INDEX NAME="ejsappid" UNIQUE="false" FIELDS="ejsappid"/>
             </INDEXES>
         </TABLE>
-        <TABLE NAME="ejsapp_log" COMMENT="Contains logs to track the EJSApp labs usage"
-               PREVIOUS="ejsapp_personal_vars" NEXT="ejsapp_records">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="time"/>
-                <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"
-                       NEXT="userid"/>
-                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="time" NEXT="action"/>
-                <FIELD NAME="action" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"
-                       PREVIOUS="userid" NEXT="info"/>
-                <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
-                       PREVIOUS="action"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            </KEYS>
-        </TABLE>
         <TABLE NAME="ejsapp_records" COMMENT="Contains users interactions with the EjsS applications"
-               PREVIOUS="ejsapp_log">
+               PREVIOUS="ejsapp_personal_vars">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="time"/>
                 <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"

@@ -52,7 +52,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         $userinfo = $this->get_setting_value('userinfo');
         if ($userinfo) {
-            // $paths[] = new restore_path_element('ejsapp_log', '/activity/ejsapp/ejsapp_log');.
             $paths[] = new restore_path_element('ejsappbooking_usersaccess',
                 '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
             $paths[] = new restore_path_element('ejsappbooking_remlab_access',
@@ -157,19 +156,6 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
         $data = (object)$data;
         $data->ejsappid = $this->get_new_parentid('ejsapp');
         $DB->insert_record('ejsapp_personal_vars', $data);
-    }
-
-    /**
-     * Process table ejsapp_log
-     * @param stdClass $data
-     * @throws
-     */
-    protected function process_ejsapp_log($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $data->ejsappid = $this->get_new_parentid('ejsapp');
-        $DB->insert_record('ejsapp_log', $data);
     }
 
     /**

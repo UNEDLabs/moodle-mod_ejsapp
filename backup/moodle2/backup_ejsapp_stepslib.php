@@ -59,9 +59,6 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         $personalvars = new backup_nested_element('ejsapp_personal_vars', array('id'),
             array('name', 'type', 'minval', 'maxval'));
 
-        $log = new backup_nested_element('ejsapp_log', array('id'),
-            array('time', 'userid', 'action', 'info'));
-
         // Remote labs configuration.
         $exp2practs = new backup_nested_element('remlab_manager_exp2practs');
         $exp2prc = new backup_nested_element('block_remlab_manager_exp2prc', array('id'),
@@ -82,7 +79,6 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         // Build the tree.
         $ejsapp->add_child($personalvars);
-        $ejsapp->add_child($log);
         $ejsapp->add_child($exp2practs);
         $ejsapp->add_child($ejsappbookings);
         $ejsapp->add_child($remlabaccesses);
@@ -95,9 +91,6 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // Define sources.
         $ejsapp->set_source_table('ejsapp', array('id' => backup::VAR_ACTIVITYID));
         $personalvars->set_source_table('ejsapp_personal_vars', array('ejsappid'  => '../id'));
-
-        // Logging.
-        // if ($userinfo) $log->set_source_table('ejsapp_log', array('ejsappid'  => '../id'));.
 
         // Remote labs.
         $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));

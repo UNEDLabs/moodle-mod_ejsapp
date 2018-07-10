@@ -55,6 +55,7 @@ class ejsapp_book extends \core\event\base {
      * Get event's name
      *
      * @return string
+     * @throws
      */
     public static function get_name() {
         return get_string('event_book', 'ejsapp');
