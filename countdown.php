@@ -50,12 +50,11 @@ $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
 $remlabconf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practiceintro));
 
 if ($remainingtime > 0) {
+    $checkactivity = get_config('mod_ejsapp', 'check_activity');
     $repeatedlabs = get_repeated_remlabs($practiceintro);
     $timeinfo = remote_lab_use_time_info($repeatedlabs, $ejsapp);
-    $checkactivity = get_config('mod_ejsapp', 'check_activity');
-    $waittime = get_wait_time($remlabconf->usestate, $timeinfo->time_first_access, $timeinfo->time_last_access,
+    $waittime = get_wait_time($remlabconf, $timeinfo->time_first_access, $timeinfo->time_last_access,
         $timeinfo->max_use_time, $timeinfo->reboottime, $checkactivity);
-    make_lab_available($remainingtime, $remlabconf);
     echo $waittime . ' ' . get_string('seconds', 'ejsapp');
 } else {
     make_lab_available($remainingtime, $remlabconf);

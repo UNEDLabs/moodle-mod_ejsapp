@@ -121,5 +121,6 @@ M.mod_ejsapp.init_countdown = function(Y, url, htmlid, initial_remaining_time, f
             }
         });
     };
+    updateRemainingTimeClient();
     var intervalClient = setInterval(updateRemainingTimeClient, 1000);
 };

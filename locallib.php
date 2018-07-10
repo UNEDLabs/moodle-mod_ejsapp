@@ -1253,12 +1253,12 @@ function remote_lab_use_time_info($repeatedlabs, $ejsapp) {
         $queryparams += $params;
         $timefirstaccess = $DB->get_field_select('logstore_standard_log', 'MAX(timecreated)', $select, $queryparams);
         // Get last user:
-        $select = 'component = :component AND action = :action AND timecreated = :timecreated AND objectid ';
+        /*$select = 'component = :component AND action = :action AND timecreated = :timecreated AND objectid ';
         list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
         $select .= $sql;
         $queryparams = ['component' => 'mod_ejsapp', 'action' => 'working', 'timecreated' => $timelastaccess];
         $queryparams += $params;
-        $lastuserid = $DB->get_field_select('logstore_standard_log', 'userid', $select, $queryparams);
+        $lastuserid = $DB->get_field_select('logstore_standard_log', 'userid', $select, $queryparams);*/
     } else {
         $select = 'action = :action AND time > :time AND info ';
         list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
@@ -1270,12 +1270,12 @@ function remote_lab_use_time_info($repeatedlabs, $ejsapp) {
         $queryparams += $params;
         $timefirstaccess = $DB->get_field_select('log', 'MAX(time)', $select, $queryparams);
         // Get last user:
-        $select = 'action = :action AND time = :time AND info ';
+        /*$select = 'action = :action AND time = :time AND info ';
         list($sql, $params) = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED);
         $select .= $sql;
         $queryparams = ['action' => 'working', 'time' => $timelastaccess];
         $queryparams += $params;
-        $lastuserid = $DB->get_field_select('log', 'userid', $select, $queryparams);
+        $lastuserid = $DB->get_field_select('log', 'userid', $select, $queryparams);*/
     }
 
     $timeinfo = new stdClass;
@@ -1289,7 +1289,7 @@ function remote_lab_use_time_info($repeatedlabs, $ejsapp) {
     } else {
         $timeinfo->time_first_access = 0;
     }
-    $timeinfo->last_user_id = $lastuserid;
+    //$timeinfo->last_user_id = $lastuserid;
     $timeinfo->max_use_time = $maxusetime;
     $timeinfo->reboottime = $DB->get_field('block_remlab_manager_conf',
         'reboottime', array('practiceintro' => $practiceintro));
@@ -1314,10 +1314,16 @@ function get_wait_time($remlabconf, $timefirstaccess, $timelastaccess, $maxuseti
     if ($remlabconf->usestate == 'in use') {
         $remainingtime = $timefirstaccess + $maxusetime + 60 * $reboottime + $checkactivity - time();
     } else if ($remlabconf->usestate == 'rebooting') {
-        $remainingtime = $timelastaccess + $reboottime + $checkactivity - time();
+        if ($reboottime == 0) {
+            $remainingtime = 0;
+        } else {
+            $remainingtime = $timelastaccess + $reboottime + $checkactivity - time();
+        }
     } else {
         $remainingtime = 0;
     }
+    make_lab_available($remainingtime, $remlabconf);
+
     return $remainingtime;
 }
 

@@ -154,6 +154,7 @@ create_blockly_configuration($ejsapp);
 // For logging purposes.
 $action = 'view';
 $accessed = false;
+$checkactivity = get_config('mod_ejsapp', 'check_activity');
 
 // Define the div section for charts and related buttons.
 $fullscreencharts = html_writer::div('', 'fa fa-arrows-alt fa-1g', array( 'id' => 'full_screen_chart'));
@@ -185,7 +186,10 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
         $maxusetime = $remlabtime->max_use_time;
         // Get the lab use status.
         $labstatus = $remlabconf->usestate;
-        if ($labstatus == 'available') { // Lab is available.
+        // Determine the waiting time.
+        $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
+            $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
+        if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
             if ($sarlabinstance !== false) {
                 // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
                 $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
@@ -227,7 +231,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             $action = 'inactive_lab';
         } else {    // Students trying to access a remote lab with restricted access.
             if ($remlabaccess->booking_info['active_booking']) {
-                // Remote lab freely accessible from one course but with an active booking made by someone in a different course.
+                // Remote lab freely accessible from the current course but with an active booking made by someone in a different course.
                 echo $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
                 $action = 'booked_lab';
             } else { // Other cases.
@@ -239,9 +243,21 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
                     $remlabaccess->labmanager, $maxusetime);
                 if (!is_null($remlabinfo)) { // The user has an active booking -> he can access the lab.
-                    $accessed = true;
-                    echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
-                        $chartsdiv, 'labchart');
+                    $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
+                    $maxusetime = $remlabtime->max_use_time;
+                    // Get the lab use status.
+                    $labstatus = $remlabconf->usestate;
+                    // Determine the waiting time.
+                    $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
+                        $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
+                    if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
+                        $accessed = true;
+                        echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+                            $chartsdiv, 'labchart');
+                    } else {
+                        echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
+                        $action = 'need_to_wait';
+                    }
                 } else { // No active booking.
                     echo $OUTPUT->box(get_string('no_booking', 'ejsapp'));
                     if (false) {    // TODO: Check if the lab supports collaborative access.
@@ -385,7 +401,6 @@ if (isset($collabsession)) {
 }
 
 // Javascript features for monitoring the time spent by a user in the activity.
-$checkactivity = get_config('mod_ejsapp', 'check_activity');
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to
     // work with the remote lab.
@@ -403,9 +418,6 @@ if ($accessed) {
     }
     $PAGE->requires->js_call_amd('mod_ejsapp/onclose', 'onclose', array($urlleave));
 } else if ($action == 'booked_lab' || $action == 'need_to_wait') {
-    $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
-        $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
-    make_lab_available($waittime, $remlabconf);
     // Remote lab not accessible by the user at the present moment.
     $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid=' . $ejsapp->id . '&check_activity=' . $checkactivity;
     $htmlid = "timecountdown";
