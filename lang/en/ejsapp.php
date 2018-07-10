@@ -158,22 +158,6 @@ $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not
 $string['personal_vars_button'] = 'View personalized variables';
 
 // Strings in lib.php.
-$string['mail_subject_lab_not_checkable'] = 'Not Checkable Lab State Alert';
-$string['mail_content1_lab_not_checkable'] = 'The state of one of your remote labs (';
-$string['mail_content2_lab_not_checkable'] = ' - IP: ';
-$string['mail_content3_lab_not_checkable'] = ') could not be checked.';
-
-$string['mail_subject_lab_down'] = 'Lab Down Alert';
-$string['mail_content1_lab_down'] = 'One of your previously operative remote labs (';
-$string['mail_content2_lab_down'] = ' - IP: ';
-$string['mail_content3_lab_down'] = ") has ceased to be accessible. \r\n";
-$string['mail_content4_lab_down'] = "A list of the inaccessible or inoperative devices is given below: \r\n";
-
-$string['mail_subject_lab_up'] = 'Lab Up Notice';
-$string['mail_content1_lab_up'] = 'One of your previously not accessible remote labs (';
-$string['mail_content2_lab_up'] = ' - IP: ';
-$string['mail_content3_lab_up'] = ') is operative once again.';
-
 $string['deletedlogs'] = 'Delete all log entries';
 $string['deletedlegacylogs'] = 'Delete all legacy log entries';
 $string['deletedrecords'] = 'Delete all user actions recorded in ejsapp activities';

@@ -155,22 +155,6 @@ $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de 
 $string['personal_vars_button'] = 'Ver variables personalizadas';
 
 // Strings in lib.php.
-$string['mail_subject_lab_not_checkable'] = 'Alerta de Estado de Laboratorio no Verificable';
-$string['mail_content1_lab_not_checkable'] = 'El estado de uno de tus laboratorios remotos (';
-$string['mail_content2_lab_not_checkable'] = ' - IP: ';
-$string['mail_content3_lab_not_checkable'] = ') no ha podido ser verificado.';
-
-$string['mail_subject_lab_down'] = 'Alerta de Laboratorio Inactivo';
-$string['mail_content1_lab_down'] = 'Uno de tus laboratorios remotos previamente operativos (';
-$string['mail_content2_lab_down'] = ' - IP: ';
-$string['mail_content3_lab_down'] = ") ha dejado de estar accesible. \r\n";
-$string['mail_content4_lab_down'] = "A continuaci&oacute;n se da una lista de los dispositivos inaccessibles o inoperativos: \r\n";
-
-$string['mail_subject_lab_up'] = 'Aviso de Laboratorio Activo';
-$string['mail_content1_lab_up'] = 'Uno de tus laboratorios remotos previamente innaccesibles (';
-$string['mail_content2_lab_up'] = ' - IP: ';
-$string['mail_content3_lab_up'] = ') vuelve a estar operativo.';
-
 $string['deletedlogs'] = 'Borrar todas las entradas del log';
 $string['deletedlegacylogs'] = 'Borrar todas las entradas del log antiguo';
 $string['deletedrecords'] = 'Borrar todas acciones grabadas de usuario en actividades ejsapp';
