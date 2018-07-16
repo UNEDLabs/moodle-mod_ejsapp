@@ -1332,7 +1332,7 @@ functions = function(workspace) {
 	var blockText = '<xml>' + '<block type="evaluation2"></block>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
-	if (keys_others.length > 0) {
+	if ((keys_others.length > 0)||(keys_others_input.length > 0)||(keys_others_output.length > 0) ) {
 		blockText = '<xml>' + '<block type="replacefunc"><value name="return"><shadow type="math_number"><field name="NUM">0</field></shadow></value></block>' + '</xml>';
 		block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block);
