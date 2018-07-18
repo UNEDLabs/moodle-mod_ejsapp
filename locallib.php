@@ -260,15 +260,17 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
     $path = $CFG->wwwroot . $codebase;
 
     // Replace links for images and stuff and insert a placeholder for future purposes.
-    // TODO: Do it for all languages .js files.
     $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
     $filepath = $CFG->dirroot . $codebase . $filename . '.js';
     $search = '("_topFrame","_ejs_library/",null);';
     $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
     if (file_exists($filepath)) { // Javascript code included in a separated .js file.
-        $jscode = file_get_contents($filepath);
-        $jscode = str_replace($search, $replace, $jscode);
-        file_put_contents($filepath, $jscode);
+        $filespath = glob($CFG->dirroot . $codebase . $filename . '*.js');
+        foreach ($filespath as $filepath) {
+            $jscode = file_get_contents($filepath);
+            $jscode = str_replace($search, $replace, $jscode);
+            file_put_contents($filepath, $jscode);
+        }
     } else { // If the .js file does not exists, then this part is inside the $code variable.
         $code = str_replace($search, $replace, $code);
     }
@@ -1212,10 +1214,10 @@ function remote_lab_use_time_info($repeatedlabs, $ejsapp) {
     global $DB;
 
     $userwithbooking = check_anyones_booking($DB, $ejsapp);
-    $currenttime = time();
     $repeatedlab = reset($repeatedlabs);
     $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
         array('ejsappid' => $repeatedlab->id));
+    $currenttime = time();
     if ($userwithbooking !== '') {
         $maxusetime = strtotime(check_last_valid_booking($DB, $userwithbooking, $ejsapp->id)) - $currenttime;
     } else {
@@ -1317,7 +1319,7 @@ function get_wait_time($remlabconf, $timefirstaccess, $timelastaccess, $maxuseti
         if ($reboottime == 0) {
             $remainingtime = 0;
         } else {
-            $remainingtime = $timelastaccess + $reboottime + $checkactivity - time();
+            $remainingtime = $timelastaccess + 60 * $reboottime + $checkactivity - time();
         }
     } else {
         $remainingtime = 0;
