@@ -695,7 +695,7 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
         return 1;
     } else {
         // Get list of devices in the experience that are not alive and see which ones are down.
-        $devices = explode("Ping to ", $response);
+        //$devices = explode("Ping to ", $response);
 
         /**
          * Gets a string between an initial and a final string.
@@ -706,7 +706,7 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
          * @return string
          *
          */
-        function get_string_between($string, $start, $end) {
+        /*function get_string_between($string, $start, $end) {
             $string = " ".$string;
             $ini = strpos($string, $start);
             if ($ini == 0) {
@@ -725,7 +725,7 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
             if ($info = file_get_contents($url)) {
                 $devicesinfo[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? true : false;
             }
-        }
+        }*/
         return 0;
     }
 }
