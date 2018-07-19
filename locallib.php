@@ -670,76 +670,17 @@ function chmod_r($path) {
  *
  */
 function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
-    global $infodevices;
+    global $devicesinfo;
 
     $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
     $notcheckable = false;
     if ($alive && $sarlabinstance !== false) {
-        // Obtain the xml filename from idExp.
-        $uri = 'http://' . $host . '/';
+        $uri = 'http://' . $host . '/SARLABV8.0/';
         $headers = @get_headers($uri);
-        if (substr($headers[0], 9, 3) == 200) { // Valid file.
-            $dom = new DOMDocument;
-            $dom->validateOnParse = true;
-            if ($dom->load($uri)) {
-                $listexperiences = $dom->getElementsByTagName('Experience'); // Get list of experiences.
-                $xmlfilename = 'null';
-                foreach ($listexperiences as $experience) {
-                    $expideriences = $experience->getElementsByTagName('idExperience'); // Get the name of the experience.
-                    foreach ($expideriences as $expiderience) {
-                        if ($expiderience->nodeValue == $expid) {
-                            $fileexperiences = $experience->getElementsByTagName('fileName'); // Get the name of the xml file.
-                            foreach ($fileexperiences as $fileexperience) {
-                                $xmlfilename = $fileexperience->nodeValue;
-                            }
-                            break 2;
-                        }
-                    }
-                }
-                $url = $uri . 'isAliveExp?' . $xmlfilename;
-                if ($info = file_get_contents($url)) {
-                    $info = explode("=", $info);
-                    $alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper ("true")) ? true : false;
-                    if (!$alive) {
-                        // Get list of devices in the experience that are not alive and see which ones are down.
-                        $url = $uri . 'pingExp' . $xmlfilename;
-                        if ($info = file_get_contents($url)) {
-                            $devices = explode("Ping to ", $info);
-
-                            /**
-                             * Gets a string between an initial and a final string.
-                             *
-                             * @param string $string
-                             * @param string $start
-                             * @param string $end
-                             * @return string
-                             *
-                             */
-                            function get_string_between($string, $start, $end) {
-                                $string = " ".$string;
-                                $ini = strpos($string, $start);
-                                if ($ini == 0) {
-                                    return "";
-                                }
-                                $ini += strlen($start);
-                                $len = strpos($string, $end, $ini) - $ini;
-                                return substr($string, $ini, $len);
-                            }
-
-                            foreach ($devices as $device) {
-                                $infodevices[]->name = get_string_between($device, ": ", "ping ");
-                                $ip = get_string_between($device, "ping ", "Reply from ");
-                                $infodevices[]->ip = $ip;
-                                $url = $uri . 'isAlive?' . $ip;
-                                if ($info = file_get_contents($url)) {
-                                    $infodevices[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? true : false;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    $notcheckable = true;
-                }
+        if (substr($headers[0], 9, 3) == 200) { // Valid url.
+            $url = $uri . 'webresources/net/isLive?idExp=' . $expid;
+            if ($response = file_get_contents($url)) {
+                $alive = ($response === 'true');
             } else {
                 $notcheckable = true;
             }
@@ -753,6 +694,38 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
     if ($alive) {
         return 1;
     } else {
+        // Get list of devices in the experience that are not alive and see which ones are down.
+        $devices = explode("Ping to ", $response);
+
+        /**
+         * Gets a string between an initial and a final string.
+         *
+         * @param string $string
+         * @param string $start
+         * @param string $end
+         * @return string
+         *
+         */
+        function get_string_between($string, $start, $end) {
+            $string = " ".$string;
+            $ini = strpos($string, $start);
+            if ($ini == 0) {
+                return "";
+            }
+            $ini += strlen($start);
+            $len = strpos($string, $end, $ini) - $ini;
+            return substr($string, $ini, $len);
+        }
+
+        foreach ($devices as $device) {
+            $devicesinfo[]->name = get_string_between($device, ": ", "ping ");
+            $ip = get_string_between($device, "ping ", "Reply from ");
+            $devicesinfo[]->ip = $ip;
+            $url = $uri . 'isAlive?' . $ip;
+            if ($info = file_get_contents($url)) {
+                $devicesinfo[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? true : false;
+            }
+        }
         return 0;
     }
 }

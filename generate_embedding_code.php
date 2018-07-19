@@ -380,8 +380,9 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
                 // Launching the websocket service for Sarlab.
                 global $PAGE;
                 $username = $USER->username . "@" . $CFG->wwwroot;
+                $practice = explode("@", $remlabinfo->practice, 2);
                 $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                    array($commandsarlab, $sarlabip, $sarlabport, $remlabinfo->practice,
+                    array($commandsarlab, $sarlabip, $sarlabport, $practice[0],
                         $remlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
                 $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
             }
