@@ -1,4 +1,5 @@
 [Zenodo](https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp)
+
 [DOI](10.5281/zenodo.33845)
 
 ## 1. Content
@@ -85,7 +86,7 @@ When installing ejsapp for the first time, you may need to set a few variables (
    certificate_alias: 	This variable stores the alias given to your trust certificate.
 
 ## 5. Authors
-==========
+
 EJSApp has been developed by:
  - Luis de la Torre: ldelatorre@dia.uned.es
  - Ruben Heradio: rheradio@issi.uned.es
