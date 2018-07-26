@@ -1,12 +1,8 @@
-##########
-# EJSApp #
-##########
+[Zenodo](https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp)
 
-https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp
-DOI: 10.5281/zenodo.33845
+[DOI](10.5281/zenodo.33845)
 
-1. Content
-==========
+## 1. Content
 
 This plugin lets you add any Java applet or Javascript application created with Easy Java Simulations (EJS) to your
 Moodle course.
@@ -14,8 +10,7 @@ Moodle course.
 The Java applets should have been compiled with version 4.37 (build 20120715 or later) of EJS while the Javascript
 applications should have been created with version 5.1 (build 20150613 or later) to work properly.
 
-2. License
-==========
+## 2. License
 
 EJSApp is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -25,8 +20,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
 
 The GNU General Public License is available on <http://www.gnu.org/licenses/>
 
-3. Installation
-===============
+## 3. Installation
 
 If you downloaded this plugin from github, you will need to change the folder's name to ejsapp. If you downloaded it
 from Moodle.org, then you are fine.
@@ -81,8 +75,7 @@ https://github.com/UNEDLabs.
  $ chown wwwrun /usr/java/jdk1.7.0_51/bin/jarsigner                                                                                                                                  
 ------------------------------------------------------------------------------------------------
 
-4. Configuration
-================
+## 4. Configuration
 
 When installing ejsapp for the first time, you may need to set a few variables (in case you want to use applets):
 
@@ -92,8 +85,8 @@ When installing ejsapp for the first time, you may need to set a few variables (
 
    certificate_alias: 	This variable stores the alias given to your trust certificate.
 
-5. Authors
-==========
+## 5. Authors
+
 EJSApp has been developed by:
  - Luis de la Torre: ldelatorre@dia.uned.es
  - Ruben Heradio: rheradio@issi.uned.es
