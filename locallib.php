@@ -275,7 +275,7 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
         $code = str_replace($search, $replace, $code);
     }
 
-    // Replace link for css.
+    // Replace link for EjsS built-in css.
     $ejsscss = '_ejs_library/css/ejss.css';
     if (!file_exists($CFG->dirroot . $codebase . $ejsscss)) {
         $ejsscss = '_ejs_library/css/ejsSimulation.css';
@@ -287,26 +287,20 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
         $replace = '';
     }
     $code = str_replace($search, $replace, $code);
+    // Replace link for users' css.
+    $search = '<link rel="stylesheet"  type="text/css" href="';
+    $replace = '<link rel="stylesheet"  type="text/css" href="' . $path;
+    $pos = strrpos($code, $search);
+    var_dump(substr($code, $pos, 4));
+    if($pos !== false && substr($code, $pos+strlen($search), 4) !== 'http') {
+        $code = substr_replace($code, $replace, $pos, strlen($search));
+    }
 
-    $search = '<link rel="stylesheet"  type="text/css" href="css/style.css" />';
-    $replace = '';
-    $code = str_replace($search, $replace, $code);
-
-    // Replace links for common_script.js, textsizedetector.js and the ejss library file.
-    $search = '<script src="_ejs_library/scripts/common_script.js"></script>';
-    $replace = '<script src="' . $path .'_ejs_library/scripts/common_script.js"></script>';
-    $code = str_replace($search, $replace, $code);
-    $search = '<script src="_ejs_library/scripts/textresizedetector.js"></script>';
-    $replace = '<script src="' . $path .'_ejs_library/scripts/textresizedetector.js"></script>';
-    $code = str_replace($search, $replace, $code);
-    $search = '<script src="_ejs_library/ejsS.v1.min.js"></script>';
-    $replace = '<script src="' . $path .'_ejs_library/ejsS.v1.min.js"></script>';
-    $code = str_replace($search, $replace, $code);
-    $search = '<script src="_ejs_library/ejsS.v1.max.js"></script>';
-    $replace = '<script src="' . $path .'_ejs_library/ejsS.v1.max.js"></script>';
-    $code = str_replace($search, $replace, $code);
-
-    // TODO: Replace links for user files.
+    // Replace links for common_script.js, textsizedetector.js, the ejss library file and any other js file added by
+    // the user as long as it is a local file and not an online one.
+    $search = '#<script src=\"(?!http)#';
+    $replace = '<script src="' . $path;
+    $code = preg_replace($search, $replace, $code);
 
     return $code;
 }
@@ -613,11 +607,11 @@ function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase
                 $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) .
                     '<div id="_topFrame" style="text-align:center"></div>';
 
+                // Variable $code2 is $code from </head> to </body> tags, none of them included.
+                $code2 = substr($code, strpos($code, '</head>'));
+                $code2 = explode('</body>', $code2);
+                $code2 = $code2[0] . '</div>';
                 if (strpos($code, '<script type')) { // EjsS with Javascript embedded in the html page.
-                    // Variable $code2 is $code from </head> to </body> tags, none of them included.
-                    $code2 = substr($code, strpos($code, '</head>'));
-                    $code2 = explode('</body>', $code2);
-                    $code2 = $code2[0] . '</div>';
                     $code2 = substr($code2, strpos($code2, '<script type'));
                 } else { // EjsS with an external .js file for the Javascript.
                     $explodedfilename = explode(".", $ejsapp->applet_name);
