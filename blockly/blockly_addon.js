@@ -961,12 +961,10 @@ function loadJavaScriptModelBlocks() {
 		var dropdown_original = block.getFieldValue('original');
 		var text_params = block.getFieldValue('params');
 		replacing = true;
-		remoteLab = true;
 		remote = true && remoteLab;
 		var statements_code = Blockly.JavaScript.statementToCode(block, 'code');
 		remote = false;
 		replacing = false;
-		remoteLab = false;
 		paramsList = "";
 		// TODO: Assemble JavaScript into code variable.
 		statements_code = statements_code ? statements_code.toString() : '';
