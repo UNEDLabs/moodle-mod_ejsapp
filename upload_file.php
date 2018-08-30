@@ -51,11 +51,13 @@ if ($_POST['type'] == 'actions') { // Users interactions: store in the database 
 } else { // Store the file in the user private repository.
     $originalname = $_POST['user_file'];
     $filename = replace_characters($originalname);
-    $extension = pathinfo($filename, PATHINFO_EXTENSION);
-    if (!$extension) {
-        $extension = $_POST['type'];
-        $extension = str_replace(".", "", $extension);
-        $filename = $filename . '.' . $extension;
+    $ejssextension = $_POST['type'];
+    $userextension = pathinfo($filename, PATHINFO_EXTENSION);
+    if ($ejssextension != null && $ejssextension != '') {
+        if ($userextension) $filename = substr($filename, 0, strrpos( $filename, '.')) . $ejssextension;
+        else $filename .= $ejssextension;
+    } else {
+        if (!$userextension) $filename = $filename . '.txt';
     }
 
     $contextid = $_POST['context_id'];

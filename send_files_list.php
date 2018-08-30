@@ -51,8 +51,9 @@ $records = $DB->get_records_select('files', "component='user' AND filearea='priv
 
 foreach ($records as $record) {
     $extension = pathinfo($record->filename, PATHINFO_EXTENSION);
-    if (($type == 'text' && $extension == 'txt') || ($type == '.rec' && $extension == 'rec') ||
-        ($type == '.blk' && $extension == 'blk') || ($type == '.json' && $extension == 'json')) {
+    if (($type == 'text' && $extension == 'txt' || $extension == 'm' || $extension == 'js' || $extension == 'py') ||
+        ($type == '.rec' && $extension == 'rec') || ($type == '.blk' && $extension == 'blk') ||
+        ($type == '.json' && $extension == 'json')) {
         $ejsappfilepath = $CFG->wwwroot . '/pluginfile.php/' . $record->contextid . '/mod_ejsapp/private/' .
             $record->itemid . '/';
         $filename["file_name"] = $record->filename;

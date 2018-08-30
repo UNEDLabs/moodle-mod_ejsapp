@@ -406,7 +406,7 @@ if ($accessed) {
     // work with the remote lab.
     $ejsappname = urlencode($ejsapp->name);
     $params = '?courseid=' . $course->id . '&activityid=' . $ejsapp->id .
-        '&cmid=' . $cm->id . '&ejsappname=' . $ejsappname . '&userid=' . $USER->id;
+        '&cmid=' . $cm->id . '&ejsappname=' . urlencode($ejsappname) . '&userid=' . $USER->id;
     $urllog = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php' . $params;
     $urlleave = $CFG->wwwroot . '/mod/ejsapp/leave_or_kick_out.php' . $params;
     if ($ejsapp->is_rem_lab == 0) {
