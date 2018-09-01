@@ -232,3 +232,11 @@ $string['certificate_password'] = "Contraseña del certificado de confianza";
 $string['certificate_password_description'] = "La contraseña requerida para usar el certificado de confianza";
 $string['certificate_alias'] = "Alias del certificado de confianza";
 $string['certificate_alias_description'] = "El alias asignado al certificado de confianza";
+
+// Privacy
+$string['privacy:metadata:ejsapp_records'] = 'Contiene las interacciones de los usuarios (eventos del raton) realizadas en las aplicaciones EjsS.';
+$string['privacy:metadata:ejsapp_records:time'] = 'El tiempo en el que tuvo lugar la accion.';
+$string['privacy:metadata:ejsapp_records:userid'] = 'El ID del usuario que realiza la accion.';
+$string['privacy:metadata:ejsapp_records:ejsappid'] = 'El ID de la actividad EJSApp sobre la que se realiza la accion.';
+$string['privacy:metadata:ejsapp_records:sessionsid'] = 'El ID de la sesion.';
+$string['privacy:metadata:ejsapp_records:actions'] = 'Una descripcion de las acciones que se realizaron.';

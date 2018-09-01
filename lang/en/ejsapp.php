@@ -233,3 +233,11 @@ $string['certificate_password'] = "Trust certificate password";
 $string['certificate_password_description'] = "The password required for using the trust certificate";
 $string['certificate_alias'] = "Trust certificate alias";
 $string['certificate_alias_description'] = "The alias given to the trust certificate";
+
+// Privacy
+$string['privacy:metadata:ejsapp_records'] = 'Contains users interactions (mouse events) with the EjsS applications.';
+$string['privacy:metadata:ejsapp_records:time'] = 'The time at which the action took place.';
+$string['privacy:metadata:ejsapp_records:userid'] = 'The ID of the user making the action.';
+$string['privacy:metadata:ejsapp_records:ejsappid'] = 'The ID of the EJSApp activity in which the action was made.';
+$string['privacy:metadata:ejsapp_records:sessionsid'] = 'The ID of the session.';
+$string['privacy:metadata:ejsapp_records:actions'] = 'A description of the actions that were made.';
