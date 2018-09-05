@@ -54,8 +54,13 @@ if ($_POST['type'] == 'actions') { // Users interactions: store in the database 
     $ejssextension = $_POST['type'];
     $userextension = pathinfo($filename, PATHINFO_EXTENSION);
     if ($ejssextension != null && $ejssextension != '') {
-        if ($userextension) $filename = substr($filename, 0, strrpos( $filename, '.')) . $ejssextension;
-        else $filename .= $ejssextension;
+        if ($userextension) {
+            $filename = substr($filename, 0, strrpos( $filename, '.')) . $ejssextension;
+        } else if (substr($ejssextension, 0, 1) == '.') {
+            $filename .= $ejssextension;
+        } else {
+            $filename .= '.' . $ejssextension;
+        }
     } else {
         if (!$userextension) $filename = $filename . '.txt';
     }
