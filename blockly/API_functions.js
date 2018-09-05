@@ -128,7 +128,7 @@ var ARGUMENT_NAMES = /([^\s,]+)/g;
 function getParamNames(func) {
 	var fnStr = func.toString().replace(STRIP_COMMENTS, '');
 	var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-	result = result.toString().replace(/,/g, ' , ');
+	//result = result.toString().replace(/,/g, ' , ');
 	if(result === null) result = [];
 	else result = result.toString().replace(/,/g, ' , ');
 	return result;
@@ -137,35 +137,35 @@ function getParamNames(func) {
 function replaceFunction(dropdown_original, text_params, value_name) {
 	var statements_code = statem[0].toString();
 	statem.splice(0, 1);
-	var text_vars = "";
+	//var text_vars = "";
 	//var text_vars2 = "";
-	var array = text_params.split(',');
-	if (!remote) {
-		if (text_params !== "") {
-			for (var i in array) {
+	//var array = text_params.split(',');
+	//if (!remote) {
+		//if (text_params !== "") {
+			//for (var i in array) {
 				// text_vars = text_vars + array[i]+"=getValueModel('"+array[i]+"');\n";
 				// text_vars2 = text_vars2 + "setValueModel('"+array[i]+"',"+array[i]+");\n";
-			}
-		}
-	}
-	var fill = new Function(text_params, text_vars + statements_code + ' return ' + value_name + ';');
+			//}
+		//}
+	//}
+	var fill = new Function(text_params, statements_code + ' return ' + value_name + ';');
 	setValueModel(dropdown_original, fill);
 }
 
 function replaceFunction2(dropdown_original, text_params) {
 	var statements_code = statem[0].toString();
 	statem.splice(0, 1);
-	var text_vars = "";
-	var array = text_params.split(',');
-	if (!remote) {
-		if (text_params !== "") {
-			for (var i in array) {
+	//var text_vars = "";
+	//var array = text_params.split(',');
+	//if (!remote) {
+		//if (text_params !== "") {
+			//for (var i in array) {
 				// text_vars = text_vars + array[i]+"=getValueModel('"+array[i]+"');\n";
 				// text_vars2 = text_vars2 + "setValueModel('"+array[i]+"',"+array[i]+");\n";
-			}
-		}
-	}
-	var fill = new Function(text_params, text_vars + statements_code + ';');
+			//}
+		//}
+	//}
+	var fill = new Function(text_params, statements_code + ';');
 	setValueModel(dropdown_original, fill);
 }
 

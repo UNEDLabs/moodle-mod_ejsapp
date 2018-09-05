@@ -36,6 +36,7 @@ var function_code_remote = "";
 var remote = false;
 var notComment = false;
 var newImplement = false;
+var params_replace = [];
 
 function loadModelBlocks() {
 	var _vars = "";
@@ -768,6 +769,10 @@ function loadJavaScriptModelBlocks() {
 	function getJS(block, text) {
 		var dropdown_d = block.getFieldValue(text);
 		var code;
+		for (var i in params_replace) {
+			if(params_replace[i].toString() === dropdown_d)
+				return [dropdown_d, Blockly.JavaScript.NONE];
+		}
 		if ((!condition) && (!remote)) {
 			code = "getValueModel('" + dropdown_d + "')";
 		} else {
@@ -782,6 +787,11 @@ function loadJavaScriptModelBlocks() {
 		var obj = _model._userSerialize();
 		if ((typeof (obj[dropdown_d])).localeCompare("function") === 0) {
 			value_name = value_name.replace("()", "");
+		}
+		
+		for (var i in params_replace) {
+			if(params_replace[i].toString() === dropdown_d)
+				return dropdown_d + " = " + value_name + ";\n";
 		}
 		if ((!condition) && (!remote)) {
 			return "setValueModel('" + dropdown_d + "'," + value_name + ",'" + typeof (obj[dropdown_d]) + "');\n";
@@ -916,7 +926,7 @@ function loadJavaScriptModelBlocks() {
 		if (remoteLab) {
 			return value_name;
 		} else {
-			return "evaluate(\"" + value_name + "\");\n";
+			return "evaluate('" + value_name + "');\n";
 		}
 	};
 
@@ -928,20 +938,26 @@ function loadJavaScriptModelBlocks() {
 		if (remoteLab) {
 			return [value_name, Blockly.JavaScript.ATOMIC];
 		} else {
-			return ["evaluate(\"" + value_name + "\")", Blockly.JavaScript.ATOMIC];
+			return ["evaluate('" + value_name + "')", Blockly.JavaScript.ATOMIC];
 		}
 	};
 
+	
+	
 	Blockly.JavaScript.replacefunc = function(block) {
 		var dropdown_original = block.getFieldValue('original');
 		var text_params = block.getFieldValue('params');
+		params_replace = [];
+		params_replace = text_params.split(',');
+		if(text_params === "") params_replace = [];
 		replacing = true;
 		remote = true && remoteLab;
 		var statements_code = Blockly.JavaScript.statementToCode(block, 'code');
+		var value_name = Blockly.JavaScript.valueToCode(block, 'return', Blockly.JavaScript.ORDER_ATOMIC);
 		remote = false;
 		replacing = false;
 		paramsList = "";
-		var value_name = Blockly.JavaScript.valueToCode(block, 'return', Blockly.JavaScript.ORDER_ATOMIC);
+		params_replace = [];
 		// TODO: Assemble JavaScript into code variable.
 		statements_code = statements_code ? statements_code.toString() : '';
 		value_name = value_name ? value_name.toString() : '';
@@ -960,11 +976,15 @@ function loadJavaScriptModelBlocks() {
 	Blockly.JavaScript.replacefunc2 = function(block) {
 		var dropdown_original = block.getFieldValue('original');
 		var text_params = block.getFieldValue('params');
+		params_replace = [];
+		params_replace = text_params.split(',');
+		if(text_params === "") params_replace = [];
 		replacing = true;
 		remote = true && remoteLab;
 		var statements_code = Blockly.JavaScript.statementToCode(block, 'code');
 		remote = false;
 		replacing = false;
+		params_replace = [];
 		paramsList = "";
 		// TODO: Assemble JavaScript into code variable.
 		statements_code = statements_code ? statements_code.toString() : '';
@@ -1356,7 +1376,6 @@ controls = function(workspace) {
 	xmlList.push(block);
 	return xmlList;
 };
-
 window.onload = function() {
 	if (typeof _model !== 'undefined') { // Any scope
 		loadModelBlocks();
