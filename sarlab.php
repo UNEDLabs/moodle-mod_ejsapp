@@ -44,7 +44,7 @@ if ($version < 8) {
     $obj->key = $key;
 }
 
-$time = array(strtotime(date('Y-m-d H:i:s')) + 120); // At least two minutes margin for working with the lab.
+$time = strtotime(date('Y-m-d H:i:s')) + 120; // At least two minutes margin for working with the lab.
 
 if ($record = $DB->get_records_select('block_remlab_manager_sb_keys',
     'sarlabpass = ? AND expirationtime > ?', array($key, $time))) {
