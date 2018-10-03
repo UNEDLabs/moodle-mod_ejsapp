@@ -311,81 +311,79 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
 
         $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $ejsappname = $ejsapp->applet_name;
-        if ($remlabinfo) {
-            if (!$remlabinfo->instance === false) {
-                // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
-                if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
-                    $ejsappname = substr($ejsapp->applet_name, 0, -4);
-                }
-
-                $wwwpath = new moodle_url($ejsapp->codebase);
-                $mainclass = substr($ejsapp->class_file, 0, -12);
-
-                // Create the JNLP file.
-                $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
-                        <jnlp spec=\"1.0+\"
-                            codebase=\"$wwwpath\"
-                            href=\"$ejsappname.jnlp\">
-                            <information>
-                                <title>$ejsappname</title>
-                                <vendor>Easy Java Simulations</vendor>
-                            </information>
-                            <resources>
-                                <j2se version=\"1.7+\"
-                                    href=\"http://java.sun.com/products/autodl/j2se\"/>
-                                <jar href=\"$ejsappname.jar\" main=\"true\"/>
-                            </resources>
-                            <application-desc
-                                main-class=\"$mainclass\">
-                                <argument>-language</argument>
-                                <argument>$language</argument>
-                                <argument>-lookandfeel</argument>
-                                <argument>NIMBUS</argument>
-                                <argument>-context_id</argument>
-                                <argument>{$context->id}</argument>
-                                <argument>-user_id</argument>
-                                <argument>{$USER->id}</argument>
-                                <argument>-ejsapp_id</argument>
-                                <argument>{$ejsapp->id}</argument>
-                                <argument>-user_moodle</argument>
-                                <argument>user</argument>
-                                <argument>-password_moodle</argument>
-                                <argument>password</argument>
-                                <argument>-moodle_upload_file</argument>
-                                <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file</argument>
-                            </application-desc>
-                            <security>
-                                <all-permissions/>
-                            </security>
-                            <update check=\"background\"/>
-                        </jnlp>";
-
-                $jnlp = fopen($dirpath . $ejsappname . '.jnlp', 'w');
-                fwrite($jnlp, $content);
-                fclose($jnlp);
-
-                // Run or download JNLP.
-                $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
-                        <script src=\"https://www.java.com/js/deployJava.js\"></script>
-                        <script>
-                            var url = '$wwwpath$ejsappname.jnlp';
-                            var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-                            if (is_chrome) document.getElementById('EJsS').src = url;
-                            else deployJava.launchWebStartApplication(url);
-                        </script>";
-            } else {
-                $code = '';
-                $commandsarlab = 'execjar';
-                $jarpath = $CFG->wwwroot. '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $ejsappname;
-                // Launching the websocket service for Sarlab.
-                global $PAGE;
-                $username = $USER->username . "@" . $CFG->wwwroot;
-                $practice = explode("@", $remlabinfo->practice, 2);
-                $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                    array($commandsarlab, $sarlabip, $sarlabport, $practice[0],
-                        $remlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
-                $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
+        if (!$remlabinfo || !$remlabinfo->instance === false) {
+            // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
+            if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
+                $ejsappname = substr($ejsapp->applet_name, 0, -4);
             }
+
+            $wwwpath = new moodle_url($ejsapp->codebase);
+            $mainclass = substr($ejsapp->class_file, 0, -12);
+
+            // Create the JNLP file.
+            $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+                    <jnlp spec=\"1.0+\"
+                        codebase=\"$wwwpath\"
+                        href=\"$ejsappname.jnlp\">
+                        <information>
+                            <title>$ejsappname</title>
+                            <vendor>Easy Java Simulations</vendor>
+                        </information>
+                        <resources>
+                            <j2se version=\"1.7+\"
+                                href=\"http://java.sun.com/products/autodl/j2se\"/>
+                            <jar href=\"$ejsappname.jar\" main=\"true\"/>
+                        </resources>
+                        <application-desc
+                            main-class=\"$mainclass\">
+                            <argument>-language</argument>
+                            <argument>$language</argument>
+                            <argument>-lookandfeel</argument>
+                            <argument>NIMBUS</argument>
+                            <argument>-context_id</argument>
+                            <argument>{$context->id}</argument>
+                            <argument>-user_id</argument>
+                            <argument>{$USER->id}</argument>
+                            <argument>-ejsapp_id</argument>
+                            <argument>{$ejsapp->id}</argument>
+                            <argument>-user_moodle</argument>
+                            <argument>user</argument>
+                            <argument>-password_moodle</argument>
+                            <argument>password</argument>
+                            <argument>-moodle_upload_file</argument>
+                            <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file</argument>
+                        </application-desc>
+                        <security>
+                            <all-permissions/>
+                        </security>
+                        <update check=\"background\"/>
+                    </jnlp>";
+
+            $jnlp = fopen($dirpath . $ejsappname . '.jnlp', 'w');
+            fwrite($jnlp, $content);
+            fclose($jnlp);
+
+            // Run or download JNLP.
+            $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
+                    <script src=\"https://www.java.com/js/deployJava.js\"></script>
+                    <script>
+                        var url = '$wwwpath$ejsappname.jnlp';
+                        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                        if (is_chrome) document.getElementById('EJsS').src = url;
+                        else deployJava.launchWebStartApplication(url);
+                    </script>";
+        } else {
+            $code = '';
+            $commandsarlab = 'execjar';
+            $jarpath = $CFG->wwwroot. '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/' . $ejsappname;
+            // Launching the websocket service for Sarlab.
+            global $PAGE;
+            $username = $USER->username . "@" . $CFG->wwwroot;
+            $practice = explode("@", $remlabinfo->practice, 2);
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
+                array($commandsarlab, $sarlabip, $sarlabport, $practice[0],
+                    $remlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
+            $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
         }
 
     }
