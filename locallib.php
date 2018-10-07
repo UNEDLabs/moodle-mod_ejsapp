@@ -291,7 +291,6 @@ function update_links($codebase, $ejsapp, $code, $usecss) {
     $search = '<link rel="stylesheet"  type="text/css" href="';
     $replace = '<link rel="stylesheet"  type="text/css" href="' . $path;
     $pos = strrpos($code, $search);
-    var_dump(substr($code, $pos, 4));
     if($pos !== false && substr($code, $pos+strlen($search), 4) !== 'http') {
         $code = substr_replace($code, $replace, $pos, strlen($search));
     }
