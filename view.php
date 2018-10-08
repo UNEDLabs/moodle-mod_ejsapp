@@ -127,7 +127,7 @@ if ($ejsapp->class_file == '') {
             '/mod/ejsapp/send_files_list.php', 'refreshEJSAppFBBut'));
     // If enabled, start recording of users interactions.
     if ($ejsapp->record == 1) {
-        if ($DB->get_field('ejsapp', 'mouse_events', array('id' => $ejsapp->id)) == 1) {
+        if ($DB->get_field('ejsapp', 'mouseevents', array('id' => $ejsapp->id)) == 1) {
             $mouseevents = true;
         } else {
             $mouseevents = false;
