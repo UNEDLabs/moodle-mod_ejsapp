@@ -95,7 +95,7 @@
                        PREVIOUS="time" NEXT="ejsappid"/>
                 <FIELD NAME="ejsappid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"
                        PREVIOUS="userid" NEXT="sessionsid"/>
-                <FIELD NAME="sessionsid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"
+                <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"
                        PREVIOUS="ejsappid" NEXT="actions"/>
                 <FIELD NAME="actions" TYPE="text" LENGTH="400000" NOTNULL="true" SEQUENCE="false"
                        PREVIOUS="sessionid"/>
