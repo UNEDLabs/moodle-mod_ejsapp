@@ -181,18 +181,6 @@ function ejsapp_delete_instance($id) {
         return false;
     }
 
-    $moduleid = $DB->get_field('modules', 'id', array('name' => 'ejsapp'));
-    $cmid = $DB->get_field('course_modules', 'id', array('course' => $ejsapp->course, 'instance' => $id,
-        'module' => $moduleid));
-    $context = context_module::instance($cmid);
-
-    $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'xmlfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'recfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'blkfiles', $id);
-
     $DB->delete_records('ejsapp', array('id' => $id));
     if ($ejsapp->is_rem_lab == 1) {
         $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $id));
@@ -206,6 +194,18 @@ function ejsapp_delete_instance($id) {
     if ($ejsapp->personalvars == 1) {
         $DB->delete_records('ejsapp_personal_vars', array('ejsappid' => $id));
     }
+
+    $moduleid = $DB->get_field('modules', 'id', array('name' => 'ejsapp'));
+    $cmid = $DB->get_field('course_modules', 'id', array('course' => $ejsapp->course, 'instance' => $id,
+        'module' => $moduleid));
+    $context = context_module::instance($cmid);
+
+    $fs = get_file_storage();
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'xmlfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'recfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'blkfiles', $id);
 
     ejsapp_grade_item_delete($ejsapp);
 
