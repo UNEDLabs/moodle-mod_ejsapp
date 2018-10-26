@@ -381,7 +381,7 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
             $username = $USER->username . "@" . $CFG->wwwroot;
             $practice = explode("@", $remlabinfo->practice, 2);
             $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                array($commandsarlab, $sarlabip, $sarlabport, $practice[0],
+                array($commandsarlab, $sarlabip, 443, $practice[0],
                     $remlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
             $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
         }
