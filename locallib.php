@@ -734,8 +734,13 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
  *
  */
 function get_experiences_sarlab($sarlabips, $username = "") {
-    global $DB;
+    global $USER;
     $listexperiences = '';
+
+    $context = context_system::instance();
+    if ($username != "" && !has_capability('ltisource/sarlab:editexp', $context, $USER->id, false)){
+        return $listexperiences;
+    }
 
     foreach ($sarlabips as $sarlabip) {
         $lastquotemark = strrpos($sarlabip, "'");
@@ -765,25 +770,27 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                             $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
                             // Get list of users in this Moodle server who can access the experience
                             $moodleservers = $listownermoodleusers->ServerMoodle;
-                            foreach ($moodleservers as $moodleserver) {
-                                // Check whether this Moodle server is registered in the experience.
-                                if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
-                                    if ($username != "") {
-                                        // If username is provided, check users permissions both in Moodle and Sarlab.
-                                        $userid = $DB->get_field('user', 'id', array('username' => $username));
-                                        $ownerusers = $moodleserver->Owner;
-                                        if  (get_capability_info('ltisource/sarlab:useexp')) {
-                                            foreach ($ownerusers as $owneruser) {
-                                                // Check whether the required user has access to the experience.
-                                                if (strcasecmp($username, $owneruser) == 0) { // TODO: replace $username with userid
-                                                    $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
-                                                    break;
+                            if ($moodleservers != null) {
+                                foreach ($moodleservers as $moodleserver) {
+                                    // Check whether this Moodle server is registered in the experience.
+                                    if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
+                                        if ($username != "") {
+                                            // If username is provided, check users permissions both in Moodle and Sarlab.
+                                            // $userid = $DB->get_field('user', 'id', array('username' => $username));
+                                            $ownerusers = $moodleserver->Owner;
+                                            if (get_capability_info('ltisource/sarlab:useexp')) {
+                                                foreach ($ownerusers as $owneruser) {
+                                                    // Check whether the required user has access to the experience.
+                                                    if (strcasecmp($username, $owneruser) == 0) { // TODO: replace $username with userid
+                                                        $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
+                                                        break;
+                                                    }
                                                 }
                                             }
+                                        } else {
+                                            // If not, the whole list of Sarlab experiences must be returned, so add it.
+                                            $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                         }
-                                    } else {
-                                        // If not, the whole list of Sarlab experiences must be returned, so add it.
-                                        $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                     }
                                 }
                             }
@@ -848,9 +855,9 @@ function get_showable_experiences($username = "") {
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
     }
     // Get experiences from Sarlab.
-    $userlistexperiences = get_experiences_sarlab($sarlabips, $username);
+    $userlistexperiences = ($username != "") ? get_experiences_sarlab($sarlabips, $username) : "";
     $alllistexperiences = get_experiences_sarlab($sarlabips, "");
-    $usersarlabexperiences = explode(";", $userlistexperiences);
+    $usersarlabexperiences = ($username != "") ? explode(";", $userlistexperiences) : array("");
     $allsarlabexperiences = explode(";", $alllistexperiences);
     // Also get experiences NOT in Sarlab and add them to the list.
     $showableexperiences = combine_experiences($usersarlabexperiences, $allsarlabexperiences);
