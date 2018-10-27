@@ -765,7 +765,6 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                             $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
                             // Get list of users in this Moodle server who can access the experience
                             $moodleservers = $listownermoodleusers->ServerMoodle;
-                            if (!is_array($moodleservers)) $moodleservers = array($moodleservers);
                             foreach ($moodleservers as $moodleserver) {
                                 // Check whether this Moodle server is registered in the experience.
                                 if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
