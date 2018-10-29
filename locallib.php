@@ -878,7 +878,6 @@ function default_rem_lab_conf($practice, $username = "") {
     // Get experiences from Sarlab and check whether this practice is in a Sarlab server or not.
     $sarlabinstance = is_practice_in_sarlab($practice, $username);
     $defaultconf = new stdClass();
-    $defaultconf->practiceintro = $practice;
     if ($sarlabinstance !== false) { // Practice is defined in a Sarlab server
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
         if (empty($sarlabips)) {
@@ -896,9 +895,12 @@ function default_rem_lab_conf($practice, $username = "") {
         $defaultconf->ip = $ip;
         $defaultconf->port = $sarlabports[intval($sarlabinstance)];
     } else {
+        $arr = explode("@", $practice, 2);
+        $practice = $arr[0];
         $defaultconf->ip = '127.0.0.1';
         $defaultconf->port = 443;
     }
+    $defaultconf->practiceintro = $practice;
     $defaultconf->slotsduration = 1;
     $defaultconf->totalslots = 18;
     $defaultconf->weeklyslots = 9;
