@@ -31,8 +31,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('generate_embedding_code.php');
-
-use block_remlab_manager\task\refresh_adhoc_usestate_field;
+require_once('locallib.php');
 
 global $USER, $DB, $CFG, $PAGE, $OUTPUT;
 $CFG->cachejs = false;

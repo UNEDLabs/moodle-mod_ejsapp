@@ -671,6 +671,10 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
         $uri = 'http://' . $host . '/SARLABV8.0/';
         $headers = @get_headers($uri);
         if (substr($headers[0], 9, 3) == 200) { // Valid url.
+            if ($expid != null) {
+                $expid = explode('@', $expid);
+                $expid = $expid[0];
+            }
             $url = $uri . 'webresources/net/isLive?idExp=' . $expid;
             if ($response = file_get_contents($url)) {
                 $alive = ($response === 'true');

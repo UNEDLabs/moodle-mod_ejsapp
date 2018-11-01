@@ -33,8 +33,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('locallib.php');
-
 /**
  * Supported features by EJSApp
  *
@@ -215,6 +213,10 @@ function ejsapp_delete_instance($id) {
     return true;
 }
 
+
+
+// Grading API.
+
 /**
  * Create grade item for given $ejsapp
  *
@@ -263,6 +265,10 @@ function ejsapp_grade_item_delete($ejsapp) {
     return grade_update('mod/ejsapp', $ejsapp->course, 'mod', '$ejsapp', $ejsapp->id,
         0, null, array('deleted' => 1));
 }
+
+
+
+// Activity API.
 
 /**
  * Return a small object with summary information about what a user has done with a given particular instance of this
