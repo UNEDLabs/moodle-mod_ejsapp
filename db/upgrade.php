@@ -339,19 +339,19 @@ function xmldb_ejsapp_upgrade($oldversion) {
     }
 
     if ($oldversion < '2017092201') {
-        // Create "record" and "mouse_events" fields in ejsapp table.
+        // Create "record" and "mouseevents" fields in ejsapp table.
         $dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp');
         $field = new xmldb_field('record', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL,
             null, '0', 'blockly_conf');
         $dbman->add_field($table, $field);
-        $field = new xmldb_field('mouse_events', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL,
+        $field = new xmldb_field('mouseevents', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL,
             null, '0', 'record');
         $dbman->add_field($table, $field);
     }
 
     if ($oldversion < '2018070700') {
-        // Create "record" and "mouse_events" fields in ejsapp table.
+        // Drop ejsapp_log table.
         $dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp_log');
         $dbman->drop_table($table);
