@@ -68,7 +68,7 @@ class provider implements \core_privacy\local\metadata\provider {
                  FROM {context} c
            INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-           INNER JOIN {ejsapp} f ON e.id = cm.instance
+           INNER JOIN {ejsapp} e ON e.id = cm.instance
             LEFT JOIN {ejsapp_records} r ON r.ejsappid = e.id
                 WHERE (
                 r.userid        = :drecorduserid

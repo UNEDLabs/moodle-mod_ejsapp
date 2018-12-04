@@ -225,7 +225,7 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
         if (($ejsapp->is_rem_lab || $collabinfo) && $remlabinfo) {
             if ($remlabinfo->instance !== false ) { // For remote labs accessed through Sarlab, pass authentication params to the app.
                 $practice = explode("@", $remlabinfo->practice, 2);
-                // TODO: Replace $USER->username by $USER->id and $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')
+                // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
                     array($USER->username . "@" . $CFG->wwwroot, $sarlabkey));
                 $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',

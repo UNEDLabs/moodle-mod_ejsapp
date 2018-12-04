@@ -44,7 +44,7 @@ if ($_POST['type'] == 'actions') { // Users interactions: store in the database 
     $data = new stdClass();
     $data->time = time();
     $data->userid = $_POST['user_id'];
-    $data->ejsappid = $_POST['ejsapp_id'];;
+    $data->ejsappid = $_POST['ejsapp_id'];
     $data->sessionid = 0;
     $data->actions = $_POST['file'];
     $DB->insert_record('ejsapp_records', $data);

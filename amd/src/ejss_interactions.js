@@ -37,11 +37,11 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
                         // Start recording of users interaction
                         _model.startRegister(mouseevents);
                         // Save record every 30 seconds
-                        _model.sendRegister(false);
+                        _model.sendRegister(true);
                     }, 30000);
                     // Also save before the user leaves the EJSApp activity
                     $(window).bind('beforeunload', function(){
-                        _model.sendRegister(false);
+                        _model.sendRegister(true);
                     });
                     clearInterval(doit);
                 }

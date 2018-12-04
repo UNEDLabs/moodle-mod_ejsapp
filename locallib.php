@@ -780,12 +780,11 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                                     if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
                                         if ($username != "") {
                                             // If username is provided, check users permissions both in Moodle and Sarlab.
-                                            // $userid = $DB->get_field('user', 'id', array('username' => $username));
                                             $ownerusers = $moodleserver->Owner;
                                             if (get_capability_info('ltisource/sarlab:useexp')) {
                                                 foreach ($ownerusers as $owneruser) {
                                                     // Check whether the required user has access to the experience.
-                                                    if (strcasecmp($username, $owneruser) == 0) { // TODO: replace $username with userid
+                                                    if (strcasecmp($username, $owneruser) == 0) {
                                                         $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                                         break;
                                                     }
