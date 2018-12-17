@@ -33,7 +33,7 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
         recording: function(mouseevents) {
             var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
-                        setInterval(function() {
+                    setInterval(function() {
                         // Start recording of users interaction
                         _model.startRegister(mouseevents);
                         // Save record every 30 seconds
@@ -142,13 +142,13 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
 
         fullScreen: function() {
             const chart = $('#slideshow-wrapper')[0];
-            $('#full_screen_chart').click(function() {
+            $('#full_screen_chart').on('click', function () {
                 if (screenfull.enabled) {
                     screenfull.request(chart);
                 }
             });
             const blockly = $('#injectionDiv')[0];
-            $('#full_screen_blockly').click(function() {
+            $('#full_screen_blockly').on('click', function () {
                 if (screenfull.enabled) {
                     screenfull.request(blockly);
                 }
