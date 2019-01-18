@@ -259,7 +259,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('is_rem_lab', 'remlab_manager', 'eq', 0);
 
         if ($remlabmanagerinstalled) {
-            $showableexperiences = get_showable_experiences($USER->username);
+            $showableexperiences = get_showable_experiences($USER->username, 1);
         } else {
             $showableexperiences = array();
         }

@@ -733,11 +733,12 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
  *
  * @param array $sarlabips
  * @param string $username
+ * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
  * @return string $listexperiences
  * @throws
  *
  */
-function get_experiences_sarlab($sarlabips, $username = "") {
+function get_experiences_sarlab($sarlabips, $username = "", $ejsappcontext = 0) {
     global $USER;
     $listexperiences = '';
 
@@ -781,7 +782,12 @@ function get_experiences_sarlab($sarlabips, $username = "") {
                                         if ($username != "") {
                                             // If username is provided, check users permissions both in Moodle and Sarlab.
                                             $ownerusers = $moodleserver->Owner;
-                                            if (get_capability_info('ltisource/sarlab:useexp')) {
+                                            if ($ejsappcontext == 0) {
+                                                $cap = get_capability_info('ltisource/sarlab:editexp');
+                                            } else {
+                                                $cap = get_capability_info('ltisource/sarlab:useexp');
+                                            }
+                                            if ($cap) {
                                                 foreach ($ownerusers as $owneruser) {
                                                     // Check whether the required user has access to the experience.
                                                     if (strcasecmp($username, $owneruser) == 0) {
@@ -848,17 +854,18 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
  * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
  *
  * @param string $username
+ * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
  * @return array $showableexperiences
  * @throws
  *
  */
-function get_showable_experiences($username = "") {
+function get_showable_experiences($username = "", $ejsappcontext = 0) {
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     if (empty($sarlabips)) {
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
     }
     // Get experiences from Sarlab.
-    $userlistexperiences = ($username != "") ? get_experiences_sarlab($sarlabips, $username) : "";
+    $userlistexperiences = ($username != "") ? get_experiences_sarlab($sarlabips, $username, $ejsappcontext) : "";
     $alllistexperiences = get_experiences_sarlab($sarlabips, "");
     $usersarlabexperiences = ($username != "") ? explode(";", $userlistexperiences) : array("");
     $allsarlabexperiences = explode(";", $alllistexperiences);
@@ -879,7 +886,7 @@ function get_showable_experiences($username = "") {
  */
 function default_rem_lab_conf($practice, $username = "") {
     // Get experiences from Sarlab and check whether this practice is in a Sarlab server or not.
-    $sarlabinstance = is_practice_in_sarlab($practice, $username);
+    $sarlabinstance = is_practice_in_sarlab($practice, $username, 1);
     $defaultconf = new stdClass();
     if ($sarlabinstance !== false) { // Practice is defined in a Sarlab server
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
@@ -921,11 +928,12 @@ function default_rem_lab_conf($practice, $username = "") {
  *
  * @param string $practice
  * @param string $username
+ * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
  * @return false|int $sarlabinstance
  * @throws
  *
  */
-function is_practice_in_sarlab($practice, $username = "") {
+function is_practice_in_sarlab($practice, $username = "", $ejsappcontext = 0) {
     $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
     if (empty($sarlabips)) {
         $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
@@ -934,7 +942,7 @@ function is_practice_in_sarlab($practice, $username = "") {
     $instance = 0;
     foreach ($sarlabips as $sarlabip) {
         $sarlabiparray = array($sarlabip);
-        $listexperiences = get_experiences_sarlab($sarlabiparray, $username);
+        $listexperiences = get_experiences_sarlab($sarlabiparray, $username, $ejsappcontext);
         $sarlabexperiences = explode(";", $listexperiences);
         if (in_array($practice, $sarlabexperiences)) {
             $sarlabinstance = $instance;
