@@ -48,6 +48,7 @@ function loadWorkspace() {
 
 function cleanCharts() {
     var clean = actual_chart;
+	rec(false);
 	if(chartArray.length > 1) {
 		prevChart();
 		// clearInterval(chartArray[clean]["timer"]);

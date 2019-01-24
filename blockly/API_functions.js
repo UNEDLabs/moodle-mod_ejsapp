@@ -366,6 +366,12 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(createChart(number));
 	};
 	interpreter.setProperty(scope, 'createChart', interpreter.createNativeFunction(wrapper));
+	
+	// Add an API function for cleanCharts blocks.
+	var wrapper = function() {
+		return interpreter.createPrimitive(cleanCharts());
+	};
+	interpreter.setProperty(scope, 'cleanCharts',	interpreter.createNativeFunction(wrapper));
 } // End of initApi
 
 function highlightBlock(id) {
