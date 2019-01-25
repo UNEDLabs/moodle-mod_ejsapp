@@ -1734,7 +1734,7 @@ function create_blockly_configuration($ejsapp) {
         $labcontrol = "'<category name=\"" . get_string('xml_lab_control', 'ejsapp')  . "\" custom=\"controls\"></category>'";
 		$labcharts = "'<category name=\"" . get_string('xml_lab_charts', 'ejsapp') .
             "\"><block type=\"createChart\"></block><block type=\"start_rec\"></block>" .
-            "<block type=\"stop_rec\"></block></category>'";
+            "<block type=\"stop_rec\"></block><block type=\"reinit_charts\"></block></category>'";
 
         // Now, create the configuration by adding the categories selected in the ejsapp activity configuration.
         // Categories.

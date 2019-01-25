@@ -688,6 +688,18 @@ function loadModelBlocks() {
 			}
 		}
 	};
+	
+	Blockly.Blocks.reinit_charts = {
+		init: function() {
+			this.appendDummyInput()
+			.appendField(Blockly.Msg.ExpCLEAN);
+			this.setPreviousStatement(true, null);
+			this.setNextStatement(true, null);
+			this.setColour(200);
+			this.setTooltip('');
+		}
+	};
+	
 } // End of loadModelBlocks
 
 var condition = false;
@@ -1004,6 +1016,10 @@ function loadJavaScriptModelBlocks() {
 
 	Blockly.JavaScript.initialize_lab = function(block) {
 		return "initialize();\n";
+	};
+	
+	Blockly.JavaScript.reinit_charts = function(block) {
+		return "cleanCharts();\n";
 	};
 } // End of loadJavaScriptModelBlocks
 
