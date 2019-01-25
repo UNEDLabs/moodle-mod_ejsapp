@@ -114,6 +114,9 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
         }
     }
 
+    // Codebase.
+    $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+
     // Create folders to store the .jar or .zip file.
     $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
     if (!file_exists($path)) {
@@ -123,7 +126,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     if (!file_exists($path)) {
         mkdir($path, 0755);
     }
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
+    $path = $CFG->dirroot . $codebase;
     if (file_exists($path)) { // Updating, not creating, the ejsapp activity.
         delete_recursively($path);
     }
@@ -132,9 +135,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     // Copy the jar/zip file to its destination folder in jarfiles.
     $filepath = $path . $filerecord->filename;
     $file->copy_content_to($filepath);
-
-    // Codebase.
-    $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
 
     // Initialize the mod_form elements.
     $ejsapp->class_file = '';
@@ -148,7 +148,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     if ($ext == 'jar') { // Java.
         $ejsok = modifications_for_java($filepath, $ejsapp, $file, $filerecord, false);
     } else { // Javascript.
-        $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
         $ejsok = modifications_for_javascript($filepath, $ejsapp, $path, $codebase);
     }
 

@@ -30,6 +30,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
+require_once(dirname(dirname(dirname(__FILE__))) . '/locallib.php');
 
 /**
  * Structure step to restore one EJSApp activity
@@ -124,6 +125,11 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
 
                 $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
 
+                // Update ejsapp table.
+                $data->id = $newitemid;
+                $data->codebase = $codebase;
+                $DB->update_record('ejsapp', $data);
+
                 // Copy file .jar or .zip file.
                 $folderpath = $CFG->dirroot . $codebase;
                 $filepath = $folderpath . $filerecord->filename;
@@ -132,12 +138,6 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
                     modifications_for_javascript($filepath, $data, $folderpath, $codebase);
                     unlink($filepath);
                 }
-
-                // Update ejsapp table.
-                $record = new stdClass();
-                $record->id = $newitemid;
-                $record->codebase = $codebase;
-                $DB->update_record('ejsapp', $record);
             }
         }
 
