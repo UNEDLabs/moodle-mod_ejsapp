@@ -184,7 +184,9 @@ function ejsapp_delete_instance($id) {
 
     $DB->delete_records('ejsapp', array('id' => $id));
     if ($ejsapp->is_rem_lab == 1) {
-        $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $id));
+        if ($DB->record_exists('block_remlab_manager_exp2prc', array('ejsappid' => $id))) {
+            $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $id));
+        }
         // EJSApp booking system.
         if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
             $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $id));
