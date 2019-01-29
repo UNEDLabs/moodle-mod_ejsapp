@@ -46,8 +46,8 @@ function loadWorkspace() {
 	}
 }
 
-function cleanCharts() {
-    var clean = actual_chart;
+function clearChartByNumber(number) {
+	var clean = number;
 	rec(false);
 	if(chartArray.length > 1) {
 		prevChart();
@@ -78,6 +78,10 @@ function cleanCharts() {
         document.getElementById("prev_chart").style.display = "inline";
         document.getElementById("next_chart").style.display = "inline";
     }
+}
+
+function cleanCharts() {
+    clearChartByNumber(actual_chart);
 }
 
 function getRemoteCode() {

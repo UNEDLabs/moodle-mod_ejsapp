@@ -458,6 +458,10 @@ function loadModelBlocks() {
 				.appendField(Blockly.Msg.ExpCHARTLAST)
 				.appendField(new Blockly.FieldNumber(10, 1), "numberOnlyLast")
 				.appendField(Blockly.Msg.ExpVALUES);
+			this.appendDummyInput().setAlign(Blockly.ALIGN_RIGHT)
+				.appendField("   ")
+				.appendField(new Blockly.FieldCheckbox("True"), "checkboxRenew")
+				.appendField(Blockly.Msg.ExpCHARTRENEW);
 			this.appendDummyInput().appendField(Blockly.Msg.ExpCHARTDATA);
 			this.appendValueInput("x").setCheck(null)
 				.setAlign(Blockly.ALIGN_RIGHT)
@@ -689,16 +693,6 @@ function loadModelBlocks() {
 		}
 	};
 	
-	Blockly.Blocks.reinit_charts = {
-		init: function() {
-			this.appendDummyInput()
-			.appendField(Blockly.Msg.ExpCLEAN);
-			this.setPreviousStatement(true, null);
-			this.setNextStatement(true, null);
-			this.setColour(200);
-			this.setTooltip('');
-		}
-	};
 	
 } // End of loadModelBlocks
 
@@ -717,6 +711,7 @@ function loadJavaScriptModelBlocks() {
 		var name = block.getFieldValue('Chart_NAME');
 		var time = block.getFieldValue('time');
 		var check = block.getFieldValue('checkboxOnlyLast') == 'TRUE';
+		var renew = block.getFieldValue('checkboxRenew') == 'TRUE';
 		var numb = block.getFieldValue('numberOnlyLast');
 		var value_name = Blockly.JavaScript.valueToCode(block, 'x', Blockly.JavaScript.ORDER_ATOMIC);
 		var c0name = block.getFieldValue('cName0');
@@ -725,6 +720,7 @@ function loadJavaScriptModelBlocks() {
 			"name": c0name,
 			"value": value_name,
 			"checkBox": check,
+			"renew": renew,
 			"number": numb,
 			"title": name,
 			"time": time
@@ -1018,9 +1014,7 @@ function loadJavaScriptModelBlocks() {
 		return "initialize();\n";
 	};
 	
-	Blockly.JavaScript.reinit_charts = function(block) {
-		return "cleanCharts();\n";
-	};
+
 } // End of loadJavaScriptModelBlocks
 
 function cleanFromComments(textblock) {
@@ -1087,6 +1081,7 @@ function createChart(number) {
 	setTimeStep(10);
 	var exists = -1;
 	var textName = chartInfo[number][0].title;
+	var renew = chartInfo[number][0].renew;
 	var time = chartInfo[number][0].time;
 	for (var n = 0; n < chartArray.length; n++) {
 		if (textName === chartArray[n].name) {
@@ -1095,6 +1090,10 @@ function createChart(number) {
 		}
 	}
     if (exists === -1) {
+		initChart(number, addTab(textName), textName, time);
+	}
+	else if(renew === true){
+		clearChartByNumber(exists);
 		initChart(number, addTab(textName), textName, time);
 	} else {
 		addtoChart(number, exists, time);
