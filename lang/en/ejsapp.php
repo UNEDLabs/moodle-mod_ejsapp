@@ -44,7 +44,6 @@ When used along with the EJSApp Collab Sessions block, Moodle users can work wit
 When used along with the Remlab Manager block, the EJSApp activities that consist on remote labs can benefit from the numerous management options featured by such block.
 
 When used along with the EJSApp Booking System activity, experimentation sessions with the EJSApp activities that consist of remote labs are scheduled from this module.';
-$string['ejsappfieldset'] = 'Custom example fieldset';
 $string['ejsappname'] = 'Lab name';
 $string['ejsappname_help'] = 'Name that will appear in the course for this laboratory';
 $string['ejsapp'] = 'EJSApp';
