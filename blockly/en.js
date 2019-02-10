@@ -417,4 +417,4 @@ Blockly.Msg.ExpINPUT = "input parameters";
 Blockly.Msg.ExpNEWVAR = "new variables";
 Blockly.Msg.ExpCODE = "code";
 Blockly.Msg.ExpINITIALIZE  = "initialize the lab";
-Blockly.Msg.ExpCLEAN = "delete charts";
+Blockly.Msg.ExpCHARTRENEW = "refresh with every experiment";

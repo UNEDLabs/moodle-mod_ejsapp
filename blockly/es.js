@@ -417,4 +417,4 @@ Blockly.Msg.ExpINPUT = "parametros de entrada";
 Blockly.Msg.ExpNEWVAR = "nuevas variables";
 Blockly.Msg.ExpCODE = "código";
 Blockly.Msg.ExpINITIALIZE  = "inicializa el laboratorio";
-Blockly.Msg.ExpCLEAN = "borra las gráficas";
+Blockly.Msg.ExpCHARTRENEW = "renueva con cada experimento";
