@@ -967,8 +967,12 @@ function check_create_remlab_conf($practice) {
     if ($DB->record_exists('block_remlab_manager_conf', array('practiceintro' => $practice))) {
         $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
     } else {
-        $remlab_conf = default_rem_lab_conf($practice);
-        $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
+        if ($practice != '') {
+            $remlab_conf = default_rem_lab_conf($practice);
+            $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
+        } else {
+            $remlab_conf = null;
+        }
     }
 
     return $remlab_conf;
