@@ -61,8 +61,8 @@ define(['jquery'], function() {
                 }
                 alert("You need to download, install and/or run the Sarlab service.");
                 var a = document.createElement("a");
-                a.download = "installsarlabservice_win64.exe";
-                a.href = "http://sarlabirs.dia.uned.es/assets/installsarlabservice_win64.exe";
+                a.download = "myDiscovery_win64.exe";
+                a.href = "http://enlargeirs.dia.uned.es/assets/install_myDiscovery_win64.exe";
                 a.target = "_blank";
                 document.body.appendChild(a);
                 a.click();
