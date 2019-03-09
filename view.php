@@ -153,7 +153,7 @@ create_blockly_configuration($ejsapp);
 // For logging purposes.
 $action = 'view';
 $accessed = false;
-$checkactivity = get_config('mod_ejsapp', 'check_activity');
+$checkactivity = intval(get_config('mod_ejsapp', 'check_activity'));
 
 // Define the div section for charts and related buttons.
 $fullscreencharts = html_writer::div('', 'fa fa-arrows-alt fa-1g', array( 'id' => 'full_screen_chart'));

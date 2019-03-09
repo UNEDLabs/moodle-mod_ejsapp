@@ -184,9 +184,6 @@ function generate_embedding_code($ejsapp, $remlabinfo, $userdatafiles, $collabin
                 $sarlabip = $collabinfo->ip;
                 $sarlabport = $collabinfo->sarlabport;
             }
-
-            $commandsarlab = 'sarlab';
-            $jarpath = '';
         }
     }
 
