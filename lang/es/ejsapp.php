@@ -143,7 +143,7 @@ $string['manifest_error'] = " > No se ha podido encontrar o abrir el manifiesto 
 $string['EJS_version'] = "ATENCI&Oacute;N: El applet no fu&eacute; generado con EjsS 4.37 (build 121201), o superior. Recomp&iacute;lelo con una versi&oacute;n m&aacute;s moderna de EjsS.";
 $string['EJS_codebase'] = "ATENCI&Oacute;N: El manifest del applet que ha subido no especifica este servidor Moodle en el par&aacute;metro 'codebase', de modo que no ha sido firmado.";
 
-$string['inactive_lab'] = 'El laboratorio remoto es&aacute; inactivo en este momento.';
+$string['inactive_lab'] = 'El laboratorio remoto est&aacute; inactivo en este momento.';
 $string['no_booking'] = 'No tiene reserva para este laboratorio en este horario.';
 $string['collab_access'] = 'Esta es una sesi&oacute;n colaborativa.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';

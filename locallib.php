@@ -999,64 +999,6 @@ function ejsapp_expsyst2pract($ejsapp) {
 }
 
 /**
- * Updates the ejsappbooking_usersaccess table
- *
- * @param stdClass $ejsapp
- * @return void
- * @throws
- *
- */
-function update_booking_table($ejsapp) {
-    global $DB;
-
-    /**
-     * Updates a record in the the ejsappbooking_usersaccess table.
-     *
-     * @param int $ejsappbookingid
-     * @param object $usersaccess
-     * @param int $ejsappid
-     * @throws
-     *
-     */
-    function update_or_insert_record($ejsappbookingid, $usersaccess, $ejsappid) {
-        global $DB;
-        if (!$DB->record_exists('ejsappbooking_usersaccess', array('bookingid' => $ejsappbookingid,
-            'userid' => $usersaccess->userid, 'ejsappid' => $ejsappid))) {
-            $DB->insert_record('ejsappbooking_usersaccess', $usersaccess);
-        } else {
-            $record = $DB->get_record('ejsappbooking_usersaccess', array('bookingid' => $ejsappbookingid,
-                'userid' => $usersaccess->userid, 'ejsappid' => $ejsappid));
-            $usersaccess->id = $record->id;
-            $DB->update_record('ejsappbooking_usersaccess', $usersaccess);
-        }
-    }
-
-    if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
-        $coursecontext = context_course::instance($ejsapp->course);
-        $users = get_enrolled_users($coursecontext);
-        $ejsappbooking = $DB->get_record('ejsappbooking', array('course' => $ejsapp->course));
-        // For ejsappbooking_usersaccess table.
-        $usersaccess = new stdClass();
-        $usersaccess->bookingid = $ejsappbooking->id;
-        $usersaccess->ejsappid = $ejsapp->id;
-        // Grant remote access to admin user.
-        $usersaccess->userid = 2;
-        $usersaccess->allowremaccess = 1;
-        update_or_insert_record($ejsappbooking->id, $usersaccess, $ejsapp->id);
-        // Consider other enrolled users.
-        foreach ($users as $user) {
-            $usersaccess->userid = $user->id;
-            if (!has_capability('mod/ejsapp:addinstance', $coursecontext, $user->id, true)) {
-                $usersaccess->allowremaccess = 0;
-            } else {
-                $usersaccess->allowremaccess = 1;
-            }
-            update_or_insert_record($ejsappbooking->id, $usersaccess, $ejsapp->id);
-        }
-    }
-}
-
-/**
  * Checks whether a the booking system is being used in the course of a particular ejsapp activity or not.
  *
  * @param stdClass $ejsapp

@@ -154,7 +154,6 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
             }
             if ($bookinginstalled) {
                 if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
-                    $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $ejsapp->id));
                     $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
                 }
             }
@@ -189,7 +188,6 @@ function ejsapp_delete_instance($id) {
         }
         // EJSApp booking system.
         if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
-            $DB->delete_records('ejsappbooking_usersaccess', array('ejsappid' => $id));
             $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $id));
         }
     }

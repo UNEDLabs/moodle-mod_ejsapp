@@ -73,20 +73,14 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         $remlabaccess = new backup_nested_element('ejsappbooking_remlab_access', array('id'),
             array('username', 'practiceid', 'starttime', 'endtime', 'valid'));
 
-        $usersaccesses = new backup_nested_element('ejsappbooking_usersaccesses');
-        $usersaccess = new backup_nested_element('ejsappbooking_usersaccess', array('id'),
-            array('bookingid', 'userid', 'allowremaccess'));
-
         // Build the tree.
         $ejsapp->add_child($personalvars);
         $ejsapp->add_child($exp2practs);
         $ejsapp->add_child($ejsappbookings);
         $ejsapp->add_child($remlabaccesses);
-        $ejsapp->add_child($usersaccesses);
         $exp2practs->add_child($exp2prc);
         $ejsappbookings->add_child($ejsappbooking);
         $remlabaccesses->add_child($remlabaccess);
-        $usersaccesses->add_child($usersaccess);
 
         // Define sources.
         $ejsapp->set_source_table('ejsapp', array('id' => backup::VAR_ACTIVITYID));
@@ -103,10 +97,8 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
             $bookingsystem = $DB->get_records('modules', array('name' => 'ejsappbooking'));
             if (!empty($bookingsystem)) {
                 $ejsappbooking->set_source_table('ejsappbooking', array('course' => '../../course'));
-                $usersaccess->set_source_table('ejsappbooking_usersaccess', array('ejsappid' => '../../id'));
                 $remlabaccess->set_source_table('ejsappbooking_remlab_access', array('ejsappid' => '../../id'));
                 // Define id annotations.
-                $usersaccess->annotate_ids('user', 'userid');
                 $remlabaccess->annotate_ids('user', 'username');
             }
         }

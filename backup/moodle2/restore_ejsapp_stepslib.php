@@ -53,8 +53,6 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
 
         $userinfo = $this->get_setting_value('userinfo');
         if ($userinfo) {
-            $paths[] = new restore_path_element('ejsappbooking_usersaccess',
-                '/activity/ejsapp/ejsappbooking_usersaccesses/ejsappbooking_usersaccess');
             $paths[] = new restore_path_element('ejsappbooking_remlab_access',
                 '/activity/ejsapp/ejsappbooking_remlab_accesses/ejsappbooking_remlab_access');
         }
@@ -186,21 +184,6 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
         if (!$ejsappbooking) {
             $DB->insert_record('ejsappbooking', $data);
         }
-    }
-
-    /**
-     * Process table process_ejsappbooking_usersaccess
-     * @param stdClass $data
-     * @throws
-     */
-    protected function process_ejsappbooking_usersaccess($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $data->ejsappid = $this->get_new_parentid('ejsapp');
-        $data->bookingid = $this->get_mappingid('ejsappbooking', $data->bookingid);
-        $data->userid = $this->get_mappingid('user', $data->userid);
-        $DB->insert_record('ejsappbooking_usersaccess', $data);
     }
 
     /**
