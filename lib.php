@@ -145,9 +145,6 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
                 $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
                 ejsapp_expsyst2pract($ejsapp);
             }
-            if ($bookinginstalled) {
-                update_booking_table($ejsapp);
-            }
         } else {
             if ($ejsapp->remlab_manager) {
                 $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
