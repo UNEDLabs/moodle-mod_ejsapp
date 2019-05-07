@@ -661,7 +661,7 @@ function chmod_r($path) {
  * @return int 0, not alive; 1, alive; 2, not checkable
  *
  */
-function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
+function ping($host, $port, $sarlabinstance, $expid=null, $timeout=3) {
     global $devicesinfo;
 
     $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
@@ -672,7 +672,7 @@ function ping($host, $port=80, $sarlabinstance, $expid=null, $timeout=3) {
         if (substr($headers[0], 9, 3) == 200) { // Valid url.
             if ($expid != null) {
                 $expid = explode('@', $expid);
-                $expid = $expid[0];
+                $expid = urlencode($expid[0]);
             }
             $url = $uri . 'webresources/net/isLive?idExp=' . $expid;
             if ($response = file_get_contents($url)) {
