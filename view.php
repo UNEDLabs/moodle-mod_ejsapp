@@ -138,6 +138,52 @@ if ($ejsapp->class_file == '') {
     $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'fullScreen');
 }
 
+// Javascript files and html injection for Blockly
+$chartsdiv = '';
+$blockly = '';
+if ($ejsapp->class_file == '') { // EjsS Javascript
+    $blocklyconf = json_decode($ejsapp->blockly_conf);
+    if ($blocklyconf[0] == 1) {
+        // Required libraries for blockly
+        $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blockly_compressed.js', true);
+        $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blocks_compressed.js', true);
+        $PAGE->requires->js('/mod/ejsapp/vendor/blockly/javascript_compressed.js', true);
+        if (file_exists('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js')) {
+            $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js', true);
+        } else {
+            $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/en.js', true);
+        }
+        $PAGE->requires->js('/mod/ejsapp/vendor/js-interpreter/acorn.js', true);
+        $PAGE->requires->js('/mod/ejsapp/vendor/js-interpreter/interpreter.js', true);
+        $PAGE->requires->js('/mod/ejsapp/vendor/ace/ace.js', true);
+        $PAGE->requires->js('/lib/amd/src/chartjs-lazy.js', true);
+        $PAGE->requires->js($ejsapp->codebase . 'configuration.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/charts.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/blockly.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/blocks.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/javascript.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/execution.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/toolbox.js');
+        if (file_exists('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js')) {
+            $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js');
+        } else {
+            $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/en.js');
+        }
+        if (file_exists('/mod/ejsapp/addon/lang/' . current_language() . '.js')) {
+            $PAGE->requires->js('/mod/ejsapp/addon/lang/' . current_language() . '.js');
+        } else {
+            $PAGE->requires->js('/mod/ejsapp/addon/lang/en.js');
+        }
+
+        [$chartsdiv, $controldiv, $blocklydiv, $logdiv] = add_blockly_html();
+
+        // Blockly HTML div for placing blockly related elements.
+        $injectiondiv = html_writer::div(html_writer::div($blocklydiv, 'blockly', array('id' => 'injectionDiv')),
+            'blockly', array('id' => 'blocklyDiv'));
+        $blockly = $controldiv . $injectiondiv . $logdiv;
+    }
+}
+
 // Output starts here.
 echo $OUTPUT->header();
 if ($ejsapp->intro) { // If some text was written, show the intro.
@@ -148,24 +194,12 @@ if ($ejsapp->intro) { // If some text was written, show the intro.
 $personalvarsinfo = personalize_vars($ejsapp, $USER, false);
 
 // If required, create the javascript file with the configuration for using blockly.
-create_blockly_configuration($ejsapp);
+//create_blockly_configuration($ejsapp);
 
 // For logging purposes.
 $action = 'view';
 $accessed = false;
 $checkactivity = intval(get_config('mod_ejsapp', 'check_activity'));
-
-// Define the div section for charts and related buttons.
-$fullscreencharts = html_writer::div('', 'fa fa-arrows-alt fa-1g', array( 'id' => 'full_screen_chart'));
-$wrapper = html_writer::div('', 'charts', array('id' => 'slideshow-wrapper'));
-$prevchart = html_writer::div('', 'fa fa-chevron-left fa-2x', array('id' => 'prev_chart',
-    'onclick' => 'prevChart()'));
-$cleancharts = html_writer::div('', 'fa fa-window-close-o fa-2x', array( 'id' => 'clean_chart',
-    'onclick' => 'cleanCharts()'));
-$nextchart = html_writer::div('', 'fa fa-chevron-right fa-2x', array('id' => 'next_chart',
-    'onclick' => 'nextChart()'));
-$buttonscharts = html_writer::div($prevchart . $cleancharts . $nextchart, 'charts', array('id' => 'buttons_charts'));
-$chartsdiv = html_writer::div($fullscreencharts . $wrapper . $buttonscharts, 'charts', array('id' => 'slideshow'));
 
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
 // whether the ejsapp instance is a remote lab or not.
@@ -174,6 +208,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
     $accessed = true;
     echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
+    echo $blockly;
 } else { // Remote lab.
     $remlabaccess = remote_lab_access_info($ejsapp, $course);
     $remlabconf = $remlabaccess->remlab_conf;
@@ -203,6 +238,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             $accessed = true;
             echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
                 $chartsdiv, 'labchart');
+            echo $blockly;
         } else { // Lab is in use or rebooting.
             if (false) { // TODO: Check if the lab supports collaborative access.
                 // Teacher can still access in collaborative mode.
@@ -213,6 +249,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 }
                 echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
                     $chartsdiv, 'labchart');
+                echo $blockly;
                 $action = 'collab_view';
             } else { // No access.
                 $userwithbooking = check_anyones_booking($DB, $ejsapp);
@@ -253,6 +290,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                         $accessed = true;
                         echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
                             $chartsdiv, 'labchart');
+                        echo $blockly;
                     } else {
                         echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
                         $action = 'need_to_wait';
@@ -266,6 +304,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                             $remlabaccess->labmanager, $maxusetime);
                         echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo,
                                 $personalvarsinfo) . $chartsdiv, 'labchart');
+                        echo $blockly;
                         $action = 'collab_view';
                     } else { // No access.
                         echo $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
@@ -341,51 +380,6 @@ switch ($action) {
 $event->trigger();
 // Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not.
 
-// If some text was written, show it.
-if ($ejsapp->appwording) {
-    $formatoptions = new stdClass;
-    $formatoptions->noclean = true;
-    $formatoptions->overflowdiv = true;
-    $formatoptions->context = $modulecontext;
-    $content = format_text($ejsapp->appwording, $ejsapp->appwordingformat, $formatoptions);
-    echo $OUTPUT->box($content, 'generalbox center clearfix');
-}
-
-// Blockly stuff
-if ($accessed && $ejsapp->class_file == '') {
-    $blocklyconf = json_decode($ejsapp->blockly_conf);
-    if ($blocklyconf[0] == 1) {
-        // Button for running the Blockly code
-        $fullscreenblockly = html_writer::div('', 'fa fa-arrows-alt fa-2g', array( 'id' => 'full_screen_blockly'));
-        $runcodebutton = html_writer::empty_tag('input',
-            array('class' => 'blockly_button', 'type' => 'submit',
-                'name' => 'runCode', 'id' => 'runCodeButEJSApp',
-                'value' => get_string('run_code', 'block_ejsapp_file_browser'),
-                'onclick' => 'playCode()'));
-        $emptyelement = html_writer::tag('a', '');
-        $content = html_writer::div($emptyelement . $runcodebutton . $fullscreenblockly, 'runCodeEJSApp');
-        echo $content;
-        // Blockly programming space for Javascript labs.
-        $includejslibraries = html_writer::tag('script', '',
-                array('src' => (new moodle_url($CFG->wwwroot . $ejsapp->codebase . 'configuration.js')))) .
-            html_writer::tag('script', '', array('src' => 'blockly/acorn_interpreter.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blockly_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blocks_compressed.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/javascript_compressed.js')) .
-            html_writer::tag('script', '', array('src' => '../../lib/amd/src/chartjs-lazy.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/blockly_addon.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/GUI_functions.js')) .
-            html_writer::tag('script', '', array('src' => 'blockly/API_functions.js'));
-        if (strpos(current_language(), 'es') !== false) {
-            $includejslibraries .= html_writer::tag('script', '', array('src' => 'blockly/es.js'));
-        } else {
-            $includejslibraries .= html_writer::tag('script', '', array('src' => 'blockly/en.js'));
-        }
-        echo html_writer::div(html_writer::div($includejslibraries, 'blockly', array('id' => 'injectionDiv')),
-            'blockly', array('id' => 'blocklyDiv'));
-    }
-}
-
 // Buttons to close or leave collab sessions.
 if (isset($collabsession)) {
     $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$sessionid&courseid={$course->id}";
@@ -399,7 +393,17 @@ if (isset($collabsession)) {
     echo $button;
 }
 
-// Javascript features for monitoring the time spent by a user in the activity.
+// If some text was written, show it.
+if ($ejsapp->appwording) {
+    $formatoptions = new stdClass;
+    $formatoptions->noclean = true;
+    $formatoptions->overflowdiv = true;
+    $formatoptions->context = $modulecontext;
+    $content = format_text($ejsapp->appwording, $ejsapp->appwordingformat, $formatoptions);
+    echo $OUTPUT->box($content, 'generalbox center clearfix');
+}
+
+// Javascript feature for monitoring the time spent by a user in the activity.
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to
     // work with the remote lab.
@@ -409,11 +413,11 @@ if ($accessed) {
     $urllog = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php' . $params;
     $urlleave = $CFG->wwwroot . '/mod/ejsapp/leave_or_kick_out.php' . $params;
     if ($ejsapp->is_rem_lab == 0) {
-        $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($urllog, $urlleave, intval($ejsapp->is_rem_lab), 'EJsS',
-            $checkactivity));
+        $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($urllog, $urlleave,
+            intval($ejsapp->is_rem_lab), 'EJsS', $checkactivity));
     } else {
-        $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($urllog, $urlleave, intval($ejsapp->is_rem_lab), 'EJsS',
-            $checkactivity, $maxusetime));
+        $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($urllog, $urlleave,
+            intval($ejsapp->is_rem_lab), 'EJsS', $checkactivity, $maxusetime));
     }
     $PAGE->requires->js_call_amd('mod_ejsapp/onclose', 'onclose', array($urlleave));
 } else if ($action == 'booked_lab' || $action == 'need_to_wait') {

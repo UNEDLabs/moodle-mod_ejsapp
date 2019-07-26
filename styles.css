@@ -43,13 +43,13 @@
     align-items: flex-end;
 }
 
-.path-mod-ejsapp #slideshow {
+.path-mod-ejsapp #ChartBox {
+    display: flex;
     min-width: 35%;
     max-width: 100%;
     flex-basis: 35%;
     flex-shrink: 1;
     flex-grow: 1;
-    display: none;
     flex-direction: column;
     justify-content: center;
 }
@@ -71,17 +71,180 @@
     text-align: right;
 }
 
-.path-mod-ejsapp #prev_chart {
-    margin: 0 30px;
-}
-
 .path-mod-ejsapp #clean_chart {
     margin: 0 30px;
 }
 
-.path-mod-ejsapp #buttons_charts {
-    margin-top: 20px;
-    display: none;
-    flex-direction: row;
-    justify-content: space-around;
+.path-mod-ejsapp .peru{
+    color:peru;
+}
+
+.path-mod-ejsapp .green{
+    color:green;
+}
+
+.path-mod-ejsapp .blue{
+    color:blue;
+}
+
+.path-mod-ejsapp .yellow{
+    color:yellow;
+}
+
+.path-mod-ejsapp .red{
+    color:red;
+}
+
+.path-mod-ejsapp .nice-select {
+    -webkit-tap-highlight-color: transparent;
+    background-color: #fff;
+    border-radius: 5px;
+    border: solid 1px #e8e8e8;
+    box-sizing: border-box;
+    clear: both;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: normal;
+    height: 42px;
+    line-height: 40px;
+    outline: none;
+    padding-left: 8px;
+    padding-right: 18px;
+    position: relative;
+    text-align: left !important;
+    -webkit-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    white-space: nowrap;
+    width: auto;
+    font-family: 'Helvetica Neue', sans-serif; font-size: 18px; font-weight: bold; letter-spacing: -1px; margin-top:0.4em; text-align: left;
+}
+.path-mod-ejsapp .nice-select:hover {
+    border-color: #dbdbdb; }
+.path-mod-ejsapp .nice-select:active, .nice-select.open, .nice-select:focus {
+    border-color: #999; }
+.path-mod-ejsapp .nice-select:after {
+    border-bottom: 2px solid #999;
+    border-right: 2px solid #999;
+    content: '';
+    display: block;
+    height: 5px;
+    margin-top: -4px;
+    pointer-events: none;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    -webkit-transform-origin: 66% 66%;
+    -ms-transform-origin: 66% 66%;
+    transform-origin: 66% 66%;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    -webkit-transition: all 0.15s ease-in-out;
+    transition: all 0.15s ease-in-out;
+    width: 5px; }
+.path-mod-ejsapp .nice-select.open:after {
+    -webkit-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    transform: rotate(-135deg); }
+.path-mod-ejsapp .nice-select.open .list {
+    opacity: 1;
+    pointer-events: auto;
+    -webkit-transform: scale(1) translateY(0);
+    -ms-transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0); }
+.path-mod-ejsapp .nice-select.disabled {
+    border-color: #ededed;
+    color: #999;
+    pointer-events: none; }
+.path-mod-ejsapp .nice-select.disabled:after {
+    border-color: #cccccc; }
+.path-mod-ejsapp .nice-select.wide {
+    width: 100%; }
+.path-mod-ejsapp .nice-select.wide .list {
+    left: 0 !important;
+    right: 0 !important; }
+.path-mod-ejsapp .nice-select.right {
+    float: right; }
+.path-mod-ejsapp .nice-select.right .list {
+    left: auto;
+    right: 0; }
+.path-mod-ejsapp .nice-select.small {
+    font-size: 12px;
+    height: 36px;
+    line-height: 34px; }
+.path-mod-ejsapp .nice-select.small:after {
+    height: 4px;
+    width: 4px; }
+.path-mod-ejsapp .nice-select.small .option {
+    line-height: 34px;
+    min-height: 34px; }
+.path-mod-ejsapp .nice-select .list {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 0 1px rgba(68, 68, 68, 0.11);
+    box-sizing: border-box;
+    margin-top: 4px;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    -webkit-transform-origin: 50% 0;
+    -ms-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+    -webkit-transform: scale(0.75) translateY(-21px);
+    -ms-transform: scale(0.75) translateY(-21px);
+    transform: scale(0.75) translateY(-21px);
+    -webkit-transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25), opacity 0.15s ease-out;
+    transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25), opacity 0.15s ease-out;
+    z-index: 9; }
+.path-mod-ejsapp .nice-select .list:hover .option:not(:hover) {
+    background-color: transparent !important; }
+.path-mod-ejsapp .nice-select .option {
+    cursor: pointer;
+    font-weight: 400;
+    line-height: 40px;
+    list-style: none;
+    min-height: 40px;
+    outline: none;
+    padding-left: 18px;
+    padding-right: 29px;
+    text-align: left;
+    -webkit-transition: all 0.2s;
+    transition: all 0.2s; }
+.path-mod-ejsapp .nice-select .option:hover, .nice-select .option.focus, .nice-select .option.selected.focus {
+    background-color: #f6f6f6; }
+.path-mod-ejsapp .nice-select .option.selected {
+    font-weight: bold; }
+.path-mod-ejsapp .nice-select .option.disabled {
+    background-color: transparent;
+    color: #999;
+    cursor: default; }
+
+.path-mod-ejsapp .no-csspointerevents .nice-select .list {
+    display: none; }
+
+.path-mod-ejsapp .no-csspointerevents .nice-select.open .list {
+    display: block; }
+
+.path-mod-ejsapp .topnav-right {
+    display: inline-block;
+}
+
+.path-mod-ejsapp #titleScriptBox {
+    display: flex;
+    justify-content: space-between;
+}
+
+.path-mod-ejsapp .textExecutionElement {
+    margin:1rem 1rem;
 }

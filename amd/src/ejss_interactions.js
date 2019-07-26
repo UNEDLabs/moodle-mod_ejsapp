@@ -1,4 +1,3 @@
-// This file is part of the Moodle module "EJSApp"
 //
 // EJSApp is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -128,26 +127,25 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
         readBlocklyFile: function(blkfile) {
             var doit = setInterval(function() {
                 if (typeof _model !== "undefined") {
-                    _model.readText(blkfile, '.blk', function(xmlText) {
-                        if (xmlText) {
-                            workspace.clear();
-                            xmlDom = Blockly.Xml.textToDom(xmlText);
-                            Blockly.Xml.domToWorkspace(xmlDom, workspace);
-                        }
-                    });
+                    _model.readText(blkfile, '.blk',
+                        function(json) {
+                            if (json) {
+                                setLoadedWorkspace(json);
+                            }
+                        });
                     clearInterval(doit);
                 }
             }, 200);
         },
 
         fullScreen: function() {
-            const chart = $('#slideshow-wrapper')[0];
+            var chart = $('#slideshow-wrapper')[0];
             $('#full_screen_chart').on('click', function () {
                 if (screenfull.enabled) {
                     screenfull.request(chart);
                 }
             });
-            const blockly = $('#injectionDiv')[0];
+            var blockly = $('#whereScriptsAre')[0];
             $('#full_screen_blockly').on('click', function () {
                 if (screenfull.enabled) {
                     screenfull.request(blockly);
