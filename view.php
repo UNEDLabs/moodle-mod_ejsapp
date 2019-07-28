@@ -157,7 +157,7 @@ if ($ejsapp->class_file == '') {
         $PAGE->requires->js('/mod/ejsapp/vendor/js-interpreter/interpreter.js', true);
         $PAGE->requires->js('/mod/ejsapp/vendor/ace/ace.js', true);
         $PAGE->requires->js('/lib/amd/src/chartjs-lazy.js', true);
-        $PAGE->requires->js($ejsapp->codebase . 'configuration.js');
+        $PAGE->requires->js('/mod/ejsapp/addon/configuration.js');
         $PAGE->requires->js('/mod/ejsapp/addon/charts.js');
         $PAGE->requires->js('/mod/ejsapp/addon/blockly.js');
         $PAGE->requires->js('/mod/ejsapp/addon/blocks.js');

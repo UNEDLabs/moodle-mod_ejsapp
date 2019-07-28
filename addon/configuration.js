@@ -5,534 +5,520 @@ var chartsBlockly = true;
 var controllerBlockly = true;
 var functionToReplace = "controller";
 var controllerFunctionLanguage = "javascript";
-var codeBeforeController = "";
-var codeAfterController = "";
+/*var codeBeforeController = "";
+var codeAfterController = "";*/
 
-var toolbox = '<xml>';  
-  toolbox += '  <category name="Logic" colour="210">';
-  toolbox += '      <block type="controls_if"></block>';
-  toolbox += '      <block type="logic_compare"></block>';
-  toolbox += '      <block type="logic_operation"></block>';
-  toolbox += '      <block type="logic_negate"></block>';
-  toolbox += '      <block type="logic_boolean"></block>';
-  toolbox += '      <block type="logic_null"></block>';
-  toolbox += '      <block type="logic_ternary"></block>';
-  toolbox += '    </category>';
-  toolbox += '    <category name="Loops" colour="120">';
-  toolbox += '      <block type="controls_repeat_ext">';
-  toolbox += '        <value name="TIMES">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">10</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="controls_whileUntil"></block>';
-  toolbox += '      <block type="controls_for">';
-  toolbox += '        <value name="FROM">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="TO">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">10</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="BY">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="controls_forEach"></block>';
-  toolbox += '      <block type="controls_flow_statements"></block>';
-  toolbox += '    </category>';
-  toolbox += '    <category name="Math" colour="230">';
-  toolbox += '      <block type="math_number"></block>';
-  toolbox += '      <block type="math_arithmetic">';
-  toolbox += '        <value name="A">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="B">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_single">';
-  toolbox += '        <value name="NUM">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">9</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_trig">';
-  toolbox += '        <value name="NUM">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">45</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_constant"></block>';
-  toolbox += '      <block type="math_number_property">';
-  toolbox += '        <value name="NUMBER_TO_CHECK">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">0</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_round">';
-  toolbox += '        <value name="NUM">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">3.1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_on_list"></block>';
-  toolbox += '      <block type="math_modulo">';
-  toolbox += '        <value name="DIVIDEND">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">64</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="DIVISOR">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">10</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_constrain">';
-  toolbox += '        <value name="VALUE">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">50</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="LOW">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="HIGH">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">100</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_random_int">';
-  toolbox += '        <value name="FROM">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">1</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '        <value name="TO">';
-  toolbox += '          <shadow type="math_number">';
-  toolbox += '            <field name="NUM">100</field>';
-  toolbox += '          </shadow>';
-  toolbox += '        </value>';
-  toolbox += '      </block>';
-  toolbox += '      <block type="math_random_float"></block>';
-  toolbox += '    </category>';
-  toolbox += '    <category name="JavaScript" custom="jss" colour="183"></category>';
- 
- 
-  toolbox += '    <sep></sep>';
-	
-  toolbox += '    	<category name="Variables" custom="generalVars" colour="44"></category>';
-  toolbox += '    <category name="Functions" colour="290" custom="PROCEDURE"></category>';
-  
-  toolbox += '    <sep></sep>';
-  toolbox += '   		 <category name="Execution" colour = "0">';
-  toolbox += '   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>';
-  toolbox += '   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>';
-  toolbox += '   		 	<block type=\"wait\"></block>';
-  toolbox += '   		 </category>';
-  toolbox += '		 <category name="Data for charts" colour="33">';
-  toolbox += '   		 	<block type="start_rec"></block>';
-  toolbox += '   		 	<block type="stop_rec"></block>';
-  toolbox += '   		 </category>';
-  toolbox += '</xml>';
+var toolbox = '<xml>' + 
+'  <category name="Logic" colour="210">' +
+'      <block type="controls_if"></block>' + 
+'      <block type="logic_compare"></block>' +
+'      <block type="logic_operation"></block>' +
+'      <block type="logic_negate"></block>' +
+'      <block type="logic_boolean"></block>' +
+'      <block type="logic_null"></block>' + 
+'      <block type="logic_ternary"></block>' + 
+'    </category>' + 
+'    <category name="Loops" colour="120">' + 
+'      <block type="controls_repeat_ext">' + 
+'        <value name="TIMES">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">10</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="controls_whileUntil"></block>' + 
+'      <block type="controls_for">' + 
+'        <value name="FROM">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="TO">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">10</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="BY">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="controls_forEach"></block>' + 
+'      <block type="controls_flow_statements"></block>' + 
+'    </category>' + 
+'    <category name="Math" colour="230">' + 
+'      <block type="math_number"></block>' + 
+'      <block type="math_arithmetic">' + 
+'        <value name="A">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="B">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_single">' + 
+'        <value name="NUM">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">9</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_trig">' + 
+'        <value name="NUM">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">45</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_constant"></block>' + 
+'      <block type="math_number_property">' + 
+'        <value name="NUMBER_TO_CHECK">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">0</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_round">' + 
+'        <value name="NUM">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">3.1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_on_list"></block>' + 
+'      <block type="math_modulo">' + 
+'        <value name="DIVIDEND">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">64</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="DIVISOR">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">10</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_constrain">' + 
+'        <value name="VALUE">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">50</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="LOW">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="HIGH">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">100</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_random_int">' + 
+'        <value name="FROM">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">1</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'        <value name="TO">' + 
+'          <shadow type="math_number">' + 
+'            <field name="NUM">100</field>' + 
+'          </shadow>' + 
+'        </value>' + 
+'      </block>' + 
+'      <block type="math_random_float"></block>' + 
+'    </category>' + 
+'    <category name="JavaScript" custom="jss" colour="183"></category>' +
+'    <sep></sep>' +
+'    	<category name="Variables" custom="generalVars" colour="44"></category>' + 
+'    <category name="Functions" colour="290" custom="PROCEDURE"></category>' +
+'    <sep></sep>' + 
+'   		 <category name="Execution" colour = "0">' + 
+'   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>' + 
+'   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>' + 
+'   		 	<block type=\"wait\"></block>' + 
+'   		 </category>' + 
+'		 <category name="Data for charts" colour="33">' + 
+'   		 	<block type="start_rec"></block>' + 
+'   		 	<block type="stop_rec"></block>' + 
+'   		 </category>' + 
+'</xml>';
   
   
-var toolboxEvents = '<xml>';  
-  toolboxEvents += '  <category name="Events"  custom="controls" colour = "60">  </category>';
-  toolboxEvents += '    <sep></sep>';
-  toolboxEvents += '  <category name="Logic" colour="210">';
-  toolboxEvents += '      <block type="controls_if"></block>';
-  toolboxEvents += '      <block type="logic_compare"></block>';
-  toolboxEvents += '      <block type="logic_operation"></block>';
-  toolboxEvents += '      <block type="logic_negate"></block>';
-  toolboxEvents += '      <block type="logic_boolean"></block>';
-  toolboxEvents += '      <block type="logic_null"></block>';
-  toolboxEvents += '      <block type="logic_ternary"></block>';
-  toolboxEvents += '    </category>';
-  toolboxEvents += '    <category name="Loops" colour="120">';
-  toolboxEvents += '      <block type="controls_repeat_ext">';
-  toolboxEvents += '        <value name="TIMES">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">10</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="controls_whileUntil"></block>';
-  toolboxEvents += '      <block type="controls_for">';
-  toolboxEvents += '        <value name="FROM">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="TO">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">10</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="BY">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="controls_forEach"></block>';
-  toolboxEvents += '      <block type="controls_flow_statements"></block>';
-  toolboxEvents += '    </category>';
-  toolboxEvents += '    <category name="Math" colour="230">';
-  toolboxEvents += '      <block type="math_number"></block>';
-  toolboxEvents += '      <block type="math_arithmetic">';
-  toolboxEvents += '        <value name="A">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="B">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_single">';
-  toolboxEvents += '        <value name="NUM">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">9</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_trig">';
-  toolboxEvents += '        <value name="NUM">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">45</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_constant"></block>';
-  toolboxEvents += '      <block type="math_number_property">';
-  toolboxEvents += '        <value name="NUMBER_TO_CHECK">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">0</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_round">';
-  toolboxEvents += '        <value name="NUM">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">3.1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_on_list"></block>';
-  toolboxEvents += '      <block type="math_modulo">';
-  toolboxEvents += '        <value name="DIVIDEND">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">64</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="DIVISOR">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">10</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_constrain">';
-  toolboxEvents += '        <value name="VALUE">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">50</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="LOW">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="HIGH">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">100</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_random_int">';
-  toolboxEvents += '        <value name="FROM">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">1</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '        <value name="TO">';
-  toolboxEvents += '          <shadow type="math_number">';
-  toolboxEvents += '            <field name="NUM">100</field>';
-  toolboxEvents += '          </shadow>';
-  toolboxEvents += '        </value>';
-  toolboxEvents += '      </block>';
-  toolboxEvents += '      <block type="math_random_float"></block>';
-  toolboxEvents += '    </category>';
-  toolboxEvents += '    <category name="JavaScript" custom="jss2" colour="183"></category>';
- 
- 
-  toolboxEvents += '    <sep></sep>';
-	
-  toolboxEvents += '    	<category name="Variables" custom="generalVars" colour="44"></category>';
-  
-  toolboxEvents += '    <sep></sep>';
-  toolboxEvents += '   		 <category name="Execution" colour = "0">';
-  toolboxEvents += '   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>';
-  toolboxEvents += '   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>';
-  toolboxEvents += '   		 	<block type=\"wait\"></block>';
-  toolboxEvents += '   		 </category>';
-  toolboxEvents += '		 <category name="Data for charts" colour="33">';
-  toolboxEvents += '   		 	<block type="start_rec"></block>';
-  toolboxEvents += '   		 	<block type="stop_rec"></block>';
-  toolboxEvents += '   		 </category>';
-  toolboxEvents += '</xml>';
+var toolboxEvents = '<xml>' +   
+'  <category name="Events"  custom="controls" colour = "60">  </category>' +
+'    <sep></sep>' +
+'  <category name="Logic" colour="210">' +
+'      <block type="controls_if"></block>' +
+'      <block type="logic_compare"></block>' +
+'      <block type="logic_operation"></block>' +
+'      <block type="logic_negate"></block>' +
+'      <block type="logic_boolean"></block>' +
+'      <block type="logic_null"></block>' +
+'      <block type="logic_ternary"></block>' +
+'    </category>' +
+'    <category name="Loops" colour="120">' +
+'      <block type="controls_repeat_ext">' +
+'        <value name="TIMES">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="controls_whileUntil"></block>' +
+'      <block type="controls_for">' +
+'        <value name="FROM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="TO">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="BY">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="controls_forEach"></block>' +
+'      <block type="controls_flow_statements"></block>' +
+'    </category>' +
+'    <category name="Math" colour="230">' +
+'      <block type="math_number"></block>' +
+'      <block type="math_arithmetic">' +
+'        <value name="A">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="B">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_single">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">9</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_trig">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">45</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_constant"></block>' +
+'      <block type="math_number_property">' +
+'        <value name="NUMBER_TO_CHECK">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">0</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_round">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">3.1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_on_list"></block>' +
+'      <block type="math_modulo">' +
+'        <value name="DIVIDEND">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">64</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="DIVISOR">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_constrain">' +
+'        <value name="VALUE">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">50</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="LOW">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="HIGH">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">100</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_random_int">' +
+'        <value name="FROM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="TO">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">100</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_random_float"></block>' +
+'    </category>' +
+'    <category name="JavaScript" custom="jss2" colour="183"></category>' +
+'    <sep></sep>' +
+'    	<category name="Variables" custom="generalVars" colour="44"></category>' +
+'    <sep></sep>' +
+'   		 <category name="Execution" colour = "0">' +
+'   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>' +
+'   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>' +
+'   		 	<block type=\"wait\"></block>' +
+'   		 </category>' +
+'		 <category name="Data for charts" colour="33">' +
+'   		 	<block type="start_rec"></block>' +
+'   		 	<block type="stop_rec"></block>' +
+'   		 </category>' +
+'</xml>';
   
   
-var toolboxCharts = '<xml>';  
+var toolboxCharts = '<xml>' +   
 
-  toolboxCharts += '	<category name="Data and charts" colour="200">';
-  toolboxCharts += '      <block type="createChart"></block>';
-  toolboxCharts += '      <block type="record_var"></block>';
-  toolboxCharts += '   		 </category>';
-  toolboxCharts += '    <category name="Math" colour="230">';
-  toolboxCharts += '      <block type="math_number"></block>';
-  toolboxCharts += '      <block type="math_arithmetic">';
-  toolboxCharts += '        <value name="A">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">1</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '        <value name="B">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">1</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_single">';
-  toolboxCharts += '        <value name="NUM">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">9</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_trig">';
-  toolboxCharts += '        <value name="NUM">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">45</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_constant"></block>';
-  toolboxCharts += '      <block type="math_number_property">';
-  toolboxCharts += '        <value name="NUMBER_TO_CHECK">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">0</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_round">';
-  toolboxCharts += '        <value name="NUM">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">3.1</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_on_list"></block>';
-  toolboxCharts += '      <block type="math_modulo">';
-  toolboxCharts += '        <value name="DIVIDEND">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">64</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '        <value name="DIVISOR">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">10</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_constrain">';
-  toolboxCharts += '        <value name="VALUE">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">50</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '        <value name="LOW">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">1</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '        <value name="HIGH">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">100</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_random_int">';
-  toolboxCharts += '        <value name="FROM">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">1</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '        <value name="TO">';
-  toolboxCharts += '          <shadow type="math_number">';
-  toolboxCharts += '            <field name="NUM">100</field>';
-  toolboxCharts += '          </shadow>';
-  toolboxCharts += '        </value>';
-  toolboxCharts += '      </block>';
-  toolboxCharts += '      <block type="math_random_float"></block>';
-  toolboxCharts += '    </category>';
- 
- 
-  toolboxCharts += '    <sep></sep>';
-  toolboxCharts += '    	<category name="Variables" custom="generalVars" colour="44"></category>';
-  toolboxCharts += '</xml>';
+'	<category name="Data and charts" colour="200">' +
+'      <block type="createChart"></block>' +
+'      <block type="record_var"></block>' +
+'   		 </category>' +
+'    <category name="Math" colour="230">' +
+'      <block type="math_number"></block>' +
+'      <block type="math_arithmetic">' +
+'        <value name="A">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="B">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_single">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">9</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_trig">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">45</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_constant"></block>' +
+'      <block type="math_number_property">' +
+'        <value name="NUMBER_TO_CHECK">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">0</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_round">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">3.1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_on_list"></block>' +
+'      <block type="math_modulo">' +
+'        <value name="DIVIDEND">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">64</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="DIVISOR">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_constrain">' +
+'        <value name="VALUE">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">50</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="LOW">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="HIGH">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">100</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_random_int">' +
+'        <value name="FROM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="TO">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">100</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_random_float"></block>' +
+'    </category>' +
+'    <sep></sep>' +
+'    	<category name="Variables" custom="generalVars" colour="44"></category>' +
+'</xml>';
   
   
-  var toolboxControllers = '<xml>';  
-  toolboxControllers += '  <category name="Logic" colour="210">';
-  toolboxControllers += '      <block type="controls_if"></block>';
-  toolboxControllers += '      <block type="logic_compare"></block>';
-  toolboxControllers += '      <block type="logic_operation"></block>';
-  toolboxControllers += '      <block type="logic_negate"></block>';
-  toolboxControllers += '      <block type="logic_boolean"></block>';
-  toolboxControllers += '      <block type="logic_null"></block>';
-  toolboxControllers += '      <block type="logic_ternary"></block>';
-  toolboxControllers += '    </category>';
-  toolboxControllers += '    <category name="Loops" colour="120">';
-  toolboxControllers += '      <block type="controls_repeat_ext">';
-  toolboxControllers += '        <value name="TIMES">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">10</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="controls_whileUntil"></block>';
-  toolboxControllers += '      <block type="controls_for">';
-  toolboxControllers += '        <value name="FROM">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="TO">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">10</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="BY">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="controls_forEach"></block>';
-  toolboxControllers += '      <block type="controls_flow_statements"></block>';
-  toolboxControllers += '    </category>';
-  toolboxControllers += '    <category name="Math" colour="230">';
-  toolboxControllers += '      <block type="math_number"></block>';
-  toolboxControllers += '      <block type="math_arithmetic">';
-  toolboxControllers += '        <value name="A">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="B">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_single">';
-  toolboxControllers += '        <value name="NUM">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">9</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_trig">';
-  toolboxControllers += '        <value name="NUM">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">45</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_constant"></block>';
-  toolboxControllers += '      <block type="math_number_property">';
-  toolboxControllers += '        <value name="NUMBER_TO_CHECK">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">0</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_round">';
-  toolboxControllers += '        <value name="NUM">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">3.1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_on_list"></block>';
-  toolboxControllers += '      <block type="math_modulo">';
-  toolboxControllers += '        <value name="DIVIDEND">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">64</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="DIVISOR">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">10</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_constrain">';
-  toolboxControllers += '        <value name="VALUE">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">50</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="LOW">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="HIGH">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">100</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_random_int">';
-  toolboxControllers += '        <value name="FROM">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">1</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '        <value name="TO">';
-  toolboxControllers += '          <shadow type="math_number">';
-  toolboxControllers += '            <field name="NUM">100</field>';
-  toolboxControllers += '          </shadow>';
-  toolboxControllers += '        </value>';
-  toolboxControllers += '      </block>';
-  toolboxControllers += '      <block type="math_random_float"></block>';
-  toolboxControllers += '    </category>';
- 
- 
-  toolboxControllers += '    <sep></sep>';
-	
-  toolboxControllers += '    	<category name="Variables" custom="generalVars" colour="44"></category>';
-  
-  toolboxControllers += '</xml>';
+  var toolboxControllers = '<xml>' +   
+'  <category name="Logic" colour="210">' +
+'      <block type="controls_if"></block>' +
+'      <block type="logic_compare"></block>' +
+'      <block type="logic_operation"></block>' +
+'      <block type="logic_negate"></block>' +
+'      <block type="logic_boolean"></block>' +
+'      <block type="logic_null"></block>' +
+'      <block type="logic_ternary"></block>' +
+'    </category>' +
+'    <category name="Loops" colour="120">' +
+'      <block type="controls_repeat_ext">' +
+'        <value name="TIMES">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="controls_whileUntil"></block>' +
+'      <block type="controls_for">' +
+'        <value name="FROM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="TO">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="BY">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="controls_forEach"></block>' +
+'      <block type="controls_flow_statements"></block>' +
+'    </category>' +
+'    <category name="Math" colour="230">' +
+'      <block type="math_number"></block>' +
+'      <block type="math_arithmetic">' +
+'        <value name="A">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="B">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_single">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">9</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_trig">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">45</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_constant"></block>' +
+'      <block type="math_number_property">' +
+'        <value name="NUMBER_TO_CHECK">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">0</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_round">' +
+'        <value name="NUM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">3.1</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_on_list"></block>' +
+'      <block type="math_modulo">' +
+'        <value name="DIVIDEND">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">64</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="DIVISOR">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">10</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_constrain">' +
+'        <value name="VALUE">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">50</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="LOW">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="HIGH">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">100</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_random_int">' +
+'        <value name="FROM">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">1</field>' +
+'          </shadow>' +
+'        </value>' +
+'        <value name="TO">' +
+'          <shadow type="math_number">' +
+'            <field name="NUM">100</field>' +
+'          </shadow>' +
+'        </value>' +
+'      </block>' +
+'      <block type="math_random_float"></block>' +
+'    </category>' +
+'    <sep></sep>' +
+'    	<category name="Variables" custom="generalVars" colour="44"></category>' +
+'</xml>';
