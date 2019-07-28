@@ -30,28 +30,27 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once('generate_embedding_code.php');
 require_once('locallib.php');
 
 global $USER, $DB, $CFG, $PAGE, $OUTPUT;
 $CFG->cachejs = false;
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
+$colsessionid = optional_param('colsession', null, PARAM_INT);
 $statefile = optional_param('state_file', null, PARAM_TEXT);
 $recfile = optional_param('rec_file', null, PARAM_TEXT);
 $blkfile = optional_param('blk_file', null, PARAM_TEXT);
-$sessionid = optional_param('colsession', null, PARAM_INT);
 
 $datafiles = array($statefile, $recfile, $blkfile);
 
-if (!is_null($sessionid)) {
-    $collabsession = $DB->get_record('ejsapp_collab_sessions', array('id' => $sessionid));
+if (!is_null($colsessionid)) {
+    $collabsession = $DB->get_record('ejsapp_collab_sessions', array('id' => $colsessionid));
     if (isset($collabsession->localport)) {
         require_once(dirname(dirname(dirname(__FILE__))) . '/blocks/ejsapp_collab_session/manage_collab_db.php');
 
         $n = $collabsession->ejsapp;
 
         $collabinfo = new stdClass();
-        $collabinfo->session = $sessionid;
+        $collabinfo->session = $colsessionid;
         $collabinfo->ip = $collabsession->ip;
         $collabinfo->localport = $collabsession->localport;
         if ($collabsession->sarlabport != 0) {
@@ -62,7 +61,7 @@ if (!is_null($sessionid)) {
         } else if (!$DB->record_exists('ejsapp_collab_acceptances', array('accepted_user' => $USER->id))) {
             $collabrecord = new stdClass();
             $collabrecord->accepted_user = $USER->id;
-            $collabrecord->collaborative_session = $sessionid;
+            $collabrecord->collaborative_session = $colsessionid;
             $DB->insert_record('ejsapp_collab_acceptances', $collabrecord);
         }
     } else {
@@ -111,13 +110,19 @@ $originalcss = $ejsapp->codebase . '_ejs_library/css/ejss.css';
 if (!file_exists($CFG->dirroot . $originalcss)) {
     $originalcss = $ejsapp->codebase . '_ejs_library/css/ejsSimulation.css';
 }
+if (file_exists($CFG->dirroot . $originalcss)) {
+    $PAGE->requires->css($originalcss);
+}
 $customcss = $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
 if (file_exists($CFG->dirroot . $customcss)) {
     $PAGE->requires->css($customcss);
-} else if (file_exists($CFG->dirroot . $originalcss)) {
-    $PAGE->requires->css($originalcss);
 }
 
+$renderer = $PAGE->get_renderer('mod_ejsapp');
+
+// Javascript files and html injection for Blockly
+$chartsdiv = '';
+$experiments = '';
 if ($ejsapp->class_file == '') {
     $context = context_user::instance($USER->id);
     // Pass the needed common parameters to the javascript application.
@@ -136,12 +141,7 @@ if ($ejsapp->class_file == '') {
     // Full screen features
     $PAGE->requires->js_call_amd('mod_ejsapp/screenfull', 'init');
     $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'fullScreen');
-}
 
-// Javascript files and html injection for Blockly
-$chartsdiv = '';
-$blockly = '';
-if ($ejsapp->class_file == '') { // EjsS Javascript
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
         // Required libraries for blockly
@@ -164,24 +164,26 @@ if ($ejsapp->class_file == '') { // EjsS Javascript
         $PAGE->requires->js('/mod/ejsapp/addon/javascript.js');
         $PAGE->requires->js('/mod/ejsapp/addon/execution.js');
         $PAGE->requires->js('/mod/ejsapp/addon/toolbox.js');
-        if (file_exists('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js')) {
-            $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js');
-        } else {
-            $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/en.js');
-        }
         if (file_exists('/mod/ejsapp/addon/lang/' . current_language() . '.js')) {
             $PAGE->requires->js('/mod/ejsapp/addon/lang/' . current_language() . '.js');
         } else {
             $PAGE->requires->js('/mod/ejsapp/addon/lang/en.js');
         }
 
-        [$chartsdiv, $controldiv, $blocklydiv, $logdiv] = add_blockly_html();
+        $chartsdiv = $renderer->ejsapp_charts();
+        $controldiv = $renderer->ejsapp_controlbar();
+        $blocklydiv = $renderer->ejsapp_blockly();
+        $logdiv = $renderer->ejsapp_log();
 
-        // Blockly HTML div for placing blockly related elements.
-        $injectiondiv = html_writer::div(html_writer::div($blocklydiv, 'blockly', array('id' => 'injectionDiv')),
-            'blockly', array('id' => 'blocklyDiv'));
-        $blockly = $controldiv . $injectiondiv . $logdiv;
+        // Join HTML divs for placing blockly related elements in a single one.
+        $experiments = $controldiv . $blocklydiv . $logdiv;
+
+        // If required, create the javascript file with the configuration for using blockly.
+        //create_blockly_configuration($ejsapp);
     }
+
+    // Check if there are variables configured to be personalized in this EJSApp.
+    $personalvarsinfo = personalize_vars($ejsapp, $USER, false);
 }
 
 // Output starts here.
@@ -189,12 +191,6 @@ echo $OUTPUT->header();
 if ($ejsapp->intro) { // If some text was written, show the intro.
     echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
 }
-
-// Check if there are variables configured to be personalized in this EJSApp.
-$personalvarsinfo = personalize_vars($ejsapp, $USER, false);
-
-// If required, create the javascript file with the configuration for using blockly.
-//create_blockly_configuration($ejsapp);
 
 // For logging purposes.
 $action = 'view';
@@ -206,9 +202,9 @@ $checkactivity = intval(get_config('mod_ejsapp', 'check_activity'));
 $remlabinfo = null;
 if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
     $accessed = true;
-    echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+    echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
-    echo $blockly;
+    echo $experiments;
 } else { // Remote lab.
     $remlabaccess = remote_lab_access_info($ejsapp, $course);
     $remlabconf = $remlabaccess->remlab_conf;
@@ -236,9 +232,9 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                 }
             }
             $accessed = true;
-            echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+            echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
                 $chartsdiv, 'labchart');
-            echo $blockly;
+            echo $experiments;
         } else { // Lab is in use or rebooting.
             if (false) { // TODO: Check if the lab supports collaborative access.
                 // Teacher can still access in collaborative mode.
@@ -247,9 +243,9 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                     $remlabinfo = define_remlab($sarlabinstance, true, 'NULL',
                         $remlabaccess->labmanager, $maxusetime);
                 }
-                echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+                echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
                     $chartsdiv, 'labchart');
-                echo $blockly;
+                echo $experiments;
                 $action = 'collab_view';
             } else { // No access.
                 $userwithbooking = check_anyones_booking($DB, $ejsapp);
@@ -288,9 +284,9 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                         $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
                     if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
                         $accessed = true;
-                        echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
-                            $chartsdiv, 'labchart');
-                        echo $blockly;
+                        echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo,
+                                $personalvarsinfo) . $chartsdiv, 'labchart');
+                        echo $experiments;
                     } else {
                         echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
                         $action = 'need_to_wait';
@@ -302,9 +298,9 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                         echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                         $remlabinfo = define_remlab($sarlabinstance, true, 'NULL',
                             $remlabaccess->labmanager, $maxusetime);
-                        echo html_writer::div(generate_embedding_code($ejsapp, $remlabinfo, $datafiles, $collabinfo,
+                        echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo,
                                 $personalvarsinfo) . $chartsdiv, 'labchart');
-                        echo $blockly;
+                        echo $experiments;
                         $action = 'collab_view';
                     } else { // No access.
                         echo $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
@@ -382,7 +378,7 @@ $event->trigger();
 
 // Buttons to close or leave collab sessions.
 if (isset($collabsession)) {
-    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$sessionid&courseid={$course->id}";
+    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$colsessionid&courseid={$course->id}";
     if ($USER->id == $collabsession->master_user) {
         $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
     } else {
@@ -403,7 +399,7 @@ if ($ejsapp->appwording) {
     echo $OUTPUT->box($content, 'generalbox center clearfix');
 }
 
-// Javascript feature for monitoring the time spent by a user in the activity.
+// Monitor the time spent by a user in the activity.
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to
     // work with the remote lab.

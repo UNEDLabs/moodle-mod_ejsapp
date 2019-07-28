@@ -6,18 +6,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-.path-mod-ejsapp #blocklyDiv {
-    margin-top: 10px;
-    height: 450px;
-    width: 100%;
-    display: flex;
-}
-
-.path-mod-ejsapp #injectionDiv {
-    height: 100%;
-    width: 100%;
-}
-
 .path-mod-ejsapp .labchart {
     display: flex;
     justify-content: center;
@@ -33,16 +21,6 @@
     flex-grow: 2;
 }
 
-.path-mod-ejsapp .runCodeEJSApp {
-    text-align: center;
-    margin-top: 5px;
-    margin-bottom: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
 .path-mod-ejsapp #ChartBox {
     display: flex;
     min-width: 35%;
@@ -52,6 +30,39 @@
     flex-grow: 1;
     flex-direction: column;
     justify-content: center;
+}
+
+.path-mod-ejsapp .topnav-right {
+    display: inline-block;
+}
+
+.path-mod-ejsapp #save_chart_img {
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+
+.path-mod-ejsapp #save_chart_data {
+    cursor: pointer;
+    margin: 0 0.5rem 0 0.5rem;
+}
+
+.path-mod-ejsapp #full_screen_chart {
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.path-mod-ejsapp #control_chart {
+    order: 99;
+}
+
+.path-mod-ejsapp #clean_chart {
+    cursor: pointer;
+    margin: 0 30px;
+}
+
+.path-mod-ejsapp #prev_chart,
+.path-mod-ejsapp #next_chart {
+    cursor: pointer;
 }
 
 .path-mod-ejsapp #slideshow-wrapper {
@@ -64,35 +75,122 @@
     text-align: center;
 }
 
-.path-mod-ejsapp #full_screen_chart,
+.path-mod-ejsapp #blockly_navbar {
+    margin-top: 1rem;
+}
+
+.path-mod-ejsapp .dropdown-item,
+.path-mod-ejsapp #show_log {
+    cursor: pointer;
+}
+
+.path-mod-ejsapp .textExecution {
+    z-index: 90;
+    margin-top: 1rem;
+    background: white;
+    width: 100%;
+    border: 2px solid #333;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+}
+
+.path-mod-ejsapp .textExecutionElement {
+    margin: 0.5rem 1rem;
+}
+
+.path-mod-ejsapp .play-code {
+    height: 2em;
+    cursor: pointer;
+    background-color: white;
+    border-style: ridge;
+    border-radius: 5px;
+    font-color: #111;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.path-mod-ejsapp #ScriptBox {
+    width: 100%;
+    height: 100%;
+}
+
+.path-mod-ejsapp #titleScriptBox {
+    display: flex;
+    justify-content: space-between;
+    height: 10%;
+}
+
 .path-mod-ejsapp #full_screen_blockly {
     margin-right: 0;
     margin-bottom: 0;
     text-align: right;
+    cursor: pointer;
 }
 
-.path-mod-ejsapp #clean_chart {
-    margin: 0 30px;
+.path-mod-ejsapp #whereScriptsAre {
+    text-align: center;
+    height: 90%;
 }
 
-.path-mod-ejsapp .peru{
-    color:peru;
+.path-mod-ejsapp #blocklyDivExperiments,
+.path-mod-ejsapp #blocklyDivCharts,
+.path-mod-ejsapp #blocklyDivEvents,
+.path-mod-ejsapp #blocklyDivController {
+    height: 100%;
+    width: 100%;
 }
 
-.path-mod-ejsapp .green{
-    color:green;
+.path-mod-ejsapp #_javaScriptFrame {
+    cursor: text;
+    height: 100%;
+    width: 100%;
 }
 
-.path-mod-ejsapp .blue{
-    color:blue;
+.path-mod-ejsapp #controllerDiv {
+    height: 90%;
+    width: 100%;
 }
 
-.path-mod-ejsapp .yellow{
-    color:yellow;
+.path-mod-ejsapp #footer {
+    text-align: center;
 }
 
-.path-mod-ejsapp .red{
-    color:red;
+.path-mod-ejsapp #errorArea {
+    border: none;
+    resize: none;
+    height: 100px;
+    width: 80%;
+    text-align: left;
+    border-color: grey;
+    color: #111;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.path-mod-ejsapp .peru {
+    color: peru;
+}
+
+.path-mod-ejsapp .green {
+    color: green;
+}
+
+.path-mod-ejsapp .blue {
+    color: blue;
+}
+
+.path-mod-ejsapp .yellow {
+    color: yellow;
+}
+
+.path-mod-ejsapp .red {
+    color: red;
 }
 
 .path-mod-ejsapp .nice-select {
@@ -123,12 +221,20 @@
     user-select: none;
     white-space: nowrap;
     width: auto;
-    font-family: 'Helvetica Neue', sans-serif; font-size: 18px; font-weight: bold; letter-spacing: -1px; margin-top:0.4em; text-align: left;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    text-align: left;
 }
 .path-mod-ejsapp .nice-select:hover {
-    border-color: #dbdbdb; }
-.path-mod-ejsapp .nice-select:active, .nice-select.open, .nice-select:focus {
-    border-color: #999; }
+    border-color: #dbdbdb;
+}
+.path-mod-ejsapp .nice-select:active,
+.path-mod-ejsapp .nice-select.open,
+.path-mod-ejsapp .nice-select:focus {
+    border-color: #999;
+}
 .path-mod-ejsapp .nice-select:after {
     border-bottom: 2px solid #999;
     border-right: 2px solid #999;
@@ -148,43 +254,55 @@
     transform: rotate(45deg);
     -webkit-transition: all 0.15s ease-in-out;
     transition: all 0.15s ease-in-out;
-    width: 5px; }
+    width: 5px;
+}
 .path-mod-ejsapp .nice-select.open:after {
     -webkit-transform: rotate(-135deg);
     -ms-transform: rotate(-135deg);
-    transform: rotate(-135deg); }
+    transform: rotate(-135deg);
+}
 .path-mod-ejsapp .nice-select.open .list {
     opacity: 1;
     pointer-events: auto;
     -webkit-transform: scale(1) translateY(0);
     -ms-transform: scale(1) translateY(0);
-    transform: scale(1) translateY(0); }
+    transform: scale(1) translateY(0);
+}
 .path-mod-ejsapp .nice-select.disabled {
     border-color: #ededed;
     color: #999;
-    pointer-events: none; }
+    pointer-events: none;
+}
 .path-mod-ejsapp .nice-select.disabled:after {
-    border-color: #cccccc; }
+    border-color: #cccccc;
+}
 .path-mod-ejsapp .nice-select.wide {
-    width: 100%; }
+    width: 100%;
+}
 .path-mod-ejsapp .nice-select.wide .list {
     left: 0 !important;
-    right: 0 !important; }
+    right: 0 !important;
+}
 .path-mod-ejsapp .nice-select.right {
-    float: right; }
+    float: right;
+}
 .path-mod-ejsapp .nice-select.right .list {
     left: auto;
-    right: 0; }
+    right: 0;
+}
 .path-mod-ejsapp .nice-select.small {
     font-size: 12px;
     height: 36px;
-    line-height: 34px; }
+    line-height: 34px;
+}
 .path-mod-ejsapp .nice-select.small:after {
     height: 4px;
-    width: 4px; }
+    width: 4px;
+}
 .path-mod-ejsapp .nice-select.small .option {
     line-height: 34px;
-    min-height: 34px; }
+    min-height: 34px;
+}
 .path-mod-ejsapp .nice-select .list {
     background-color: #fff;
     border-radius: 5px;
@@ -206,9 +324,11 @@
     transform: scale(0.75) translateY(-21px);
     -webkit-transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25), opacity 0.15s ease-out;
     transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25), opacity 0.15s ease-out;
-    z-index: 9; }
+    z-index: 9;
+}
 .path-mod-ejsapp .nice-select .list:hover .option:not(:hover) {
-    background-color: transparent !important; }
+    background-color: transparent !important;
+}
 .path-mod-ejsapp .nice-select .option {
     cursor: pointer;
     font-weight: 400;
@@ -220,31 +340,28 @@
     padding-right: 29px;
     text-align: left;
     -webkit-transition: all 0.2s;
-    transition: all 0.2s; }
+    transition: all 0.2s;
+}
 .path-mod-ejsapp .nice-select .option:hover, .nice-select .option.focus, .nice-select .option.selected.focus {
-    background-color: #f6f6f6; }
+    background-color: #f6f6f6;
+}
 .path-mod-ejsapp .nice-select .option.selected {
-    font-weight: bold; }
+    font-weight: bold;
+}
 .path-mod-ejsapp .nice-select .option.disabled {
     background-color: transparent;
     color: #999;
-    cursor: default; }
-
+    cursor: default;
+}
 .path-mod-ejsapp .no-csspointerevents .nice-select .list {
-    display: none; }
-
+    display: none;
+}
 .path-mod-ejsapp .no-csspointerevents .nice-select.open .list {
-    display: block; }
-
-.path-mod-ejsapp .topnav-right {
-    display: inline-block;
+    display: block;
 }
 
-.path-mod-ejsapp #titleScriptBox {
+.path-mod-ejsapp #blocklyDiv {
+    height: 450px;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
-}
-
-.path-mod-ejsapp .textExecutionElement {
-    margin:1rem 1rem;
 }
