@@ -27,7 +27,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'mod_ejsapp/screenfull'], function($) {
+define(['jquery'], function($) {
     var t = {
         recording: function(mouseevents) {
             var doit = setInterval(function() {
@@ -42,31 +42,6 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
                     $(window).bind('beforeunload', function(){
                         _model.sendRegister(true);
                     });
-                    clearInterval(doit);
-                }
-            }, 200);
-        },
-
-        sarlabCredentials: function(username, password) {
-            var doit = setInterval(function() {
-                if (typeof _model._sarlab !== "undefined") {
-                    _model._sarlab.setSarlabCredentials({"username": username, "password": password});
-                    clearInterval(doit);
-                }
-            }, 200);
-        },
-
-        sarlabRun: function(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen) {
-            var doit = setInterval(function() {
-                if (typeof _model._sarlab !== "undefined") {
-                    _model._sarlab.setSarlabInfo(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen);
-                    if (typeof _model._rip !== "undefined") {
-                        _model._sarlab.connect(function() {
-                            _model._rip.connect();
-                        });
-                    } else {
-                        _model._sarlab.connect();
-                    }
                     clearInterval(doit);
                 }
             }, 200);
@@ -138,19 +113,29 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($) {
             }, 200);
         },
 
-        fullScreen: function() {
-            var chart = $('#slideshow-wrapper')[0];
-            $('#full_screen_chart').on('click', function () {
-                if (screenfull.enabled) {
-                    screenfull.request(chart);
+        sarlabCredentials: function(username, password) {
+            var doit = setInterval(function() {
+                if (typeof _model._sarlab !== "undefined") {
+                    _model._sarlab.setSarlabCredentials({"username": username, "password": password});
+                    clearInterval(doit);
                 }
-            });
-            var blockly = $('#whereScriptsAre')[0];
-            $('#full_screen_blockly').on('click', function () {
-                if (screenfull.enabled) {
-                    screenfull.request(blockly);
+            }, 200);
+        },
+
+        sarlabRun: function(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen) {
+            var doit = setInterval(function() {
+                if (typeof _model._sarlab !== "undefined") {
+                    _model._sarlab.setSarlabInfo(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen);
+                    if (typeof _model._rip !== "undefined") {
+                        _model._sarlab.connect(function() {
+                            _model._rip.connect();
+                        });
+                    } else {
+                        _model._sarlab.connect();
+                    }
+                    clearInterval(doit);
                 }
-            });
+            }, 200);
         }
     };
     return t;

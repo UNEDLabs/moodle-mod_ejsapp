@@ -140,7 +140,7 @@ if ($ejsapp->class_file == '') {
     }
     // Full screen features
     $PAGE->requires->js_call_amd('mod_ejsapp/screenfull', 'init');
-    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'fullScreen');
+    $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'fullScreen');
 
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
@@ -409,10 +409,10 @@ if ($accessed) {
     $urllog = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php' . $params;
     $urlleave = $CFG->wwwroot . '/mod/ejsapp/leave_or_kick_out.php' . $params;
     if ($ejsapp->is_rem_lab == 0) {
-        $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($urllog, $urlleave,
+        $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'addLog', array($urllog, $urlleave,
             intval($ejsapp->is_rem_lab), 'EJsS', $checkactivity));
     } else {
-        $PAGE->requires->js_init_call('M.mod_ejsapp.init_add_log', array($urllog, $urlleave,
+        $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'addLog', array($urllog, $urlleave,
             intval($ejsapp->is_rem_lab), 'EJsS', $checkactivity, $maxusetime));
     }
     $PAGE->requires->js_call_amd('mod_ejsapp/onclose', 'onclose', array($urlleave));
@@ -421,8 +421,9 @@ if ($accessed) {
     $url = $CFG->wwwroot . '/mod/ejsapp/countdown.php?ejsappid=' . $ejsapp->id . '&check_activity=' . $checkactivity;
     $htmlid = "timecountdown";
     echo $OUTPUT->box(html_writer::div('', '', array('id' => $htmlid)));
-    $PAGE->requires->js_init_call('M.mod_ejsapp.init_countdown', array($url, $htmlid, $waittime, $checkactivity,
-        ' ' . get_string('seconds', 'ejsapp'), get_string('refresh', 'ejsapp')));
+    $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'countdown', array($url, $htmlid,
+        $waittime, $checkactivity, ' ' . get_string('seconds', 'ejsapp'),
+        get_string('refresh', 'ejsapp')));
 }
 
 // Finish the page.
