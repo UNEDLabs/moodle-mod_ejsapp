@@ -171,7 +171,7 @@ if ($ejsapp->class_file == '') {
         }
 
         $chartsdiv = $renderer->ejsapp_charts();
-        $controldiv = $renderer->ejsapp_controlbar();
+        $controldiv = $renderer->ejsapp_controlbar($blocklyconf);
         $blocklydiv = $renderer->ejsapp_blockly();
         $logdiv = $renderer->ejsapp_log();
 

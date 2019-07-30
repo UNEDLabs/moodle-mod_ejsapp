@@ -94,10 +94,11 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
     /**
      * Prints ejsapp controlbar div
+     * @param array $blocklyconf
      * @return string Html code that prints the control bar div
      */
-    public function ejsapp_controlbar() {
-        return $this->render(new ejsapp_controlbar());
+    public function ejsapp_controlbar($blocklyconf) {
+        return $this->render(new ejsapp_controlbar($blocklyconf));
     }
 
     /**
@@ -119,6 +120,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     /**
      * Returns the code that embeds an EjsS application into Moodle
      *
+     * @param ejsapp_lab $params
      * @return string Html code that embeds an EjsS application in Moodle
      * @throws
      *
@@ -472,9 +474,10 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
     /**
      * Prints ejsapp control bar div
+     * @param ejsapp_controlbar $params
      * @return string Html code that prints the html for the control bar
      */
-    public function render_ejsapp_controlbar() {
+    public function render_ejsapp_controlbar($params) {
         $navbar =
             html_writer::start_div("navbar", array('id' => 'blockly_navbar')) .
                 html_writer::start_div("dropdown", array("id" => "experimentsDropdown")) .
@@ -548,7 +551,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 html_writer::end_div() .
                 html_writer::start_div("d-flex justify-content-center") .
                     html_writer::tag("button", "Run", array("class" => "play-code textExecutionElement",
-                        "onclick" => "playCode()")) .
+                        "onclick" => "playCode(" . $params->blocklyconf[1] . "," . $params->blocklyconf[2] . "," .
+                            $params->blocklyconf[3] . "," .  ")")) .
                 html_writer::end_div() .
             html_writer::end_div();
 
@@ -623,6 +627,11 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 class ejsapp_lab implements renderable {
     /**
      * __construct
+     * @param stdClass $ejsapp
+     * @param stdClass $remlabinfo
+     * @param array $userdatafiles
+     * @param stdClass $collabinfo
+     * @param stdClass $personalvarsinfo
      */
     public function __construct($ejsapp, $remlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
         $this->ejsapp = $ejsapp;
@@ -654,8 +663,10 @@ class ejsapp_charts implements renderable {
 class ejsapp_controlbar implements renderable {
     /**
      * __construct
+     * @param array $blocklyconf
      */
-    public function __construct() {
+    public function __construct($blocklyconf) {
+        $this->blocklyconf = $blocklyconf;
     }
 }
 

@@ -109,22 +109,11 @@ $string['blockly_config'] = 'Configure use of Blockly';
 
 $string['use_blockly'] = 'Enable using Blockly';
 $string['use_blockly_help'] = 'When using this option, the EJSApp activity will display a space for programming in Blockly. The programs created with Blockly will be able to interact with the virtual or remote lab.';
-$string['display_logic'] = 'Show logic blocks';
-$string['display_loops'] = 'Show loop blocks';
-$string['display_math'] = 'Show math blocks';
-$string['display_text'] = 'Show text blocks';
-$string['display_lists'] = 'Show lists blocks';
-$string['display_variables'] = 'Show variables blocks';
-$string['display_functions'] = 'Show functions blocks';
-$string['display_lab'] = 'Show EjsS lab blocks';
-$string['display_lab_help'] = 'This option allows showing blocks related to variables and methods of the virtual or remote lab.';
-$string['display_lab_variables'] = 'Show the EjsS lab\'s variables';
-$string['display_lab_execution'] = 'Show the EjsS lab\'s running functions';
-$string['display_lab_functions'] = 'Show the EjsS lab\'s functions';
-$string['display_lab_control'] = 'Show the EjsS lab\'s controls';
-$string['display_lab_charts'] = 'Show the EjsS lab\'s charts';
-$string['blocklyfile'] = 'Initial blocks';
-$string['blocklyfile_help'] = 'You can select a .blk file that specifies which blocks should be initially displayed in Blockly.';
+$string['charts_blockly'] = 'Mostrar bloques de gr&aacute;ficas';
+$string['events_blockly'] = 'Mostrar bloques de eventos';
+$string['controller_blockly'] = 'Mostrar bloques de controlador';
+$string['blocklyfile'] = 'Initial program';
+$string['blocklyfile_help'] = 'You can select a .blk file that specifies which blockly programs should be initially loaded.';
 
 $string['rem_lab_conf'] = 'Remote lab configuration';
 

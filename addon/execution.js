@@ -72,7 +72,7 @@ function playCodeDet(value0,value1,value2,value3) {
 	return [blocklyExp,blocklyChart,blockyEvent,blocklyController];
 }
 
-function playCode() {
+function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 	var a="Select chart";
 	var b="Select event";
 	var c="Select controller";
@@ -81,17 +81,17 @@ function playCode() {
 	var replaytext = ' I want to use <span style="color:green">'+select[0].value+'</span>';
 	if(chartsBlockly) {
 		a = select[count].value;
-		replaytext += ', viewing <span style="color:blue">'+a+'</span>';
+		replaytext += ', viewing <span style="color:blue">'+ a +'</span>';
 	}
 	count++;
 	if(eventsBlockly) {
 		b = select[count].value;
-		replaytext += ', with the events defined in <span style="color:red">'+b+'</span>';
+		replaytext += ', with the events defined in <span style="color:red">'+ b +'</span>';
 	}
 	count++;
 	if(controllerBlockly) {
 		c = select[count].value;
-		replaytext += ', using <span style="color:peru">'+c+'</span>';
+		replaytext += ', using <span style="color:peru">'+ c +'</span>';
 	}
 	count++;
 	var result= playCodeDet(select[0].value,a,b,c);
