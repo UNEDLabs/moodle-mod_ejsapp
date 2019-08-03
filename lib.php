@@ -96,7 +96,6 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
                 check_create_remlab_conf($practiceslist[$ejsapp->practiceintro]);
             }
             ejsapp_expsyst2pract($ejsapp);
-            update_booking_table($ejsapp);
         }
     }
 

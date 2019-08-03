@@ -49,6 +49,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
      * Called from Moodle to define this form
      *
      * @return void
+     * @throws
      */
     public function definition() {
         global $CFG, $DB, $USER;
@@ -273,6 +274,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
      * elements).
      *
      * @param array $defaultvalues
+     * @throws
      */
     public function data_preprocessing(&$defaultvalues) {
         global $CFG, $DB;
@@ -352,10 +354,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
                 }
             }
         }
-
-        // Element listing EJS public variables.
-        // $PAGE->requires->js_init_call;
-        // TODO: Get list of public variables: their names, values and types.
     } // End of funtion data_preprocessing().
 
 
@@ -365,6 +363,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
      * @param array $data
      * @param array $files
      * @return array $errors
+     * @throws
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);

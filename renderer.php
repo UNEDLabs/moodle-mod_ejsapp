@@ -415,7 +415,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
             } else {
                 $code = '';
                 $commandsarlab = 'execjar';
-                $jarpath = $CFG->wwwroot. '/mod/ejsapp/jarfiles/' . $params->ejsapp->course . '/' . $params->ejsapp->id . '/' . $ejsappname;
+                $jarpath = $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $params->ejsapp->course . '/' . $params->ejsapp->id . '/' . $ejsappname;
                 // Launching the websocket service for Sarlab.
                 global $PAGE;
                 $username = $USER->username . "@" . $CFG->wwwroot;

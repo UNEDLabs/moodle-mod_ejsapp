@@ -228,7 +228,7 @@ function preparePage(){
 			grid:
 				{
 					spacing: 25,
-			   		length: 3,
+					length: 3,
 			   		colour: '#ccc',
 			   		snap: true
 				},
@@ -252,7 +252,7 @@ function createControllerPanel(){
 		grid:
 			{
 				spacing: 25,
-		   		length: 3,
+				length: 3,
 		   		colour: '#ccc',
 		   		snap: true
 			},
