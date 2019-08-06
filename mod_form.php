@@ -82,18 +82,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->setType('class_file', PARAM_TEXT);
         $mform->setDefault('class_file', 'null');
 
-        $mform->addElement('hidden', 'codebase', null);
-        $mform->setType('codebase', PARAM_TEXT);
-        $mform->setDefault('codebase', 'null');
-
-        $mform->addElement('hidden', 'mainframe', null);
-        $mform->setType('mainframe', PARAM_TEXT);
-        $mform->setDefault('mainframe', 'null');
-
-        $mform->addElement('hidden', 'is_collaborative', null);
-        $mform->setType('is_collaborative', PARAM_TEXT);
-        $mform->setDefault('is_collaborative', 0);
-
         $mform->addElement('hidden', 'manifest', null);
         $mform->setType('manifest', PARAM_TEXT);
         $mform->setDefault('manifest', '');
@@ -335,23 +323,9 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $blocklyconf = json_decode($jsonblocklyconf);
             if (is_array($blocklyconf)) {
                 $defaultvalues['use_blockly'] = $blocklyconf[0];
-                $defaultvalues['display_logic'] = $blocklyconf[1];
-                $defaultvalues['display_loops'] = $blocklyconf[2];
-                $defaultvalues['display_math'] = $blocklyconf[3];
-                $defaultvalues['display_text'] = $blocklyconf[4];
-                $defaultvalues['display_lists'] = $blocklyconf[5];
-                $defaultvalues['display_variables'] = $blocklyconf[6];
-                $defaultvalues['display_functions'] = $blocklyconf[7];
-                $defaultvalues['display_lab'] = $blocklyconf[8];
-                $defaultvalues['display_lab_variables'] = $blocklyconf[9];
-                $defaultvalues['display_lab_execution'] = $blocklyconf[10];
-                $defaultvalues['display_lab_functions'] = $blocklyconf[11];
-                if (array_key_exists(12, $blocklyconf)) {
-                    $defaultvalues['display_lab_control'] = $blocklyconf[12];
-                }
-                if (array_key_exists(13, $blocklyconf)) {
-                    $defaultvalues['display_lab_charts'] = $blocklyconf[13];
-                }
+                $defaultvalues['charts_blockly'] = $blocklyconf[1];
+                $defaultvalues['events_blockly'] = $blocklyconf[2];
+                $defaultvalues['controller_blockly'] = $blocklyconf[3];
             }
         }
     } // End of funtion data_preprocessing().

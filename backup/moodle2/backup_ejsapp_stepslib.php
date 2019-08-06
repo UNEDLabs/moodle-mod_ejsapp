@@ -53,8 +53,8 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
         // Parameter 'course' is needed in $ejsapp to get ejsappbooking.
         $ejsapp = new backup_nested_element('ejsapp', array('id'),
             array('course', 'name', 'intro', 'introformat', 'appwording', 'appwordingformat', 'css', 'timecreated',
-            'timemodified', 'applet_name', 'class_file', 'codebase', 'mainframe', 'is_collaborative', 'is_rem_lab',
-            'personalvars', 'blockly_conf', 'record', 'mouseevents'));
+            'timemodified', 'applet_name', 'class_file', 'is_rem_lab', 'personalvars', 'blockly_conf', 'record',
+                'mouseevents'));
 
         $personalvars = new backup_nested_element('ejsapp_personal_vars', array('id'),
             array('name', 'type', 'minval', 'maxval'));
@@ -105,7 +105,7 @@ class backup_ejsapp_activity_structure_step extends backup_activity_structure_st
 
         // Define file annotations.
         $ejsapp->annotate_files('mod_ejsapp', 'jarfiles', null);
-        $ejsapp->annotate_files('mod_ejsapp', 'tmp_jarfiles', null);
+        $ejsapp->annotate_files('mod_ejsapp', 'content', null);
         $ejsapp->annotate_files('mod_ejsapp', 'xmlfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'recfiles', null);
         $ejsapp->annotate_files('mod_ejsapp', 'blkfiles', null);

@@ -131,7 +131,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'content', $ejsapp->id);
     $ejsok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejsok) {
         ejsapp_grade_item_update($ejsapp);
@@ -199,16 +199,13 @@ function ejsapp_delete_instance($id) {
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'tmp_jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'content', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'xmlfiles', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'recfiles', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'blkfiles', $id);
 
     ejsapp_grade_item_delete($ejsapp);
 
-    // Delete recursively.
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $id;
-    delete_recursively($path);
     return true;
 }
 
@@ -586,7 +583,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'jarfiles' && $filearea !== 'xmlfiles' &&
+    if ($filearea !== 'private' && $filearea !== 'content' && $filearea !== 'xmlfiles' &&
         $filearea !== 'recfiles' && $filearea !== 'blkfiles') {
         return false;
     }

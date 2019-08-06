@@ -105,17 +105,112 @@ if ($CFG->version < 2016090100) {
     $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'ejsapp'));
 }
 
-// Set CSS style for javascript ejsapps.
-$originalcss = $ejsapp->codebase . '_ejs_library/css/ejss.css';
-if (!file_exists($CFG->dirroot . $originalcss)) {
-    $originalcss = $ejsapp->codebase . '_ejs_library/css/ejsSimulation.css';
-}
-if (file_exists($CFG->dirroot . $originalcss)) {
-    $PAGE->requires->css($originalcss);
-}
-$customcss = $ejsapp->codebase . '_ejs_library/css/ejsapp.css';
-if (file_exists($CFG->dirroot . $customcss)) {
-    $PAGE->requires->css($customcss);
+// For logging purposes.
+$action = 'view';
+$accessed = false;
+$checkactivity = intval(get_config('mod_ejsapp', 'check_activity'));
+
+// Other data.
+$remlabinfo = null;
+$message1 = '';
+$message2 = '';
+
+//Access logic
+if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
+    $accessed = true;
+} else {
+    $remlabaccess = remote_lab_access_info($ejsapp, $course);
+    $remlabconf = $remlabaccess->remlab_conf;
+    $repeatedlabs = $remlabaccess->repeated_ejsapp_labs;
+    $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);
+    if ($remlabaccess->allow_free_access && $remlabaccess->operative) {
+        // Admins and teachers, not using ejsappbooking or free access remote lab, AND the remote lab is operative.
+        $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
+        $maxusetime = $remlabtime->max_use_time;
+        // Get the lab use status.
+        $labstatus = $remlabconf->usestate;
+        // Determine the waiting time.
+        $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
+            $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
+        if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
+            if ($sarlabinstance !== false) {
+                // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
+                $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
+                    $remlabaccess->labmanager, $maxusetime);
+                if (is_null($remlabinfo)) {
+                    $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id,
+                        'practiceid' => 1));
+                    $remlabinfo = define_remlab($sarlabinstance, 0, $expsyst2pract->practiceintro,
+                        $remlabaccess->labmanager, $maxusetime);
+                }
+            }
+            $accessed = true;
+        } else { // Lab is in use or rebooting.
+            if (false) { // TODO: Check if the lab and course support collaborative access.
+                // Teachers can still access in collaborative mode.
+                $message1 = $OUTPUT->box(get_string('collab_access', 'ejsapp'));
+                if ($sarlabinstance !== false) {
+                    $remlabinfo = define_remlab($sarlabinstance, true, 'NULL',
+                        $remlabaccess->labmanager, $maxusetime);
+                }
+                $action = 'collab_view';
+            } else { // No access.
+                $userwithbooking = check_anyones_booking($DB, $ejsapp);
+                if ($userwithbooking !== '') {
+                    $endtime = check_last_valid_booking($DB, $userwithbooking, $ejsapp->id);
+                    $remlabtime->max_use_time = strtotime($endtime) - time();
+                }
+                $message1 = $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
+                $action = 'need_to_wait';
+            }
+        }
+    } else { // Students trying to access a remote lab with restricted access OR remote lab not operative.
+        if (!$remlabaccess->operative) { // Remote lab not operative.
+            $message1 = $OUTPUT->box(get_string('inactive_lab', 'ejsapp'));
+            $action = 'inactive_lab';
+        } else {    // Students trying to access a remote lab with restricted access.
+            if ($remlabaccess->booking_info['active_booking']) {
+                // Remote lab freely accessible from the current course but with an active booking made by someone in a different course.
+                $message1 = $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
+                $action = 'booked_lab';
+            } else { // Other cases.
+                // Getting the maximum time the user is allowed to use the remote lab.
+                $bookingendtime = check_last_valid_booking($DB, $USER->username, $ejsapp->id);
+                $bookingendtimeunix = strtotime($bookingendtime);
+                $maxusetime = $bookingendtimeunix - time(); // In seconds.
+                // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
+                $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
+                    $remlabaccess->labmanager, $maxusetime);
+                if (!is_null($remlabinfo)) { // The user has an active booking -> he can access the lab.
+                    $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
+                    $maxusetime = $remlabtime->max_use_time;
+                    // Get the lab use status.
+                    $labstatus = $remlabconf->usestate;
+                    // Determine the waiting time.
+                    $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
+                        $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
+                    if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
+                        $accessed = true;
+                    } else {
+                        $message = $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
+                        $action = 'need_to_wait';
+                    }
+                } else { // No active booking.
+                    $message1 = $OUTPUT->box(get_string('no_booking', 'ejsapp'));
+                    if (false) { // TODO: Check if the lab and course support collaborative access.
+                        // Students can still access in collaborative mode.
+                        $message2 = $OUTPUT->box(get_string('collab_access', 'ejsapp'));
+                        $remlabinfo = define_remlab($sarlabinstance, true, 'NULL',
+                            $remlabaccess->labmanager, $maxusetime);
+                        $action = 'collab_view';
+                    } else { // No access.
+                        $message2 = $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
+                        $action = 'need_to_book';
+                    }
+                }
+            }
+        }
+    }
 }
 
 $renderer = $PAGE->get_renderer('mod_ejsapp');
@@ -123,7 +218,44 @@ $renderer = $PAGE->get_renderer('mod_ejsapp');
 // Javascript files and html injection for Blockly
 $chartsdiv = '';
 $experiments = '';
-if ($ejsapp->class_file == '') {
+if ($ejsapp->class_file == '' && $accessed) {
+    $fs = get_file_storage();
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+        'itemid' => $ejsapp->id, 'filename' => 'ejss.css'), 'filesize DESC');
+    if (!empty($filerecords)) {
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        if ($file) {
+            $originalcss = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+                $file->get_itemid() . "/_ejs_library/css/" . $file->get_filename();
+        }
+    } else {
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => 'ejsSimulation.css'), 'filesize DESC');
+        if (!empty($filerecords)) {
+            $filerecord = reset($filerecords);
+            $file = $fs->get_file_by_id($filerecord->id);
+            if ($file) {
+                $originalcss = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+                    $file->get_itemid() . "/_ejs_library/css/" . $file->get_filename();
+            }
+        }
+    }
+    if ($file) {
+        $PAGE->requires->css($originalcss);
+    }
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+        'itemid' => $ejsapp->id, 'filename' => 'ejsapp.css'), 'filesize DESC');
+    if (!empty($filerecords)) {
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        if ($file) {
+            $customcss = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+                $file->get_itemid() . "/_ejs_library/css/" . $file->get_filename();
+            $PAGE->requires->css($customcss);
+        }
+    }
+
     $context = context_user::instance($USER->id);
     // Pass the needed common parameters to the javascript application.
     $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'setCommonParameters',
@@ -188,131 +320,74 @@ if ($ejsapp->class_file == '') {
 
 // Output starts here.
 echo $OUTPUT->header();
-if ($ejsapp->intro) { // If some text was written, show the intro.
-    echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
-}
-
-// For logging purposes.
-$action = 'view';
-$accessed = false;
-$checkactivity = intval(get_config('mod_ejsapp', 'check_activity'));
 
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
 // whether the ejsapp instance is a remote lab or not.
-$remlabinfo = null;
-if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
-    $accessed = true;
+
+if ($accessed) {
+    if ($ejsapp->intro) {
+        echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
+    }
+
+    if ($ejsapp->class_file == '') {
+        // Include the three required javascript files.
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => 'ejsS.v1.min.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+            $file->get_itemid() . "/_ejs_library/" . $file->get_filename();
+        $PAGE->requires->js(new moodle_url($pathfile));
+
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => 'textresizedetector.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+            $file->get_itemid() . "/_ejs_library/scripts/" . $file->get_filename();
+        $PAGE->requires->js(new moodle_url($pathfile));
+
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+            $file->get_itemid() . "/" . $file->get_filename();
+        $PAGE->requires->js(new moodle_url($pathfile));
+    }
+
     echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
     echo $experiments;
-} else { // Remote lab.
-    $remlabaccess = remote_lab_access_info($ejsapp, $course);
-    $remlabconf = $remlabaccess->remlab_conf;
-    $repeatedlabs = $remlabaccess->repeated_ejsapp_labs;
-    $sarlabinstance = is_practice_in_sarlab($remlabconf->practiceintro);
-    if ($remlabaccess->allow_free_access && $remlabaccess->operative) {
-        // Admins and teachers, not using ejsappbooking or free access remote lab, AND the remote lab is operative.
-        $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
-        $maxusetime = $remlabtime->max_use_time;
-        // Get the lab use status.
-        $labstatus = $remlabconf->usestate;
-        // Determine the waiting time.
-        $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
-            $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
-        if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
-            if ($sarlabinstance !== false) {
-                // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
-                $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
-                    $remlabaccess->labmanager, $maxusetime);
-                if (is_null($remlabinfo)) {
-                    $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id,
-                        'practiceid' => 1));
-                    $remlabinfo = define_remlab($sarlabinstance, 0, $expsyst2pract->practiceintro,
-                        $remlabaccess->labmanager, $maxusetime);
-                }
-            }
-            $accessed = true;
-            echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
-                $chartsdiv, 'labchart');
-            echo $experiments;
-        } else { // Lab is in use or rebooting.
-            if (false) { // TODO: Check if the lab supports collaborative access.
-                // Teacher can still access in collaborative mode.
-                echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
-                if ($sarlabinstance !== false) {
-                    $remlabinfo = define_remlab($sarlabinstance, true, 'NULL',
-                        $remlabaccess->labmanager, $maxusetime);
-                }
-                echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
-                    $chartsdiv, 'labchart');
-                echo $experiments;
-                $action = 'collab_view';
-            } else { // No access.
-                $userwithbooking = check_anyones_booking($DB, $ejsapp);
-                if ($userwithbooking !== '') {
-                    $endtime = check_last_valid_booking($DB, $userwithbooking, $ejsapp->id);
-                    $remlabtime->max_use_time = strtotime($endtime) - time();
-                }
-                echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
-                $action = 'need_to_wait';
-            }
-        }
-    } else { // Students trying to access a remote lab with restricted access OR remote lab not operative.
-        if (!$remlabaccess->operative) { // Remote lab not operative.
-            echo $OUTPUT->box(get_string('inactive_lab', 'ejsapp'));
-            $action = 'inactive_lab';
-        } else {    // Students trying to access a remote lab with restricted access.
-            if ($remlabaccess->booking_info['active_booking']) {
-                // Remote lab freely accessible from the current course but with an active booking made by someone in a different course.
-                echo $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
-                $action = 'booked_lab';
-            } else { // Other cases.
-                // Getting the maximum time the user is allowed to use the remote lab.
-                $bookingendtime = check_last_valid_booking($DB, $USER->username, $ejsapp->id);
-                $bookingendtimeunix = strtotime($bookingendtime);
-                $maxusetime = $bookingendtimeunix - time(); // In seconds.
-                // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
-                $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
-                    $remlabaccess->labmanager, $maxusetime);
-                if (!is_null($remlabinfo)) { // The user has an active booking -> he can access the lab.
-                    $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
-                    $maxusetime = $remlabtime->max_use_time;
-                    // Get the lab use status.
-                    $labstatus = $remlabconf->usestate;
-                    // Determine the waiting time.
-                    $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
-                        $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
-                    if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
-                        $accessed = true;
-                        echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo,
-                                $personalvarsinfo) . $chartsdiv, 'labchart');
-                        echo $experiments;
-                    } else {
-                        echo $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
-                        $action = 'need_to_wait';
-                    }
-                } else { // No active booking.
-                    echo $OUTPUT->box(get_string('no_booking', 'ejsapp'));
-                    if (false) {    // TODO: Check if the lab supports collaborative access.
-                        // Student can still access in collaborative mode.
-                        echo $OUTPUT->box(get_string('collab_access', 'ejsapp'));
-                        $remlabinfo = define_remlab($sarlabinstance, true, 'NULL',
-                            $remlabaccess->labmanager, $maxusetime);
-                        echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo,
-                                $personalvarsinfo) . $chartsdiv, 'labchart');
-                        echo $experiments;
-                        $action = 'collab_view';
-                    } else { // No access.
-                        echo $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
-                        $action = 'need_to_book';
-                    }
-                }
-            }
-        }
+
+    if ($ejsapp->appwording) {
+        $formatoptions = new stdClass;
+        $formatoptions->noclean = true;
+        $formatoptions->overflowdiv = true;
+        $formatoptions->context = $modulecontext;
+        $content = format_text($ejsapp->appwording, $ejsapp->appwordingformat, $formatoptions);
+        echo $OUTPUT->box($content, 'generalbox center clearfix');
     }
+
+    // Buttons to close or leave collab sessions.
+    if (isset($collabsession)) {
+        $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$colsessionid
+        &courseid={$course->id}";
+        if ($USER->id == $collabsession->master_user) {
+            $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
+        } else {
+            $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
+        }
+        $button = html_writer::empty_tag('input', array('type' => 'button', 'name' => 'close_session',
+            'value' => $text, 'onClick' => "window.location.href = '$url'"));
+        echo $button;
+    }
+} else {
+    echo $message1;
+    echo $message2;
 }
 
-// Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not.
+// <Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not>
 switch ($action) {
     case 'view':
         $event = \mod_ejsapp\event\ejsapp_viewed::create(array(
@@ -374,30 +449,7 @@ switch ($action) {
         break;
 }
 $event->trigger();
-// Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not.
-
-// Buttons to close or leave collab sessions.
-if (isset($collabsession)) {
-    $url = $CFG->wwwroot . "/blocks/ejsapp_collab_session/close_collab_session.php?session=$colsessionid&courseid={$course->id}";
-    if ($USER->id == $collabsession->master_user) {
-        $text = get_string('closeMasSessBut', 'block_ejsapp_collab_session');
-    } else {
-        $text = get_string('closeStudSessBut', 'block_ejsapp_collab_session');
-    }
-    $button = html_writer::empty_tag('input', array('type' => 'button', 'name' => 'close_session', 'value' => $text,
-        'onClick' => "window.location.href = '$url'"));
-    echo $button;
-}
-
-// If some text was written, show it.
-if ($ejsapp->appwording) {
-    $formatoptions = new stdClass;
-    $formatoptions->noclean = true;
-    $formatoptions->overflowdiv = true;
-    $formatoptions->context = $modulecontext;
-    $content = format_text($ejsapp->appwording, $ejsapp->appwordingformat, $formatoptions);
-    echo $OUTPUT->box($content, 'generalbox center clearfix');
-}
+// </Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not>
 
 // Monitor the time spent by a user in the activity.
 if ($accessed) {

@@ -33,20 +33,11 @@
                        PREVIOUS="timemodified" NEXT="class_file"/>
                 <FIELD NAME="class_file" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
                        COMMENT="applet main class file (e.g., heatflow.heatflowMoodle.heatflowMoodleApplet.class)"
-                       PREVIOUS="applet_name" NEXT="codebase"/>
-                <FIELD NAME="codebase" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
-                       COMMENT="Path of the .jar that embeds the applet (e.g., /remote_laboratories_applets/gyroscopeMoodle/)"
-                       PREVIOUS="class_file" NEXT="mainframe"/>
-                <FIELD NAME="mainframe" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
-                       COMMENT="Name of the EJS mainframe (by default MainFrame)" PREVIOUS="codebase"
-                       NEXT="is_collaborative"/>
-                <FIELD NAME="is_collaborative" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0"
-                       SEQUENCE="false" COMMENT="Does the lab supports collaborative sessions? (1=yes, 0=not)"
-                       PREVIOUS="mainframe" NEXT="applet"/>
+                       PREVIOUS="applet_name" NEXT="is_rem_lab"/>
                 <FIELD NAME="is_rem_lab" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0"
-                       PREVIOUS="custom_height" NEXT="height"/>
+                       PREVIOUS="class_file" NEXT="personalvars"/>
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
-                       PREVIOUS="width" NEXT="blockly_conf"/>
+                       PREVIOUS="is_rem_lab" NEXT="blockly_conf"/>
                 <FIELD NAME="blockly_conf" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
                        COMMENT="Blockly configuration parameters encoded in json" PREVIOUS="personalvars"
                        NEXT="record"/>

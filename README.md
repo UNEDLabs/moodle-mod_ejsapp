@@ -33,29 +33,6 @@ the ejsapp_collab_session blocks and the osp repository plugin. You can find and
 https://moodle.org/plugins/browse.php?list=set&id=27, in the plugins section in the Moodle.org webpage or at
 https://github.com/UNEDLabs.
 
- WARNING: If you are updating ejsapp from a previous version, DO NOT replace/delete your old jarfiles directory inside
- your old ejsapp directory.
-
-------------------------------------------------------------------------------------------------
- IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), EJSApp requires that (i) the apache user is the owner
- of the "jarfiles" dir inside the "ejsapp" dir, and (ii) it has permissions to read, write and execute the jarfiles dir.
-                                                                                                
- The following points describe how to do it:                                                    
-                                                                                                
- 1) go to the ejsapp dir:                                                                       
- $ cd ejsapp                                                                                    
-                                                                                                
- 2) Change the owner of the jarfiles dir to apache.                                             
- For instance,                                                                                  
- 2.a) in Linux CentOS, the apache user is "apache", so you should write                         
- $ chown -R apache jarfiles
- 2.b) in Linux OpenSuse, the apache user is "wwwrun", so you should write                       
- $ chown -R wwwrun jarfiles
-                                                                                                
- 3) Change the permissions of the apache user:                                                  
- $ chmod -R 755 jarfiles
-------------------------------------------------------------------------------------------------
-
 ------------------------------------------------------------------------------------------------
  IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), if you have a trust certificate and you want to use
  the option to automatically sign the Java applets, you must give the apache user permissions over the jarsigner (Java

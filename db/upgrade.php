@@ -357,5 +357,23 @@ function xmldb_ejsapp_upgrade($oldversion) {
         $dbman->drop_table($table);
     }
 
+    if ($oldversion < '2019080400') {
+        // Drop mainframe and codebase fields from ejsapp table.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('mainframe');
+        $dbman->drop_field($table, $field);
+        $field = new xmldb_field('codebase');
+        $dbman->drop_field($table, $field);
+    }
+
+    if ($oldversion < '2019080500') {
+        // Drop mainframe and codebase fields from ejsapp table.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('is_collaborative');
+        $dbman->drop_field($table, $field);
+    }
+
     return true;
 }

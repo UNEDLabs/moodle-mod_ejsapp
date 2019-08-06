@@ -113,6 +113,18 @@ define(['jquery'], function($) {
             }, 200);
         },
 
+        personalizeVariables: function(personalizedvars) {
+            var doit = setInterval(function() {
+                if (typeof _model !== "undefined") {
+                    personalizedvars = _model.parseInputParameters(personalizedvars);
+                    if (personalizedvars) {
+                        _model.addToReset(function() { _model._readParameters(personalizedvars); });
+                    }
+                    clearInterval(doit);
+                }
+            }, 200);
+        },
+
         sarlabCredentials: function(username, password) {
             var doit = setInterval(function() {
                 if (typeof _model._sarlab !== "undefined") {

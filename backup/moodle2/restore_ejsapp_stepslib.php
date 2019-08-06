@@ -67,7 +67,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
      * @throws
      */
     protected function process_ejsapp($data) {
-        global $DB, $CFG;
+        global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -107,34 +107,14 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
                 $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'],
                 $fileinfo['filename']);
             if ($file) {
-                // Create directories.
-                $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
-                if (!file_exists($path)) {
-                    mkdir($path, 0700);
-                }
-                $path .= $data->course . '/';
-                if (!file_exists($path)) {
-                    mkdir($path, 0700);
-                }
-                $path .= $newitemid;
-                if (!file_exists($path)) {
-                    mkdir($path, 0700);
-                }
-
-                $codebase = '/mod/ejsapp/jarfiles/' . $data->course . '/' . $newitemid . '/';
-
                 // Update ejsapp table.
                 $data->id = $newitemid;
-                $data->codebase = $codebase;
                 $DB->update_record('ejsapp', $data);
 
-                // Copy file .jar or .zip file.
-                $folderpath = $CFG->dirroot . $codebase;
-                $filepath = $folderpath . $filerecord->filename;
-                $file->copy_content_to($filepath);
                 if (empty($data->class_file)) { // Zip file with Javascript.
-                    modifications_for_javascript($filepath, $data, $folderpath, $codebase);
-                    unlink($filepath);
+                    $context = new stdClass;
+                    $context->id = $filerecord->contextid;
+                    modifications_for_javascript($context, $data, $file);
                 }
             }
         }

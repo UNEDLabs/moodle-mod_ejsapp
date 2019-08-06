@@ -128,61 +128,6 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     public function render_ejsapp_lab(ejsapp_lab $params) {
         global $DB, $USER, $CFG, $COURSE;
 
-        /**
-         * If a state, recording or blockly file has been configured in the ejsapp activity, this function returns the
-         * information of such file
-         *
-         * @param stdClass $ejsapp
-         * @param string $datatype
-         * @return stdClass $initialdatafile
-         * @throws
-         */
-        function initial_data_file($ejsapp, $datatype) {
-            global $DB;
-            $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => $datatype,
-                'itemid' => ($ejsapp->id)));
-            $initialdatafile = new stdClass();
-            if (!empty($filerecords)) {
-                foreach ($filerecords as $initialdatafile) {
-                    if ($initialdatafile->filename != '.') {
-                        break;
-                    }
-                }
-            }
-            return $initialdatafile;
-        }
-
-        /**
-         * Return either the initial or the user-saved data file (state, interaction recording or blockly)
-         *
-         * @param string $userdatafile
-         * @param stdClass $initialdatafile
-         * @return string $datafile
-         */
-        function get_data_file($userdatafile, $initialdatafile) {
-            global $CFG;
-            if ($userdatafile) {
-                $datafile = $CFG->wwwroot . "/pluginfile.php/" . $userdatafile;
-            } else {
-                $datafile = $CFG->wwwroot . "/pluginfile.php/" . $initialdatafile->contextid .
-                    "/" . $initialdatafile->component . "/" . $initialdatafile->filearea .
-                    "/" . $initialdatafile->itemid . "/" . $initialdatafile->filename;
-            }
-            return $datafile;
-        }
-
-        prepare_ejs_file($params->ejsapp);
-
-        if (!is_null($params->userdatafiles)) {
-            $userstatefile = $params->userdatafiles[0];
-            $userrecfile = $params->userdatafiles[1];
-            $userblkfile = $params->userdatafiles[2];
-        } else {
-            $userstatefile = null;
-            $userrecfile = null;
-            $userblkfile = null;
-        }
-
         // Sarlab is used to access this remote lab or to establish communication between users participating in a
         // collaborative session.
         if ($params->remlabinfo) {
@@ -193,7 +138,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 mt_srand(time());
                 $random = mt_rand(0, 1000000);
                 if ($params->remlabinfo) {
-                    $sarlabkey = sha1($min . $seg . $params->remlabinfo->practice . fullname($USER) . $USER->username . $random);
+                    $sarlabkey = sha1($min . $seg . $params->remlabinfo->practice . fullname($USER) .
+                        $USER->username . $random);
                 } else {
                     $sarlabkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
                 }
@@ -230,46 +176,119 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
             }
         }
 
-        $context = context_user::instance($USER->id);
-        $language = current_language();
-
         if ($params->ejsapp->class_file == '') { // EjsS Javascript.
             global $PAGE;
 
-            $path = new moodle_url($params->ejsapp->codebase);
-
-            $filename = substr($params->ejsapp->applet_name, 0, strpos($params->ejsapp->applet_name, '.'));
-            $extension = substr($params->ejsapp->applet_name, strpos($params->ejsapp->applet_name, ".") + 1);
-
-            $jsheaders = @get_headers($path . $filename . '.js');
-            $separatedjs = false;
-            if (($jsheaders[0] == 'HTTP/1.1 404 Not Found')) { // Javascript code included in html.
-                $fileheaders = @get_headers($path . $filename . '_' . $language . '.' . $extension);
-                if ($fileheaders[0] == 'HTTP/1.1 404 Not Found') {
-                    $code = file_get_contents($path . $params->ejsapp->applet_name);
-                } else {
-                    $code = file_get_contents($path . $filename . '_' . $language . '.' . $extension);
+            /**
+             * If a state, recording or blockly file has been configured in the ejsapp activity, this function returns the
+             * information of such file
+             *
+             * @param stdClass $ejsapp
+             * @param string $datatype
+             * @return stdClass $initialdatafile
+             * @throws
+             */
+            function initial_data_file($ejsapp, $datatype) {
+                global $DB;
+                $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => $datatype,
+                    'itemid' => ($ejsapp->id)));
+                $initialdatafile = new stdClass();
+                if (!empty($filerecords)) {
+                    foreach ($filerecords as $initialdatafile) {
+                        if ($initialdatafile->filename != '.') {
+                            break;
+                        }
+                    }
                 }
-            } else { // Javascript code in a separated .js file.
-                $separatedjs = true;
-                $jsheaderslang = @get_headers($path . $filename . '_' . $language . '.js');
-                if ($jsheaderslang[0] == 'HTTP/1.1 404 Not Found') {
-                    $code = file_get_contents($path . $filename . '.js');
+                return $initialdatafile;
+            }
+
+            /**
+             * Return either the initial or the user-saved data file (state, interaction recording or blockly)
+             *
+             * @param string $userdatafile
+             * @param stdClass $initialdatafile
+             * @return string $datafile
+             */
+            function get_data_file($userdatafile, $initialdatafile) {
+                global $CFG;
+                if ($userdatafile) {
+                    $datafile = $CFG->wwwroot . "/pluginfile.php/" . $userdatafile;
                 } else {
-                    $code = file_get_contents($path . $filename . '_' . $language . '.js');
+                    $datafile = $CFG->wwwroot . "/pluginfile.php/" . $initialdatafile->contextid .
+                        "/" . $initialdatafile->component . "/" . $initialdatafile->filearea .
+                        "/" . $initialdatafile->itemid . "/" . $initialdatafile->filename;
                 }
-                $htmlcode = file_get_contents($path . $params->ejsapp->applet_name);
+                return $datafile;
+            }
+
+            /**
+             * Call javascript code for loading state, interaction and blockly programs files as well as personalized variables
+             *
+             * @param string $userstatefile
+             * @param string $userrecfile
+             * @param string $userblkfile
+             * @param stdClass $ejsapp
+             * @param stdClass $collabinfo
+             * @param stdClass $personalvarsinfo
+             */
+            function load_configuration($userstatefile, $userrecfile, $userblkfile, $ejsapp, $collabinfo, $personalvarsinfo) {
+                global $PAGE;
+
+                // Load state files.
+                $initialstatefile = initial_data_file($ejsapp, 'xmlfiles');
+                if ($userstatefile || (isset($initialstatefile->filename)) && $initialstatefile->filename != '.') {
+                    $statefile = get_data_file($userstatefile, $initialstatefile);
+                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readStateFile', array($statefile));
+                }
+
+                // Load interaction recording files.
+                $initialrecfile = initial_data_file($ejsapp, 'recfiles');
+                if ($userrecfile || (isset($initialrecfile->filename) && $initialrecfile->filename != '.')) {
+                    $endmessage = get_string('end_message', 'ejsapp');
+                    $recfile = get_data_file($userrecfile, $initialrecfile);
+                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'playRecFile',
+                        array($recfile, $endmessage));
+                }
+
+                // Load blockly program files.
+                $initialblkfile = initial_data_file($ejsapp, 'blkfiles');
+                if ($userblkfile || (isset($initialblkfile->filename) && $initialblkfile->filename != '.')) {
+                    $blocklyconf = json_decode($ejsapp->blockly_conf);
+                    if ($blocklyconf[0] == 1) {
+                        $blkfile = get_data_file($userblkfile, $initialblkfile);
+                        $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readBlocklyFile',
+                            array($blkfile));
+                    }
+                }
+
+                // Load personalized variables.
+                if (!$collabinfo && isset($personalvarsinfo->name) && isset($params->personalvarsinfo->value)
+                    && isset($params->personalvarsinfo->type)) {
+                    $personalizevars = "'{";
+                    for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
+                        $personalizevars .= '"' . $personalvarsinfo->name[$i] . '":' . $personalvarsinfo->value[$i];
+                        if ($i < count($personalvarsinfo->name) - 1) {
+                            $personalizevars .= ",";
+                        }
+                    }
+                    $personalizevars .= "}'";
+                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'personalizeVariables',
+                        array($personalizevars));
+                }
             }
 
             // For remote labs and collaborative sessions only
             if (($params->ejsapp->is_rem_lab || $params->collabinfo) && $params->remlabinfo) {
-                if ($params->remlabinfo->instance !== false ) { // For remote labs accessed through Sarlab, pass authentication params to the app.
+                if ($params->remlabinfo->instance !== false ) {
+                    // For remote labs accessed through Sarlab, pass authentication params to the app.
                     $practice = explode("@", $params->remlabinfo->practice, 2);
                     // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
                     $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
                         array($USER->username . "@" . $CFG->wwwroot, $sarlabkey));
                     $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
-                        array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $practice[0], $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
+                        array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $practice[0], $CFG->wwwroot .
+                            '/course/view.php?id=' . $COURSE->id));
                 }
                 // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
                 $sseuri = '';
@@ -289,63 +308,23 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     array($sseuri, $port));
             }
 
-            // Init of loading state, interaction and blockly programs files as well as personalized variables.
-            // Init of loading state files.
-            $initialstatefile = initial_data_file($params->ejsapp, 'xmlfiles');
-            if ($userstatefile || (isset($initialstatefile->filename)) && $initialstatefile->filename != '.') {
-                $statefile = get_data_file($userstatefile, $initialstatefile);
-                $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readStateFile', array($statefile));
-            }
-            // End of loading state files.
-
-            // Init of loading interaction recording files.
-            $initialrecfile = initial_data_file($params->ejsapp, 'recfiles');
-            if ($userrecfile || (isset($initialrecfile->filename) && $initialrecfile->filename != '.')) {
-                $endmessage = get_string('end_message', 'ejsapp');
-                $recfile = get_data_file($userrecfile, $initialrecfile);
-                $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'playRecFile',
-                    array($recfile, $endmessage));
-            }
-            // End of loading interaction recording files.
-
-            // Init of loading blockly program files.
-            $initialblkfile = initial_data_file($params->ejsapp, 'blkfiles');
-            if ($userblkfile || (isset($initialblkfile->filename) && $initialblkfile->filename != '.')) {
-                $blocklyconf = json_decode($params->ejsapp->blockly_conf);
-                if ($blocklyconf[0] == 1) {
-                    $blkfile = get_data_file($userblkfile, $initialblkfile);
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readBlocklyFile',
-                        array($blkfile));
-                }
-            }
-            // End of loading blockly program files.
-
-            // Init of loading personalized variables.
-            $search = ',"webUserInput"';
-            if (!$params->collabinfo && isset($params->personalvarsinfo->name) && isset($params->personalvarsinfo->value) && isset($params->personalvarsinfo->type)) {
-                $personalizevarscode = "'{";
-                for ($i = 0; $i < count($params->personalvarsinfo->name); $i++) {
-                    $personalizevarscode .= '"' . $params->personalvarsinfo->name[$i] . '":' . $params->personalvarsinfo->value[$i];
-                    if ($i < count($params->personalvarsinfo->name) - 1) {
-                        $personalizevarscode .= ",";
-                    }
-                }
-                $personalizevarscode .= "}'";
-                $replace = "," . '"' . bin2hex(base64_encode($personalizevarscode)) . '"';
+            if (!is_null($params->userdatafiles)) {
+                $userstatefile = $params->userdatafiles[0];
+                $userrecfile = $params->userdatafiles[1];
+                $userblkfile = $params->userdatafiles[2];
             } else {
-                $replace = "";
+                $userstatefile = null;
+                $userrecfile = null;
+                $userblkfile = null;
             }
-            $code = str_replace($search, $replace, $code);
-            // End of loading personalized variables.
-            // End of loading state, interaction and blockly programs files as well as personalized variables.
 
-            // Embedding the js code in the html file in case there is a separated js file.
-            if ($separatedjs) {
-                $code = '<script type="text/javascript"><!--//--><![CDATA[//><!--' . "\n" . $code . '//--><!]]></script>';
-                $code = substr($htmlcode, 0, -strlen($htmlcode) +
-                        strpos($htmlcode, '<div id="_topFrame" style="text-align:center"')) .
-                    '<div id="_topFrame" style="text-align:center"></div>' . $code . '</div>';
-            }
+            load_configuration($userstatefile, $userrecfile, $userblkfile, $params->ejsapp, $params->collabinfo,
+                $params->personalvarsinfo);
+
+            $code =
+                html_writer::start_div("", array("id" => "EJsS")) .
+                    html_writer::div("", "", array("id" => "_topFrame", "style" => "text-align:center;")) .
+                html_writer::end_div();
 
         } else { // EjsS Java.
 
@@ -359,6 +338,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
                 $wwwpath = new moodle_url($params->ejsapp->codebase);
                 $mainclass = substr($params->ejsapp->class_file, 0, -12);
+                $context = context_user::instance($USER->id);
+                $language = current_language();
 
                 // Create the JNLP file.
                 $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
@@ -404,18 +385,18 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 fclose($jnlp);
 
                 // Run or download JNLP.
-                $code = "<iframe id=\"EJsS\" style=\"display:none;\"></iframe>
-                    <script src=\"https://www.java.com/js/deployJava.js\"></script>
-                    <script>
-                        var url = '$wwwpath$ejsappname.jnlp';
+                $code =
+                    html_writer::tag("iframe", "", array("id" => "EJsS", "style" => "display:none;")) .
+                    html_writer::tag("script", "", array("src" => "https://www.java.com/js/deployJava.js")) .
+                    html_writer::tag("script", "var url = '$wwwpath$ejsappname.jnlp';
                         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                         if (is_chrome) document.getElementById('EJsS').src = url;
-                        else deployJava.launchWebStartApplication(url);
-                    </script>";
+                        else deployJava.launchWebStartApplication(url);");
             } else {
                 $code = '';
                 $commandsarlab = 'execjar';
-                $jarpath = $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $params->ejsapp->course . '/' . $params->ejsapp->id . '/' . $ejsappname;
+                $jarpath = $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $params->ejsapp->course . '/' .
+                    $params->ejsapp->id . '/' . $ejsappname;
                 // Launching the websocket service for Sarlab.
                 global $PAGE;
                 $username = $USER->username . "@" . $CFG->wwwroot;

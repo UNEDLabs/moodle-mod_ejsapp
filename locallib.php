@@ -114,41 +114,16 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
         }
     }
 
-    // Codebase.
-    $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-
-    // Create folders to store the .jar or .zip file.
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
-    if (!file_exists($path)) {
-        mkdir($path, 0755);
-    }
-    $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $ejsapp->course;
-    if (!file_exists($path)) {
-        mkdir($path, 0755);
-    }
-    $path = $CFG->dirroot . $codebase;
-    if (file_exists($path)) { // Updating, not creating, the ejsapp activity.
-        delete_recursively($path);
-    }
-    mkdir($path, 0755);
-
-    // Copy the jar/zip file to its destination folder in jarfiles.
-    $filepath = $path . $filerecord->filename;
-    $file->copy_content_to($filepath);
-
     // Initialize the mod_form elements.
     $ejsapp->class_file = '';
-    $ejsapp->codebase = $codebase;
-    $ejsapp->mainframe = '';
-    $ejsapp->is_collaborative = 0;
     $ejsapp->manifest = 'EJsS';
 
-    $ext = pathinfo($filepath, PATHINFO_EXTENSION);
+    $ext = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table.
     if ($ext == 'jar') { // Java.
         $ejsok = modifications_for_java($filepath, $ejsapp, $file, $filerecord, false);
     } else { // Javascript.
-        $ejsok = modifications_for_javascript($filepath, $ejsapp, $path, $codebase);
+        $ejsok = modifications_for_javascript($context, $ejsapp, $file);
     }
 
     // Configuration of blockly.
@@ -160,16 +135,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $ejsapp->blockly_conf = json_encode($blocklyconf);
 
     $DB->update_record('ejsapp', $ejsapp);
-
-    // We add an entry in Moodle's file table for the .zip or .jar file in the jarfiles directory.
-    $fileinfo = array(                          // Prepare file record object.
-        'contextid' => $context->id,            // ID of context.
-        'component' => 'mod_ejsapp',            // usually = table name.
-        'filearea' => 'tmp_jarfiles',           // usually = table name.
-        'itemid' => $ejsapp->id,                // usually = ID of row in table.
-        'filepath' => '/',                      // any path beginning and ending in /.
-        'filename' => $filerecord->filename);  // any filename.
-    $fs->create_file_from_pathname($fileinfo, $filepath);
 
     // Update ejsapp_personal_vars table.
     // Personalizing EJS variables: update ejsapp_personal_vars table.
@@ -231,66 +196,6 @@ function delete_recursively($dir) {
         return @rmdir($dir);
     }
     return false;
-}
-
-/**
- * Modifies links to libraries and images used by the EjsS javascript applications.
- *
- * @param string $codebase
- * @param stdClass $ejsapp
- * @param string $code
- * @param boolean $usecss
- * @return string $code
- *
- */
-function update_links($codebase, $ejsapp, $code, $usecss) {
-    global $CFG;
-
-    $path = $CFG->wwwroot . $codebase;
-
-    // Replace links for images and stuff and insert a placeholder for future purposes.
-    $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
-    $filepath = $CFG->dirroot . $codebase . $filename . '.js';
-    $search = '("_topFrame","_ejs_library/",null);';
-    $replace = '("_topFrame","' . $path . '_ejs_library/","' . $path . '","webUserInput");';
-    if (file_exists($filepath)) { // Javascript code included in a separated .js file.
-        $filespath = glob($CFG->dirroot . $codebase . $filename . '*.js');
-        foreach ($filespath as $filepath) {
-            $jscode = file_get_contents($filepath);
-            $jscode = str_replace($search, $replace, $jscode);
-            file_put_contents($filepath, $jscode);
-        }
-    } else { // If the .js file does not exists, then this part is inside the $code variable.
-        $code = str_replace($search, $replace, $code);
-    }
-
-    // Replace link for EjsS built-in css.
-    $ejsscss = '_ejs_library/css/ejss.css';
-    if (!file_exists($CFG->dirroot . $codebase . $ejsscss)) {
-        $ejsscss = '_ejs_library/css/ejsSimulation.css';
-    }
-    $search = '<link rel="stylesheet"  type="text/css" href="' . $ejsscss . '" />';
-    if ($usecss) {
-        $replace = '<link rel="stylesheet"  type="text/css" href="' . $path . $ejsscss . '" />';
-    } else {
-        $replace = '';
-    }
-    $code = str_replace($search, $replace, $code);
-    // Replace link for users' css.
-    $search = '<link rel="stylesheet"  type="text/css" href="';
-    $replace = '<link rel="stylesheet"  type="text/css" href="' . $path;
-    $pos = strrpos($code, $search);
-    if($pos !== false && substr($code, $pos+strlen($search), 4) !== 'http') {
-        $code = substr_replace($code, $replace, $pos, strlen($search));
-    }
-
-    // Replace links for common_script.js, textsizedetector.js, the ejss library file and any other js file added by
-    // the user as long as it is a local file and not an online one.
-    $search = '#<script src=\"(?!http)#';
-    $replace = '<script src="' . $path;
-    $code = preg_replace($search, $replace, $code);
-
-    return $code;
 }
 
 /**
@@ -387,32 +292,6 @@ function modifications_for_java($filepath, $ejsapp, $file, $filerecord, $alert) 
         // Class_file.
         $ejsapp->class_file = get_class_for_java($manifest);
 
-        // Mainframe.
-        $pattern = '/Main-Frame\s*:\s*(.+)\s*/';
-        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-        if (count($matches) == 0) {
-            $mainframe = '';
-        } else {
-            $mainframe = $matches[1][0];
-            $mainframe = preg_replace('/\s+/', "", $mainframe); // Delete all white-spaces.
-        }
-        $ejsapp->mainframe = $mainframe;
-
-        // Is_collaborative.
-        $pattern = '/Is-Collaborative\s*:\s*(\w+)/';
-        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-        if (count($matches) == 0) {
-            $iscollaborative = 0;
-        } else {
-            $iscollaborative = trim($matches[1][0]);
-            if ($iscollaborative == 'true') {
-                $iscollaborative = 1;
-            } else {
-                $iscollaborative = 0;
-            }
-        }
-        $ejsapp->is_collaborative = $iscollaborative;
-
         // Check whether the EjsS version to build this applet is supported.
         $pattern = '/Applet-Height\s*:\s*(\w+)/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
@@ -465,6 +344,62 @@ function modifications_for_java($filepath, $ejsapp, $file, $filerecord, $alert) 
 }
 
 /**
+ * For EjsS javascript applications.
+ *
+ * @param stdClass $context
+ * @param stdClass $ejsapp
+ * @param stored_file $file
+ * @return boolean $ejsok
+ * @throws
+ *
+ */
+function modifications_for_javascript($context, $ejsapp, $file) {
+    global $DB;
+
+    $ejsok = false;
+    $packer = get_file_packer('application/zip');
+    if ($file->extract_to_storage($packer, $context->id, 'mod_ejsapp', 'content', $ejsapp->id, '/')) {
+        // Search in _metadata for the name of the main Javascript file and save it.
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => '_metadata.txt'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $fs = get_file_storage();
+        $file = $fs->get_file_by_id($filerecord->id);
+        $metadata = $file->get_content();
+        $pattern = '/main-simulation\s*:\s*(.+)\s*/';
+        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
+        $substr = $matches[1][0];
+        if (strlen($matches[1][0]) == 59) {
+            $pattern = '/^\s(.+)\s*/m';
+            if ((preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE) > 0)) {
+                $substr = $substr . $matches[1][0];
+            }
+        }
+        $ejsapp->applet_name = pathinfo(rtrim($substr), PATHINFO_FILENAME);
+
+        // Edit .js content to replace context-dependent content (i.e. the EjsS' _model variable declaration)
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $fs = get_file_storage();
+        $originalfile = $fs->get_file_by_id($filerecord->id);
+        $originalfilecontent = $originalfile->get_content();
+        $pathfiles = new moodle_url("/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() .
+            "/content/" . $file->get_itemid());
+        $ejsslibpathfiles =  $pathfiles . "/_ejs_library/";
+        $newfilecontent = str_replace("(\"_topFrame\",\"_ejs_library/\",null);",
+            "(\"_topFrame\",\"$ejsslibpathfiles\",\"$pathfiles\");",
+            $originalfilecontent);
+        $originalfile->delete();
+        $fs->create_file_from_string($filerecord, $newfilecontent);
+
+        $ejsok = true;
+    }
+
+    return $ejsok;
+}
+
+/**
  * Gets the java .class from the manifest
  *
  * @param string $manifest
@@ -486,138 +421,6 @@ function get_class_for_java($manifest) {
     $classfile = $substr . 'Applet.class';
 
     return $classfile;
-}
-
-/**
- * For EjsS javascript applications.
- *
- * @param string $filepath
- * @param stdClass $ejsapp
- * @param string $folderpath
- * @param string $codebase
- * @return boolean $ejsok
- *
- */
-function modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase) {
-    global $CFG;
-
-    $ejsapp->is_collaborative = 1;
-
-    $zip = new ZipArchive;
-    if ($zip->open($filepath)) {
-        $zip->extractTo($folderpath);
-        $zip->close();
-        $metadata = file_get_contents($folderpath . '_metadata.txt');
-        $ejsok = true;
-
-        // Search in _metadata for the name of the main Javascript file.
-        $pattern = '/main-simulation\s*:\s*(.+)\s*/';
-        preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE);
-        $substr = $matches[1][0];
-        if (strlen($matches[1][0]) == 59) {
-            $pattern = '/^\s(.+)\s*/m';
-            if ((preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE) > 0)) {
-                $substr = $substr . $matches[1][0];
-            }
-        }
-        $ejsapp->applet_name = rtrim($substr);
-
-        // Create/delete/modify the css file to change the visual aspect of the javascript application.
-        // Custom css.
-        $useoriginalcss = false;
-        $cssfilepath = $folderpath . '_ejs_library/css/ejsapp.css';
-        if ($ejsapp->css == '' && file_exists($cssfilepath)) {
-            unlink($cssfilepath);
-        }
-        $cssfilecontent = "";
-        if ($ejsapp->css != '') { // Custom css.
-            $lines = explode(PHP_EOL, $ejsapp->css);
-            foreach ($lines as $line) {
-                if (strpos($line, '{')) {
-                    $cssfilecontent .= 'div#EJsS ' . $line;
-                } else {
-                    $cssfilecontent .= $line;
-                }
-            }
-            $file = fopen($cssfilepath, "w");
-            fwrite($file, $cssfilecontent);
-            fclose($file);
-        } else { // Original css.
-            $useoriginalcss = true;
-            $ejsscss = '_ejs_library/css/ejss.css';
-            if (!file_exists($CFG->dirroot . $codebase . $ejsscss)) {
-                $ejsscss = '_ejs_library/css/ejsSimulation.css';
-            }
-            $cssfilepath = $folderpath . $ejsscss;
-            $handle = fopen($cssfilepath, "r");
-            if ($handle) {
-                while (($line = fgets($handle)) !== false) {
-                    if (strpos($line, '{')) {
-                        $cssfilecontent .= 'div#EJsS ' . $line;
-                    } else {
-                        $cssfilecontent .= $line;
-                    }
-                }
-                fclose($handle);
-                file_put_contents($cssfilepath, $cssfilecontent);
-            }
-        }
-
-        // Languages.
-        $languages = array('default');
-        $pattern = '/available-languages\s*:\s*(.+)\s*/';
-        if (preg_match($pattern, $metadata, $matches, PREG_OFFSET_CAPTURE)) {
-            $substr = $matches[1][0];
-            if (strpos($substr, ',')) {
-                $languages = explode(',', $substr);
-                array_push($languages, 'default');
-            } else if ($substr !== '') {
-                array_push($languages, $substr);
-            }
-        }
-
-        // Change content of the html file to make it work.
-        foreach ($languages as $language) {
-            if ($language == 'default') {
-                $filepath = $folderpath . $ejsapp->applet_name;
-            } else {
-                $filename = substr($ejsapp->applet_name, 0, strpos($ejsapp->applet_name, '.'));
-                $extension = substr($ejsapp->applet_name, strpos($ejsapp->applet_name, ".") + 1);
-                $filepath = $folderpath . $filename . '_' . $language . '.' . $extension;
-            }
-            if (file_exists($filepath)) {
-                $code = file_get_contents($filepath);
-                // Get the whole code from </title> (not included) onwards.
-                $code = explode('</title>', $code);
-                $code = '<div id="EJsS">' . $code[1];
-
-                // Variable $code1 is $code till </head> (not included) and with the missing standard part.
-                $code1 = substr($code, 0, -strlen($code) + strpos($code, '</head>')) .
-                    '<div id="_topFrame" style="text-align:center"></div>';
-
-                // Variable $code2 is $code from </head> to </body> tags, none of them included.
-                $code2 = substr($code, strpos($code, '</head>'));
-                $code2 = explode('</body>', $code2);
-                $code2 = $code2[0] . '</div>';
-                if (strpos($code, '<script type')) { // EjsS with Javascript embedded in the html page.
-                    $code2 = substr($code2, strpos($code2, '<script type'));
-                } else { // EjsS with an external .js file for the Javascript.
-                    $explodedfilename = explode(".", $ejsapp->applet_name);
-                    $code2 = '<script src="' . $CFG->wwwroot . $codebase . $explodedfilename[0] . '.js"></script></div>';
-                }
-
-                $code = $code1 . $code2;
-                $code = update_links($codebase, $ejsapp, $code, $useoriginalcss);
-                file_put_contents($filepath, $code);
-            }
-        }
-    } else {
-        $ejsok = false;
-    }
-
-    chmod_r($folderpath);
-
-    return $ejsok;
 }
 
 /**
@@ -1413,152 +1216,4 @@ function define_remlab($instance, $collab, $practice, $labmanager, $maxusetime) 
     $remlabinfo->max_use_time = $maxusetime;
 
     return $remlabinfo;
-}
-
-/**
- * Gets the required EJS .jar or .zip file for this activity from Moodle's File System and places it in the required
- * directory (inside jarfiles) when the file there doesn't exist or it is not synchronized with the file in Moodle's
- * File System (whether because its an alias to a file that has been modified or because the activity has been edited
- * and the original .jar or .zip file has been replaced by a new one).
- *
- * @param stdClass $ejsapp
- * @return void
- * @throws
- *
- */
-function prepare_ejs_file($ejsapp) {
-    global $DB, $CFG;
-
-    /**
-     * Deletes files inside a directory in jarfiles.
-     *
-     * @param stored_file $storedfile
-     * @param object $tempfile
-     * @param string $folderpath
-     * @return int|false
-     *
-     */
-    function delete_outdated_file($storedfile, $tempfile, $folderpath) {
-        // We compare the content of the linked file with the content of the file in the jarfiles folder.
-        if ($storedfile->get_contenthash() != $tempfile->get_contenthash()) { // If they are not the same...
-            // Delete the files in jarfiles directory in order to replace them with the content of $storedfile.
-            delete_recursively($folderpath);
-            if (!file_exists($folderpath)) {
-                mkdir($folderpath, 0700);
-            }
-            // Delete $tempfile from Moodle filesystem.
-            $tempfile->delete();
-            return true;
-        } else { // If the file exists and matches the one configured in the ejsapp activity, do nothing.
-            return false;
-        }
-    }
-
-    /**
-     * Creates a temp file in Moodle files system.
-     *
-     * @param int $contextid
-     * @param int $ejsappid
-     * @param string $filename
-     * @param file_storage $fs
-     * @param string $tempfilepath
-     * @return stored_file $tempfile
-     * @throws
-     *
-     */
-    function create_temp_file($contextid, $ejsappid, $filename, $fs, $tempfilepath) {
-        $fileinfo = array(
-            'contextid' => $contextid,
-            'component' => 'mod_ejsapp',
-            'filearea' => 'tmp_jarfiles',
-            'itemid' => $ejsappid,
-            'filepath' => '/',
-            'filename' => $filename);
-        return $tempfile = $fs->create_file_from_pathname($fileinfo, $tempfilepath);
-    }
-
-    // We first get the jar/zip file configured in the ejsapp activity and stored in the filesystem.
-    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles',
-        'itemid' => $ejsapp->id), 'filesize DESC');
-    $filerecord = reset($filerecords);
-    if ($filerecord) {
-        $fs = get_file_storage();
-        $storedfile = $fs->get_file_by_id($filerecord->id);
-
-        // In case it is an alias to an external repository.
-        // We should use $storedfile->sync_external_file(), but it doesn't do what I'd expect for non-image files...
-        // We need a workaround.
-        if (class_exists('repository_filesystem')) {
-            if (!is_null($filerecord->referencefileid)) {
-                $repositoryid = $DB->get_field('files_reference', 'repositoryid',
-                    array('id' => $filerecord->referencefileid));
-                $repositorytypeid = $DB->get_field('repository_instances', 'typeid',
-                    array('id' => $repositoryid));
-                if ($DB->get_field('repository', 'type', array('id' => $repositorytypeid)) == 'filesystem') {
-                    $repository = repository_filesystem::get_instance($repositoryid);
-                    $filepath = $repository->get_rootpath() . ltrim($storedfile->get_reference(), '/');
-                    $contenthash = sha1_file($filepath);
-                    if ($storedfile->get_contenthash() == $contenthash) {
-                        // File did not change since the last synchronisation.
-                        $filesize = filesize($filepath);
-                    } else {
-                        // Copy file into moodle filepool (used to generate an image thumbnail).
-                        list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
-                    }
-                    $storedfile->set_synchronized($contenthash, $filesize);
-                }
-            }
-        }
-
-        $codebase = '/mod/ejsapp/jarfiles/' . $ejsapp->course . '/' . $ejsapp->id . '/';
-        $folderpath = $CFG->dirroot . $codebase;
-        $ext = pathinfo($filerecord->filename, PATHINFO_EXTENSION);
-        $filepath = $folderpath . $filerecord->filename;
-        // Get the file stored in Moodle filesystem for the file in jarfiles, compare it and delete it if it is outdated.
-        $tmpfilerecords = $DB->get_records('files', array('component' => 'mod_ejsapp',
-            'filearea' => 'tmp_jarfiles', 'itemid' => $ejsapp->id), 'filesize DESC');
-        $tmpfilerecord = reset($tmpfilerecords);
-        if (file_exists($filepath)) { // If file in jarfiles exists...
-            if ($tmpfilerecord) { // The file exists in jarfiles and in Moodle filesystem.
-                $tempfile = $fs->get_file_by_id($tmpfilerecord->id);
-            } else {
-                // The file exists in jarfiles but not in Moodle filesystem (can happen with older versions of ejsapp
-                // plugins that have been updated recently or after duplicating or restoring an ejsapp activity).
-                $tempfile = create_temp_file($filerecord->contextid, $ejsapp->id, $filerecord->filename, $fs, $filepath);
-            }
-            $delete = delete_outdated_file($storedfile, $tempfile, $folderpath);
-            if (!$delete) { // If files are the same, we have finished.
-                return;
-            }
-        } else { // If file in jarfiles doesn't exists... (this should never happen actually, but just in case...).
-            // We create the directories in jarfiles to put inside $storedfile.
-            $path = $CFG->dirroot . '/mod/ejsapp/jarfiles/';
-            if (!file_exists($path)) {
-                mkdir($path, 0700);
-            }
-            $path .= $ejsapp->course . '/';
-            if (!file_exists($path)) {
-                mkdir($path, 0700);
-            }
-            if (!file_exists($folderpath)) {
-                mkdir($folderpath, 0700);
-            }
-            if ($tmpfilerecord) { // The file does not exist in jarfiles but it does in Moodle filesystem.
-                $tempfile = $fs->get_file_by_id($tmpfilerecord->id);
-                $tempfile->delete();
-            }
-        }
-
-        // We copy the content of storedfile to jarfiles and add it to the file storage.
-        $storedfile->copy_content_to($filepath);
-        create_temp_file($filerecord->contextid, $ejsapp->id, $ejsapp->applet_name, $fs, $filepath);
-
-        // We need to do a few more things depending on whether it is a Java or a Javascript application.
-        if ($ext == 'jar') {
-            modifications_for_java($filepath, $ejsapp, $storedfile, $filerecord, false);
-        } else {
-            modifications_for_javascript($filepath, $ejsapp, $folderpath, $codebase);
-        }
-        $DB->update_record('ejsapp', $ejsapp);
-    }
 }
