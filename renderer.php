@@ -31,6 +31,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/ejsapp/renderable.php');
+
+
 /**
  * Prints the required html in the ejsapp activity view
  * @copyright  2012 Luis de la Torre and Ruben Heradio
@@ -126,289 +129,32 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      *
      */
     public function render_ejsapp_lab(ejsapp_lab $params) {
-        global $DB, $USER, $CFG, $COURSE;
-
-        // Sarlab is used to access this remote lab or to establish communication between users participating in a
-        // collaborative session.
-        if ($params->remlabinfo) {
-            if ($params->remlabinfo->instance !== false || isset($collabinfo->sarlabport)) {
-                $time = time();
-                $min = date("i", $time);
-                $seg = date("s", $time);
-                mt_srand(time());
-                $random = mt_rand(0, 1000000);
-                if ($params->remlabinfo) {
-                    $sarlabkey = sha1($min . $seg . $params->remlabinfo->practice . fullname($USER) .
-                        $USER->username . $random);
-                } else {
-                    $sarlabkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
-                }
-
-                $newsarlabkey = new stdClass();
-                $newsarlabkey->user = $USER->username;
-                $newsarlabkey->sarlabpass = $sarlabkey;
-                $newsarlabkey->labmanager = $params->remlabinfo->labmanager;
-                $newsarlabkey->creationtime = $time;
-                $newsarlabkey->expirationtime = $time + $params->remlabinfo->max_use_time;
-
-                $DB->insert_record('block_remlab_manager_sb_keys', $newsarlabkey);
-
-                if ($params->remlabinfo->instance !== false) {
-                    $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-                    if (empty($sarlabips)) {
-                        $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
-                    }
-                    $sarlabip = $listsarlabips[$params->remlabinfo->instance];
-                    $initpos = strpos($sarlabip, "'");
-                    $endpos = strrpos($sarlabip, "'");
-                    if (!(($initpos === false) || ($initpos === $endpos))) {
-                        $sarlabip = substr($sarlabip, $endpos + 1);
-                    }
-                    $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
-                    if (empty($listsarlabports)) {
-                        $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
-                    }
-                    $sarlabport = $listsarlabports[$params->remlabinfo->instance];
-                } else {
-                    $sarlabip = $params->collabinfo->ip;
-                    $sarlabport = $params->collabinfo->sarlabport;
-                }
-            }
-        }
-
-        if ($params->ejsapp->class_file == '') { // EjsS Javascript.
-            global $PAGE;
-
-            /**
-             * If a state, recording or blockly file has been configured in the ejsapp activity, this function returns the
-             * information of such file
-             *
-             * @param stdClass $ejsapp
-             * @param string $datatype
-             * @return stdClass $initialdatafile
-             * @throws
-             */
-            function initial_data_file($ejsapp, $datatype) {
-                global $DB;
-                $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => $datatype,
-                    'itemid' => ($ejsapp->id)));
-                $initialdatafile = new stdClass();
-                if (!empty($filerecords)) {
-                    foreach ($filerecords as $initialdatafile) {
-                        if ($initialdatafile->filename != '.') {
-                            break;
-                        }
-                    }
-                }
-                return $initialdatafile;
-            }
-
-            /**
-             * Return either the initial or the user-saved data file (state, interaction recording or blockly)
-             *
-             * @param string $userdatafile
-             * @param stdClass $initialdatafile
-             * @return string $datafile
-             */
-            function get_data_file($userdatafile, $initialdatafile) {
-                global $CFG;
-                if ($userdatafile) {
-                    $datafile = $CFG->wwwroot . "/pluginfile.php/" . $userdatafile;
-                } else {
-                    $datafile = $CFG->wwwroot . "/pluginfile.php/" . $initialdatafile->contextid .
-                        "/" . $initialdatafile->component . "/" . $initialdatafile->filearea .
-                        "/" . $initialdatafile->itemid . "/" . $initialdatafile->filename;
-                }
-                return $datafile;
-            }
-
-            /**
-             * Call javascript code for loading state, interaction and blockly programs files as well as personalized variables
-             *
-             * @param string $userstatefile
-             * @param string $userrecfile
-             * @param string $userblkfile
-             * @param stdClass $ejsapp
-             * @param stdClass $collabinfo
-             * @param stdClass $personalvarsinfo
-             */
-            function load_configuration($userstatefile, $userrecfile, $userblkfile, $ejsapp, $collabinfo, $personalvarsinfo) {
-                global $PAGE;
-
-                // Load state files.
-                $initialstatefile = initial_data_file($ejsapp, 'xmlfiles');
-                if ($userstatefile || (isset($initialstatefile->filename)) && $initialstatefile->filename != '.') {
-                    $statefile = get_data_file($userstatefile, $initialstatefile);
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readStateFile', array($statefile));
-                }
-
-                // Load interaction recording files.
-                $initialrecfile = initial_data_file($ejsapp, 'recfiles');
-                if ($userrecfile || (isset($initialrecfile->filename) && $initialrecfile->filename != '.')) {
-                    $endmessage = get_string('end_message', 'ejsapp');
-                    $recfile = get_data_file($userrecfile, $initialrecfile);
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'playRecFile',
-                        array($recfile, $endmessage));
-                }
-
-                // Load blockly program files.
-                $initialblkfile = initial_data_file($ejsapp, 'blkfiles');
-                if ($userblkfile || (isset($initialblkfile->filename) && $initialblkfile->filename != '.')) {
-                    $blocklyconf = json_decode($ejsapp->blockly_conf);
-                    if ($blocklyconf[0] == 1) {
-                        $blkfile = get_data_file($userblkfile, $initialblkfile);
-                        $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'readBlocklyFile',
-                            array($blkfile));
-                    }
-                }
-
-                // Load personalized variables.
-                if (!$collabinfo && isset($personalvarsinfo->name) && isset($params->personalvarsinfo->value)
-                    && isset($params->personalvarsinfo->type)) {
-                    $personalizevars = "'{";
-                    for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
-                        $personalizevars .= '"' . $personalvarsinfo->name[$i] . '":' . $personalvarsinfo->value[$i];
-                        if ($i < count($personalvarsinfo->name) - 1) {
-                            $personalizevars .= ",";
-                        }
-                    }
-                    $personalizevars .= "}'";
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'personalizeVariables',
-                        array($personalizevars));
-                }
-            }
-
-            // For remote labs and collaborative sessions only
-            if (($params->ejsapp->is_rem_lab || $params->collabinfo) && $params->remlabinfo) {
-                if ($params->remlabinfo->instance !== false ) {
-                    // For remote labs accessed through Sarlab, pass authentication params to the app.
-                    $practice = explode("@", $params->remlabinfo->practice, 2);
-                    // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
-                        array($USER->username . "@" . $CFG->wwwroot, $sarlabkey));
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
-                        array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $practice[0], $CFG->wwwroot .
-                            '/course/view.php?id=' . $COURSE->id));
-                }
-                // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
-                $sseuri = '';
-                $port = '';
-                if ($params->collabinfo && !isset($collabinfo->director)) {
-                    // Collaborative session with an invited user.
-                    $f = @fopen("actions.log", "rb");
-                    $collsessid = 1;
-                    $_SESSION["file_actions_session_$collsessid"] = $f;
-                    // $sseuri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?id=$collsessid";.
-                    $sseuri = $CFG->wwwroot . "/blocks/ejsapp_collab_session/ws/sse.php?";
-                } else if ($params->collabinfo && isset($collabinfo->director)) {
-                    // Collaborative session with the director of the session.
-                    $port = 8000;
-                }
-                $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'addToInitialization',
-                    array($sseuri, $port));
-            }
-
-            if (!is_null($params->userdatafiles)) {
-                $userstatefile = $params->userdatafiles[0];
-                $userrecfile = $params->userdatafiles[1];
-                $userblkfile = $params->userdatafiles[2];
-            } else {
-                $userstatefile = null;
-                $userrecfile = null;
-                $userblkfile = null;
-            }
-
-            load_configuration($userstatefile, $userrecfile, $userblkfile, $params->ejsapp, $params->collabinfo,
-                $params->personalvarsinfo);
-
+        if ($params->class_file == '') { // EjsS Javascript.
             $code =
                 html_writer::start_div("", array("id" => "EJsS")) .
                     html_writer::div("", "", array("id" => "_topFrame", "style" => "text-align:center;")) .
                 html_writer::end_div();
-
         } else { // EjsS Java.
-
-            $dirpath = $CFG->dirroot . '/mod/ejsapp/jarfiles/' . $params->ejsapp->course . '/' . $params->ejsapp->id . '/';
-            $ejsappname = $params->ejsapp->applet_name;
             if (!$params->remlabinfo || !$params->remlabinfo->instance === false) {
-                // Without Sarlab, launch the Java file as a Web Start Application with the JNLP.
-                if (pathinfo($ejsappname, PATHINFO_EXTENSION) == 'jar') {
-                    $ejsappname = substr($params->ejsapp->applet_name, 0, -4);
-                }
-
-                $wwwpath = new moodle_url($params->ejsapp->codebase);
-                $mainclass = substr($params->ejsapp->class_file, 0, -12);
-                $context = context_user::instance($USER->id);
-                $language = current_language();
-
-                // Create the JNLP file.
-                $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
-                    <jnlp spec=\"1.0+\"
-                        codebase=\"$wwwpath\"
-                        href=\"$ejsappname.jnlp\">
-                        <information>
-                            <title>$ejsappname</title>
-                            <vendor>Easy Java Simulations</vendor>
-                        </information>
-                        <resources>
-                            <j2se version=\"1.7+\"
-                                href=\"http://java.sun.com/products/autodl/j2se\"/>
-                            <jar href=\"$ejsappname.jar\" main=\"true\"/>
-                        </resources>
-                        <application-desc
-                            main-class=\"$mainclass\">
-                            <argument>-language</argument>
-                            <argument>$language</argument>
-                            <argument>-lookandfeel</argument>
-                            <argument>NIMBUS</argument>
-                            <argument>-context_id</argument>
-                            <argument>{$context->id}</argument>
-                            <argument>-user_id</argument>
-                            <argument>{$USER->id}</argument>
-                            <argument>-ejsapp_id</argument>
-                            <argument>{$params->ejsapp->id}</argument>
-                            <argument>-user_moodle</argument>
-                            <argument>user</argument>
-                            <argument>-password_moodle</argument>
-                            <argument>password</argument>
-                            <argument>-moodle_upload_file</argument>
-                            <argument>{$CFG->wwwroot}/mod/ejsapp/upload_file</argument>
-                        </application-desc>
-                        <security>
-                            <all-permissions/>
-                        </security>
-                        <update check=\"background\"/>
-                    </jnlp>";
-
-                $jnlp = fopen($dirpath . $ejsappname . '.jnlp', 'w');
-                fwrite($jnlp, $content);
-                fclose($jnlp);
-
-                // Run or download JNLP.
+                // Without Sarlab: run or download JNLP.
                 $code =
                     html_writer::tag("iframe", "", array("id" => "EJsS", "style" => "display:none;")) .
                     html_writer::tag("script", "", array("src" => "https://www.java.com/js/deployJava.js")) .
-                    html_writer::tag("script", "var url = '$wwwpath$ejsappname.jnlp';
+                    html_writer::tag("script", "var url = '$this->wwwpath$this->ejsappname.jnlp';
                         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                         if (is_chrome) document.getElementById('EJsS').src = url;
                         else deployJava.launchWebStartApplication(url);");
             } else {
+                // With Sarlab: launch the websocket service for serving applets.
+                global $PAGE, $USER, $CFG;
                 $code = '';
-                $commandsarlab = 'execjar';
-                $jarpath = $CFG->wwwroot . '/mod/ejsapp/jarfiles/' . $params->ejsapp->course . '/' .
-                    $params->ejsapp->id . '/' . $ejsappname;
-                // Launching the websocket service for Sarlab.
-                global $PAGE;
-                $username = $USER->username . "@" . $CFG->wwwroot;
-                $practice = explode("@", $params->remlabinfo->practice, 2);
                 $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                    array($commandsarlab, $sarlabip, 443, $practice[0],
-                        $params->remlabinfo->max_use_time/60, $username, $sarlabkey, $jarpath));
+                    array('execjar', $this->sarlabip, 443, $this->practice,
+                        $params->remlabinfo->max_use_time/60, $USER->username . "@" . $CFG->wwwroot,
+                        $this->sarlabkey, $this->jarpath));
                 $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
             }
-
         }
-
         return $code;
     }
 
@@ -597,82 +343,5 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
             html_writer::end_div();
 
         return $logdiv;
-    }
-}
-
-/**
- * Auxiliary class to print the EJsS div
- * @copyright  2012 Luis de la Torre and Ruben Heradio
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class ejsapp_lab implements renderable {
-    /**
-     * __construct
-     * @param stdClass $ejsapp
-     * @param stdClass $remlabinfo
-     * @param array $userdatafiles
-     * @param stdClass $collabinfo
-     * @param stdClass $personalvarsinfo
-     */
-    public function __construct($ejsapp, $remlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
-        $this->ejsapp = $ejsapp;
-        $this->remlabinfo = $remlabinfo;
-        $this->userdatafiles = $userdatafiles;
-        $this->collabinfo = $collabinfo;
-        $this->personalvarsinfo = $personalvarsinfo;
-    }
-}
-
-/**
- * Auxiliary class to print the charts div
- * @copyright  2012 Luis de la Torre and Ruben Heradio
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class ejsapp_charts implements renderable {
-    /**
-     * __construct
-     */
-    public function __construct() {
-    }
-}
-
-/**
- * Auxiliary class to print the controlbar div
- * @copyright  2012 Luis de la Torre and Ruben Heradio
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class ejsapp_controlbar implements renderable {
-    /**
-     * __construct
-     * @param array $blocklyconf
-     */
-    public function __construct($blocklyconf) {
-        $this->blocklyconf = $blocklyconf;
-    }
-}
-
-/**
- * Auxiliary class to print the blockly div
- * @copyright  2012 Luis de la Torre and Ruben Heradio
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class ejsapp_blockly implements renderable {
-    /**
-     * __construct
-     */
-    public function __construct() {
-    }
-}
-
-/**
- * Auxiliary class to print the log div
- * @copyright  2012 Luis de la Torre and Ruben Heradio
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class ejsapp_log implements renderable {
-    /**
-     * __construct
-     */
-    public function __construct() {
     }
 }
