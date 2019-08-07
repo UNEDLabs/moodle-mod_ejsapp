@@ -1,14 +1,4 @@
-var time_step = 1;
-var remoteLab = false;
-var chartsBlockly = true;
-var eventsBlockly = false;
-var controllerBlockly = true;
-var functionToReplace = "controller";
-var controllerFunctionLanguage = "javascript";
-/*var codeBeforeController = "";
-var codeAfterController = "";*/
-
-var toolbox = '<xml>' + 
+var toolbox = '<xml>' +
 '  <category name="Logic" colour="210">' +
 '      <block type="controls_if"></block>' + 
 '      <block type="logic_compare"></block>' +

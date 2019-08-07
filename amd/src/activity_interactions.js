@@ -27,9 +27,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'mod_ejsapp/screenfull'], function($) {
+define(['jquery', 'mod_ejsapp/screenfull'], function($, sf) {
     var t = {
         fullScreen: function() {
+            var screenfull = sf.init();
             var chart = $('#slideshow-wrapper')[0];
             $('#full_screen_chart').on('click', function () {
                 if (screenfull.enabled) {

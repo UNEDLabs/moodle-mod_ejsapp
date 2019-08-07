@@ -31,7 +31,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/ejsapp/renderable.php');
+require_once('renderable.php');
 
 
 /**

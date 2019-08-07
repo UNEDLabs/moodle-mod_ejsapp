@@ -1,16 +1,4 @@
 document.addEventListener('DOMContentLoaded', function(){
-	if(!chartsBlockly) {
-		document.getElementById('chartsDropdown').style.display = "none";
-		document.getElementById('chartSelection').style.display = "none";
-	}
-	if(!eventsBlockly) {
-		document.getElementById('eventsDropdown').style.display = "none";
-		document.getElementById('eventSelection').style.display = "none";
-	}
-	if(!controllerBlockly) {
-		document.getElementById('controllersDropdown').style.display = "none";
-		document.getElementById('controllerSelection').style.display = "none";
-	}
 	// When the user clicks on <span> (x), close the modal
 	document.getElementsByClassName("close")[0].onclick = function() {
 		if(jsOpenType===0)
@@ -30,8 +18,21 @@ document.addEventListener('DOMContentLoaded', function(){
 			document.getElementById('myModal').style.display = "none";
 		}
 	};
+
 	var start = setInterval(function() {
 		if (typeof _model !== "undefined") {
+			if(!chartsBlockly) {
+				document.getElementById('chartsDropdown').style.display = "none";
+				document.getElementById('chartSelection').style.display = "none";
+			}
+			if(!eventsBlockly) {
+				document.getElementById('eventsDropdown').style.display = "none";
+				document.getElementById('eventSelection').style.display = "none";
+			}
+			if(!controllerBlockly) {
+				document.getElementById('controllersDropdown').style.display = "none";
+				document.getElementById('controllerSelection').style.display = "none";
+			}
 			initAux();
 			loadVariables();
 			preparePage();

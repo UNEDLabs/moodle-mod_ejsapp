@@ -4,7 +4,6 @@ define([], function() {
             'use strict';
 
             var document = typeof window !== 'undefined' && typeof window.document !== 'undefined' ? window.document : {};
-            var isCommonjs = typeof module !== 'undefined' && module.exports;
             var keyboardAllowed = typeof Element !== 'undefined' && 'ALLOW_KEYBOARD_INPUT' in Element;
 
             var fn = (function () {
@@ -141,13 +140,7 @@ define([], function() {
             };
 
             if (!fn) {
-                if (isCommonjs) {
-                    module.exports = false;
-                } else {
-                    window.screenfull = false;
-                }
-
-                return;
+                return false;
             }
 
             Object.defineProperties(screenfull, {
@@ -170,12 +163,7 @@ define([], function() {
                     }
                 }
             });
-
-            if (isCommonjs) {
-                module.exports = screenfull;
-            } else {
-                window.screenfull = screenfull;
-            }
+            return screenfull;
         }
     };
     return t;

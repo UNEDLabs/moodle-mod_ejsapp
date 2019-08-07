@@ -115,7 +115,8 @@ $remlabinfo = null;
 $message1 = '';
 $message2 = '';
 
-//Access logic
+// Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
+// whether the ejsapp instance is a remote lab or not.
 if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
     $accessed = true;
 } else {
@@ -271,11 +272,12 @@ if ($ejsapp->class_file == '' && $accessed) {
         $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'recording', array($mouseevents));
     }
     // Full screen features
-    $PAGE->requires->js_call_amd('mod_ejsapp/screenfull', 'init');
     $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'fullScreen');
 
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
+        $PAGE->requires->js_call_amd('mod_ejsapp/blockly_conf', 'configureBlockly',
+            array($ejsapp->is_rem_lab, $blocklyconf[1], $blocklyconf[2], $blocklyconf[3]));
         // Required libraries for blockly
         $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blockly_compressed.js', true);
         $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blocks_compressed.js', true);
@@ -309,9 +311,6 @@ if ($ejsapp->class_file == '' && $accessed) {
 
         // Join HTML divs for placing blockly related elements in a single one.
         $experiments = $controldiv . $blocklydiv . $logdiv;
-
-        // If required, create the javascript file with the configuration for using blockly.
-        //create_blockly_configuration($ejsapp);
     }
 
     // Check if there are variables configured to be personalized in this EJSApp.
@@ -320,9 +319,6 @@ if ($ejsapp->class_file == '' && $accessed) {
 
 // Output starts here.
 echo $OUTPUT->header();
-
-// Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
-// whether the ejsapp instance is a remote lab or not.
 
 if ($accessed) {
     if ($ejsapp->intro) {
@@ -387,7 +383,7 @@ if ($accessed) {
     echo $message2;
 }
 
-// <Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not>
+// Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not
 switch ($action) {
     case 'view':
         $event = \mod_ejsapp\event\ejsapp_viewed::create(array(
@@ -449,7 +445,6 @@ switch ($action) {
         break;
 }
 $event->trigger();
-// </Add the access to the log, taking into account the action; i.e. whether the user could access (view) the lab or not>
 
 // Monitor the time spent by a user in the activity.
 if ($accessed) {
