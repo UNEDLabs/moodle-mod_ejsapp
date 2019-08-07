@@ -74,6 +74,7 @@ class ejsapp_left extends \core\event\base {
      * Get URL related to the action
      *
      * @return \moodle_url
+     * @throws
      */
     public function get_url() {
         return new \moodle_url('/mod/ejsapp/view.php', array('id' => $this->objectid));

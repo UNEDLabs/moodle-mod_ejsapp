@@ -56,6 +56,9 @@ if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
             'other' => $ejsappname,
         ));
         $event->trigger();
+        $task = \core\task\manager::get_scheduled_task("block_remlab_manager\\task\\refresh_usestate_field");
+        $task->execute();
+        $task->set_last_run_time(time());
     }
 }
 
