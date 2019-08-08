@@ -90,26 +90,14 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $file = $fs->get_file_by_id($filerecord->id);
 
     // In case it is an alias to an external repository.
-    // I think we should use $file->sync_external_file(), but it doesn't do what I'd expect for non-image files...
-    // We need a workaround.
     if (class_exists('repository_filesystem')) {
-        if (!is_null($filerecord->referencefileid)) {
-            $repositoryid = $DB->get_field('files_reference', 'repositoryid',
-                array('id' => $filerecord->referencefileid));
+        if (!is_null($file->get_referencefileid())) {
+            $repositoryid = $file->get_repository_id();
             $repositorytypeid = $DB->get_field('repository_instances', 'typeid',
                 array('id' => $repositoryid));
             if ($DB->get_field('repository', 'type', array('id' => $repositorytypeid)) == 'filesystem') {
                 $repository = repository_filesystem::get_instance($repositoryid);
-                $filepath = $repository->get_rootpath() . ltrim($file->get_reference(), '/');
-                $contenthash = sha1_file($filepath);
-                if ($file->get_contenthash() == $contenthash) {
-                    // File did not change since the last synchronisation.
-                    $filesize = filesize($filepath);
-                } else {
-                    // Copy file into moodle filepool (used to generate an image thumbnail).
-                    list($contenthash, $filesize, $newfile) = $fs->add_file_to_pool($filepath);
-                }
-                $file->set_synchronized($contenthash, $filesize);
+                $repository->sync_reference($file);
             }
         }
     }
@@ -121,7 +109,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $ext = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table.
     if ($ext == 'jar') { // Java.
-        $ejsok = modifications_for_java($filepath, $ejsapp, $file, $filerecord, false);
+        $ejsok = modifications_for_java($context, $ejsapp, $file, false);
     } else { // Javascript.
         $ejsok = modifications_for_javascript($context, $ejsapp, $file);
     }
@@ -170,33 +158,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
 
     return $ejsok;
 } // End of function update_ejsapp_files_and_tables.
-
-/**
- * Deletes a directory from the server
- *
- * @param string $dir directory to delete
- * @return bool TRUE on success or FALSE on failure
- *
- */
-function delete_recursively($dir) {
-    if (file_exists($dir)) {
-        $it = new RecursiveDirectoryIterator($dir);
-        $files = new RecursiveIteratorIterator($it,
-            RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($files as $file) {
-            if ($file->getFilename() === '.' || $file->getFilename() === '..') {
-                continue;
-            }
-            if ($file->isDir()) {
-                rmdir($file->getRealPath());
-            } else {
-                unlink($file->getRealPath());
-            }
-        }
-        return @rmdir($dir);
-    }
-    return false;
-}
 
 /**
  * Generates the values of the personalized variables in a particular EJS application for a given user.
@@ -269,25 +230,29 @@ function users_personalized_vars($ejsapp) {
 /**
  * For EjsS java applications.
  *
- * @param string $filepath
+ * @param stdClass $context
  * @param stdClass $ejsapp
  * @param stored_file $file
- * @param stdClass $filerecord
  * @param boolean $alert
  * @return boolean $ejsok
  * @throws
  *
  */
-function modifications_for_java($filepath, $ejsapp, $file, $filerecord, $alert) {
-    global $CFG;
+function modifications_for_java($context, $ejsapp, $file, $alert) {
+    global $DB, $CFG;
 
     $ejsok = false;
+    $packer = get_file_packer('application/zip');
+    if ($file->extract_to_storage($packer, $context->id, 'mod_ejsapp', 'content', $ejsapp->id, '/')) {
+        $ejsapp->applet_name = $file->get_filename();
 
-    $ejsapp->applet_name = $filerecord->filename;
-
-    if (file_exists($filepath)) {
         // Extract the manifest.mf file from the .jar.
-        $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => 'MANIFEST.MF'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $fs = get_file_storage();
+        $manifest = $fs->get_file_by_id($filerecord->id);
+        $manifest = $file->get_content();
 
         // Class_file.
         $ejsapp->class_file = get_class_for_java($manifest);
@@ -299,10 +264,8 @@ function modifications_for_java($filepath, $ejsapp, $file, $filerecord, $alert) 
             // If this field doesn't exist in the manifest, then the EjsS version used to compile the jar does not support Moodle.
             if ($alert) {
                 $message = get_string('EJS_version', 'ejsapp');
-                $alert = "<script type=\"text/javascript\">
-                      window.alert(\"$message\")
-                      </script>";
-                echo $alert;
+                echo html_writer::tag("script","window.alert(\"$message\")",
+                    array("type" => "text/javascript"));
             }
         } else {
             $ejsok = true;
@@ -324,18 +287,16 @@ function modifications_for_java($filepath, $ejsapp, $file, $filerecord, $alert) 
                             'certificate_path') . " -storepass " .
                         get_config('mod_ejsapp', 'certificate_password') .
                         " -tsa http://timestamp.comodoca.com/rfc3161 " .
-                        $filepath . " " . get_config('mod_ejsapp', 'certificate_alias'));
+                        $file . " " . get_config('mod_ejsapp', 'certificate_alias'));
                     // We replace the file stored in Moodle's filesystem and its table with the signed version.
-                    $file->delete();
+                    /*$file->delete();
                     $fs = get_file_storage();
-                    $fs->create_file_from_pathname($filerecord, $filepath);
+                    $fs->create_file_from_pathname($filerecord, $filepath);*/
                 }
             } else if ($alert) { // Files without the codebase parameter set to the Moodle server direction are not signed.
                 $message = get_string('EJS_codebase', 'ejsapp');
-                $alert = "<script type=\"text/javascript\">
-                      window.alert(\"$message\")
-                      </script>";
-                echo $alert;
+                echo html_writer::tag("script","window.alert(\"$message\")",
+                    array("type" => "text/javascript"));
             }
         }
     }

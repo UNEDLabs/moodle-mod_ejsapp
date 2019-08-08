@@ -35,19 +35,7 @@ define(['jquery'], function() {
             ws.onopen = function() {
                 // Websocket is connected, send data using send().
                 ws.send("Message to send \r\n");
-                var obj = '{'
-                    +'"command":"' + command + '",'
-                    +'"ip_server":"' + IP + '",'
-                    +'"port_server":"' + port + '",'
-                    +'"id_exp":"' + idExp + '",'
-                    +'"expiration_time":"' + expTime + '",'
-                    +'"user":"' + user + '",'
-                    +'"password":"' + password + '"';
-                if (command === 'execjar') {
-                    obj += ',' + '"jar_file":"' + jarPath + '"';
-                }
-                obj += '}';
-                ws.send(obj);
+                ws.connectExperience(command, IP, port, idExp, expTime, user, password, jarPath);
                 console.log("Connected to Sarlab experience: " + idExp);
             };
 
@@ -97,8 +85,8 @@ define(['jquery'], function() {
 
         stopExperienceOnLeave: function() {
             window.onbeforeunload = function() {
-                ws.send('{"command":"reset"}');
-                ws.send('{"command":"exit"}');
+                ws.resetExperience();
+                ws.stopExperience();
             };
         },
 

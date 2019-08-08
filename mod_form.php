@@ -378,5 +378,15 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         return $errors;
     } // End of function validation().
 
+    /*public function add_completion_rules() {
+
+    }*/
+
+    /*public function completion_rule_enabled($data) {
+        $status = !empty($data['completionstatusrequired']);
+        $score = empty($data['completionscoredisabled']) && strlen($data['completionscorerequired']);
+
+        return $status || $score;
+    }*/
 
 }

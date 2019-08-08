@@ -73,8 +73,8 @@ function ejsapp_supports($feature) {
  *
  */
 function ejsapp_add_instance($ejsapp, $mform = null) {
-    global $DB, $CFG;
-    require_once($CFG->dirroot.'/mod/ejsapp/locallib.php');
+    global $DB;
+    require_once('locallib.php');
 
     $ejsapp->timecreated = time();
     $ejsapp->id = $DB->insert_record('ejsapp', $ejsapp);
@@ -113,8 +113,8 @@ function ejsapp_add_instance($ejsapp, $mform = null) {
  *
  */
 function ejsapp_update_instance($ejsapp, $mform=null) {
-    global $DB, $CFG;
-    require_once($CFG->dirroot.'/mod/ejsapp/locallib.php');
+    global $DB;
+    require_once('locallib.php');
 
     $ejsapp->timemodified = time();
     $ejsapp->id = $ejsapp->instance;
@@ -170,7 +170,6 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
  */
 function ejsapp_delete_instance($id) {
     global $DB, $CFG;
-    require_once($CFG->dirroot.'/mod/ejsapp/locallib.php');
     require_once($CFG->libdir . '/filelib.php');
 
     if (!$ejsapp = $DB->get_record('ejsapp', array('id' => $id))) {

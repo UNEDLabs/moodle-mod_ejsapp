@@ -39,9 +39,9 @@ defined('MOODLE_INTERNAL') || die();
 class ejsapp_lab implements renderable {
     /** @var string $class_file is either the name of the EjsS app main class (if Java) or an empty string (if Javascript) */
     public $class_file = '';
-    /** @var stdClass $message is the information related to the remote laboratory */
+    /** @var stdClass $remlabinfo contains the information related to the remote laboratory */
     public $remlabinfo = null;
-    /** @var string the name of the EjsS file uploaded to the EJSApp activity */
+    /** @var string $ejsapp name is the name of the EjsS file uploaded to the EJSApp activity */
     public $ejsappname = '';
     /** @var string $sarlabkey is the auth key to access the sarlab experience */
     public $sarlabkey = '';

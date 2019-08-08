@@ -140,7 +140,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 $code =
                     html_writer::tag("iframe", "", array("id" => "EJsS", "style" => "display:none;")) .
                     html_writer::tag("script", "", array("src" => "https://www.java.com/js/deployJava.js")) .
-                    html_writer::tag("script", "var url = '$this->wwwpath$this->ejsappname.jnlp';
+                    html_writer::tag("script", "var url = '$params->wwwpath$params->ejsappname.jnlp';
                         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                         if (is_chrome) document.getElementById('EJsS').src = url;
                         else deployJava.launchWebStartApplication(url);");
@@ -149,9 +149,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 global $PAGE, $USER, $CFG;
                 $code = '';
                 $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                    array('execjar', $this->sarlabip, 443, $this->practice,
+                    array('execjar', $params->sarlabip, 443, $params->practice,
                         $params->remlabinfo->max_use_time/60, $USER->username . "@" . $CFG->wwwroot,
-                        $this->sarlabkey, $this->jarpath));
+                        $params->sarlabkey, $params->jarpath));
                 $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
             }
         }
