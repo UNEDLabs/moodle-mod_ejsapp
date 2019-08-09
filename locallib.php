@@ -338,23 +338,39 @@ function modifications_for_javascript($context, $ejsapp, $file) {
         }
         $ejsapp->applet_name = pathinfo(rtrim($substr), PATHINFO_FILENAME);
 
-        // Edit .js content to replace context-dependent content (i.e. the EjsS' _model variable declaration)
-        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.js'), 'filesize DESC');
-        $filerecord = reset($filerecords);
-        $fs = get_file_storage();
-        $originalfile = $fs->get_file_by_id($filerecord->id);
-        $originalfilecontent = $originalfile->get_content();
-        $pathfiles = new moodle_url("/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() .
-            "/content/" . $file->get_itemid());
-        $ejsslibpathfiles =  $pathfiles . "/_ejs_library/";
-        $newfilecontent = str_replace("(\"_topFrame\",\"_ejs_library/\",null);",
-            "(\"_topFrame\",\"$ejsslibpathfiles\",\"$pathfiles\");",
-            $originalfilecontent);
-        $originalfile->delete();
-        $fs->create_file_from_string($filerecord, $newfilecontent);
-
-        $ejsok = true;
+        if (!empty($filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.js'), 'filesize DESC'))) {
+            $mainfile = 'javascript';
+        } else if (!empty($filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.xhtml'), 'filesize DESC'))) {
+            $mainfile = 'xhtml';
+        }
+        if (!empty($filerecords)) {
+            // Edit file content to replace context-dependent content (i.e. the EjsS' _model variable declaration)
+            $filerecord = reset($filerecords);
+            $fs = get_file_storage();
+            $originalfile = $fs->get_file_by_id($filerecord->id);
+            $originalfilecontent = $originalfile->get_content();
+            $pathfiles = new moodle_url("/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() .
+                "/content/" . $file->get_itemid());
+            $ejsslibpathfiles = $pathfiles . "/_ejs_library/";
+            $newfilecontent = str_replace("(\"_topFrame\",\"_ejs_library/\",null);",
+                "(\"_topFrame\",\"$ejsslibpathfiles\",\"$pathfiles\");",
+                $originalfilecontent);
+            $originalfile->delete();
+            if ($mainfile == "xhtml") {
+                // Extract javascript code from the .xhtml file into a new .js file
+                $newfilecontent = strstr($newfilecontent, 'function ' .
+                    strstr($ejsapp->applet_name, '_Simulation', true));
+                $newfilecontent1 = strstr($newfilecontent, '//--><!]]></script>', true);
+                $newfilecontent2 = strstr($newfilecontent, 'var _model;');
+                $newfilecontent2 = strstr($newfilecontent2, '//--><!]]></script>', true);
+                $newfilecontent = $newfilecontent1 . $newfilecontent2;
+                $filerecord->filename = $ejsapp->applet_name . '.js';
+            }
+            $fs->create_file_from_string($filerecord, $newfilecontent);
+            $ejsok = true;
+        }
     }
 
     return $ejsok;
