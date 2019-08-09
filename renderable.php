@@ -208,8 +208,8 @@ class ejsapp_lab implements renderable {
                 }
 
                 // Load personalized variables.
-                if (!$collabinfo && isset($personalvarsinfo->name) && isset($params->personalvarsinfo->value)
-                    && isset($params->personalvarsinfo->type)) {
+                if (!$collabinfo && isset($personalvarsinfo->name) && isset($personalvarsinfo->value)
+                    && isset($personalvarsinfo->type)) {
                     $personalizevars = "'{";
                     for ($i = 0; $i < count($personalvarsinfo->name); $i++) {
                         $personalizevars .= '"' . $personalvarsinfo->name[$i] . '":' . $personalvarsinfo->value[$i];
