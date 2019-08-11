@@ -219,7 +219,7 @@ $renderer = $PAGE->get_renderer('mod_ejsapp');
 // Javascript files and html injection for Blockly
 $chartsdiv = '';
 $experiments = '';
-if ($ejsapp->class_file == '' && $accessed) {
+if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'class' && $accessed) {
     $fs = get_file_storage();
     $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
         'itemid' => $ejsapp->id, 'filename' => 'ejss.css'), 'filesize DESC');
@@ -325,7 +325,7 @@ if ($accessed) {
         echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
     }
 
-    if ($ejsapp->class_file == '') {
+    if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'class') {
         // Include the three required javascript files.
         $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
             'itemid' => $ejsapp->id, 'filename' => 'ejsS.v1.min.js'), 'filesize DESC');
@@ -344,7 +344,7 @@ if ($accessed) {
         $PAGE->requires->js(new moodle_url($pathfile));
 
         $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.js'), 'filesize DESC');
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.js'), 'filesize DESC');
         $filerecord = reset($filerecords);
         $file = $fs->get_file_by_id($filerecord->id);
         $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .

@@ -27,15 +27,12 @@
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="css" NEXT="timemodified"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0"
-                       SEQUENCE="false" PREVIOUS="timecreated" NEXT="applet_name"/>
-                <FIELD NAME="applet_name" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
-                       COMMENT="Name of the applet that implements the Lab (e.g., heatflowMoodle)"
-                       PREVIOUS="timemodified" NEXT="class_file"/>
-                <FIELD NAME="class_file" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
-                       COMMENT="applet main class file (e.g., heatflow.heatflowMoodle.heatflowMoodleApplet.class)"
-                       PREVIOUS="applet_name" NEXT="is_rem_lab"/>
+                       SEQUENCE="false" PREVIOUS="timecreated" NEXT="main_file"/>
+                <FIELD NAME="main_file" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Name of the main file that implements the lab"
+                       PREVIOUS="timemodified" NEXT="is_rem_lab"/>
                 <FIELD NAME="is_rem_lab" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0"
-                       PREVIOUS="class_file" NEXT="personalvars"/>
+                       PREVIOUS="main_file" NEXT="personalvars"/>
                 <FIELD NAME="personalvars" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"
                        PREVIOUS="is_rem_lab" NEXT="blockly_conf"/>
                 <FIELD NAME="blockly_conf" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false"

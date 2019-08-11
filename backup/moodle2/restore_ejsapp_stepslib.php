@@ -79,16 +79,11 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $this->apply_activity_instance($newitemid);
 
         // Copy files.
-        if (!empty($data->class_file)) { // JAR applet.
-            $ext = '.jar';
-            if (pathinfo($data->applet_name, PATHINFO_EXTENSION) == 'jar') {
-                $ext = '';
-            }
-            $name = $data->applet_name . $ext;
+        if (pathinfo($data->main_file,PATHINFO_EXTENSION) == 'class') { // JAR applet.
             $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
-itemid = {$data->id} and filename = '{$name}'";
+itemid = {$data->id} and filename = '{$data->main_file}'";
         } else { // Zip file with Javascript.
-            $withoutextension = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->applet_name);
+            $withoutextension = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->main_file);
             $withoutsimulation = substr($withoutextension, 0, strrpos($withoutextension, '_Simulation'));
             $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
 itemid = {$data->id} and filename like '%$withoutsimulation%'";
@@ -111,7 +106,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
                 $data->id = $newitemid;
                 $DB->update_record('ejsapp', $data);
 
-                if (empty($data->class_file)) { // Zip file with Javascript.
+                if (pathinfo($data->main_file,PATHINFO_EXTENSION) != 'class') { // Zip file with Javascript.
                     $context = new stdClass;
                     $context->id = $filerecord->contextid;
                     modifications_for_javascript($context, $data, $file);

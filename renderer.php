@@ -129,7 +129,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      *
      */
     public function render_ejsapp_lab(ejsapp_lab $params) {
-        if ($params->class_file == '') { // EjsS Javascript.
+        if (pathinfo($params->main_file, PATHINFO_EXTENSION) != 'class') { // EjsS Javascript.
             $code =
                 html_writer::start_div("", array("id" => "EJsS")) .
                     html_writer::div("", "", array("id" => "_topFrame", "style" => "text-align:center;")) .
@@ -140,7 +140,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 $code =
                     html_writer::tag("iframe", "", array("id" => "EJsS", "style" => "display:none;")) .
                     html_writer::tag("script", "", array("src" => "https://www.java.com/js/deployJava.js")) .
-                    html_writer::tag("script", "var url = '$params->wwwpath$params->ejsappname.jnlp';
+                    html_writer::tag("script", "var url = '$params->wwwpath$params->main_file.jnlp';
                         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                         if (is_chrome) document.getElementById('EJsS').src = url;
                         else deployJava.launchWebStartApplication(url);");

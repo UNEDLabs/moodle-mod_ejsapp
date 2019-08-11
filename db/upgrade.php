@@ -375,5 +375,16 @@ function xmldb_ejsapp_upgrade($oldversion) {
         $dbman->drop_field($table, $field);
     }
 
+    if ($oldversion < '2019081103') {
+        // Drop mainframe and codebase fields from ejsapp table.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('ejsapp');
+        $field = new xmldb_field('applet_name', XMLDB_TYPE_TEXT, '64', null, null,
+            null, null, 'timemodified', 'class_file');
+        $dbman->rename_field($table, $field, 'main_file');
+        $field = new xmldb_field('class_file');
+        $dbman->drop_field($table, $field);
+    }
+
     return true;
 }

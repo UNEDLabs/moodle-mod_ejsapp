@@ -103,7 +103,6 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     }
 
     // Initialize the mod_form elements.
-    $ejsapp->class_file = '';
     $ejsapp->manifest = 'EJsS';
 
     $ext = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
@@ -244,18 +243,16 @@ function modifications_for_java($context, $ejsapp, $file, $alert) {
     $ejsok = false;
     $packer = get_file_packer('application/zip');
     if ($file->extract_to_storage($packer, $context->id, 'mod_ejsapp', 'content', $ejsapp->id, '/')) {
-        $ejsapp->applet_name = $file->get_filename();
-
         // Extract the manifest.mf file from the .jar.
         $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
             'itemid' => $ejsapp->id, 'filename' => 'MANIFEST.MF'), 'filesize DESC');
         $filerecord = reset($filerecords);
         $fs = get_file_storage();
         $manifest = $fs->get_file_by_id($filerecord->id);
-        $manifest = $file->get_content();
+        $manifest = $manifest->get_content();
 
         // Class_file.
-        $ejsapp->class_file = get_class_for_java($manifest);
+        $ejsapp->main_file = get_class_for_java($manifest);
 
         // Check whether the EjsS version to build this applet is supported.
         $pattern = '/Applet-Height\s*:\s*(\w+)/';
@@ -336,13 +333,13 @@ function modifications_for_javascript($context, $ejsapp, $file) {
                 $substr = $substr . $matches[1][0];
             }
         }
-        $ejsapp->applet_name = pathinfo(rtrim($substr), PATHINFO_FILENAME);
+        $ejsapp->main_file = pathinfo(rtrim($substr), PATHINFO_FILENAME);
 
         if (!empty($filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.js'), 'filesize DESC'))) {
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.js'), 'filesize DESC'))) {
             $mainfile = 'javascript';
         } else if (!empty($filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => $ejsapp->applet_name . '.xhtml'), 'filesize DESC'))) {
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.xhtml'), 'filesize DESC'))) {
             $mainfile = 'xhtml';
         }
         if (!empty($filerecords)) {
@@ -361,12 +358,12 @@ function modifications_for_javascript($context, $ejsapp, $file) {
             if ($mainfile == "xhtml") {
                 // Extract javascript code from the .xhtml file into a new .js file
                 $newfilecontent = strstr($newfilecontent, 'function ' .
-                    strstr($ejsapp->applet_name, '_Simulation', true));
+                    strstr($ejsapp->main_file, '_Simulation', true));
                 $newfilecontent1 = strstr($newfilecontent, '//--><!]]></script>', true);
                 $newfilecontent2 = strstr($newfilecontent, 'var _model;');
                 $newfilecontent2 = strstr($newfilecontent2, '//--><!]]></script>', true);
                 $newfilecontent = $newfilecontent1 . $newfilecontent2;
-                $filerecord->filename = $ejsapp->applet_name . '.js';
+                $filerecord->filename = $ejsapp->main_file . '.js';
             }
             $fs->create_file_from_string($filerecord, $newfilecontent);
             $ejsok = true;

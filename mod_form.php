@@ -78,17 +78,13 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Adding other ejsapp settings by adding hidden fieldsets.
         $mform->addElement('header', 'conf_parameters', get_string('jar_file', 'ejsapp'));
 
-        $mform->addElement('hidden', 'class_file', null);
-        $mform->setType('class_file', PARAM_TEXT);
-        $mform->setDefault('class_file', 'null');
-
         $mform->addElement('hidden', 'manifest', null);
         $mform->setType('manifest', PARAM_TEXT);
         $mform->setDefault('manifest', '');
 
-        $mform->addElement('hidden', 'applet_name', null);
-        $mform->setType('applet_name', PARAM_TEXT);
-        $mform->setDefault('applet_name', '');
+        $mform->addElement('hidden', 'main_file', null);
+        $mform->setType('main_file', PARAM_TEXT);
+        $mform->setDefault('main_file', '');
 
         $mform->addElement('hidden', 'remlab_manager', null);
         $mform->setType('remlab_manager', PARAM_INT);
