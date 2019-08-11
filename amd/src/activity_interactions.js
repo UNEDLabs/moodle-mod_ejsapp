@@ -46,44 +46,24 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($, sf) {
         },
 
         addLog: function(url_add_log, url_max_time, is_rem_lab, htmlid, frequency, max_time) {
-            var handleSuccessAddLog = function(o) {
-                /*success handler code*/
-            };
-            var handleFailureAddLog = function(o) {
-                /*failure handler code*/
-            };
-            var callbackAddLog = {
-                success: handleSuccessAddLog,
-                failure: handleFailureAddLog
-            };
-            var handleSuccessKickOut = function(o) {
-                var div = $('"#' + htmlid + '"');
-                div.innerHTML = o.responseText;
-            };
-            var handleFailureKickOut = function(o) {
-                /*failure handler code*/
-            };
-            var callbackKickOut = {
-                success: handleSuccessKickOut,
-                failure: handleFailureKickOut
-            };
             if (typeof max_time !== 'undefined') {
                 max_times = Math.round(max_time/frequency); // A user can occupy a remote lab just for max_times seconds.
             }
             var counter = 0;
             var checkActivity = function() {
-                //Y.use('yui2-connection', 'yui2-dom', function(Y) {
-                    // Call php code to insert log in Moodle table.
-                    $.get(url_add_log, callbackAddLog);
-                    counter++;
-                    if (typeof max_time !== 'undefined') {
-                        if (counter >= max_times) {
-                            // Call php code to refresh view.php and kick the user from the remote lab.
-                            $.get(url_max_time, callbackKickOut);
-                            clearInterval(checkUserActivity);
-                        }
+                // Call php code to insert log in Moodle table.
+                $.get(url_add_log);
+                counter++;
+                if (typeof max_time !== 'undefined') {
+                    if (counter >= max_times) {
+                        // Call php code to refresh view.php and kick the user from the remote lab.
+                        $.get(url_max_time,  function(data) {
+                            var div = $('#' + htmlid);
+                            div.text(data);
+                        });
+                        clearInterval(checkUserActivity);
                     }
-                //});
+                }
             };
             // Call a first time.
             checkActivity();
@@ -92,49 +72,36 @@ define(['jquery', 'mod_ejsapp/screenfull'], function($, sf) {
         },
 
         countdown: function(url, htmlid, initial_remaining_time, frequency, seconds_label, refresh_label) {
-            var handleSuccess = function(o) {
-                var response = o.responseText;
-                remaining_time = response.substring(0, response.indexOf(' '));
-                remaining_time_client = remaining_time;
-                if (remaining_time > 0) {
-                    var div = $('"#' + htmlid + '"');
-                    div.innerHTML = response;
-                }
-            };
-            var handleFailure = function(o) {
-                /*failure handler code*/
-            };
-            var callback = {
-                success: handleSuccess,
-                failure: handleFailure
-            };
             var counter = 0;
             var remaining_time =  initial_remaining_time;
             var remaining_time_client = remaining_time;
             var updateRemainingTimeServer = function() {
-                //Y.use('yui2-connection', 'yui2-dom', function(Y) {
-                    // Call php code to update the remaining time till the remote lab is free again.
-                    var final_url = url + '&remaining_time=' + remaining_time;
-                    $.get(final_url, callback);
-                    if (remaining_time > 0) { //still counting
-                        counter++;
-                    } else { // End, user can try refreshing the window.
-                        clearInterval(intervalServer);
+                // Call php code to update the remaining time till the remote lab is free again.
+                var final_url = url + '&remaining_time=' + remaining_time;
+                $.get(final_url, function(data) {
+                    remaining_time = data.substring(0, data.indexOf(' '));
+                    remaining_time_client = remaining_time;
+                    if (remaining_time > 0) {
+                        var div = $('#' + htmlid);
+                        div.text(data);
                     }
-                //});
+                });
+                if (remaining_time > 0) { //still counting
+                    counter++;
+                } else { // End, user can try refreshing the window.
+                    clearInterval(intervalServer);
+                }
             };
             var intervalServer = setInterval(updateRemainingTimeServer, 1000 * frequency);
             var updateRemainingTimeClient = function() {
-                //Y.use('yui2-connection', 'yui2-dom', function(Y) {
-                    var div = $('"#' + htmlid + '"');
-                    if (remaining_time_client > 0) { // Still counting.
-                        remaining_time_client--;
-                        div.innerHTML = remaining_time_client + seconds_label;
-                    } else { // End, user can try refreshing the window.
-                        div.innerHTML = refresh_label;
-                        clearInterval(intervalClient);
-                    }
-                //});
+                var div = $('#' + htmlid);
+                if (remaining_time_client > 0) { // Still counting.
+                    remaining_time_client--;
+                    div.text(remaining_time_client + seconds_label);
+                } else { // End, user can try refreshing the window.
+                    div.text(refresh_label);
+                    clearInterval(intervalClient);
+                }
             };
             updateRemainingTimeClient();
             var intervalClient = setInterval(updateRemainingTimeClient, 1000);
