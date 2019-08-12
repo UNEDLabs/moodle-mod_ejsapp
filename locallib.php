@@ -243,6 +243,8 @@ function modifications_for_java($context, $ejsapp, $file, $alert) {
     $ejsok = false;
     $packer = get_file_packer('application/zip');
     if ($file->extract_to_storage($packer, $context->id, 'mod_ejsapp', 'content', $ejsapp->id, '/')) {
+        $ejsapp->main_file = $file->get_filename();
+
         // Extract the manifest.mf file from the .jar.
         $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
             'itemid' => $ejsapp->id, 'filename' => 'MANIFEST.MF'), 'filesize DESC');
@@ -250,10 +252,6 @@ function modifications_for_java($context, $ejsapp, $file, $alert) {
         $fs = get_file_storage();
         $manifest = $fs->get_file_by_id($filerecord->id);
         $manifest = $manifest->get_content();
-
-        // Class_file.
-        $ejsapp->main_file = get_class_for_java($manifest);
-
         // Check whether the EjsS version to build this applet is supported.
         $pattern = '/Applet-Height\s*:\s*(\w+)/';
         preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
@@ -371,50 +369,6 @@ function modifications_for_javascript($context, $ejsapp, $file) {
     }
 
     return $ejsok;
-}
-
-/**
- * Gets the java .class from the manifest
- *
- * @param string $manifest
- * @return string $classfile
- *
- */
-function get_class_for_java($manifest) {
-    $pattern = '/Main-Class\s*:\s*(.+)\s*/';
-    preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-    $substr = $matches[1][0];
-    if (strlen($matches[1][0]) == 59) {
-        // Delete all white-spaces and the first newline.
-        if (preg_match('/^\s(.+)\s*/m', $manifest, $matches, PREG_OFFSET_CAPTURE) > 0) {
-            if (preg_match('/\s*:\s*/', $matches[1][0], $matches2, PREG_OFFSET_CAPTURE) == 0) {
-                $substr = $substr . $matches[1][0];
-            }
-        }
-    }
-    $classfile = $substr . 'Applet.class';
-
-    return $classfile;
-}
-
-/**
- * Recursively change permissions for the jarfiles directory and subdirectories
- *
- * @param string $path
- *
- */
-function chmod_r($path) {
-    $dir = new DirectoryIterator($path);
-    foreach ($dir as $item) {
-        if (!is_dir($item->getPathname())) {
-            chmod($item->getPathname(), 0644);
-        } else {
-            chmod($item->getPathname(), 0755);
-        }
-        if ($item->isDir() && !$item->isDot()) {
-            chmod_r($item->getPathname());
-        }
-    }
 }
 
 /**

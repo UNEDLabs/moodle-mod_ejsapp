@@ -79,7 +79,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $this->apply_activity_instance($newitemid);
 
         // Copy files.
-        if (pathinfo($data->main_file,PATHINFO_EXTENSION) == 'class') { // JAR applet.
+        if (pathinfo($data->main_file,PATHINFO_EXTENSION) == 'jar') { // JAR applet.
             $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
 itemid = {$data->id} and filename = '{$data->main_file}'";
         } else { // Zip file with Javascript.
@@ -106,7 +106,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
                 $data->id = $newitemid;
                 $DB->update_record('ejsapp', $data);
 
-                if (pathinfo($data->main_file,PATHINFO_EXTENSION) != 'class') { // Zip file with Javascript.
+                if (pathinfo($data->main_file,PATHINFO_EXTENSION) != 'jar') { // Zip file with Javascript.
                     $context = new stdClass;
                     $context->id = $filerecord->contextid;
                     modifications_for_javascript($context, $data, $file);
@@ -175,12 +175,10 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
         $DB->insert_record('ejsappbooking_remlab_access', $data);
     }
 
-    /**
-     * Extract jarfiles to the ejsapp jar folder
-     */
     protected function after_execute() {
         // Add ejsapp related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
+        $this->add_related_files('mod_ejsapp', 'content', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'recfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'blkfiles', 'ejsapp');

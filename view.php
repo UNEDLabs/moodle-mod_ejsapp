@@ -114,6 +114,7 @@ $checkactivity = intval(get_config('mod_ejsapp', 'check_activity'));
 $remlabinfo = null;
 $message1 = '';
 $message2 = '';
+$personalvarsinfo = '';
 
 // Check the access conditions, depending on whether sarlab and/or the ejsapp booking system are being used or not and
 // whether the ejsapp instance is a remote lab or not.
@@ -219,7 +220,7 @@ $renderer = $PAGE->get_renderer('mod_ejsapp');
 // Javascript files and html injection for Blockly
 $chartsdiv = '';
 $experiments = '';
-if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'class' && $accessed) {
+if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // Javascript
     $fs = get_file_storage();
     $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
         'itemid' => $ejsapp->id, 'filename' => 'ejss.css'), 'filesize DESC');
@@ -303,7 +304,6 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'class' && $accessed) {
         } else {
             $PAGE->requires->js('/mod/ejsapp/addon/lang/en.js');
         }
-
         $chartsdiv = $renderer->ejsapp_charts();
         $controldiv = $renderer->ejsapp_controlbar($blocklyconf);
         $blocklydiv = $renderer->ejsapp_blockly();
@@ -312,6 +312,31 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'class' && $accessed) {
         // Join HTML divs for placing blockly related elements in a single one.
         $experiments = $controldiv . $blocklydiv . $logdiv;
     }
+
+    // Include the three required javascript files for EjsS.
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+        'itemid' => $ejsapp->id, 'filename' => 'ejsS.v1.min.js'), 'filesize DESC');
+    $filerecord = reset($filerecords);
+    $file = $fs->get_file_by_id($filerecord->id);
+    $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+        $file->get_itemid() . "/_ejs_library/" . $file->get_filename();
+    $PAGE->requires->js(new moodle_url($pathfile));
+
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+        'itemid' => $ejsapp->id, 'filename' => 'textresizedetector.js'), 'filesize DESC');
+    $filerecord = reset($filerecords);
+    $file = $fs->get_file_by_id($filerecord->id);
+    $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+        $file->get_itemid() . "/_ejs_library/scripts/" . $file->get_filename();
+    $PAGE->requires->js(new moodle_url($pathfile));
+
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+        'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.js'), 'filesize DESC');
+    $filerecord = reset($filerecords);
+    $file = $fs->get_file_by_id($filerecord->id);
+    $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+        $file->get_itemid() . "/" . $file->get_filename();
+    $PAGE->requires->js(new moodle_url($pathfile));
 
     // Check if there are variables configured to be personalized in this EJSApp.
     $personalvarsinfo = personalize_vars($ejsapp, $USER, false);
@@ -323,33 +348,6 @@ echo $OUTPUT->header();
 if ($accessed) {
     if ($ejsapp->intro) {
         echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
-    }
-
-    if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'class') {
-        // Include the three required javascript files.
-        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => 'ejsS.v1.min.js'), 'filesize DESC');
-        $filerecord = reset($filerecords);
-        $file = $fs->get_file_by_id($filerecord->id);
-        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-            $file->get_itemid() . "/_ejs_library/" . $file->get_filename();
-        $PAGE->requires->js(new moodle_url($pathfile));
-
-        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => 'textresizedetector.js'), 'filesize DESC');
-        $filerecord = reset($filerecords);
-        $file = $fs->get_file_by_id($filerecord->id);
-        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-            $file->get_itemid() . "/_ejs_library/scripts/" . $file->get_filename();
-        $PAGE->requires->js(new moodle_url($pathfile));
-
-        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.js'), 'filesize DESC');
-        $filerecord = reset($filerecords);
-        $file = $fs->get_file_by_id($filerecord->id);
-        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-            $file->get_itemid() . "/" . $file->get_filename();
-        $PAGE->requires->js(new moodle_url($pathfile));
     }
 
     echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
