@@ -130,7 +130,7 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
     $context = context_module::instance($cmid);
 
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $ejsapp->id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'compressed', $ejsapp->id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'content', $ejsapp->id);
     $ejsok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejsok) {
@@ -197,7 +197,7 @@ function ejsapp_delete_instance($id) {
     $context = context_module::instance($cmid);
 
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_ejsapp', 'jarfiles', $id);
+    $fs->delete_area_files($context->id, 'mod_ejsapp', 'compressed', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'content', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'xmlfiles', $id);
     $fs->delete_area_files($context->id, 'mod_ejsapp', 'recfiles', $id);
@@ -534,7 +534,8 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
  *
  */
 function ejsapp_get_file_areas($course, $cm, $context) {
-    return array('jarfiles' => 'Applets and Javascript files with the virtual or remote labs',
+    return array('compressed' => 'Applets and zip files with the virtual or remote labs',
+                 'content' => 'Uncompressed files from applets and zip files',
                  'xmlfiles' => 'Text files containing all the information to define the state of a lab',
                  'recfiles' => 'Text files containing a script recording the interaction of a user with a lab',
                  'blkfiles' => 'Text files containing a blockly program or a configuration of blocks');

@@ -49,7 +49,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
 
     // Creating the .jar or .zip file in dataroot and updating the files table in the database.
     if ($ejsapp->appletfile) {
-        file_save_draft_area_files($ejsapp->appletfile, $context->id, 'mod_ejsapp', 'jarfiles',
+        file_save_draft_area_files($ejsapp->appletfile, $context->id, 'mod_ejsapp', 'compressed',
             $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1,
                 'accepted_types' => array('application/java-archive', 'application/zip')));
     }
@@ -83,7 +83,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     }
 
     // Obtain the uploaded .zip or .jar file from moodledata using the information in the files table.
-    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'jarfiles',
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'compressed',
         'itemid' => $ejsapp->id), 'filesize DESC');
     $filerecord = reset($filerecords);
     $fs = get_file_storage();
@@ -265,6 +265,7 @@ function modifications_for_java($context, $ejsapp, $file, $alert) {
         } else {
             $ejsok = true;
         }
+        $fs->delete_area_files($filerecord->contextid, 'mod_ejsapp', 'content');
 
         // Sign the applet.
         // Check whether a certificate is installed and in use.
@@ -343,7 +344,6 @@ function modifications_for_javascript($context, $ejsapp, $file) {
         if (!empty($filerecords)) {
             // Edit file content to replace context-dependent content (i.e. the EjsS' _model variable declaration)
             $filerecord = reset($filerecords);
-            $fs = get_file_storage();
             $originalfile = $fs->get_file_by_id($filerecord->id);
             $originalfilecontent = $originalfile->get_content();
             $pathfiles = new moodle_url("/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() .
@@ -366,6 +366,11 @@ function modifications_for_javascript($context, $ejsapp, $file) {
             $fs->create_file_from_string($filerecord, $newfilecontent);
             $ejsok = true;
         }
+        // Delete unneeded xhtml, html, xml and ejss files
+        $DB->delete_records_select('files', "filename LIKE '%ml'", array('component' => 'mod_ejsapp',
+            'filearea' => 'content', 'itemid' => $ejsapp->id));
+        $DB->delete_records_select('files', "filename LIKE '%ejss'", array('component' => 'mod_ejsapp',
+            'filearea' => 'content', 'itemid' => $ejsapp->id));
     }
 
     return $ejsok;

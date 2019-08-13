@@ -78,43 +78,7 @@ class restore_ejsapp_activity_structure_step extends restore_activity_structure_
         $newitemid = $DB->insert_record('ejsapp', $data);
         $this->apply_activity_instance($newitemid);
 
-        // Copy files.
-        if (pathinfo($data->main_file,PATHINFO_EXTENSION) == 'jar') { // JAR applet.
-            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
-itemid = {$data->id} and filename = '{$data->main_file}'";
-        } else { // Zip file with Javascript.
-            $withoutextension = preg_replace('/\\.[^.\\s]{3,4}$/', '', $data->main_file);
-            $withoutsimulation = substr($withoutextension, 0, strrpos($withoutextension, '_Simulation'));
-            $sql = "select * from {files} where component = 'mod_ejsapp' and filearea = 'jarfiles' and
-itemid = {$data->id} and filename like '%$withoutsimulation%'";
-        }
-        $filerecord = $DB->get_record_sql($sql);
-        if ($filerecord) {
-            $fs = get_file_storage();
-            $fileinfo = array(
-                'contextid' => $filerecord->contextid,  // ID of context.
-                'component' => 'mod_ejsapp',            // Usually = table name.
-                'filearea' => 'jarfiles',               // Usually = table name.
-                'itemid' => $filerecord->itemid,        // Usually = ID of row in table.
-                'filepath' => '/',                      // Any path beginning and ending in /.
-                'filename' => $filerecord->filename);   // Any filename.
-            $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'],
-                $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'],
-                $fileinfo['filename']);
-            if ($file) {
-                // Update ejsapp table.
-                $data->id = $newitemid;
-                $DB->update_record('ejsapp', $data);
-
-                if (pathinfo($data->main_file,PATHINFO_EXTENSION) != 'jar') { // Zip file with Javascript.
-                    $context = new stdClass;
-                    $context->id = $filerecord->contextid;
-                    modifications_for_javascript($context, $data, $file);
-                }
-            }
-        }
-
-        // Mapping old_ejsapp_id->new_old_ejsapp_id for xml state_files (see after_execute).
+        // Mapping old_ejsapp_id->new_old_ejsapp_id for associated files (see after_execute).
         $this->set_mapping('ejsapp', $oldid, $newitemid, true);
     }
 
@@ -177,7 +141,7 @@ itemid = {$data->id} and filename like '%$withoutsimulation%'";
 
     protected function after_execute() {
         // Add ejsapp related files, no need to match by itemname (just internally handled context).
-        $this->add_related_files('mod_ejsapp', 'jarfiles', 'ejsapp');
+        $this->add_related_files('mod_ejsapp', 'compressed', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'content', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'xmlfiles', 'ejsapp');
         $this->add_related_files('mod_ejsapp', 'recfiles', 'ejsapp');

@@ -268,7 +268,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         // Fill the form elements with previous submitted files/data.
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('appletfile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'jarfiles',
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_ejsapp', 'compressed',
                 $this->current->instance, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1,
                     'accepted_types' => array('application/java-archive', 'application/zip')));
             $defaultvalues['appletfile'] = $draftitemid;
