@@ -76,9 +76,12 @@
 }
 
 .path-mod-ejsapp #blockly_navbar {
+    box-shadow: none;
+    -webkit-box-shadow: none;
     margin-top: 1rem;
-    max-height: 70px;
     margin-bottom: 1rem;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .path-mod-ejsapp .dropdown-item,

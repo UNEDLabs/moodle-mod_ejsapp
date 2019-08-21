@@ -23,15 +23,12 @@ document.addEventListener('DOMContentLoaded', function(){
 		if (typeof _model !== "undefined") {
 			if(!chartsBlockly) {
 				document.getElementById('chartsDropdown').style.display = "none";
-				document.getElementById('chartSelection').style.display = "none";
 			}
 			if(!eventsBlockly) {
 				document.getElementById('eventsDropdown').style.display = "none";
-				document.getElementById('eventSelection').style.display = "none";
 			}
 			if(!controllerBlockly) {
 				document.getElementById('controllersDropdown').style.display = "none";
-				document.getElementById('controllerSelection').style.display = "none";
 			}
 			initAux();
 			loadVariables();
