@@ -77,6 +77,8 @@
 
 .path-mod-ejsapp #blockly_navbar {
     margin-top: 1rem;
+    max-height: 70px;
+    margin-bottom: 1rem;
 }
 
 .path-mod-ejsapp .dropdown-item,
@@ -97,7 +99,7 @@
 }
 
 .path-mod-ejsapp .textExecutionElement {
-    margin: 0.5rem 1rem;
+    margin: 0rem 1rem
 }
 
 .path-mod-ejsapp .play-code {
@@ -111,6 +113,7 @@
     font-size: 20px;
     font-weight: bold;
 }
+
 
 .path-mod-ejsapp #ScriptBox {
     width: 100%;

@@ -11,13 +11,13 @@ function prepareControllerCode(code){
 	for(var k = 0;k<params.length;k++){
 		textoparametros+='window["'+params[k]+'"] = '+params[k]+';';
 	}
-	
+
 	control = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
 	//u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
 	//(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
 	//control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );
-	
-	
+
+
 	/*statem.push(statements_code.toString());
 	var res = getInfoFromFunctionName(functionToReplace);
 	var ret="";
@@ -30,6 +30,8 @@ function prepareControllerCode(code){
 }
 
 function playCodeDet(value0,value1,value2,value3) {
+
+	console.log(value0);
 	var blocklyExp="";blockyEvent="";blocklyChart="";blocklyController="";
 	if(value0!=="Select experiment"){
 		workspace.clear();
@@ -57,7 +59,7 @@ function playCodeDet(value0,value1,value2,value3) {
 				workspaceControllers.clear();
 				Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(code, workspaceControllers));
 				semicode=Blockly.JavaScript.workspaceToCode(workspaceControllers);
-				
+
 			}
 			else{
 				semicode=code;
@@ -65,7 +67,7 @@ function playCodeDet(value0,value1,value2,value3) {
 			blocklyController=prepareControllerCode(semicode);
 		}
 	}
-	
+
 	if((code===null) || (blocklyExp==="") )
 		return ["","","",""];
 	//CONTROLLER NOT YET Blockly.Xml.domToWorkspace(getCodeFromName(experimentsList,$('select')[3].value), workspaceEvents);
@@ -76,25 +78,26 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 	var a="Select chart";
 	var b="Select event";
 	var c="Select controller";
-	var count = 1;
-	var select = document.getElementsByClassName('nice-select');
-	var replaytext = ' I want to use <span style="color:green">'+select[0].value+'</span>';
+	var replaytext = ' I want to use <span style="color:green">'+experimentSelected+'</span>';
 	if(chartsBlockly) {
-		a = select[count].value;
-		replaytext += ', viewing <span style="color:blue">'+ a +'</span>';
+		if(chartSelected!==""){
+			a = chartSelected;
+			replaytext += ', viewing <span style="color:blue">'+ a +'</span>';
+		}
 	}
-	count++;
 	if(eventsBlockly) {
-		b = select[count].value;
-		replaytext += ', with the events defined in <span style="color:red">'+ b +'</span>';
+		if(eventSelected!==""){
+			b = eventSelected;
+			replaytext += ', with the events defined in <span style="color:red">'+ b +'</span>';
+		}
 	}
-	count++;
 	if(controllerBlockly) {
-		c = select[count].value;
-		replaytext += ', using <span style="color:peru">'+ c +'</span>';
+		if(controllerSelected!==""){
+			c = controllerSelected;
+			replaytext += ', using <span style="color:peru">'+ c +'</span>';
+		}
 	}
-	count++;
-	var result= playCodeDet(select[0].value,a,b,c);
+	var result= playCodeDet(experimentSelected,a,b,c);
 	if(result[0]!==""){
 		document.getElementById('executionLogGen').style.display="block";
 		document.getElementById('executionLog').insertAdjacentHTML('beforeend', '<div class="textsmall">' +
@@ -122,7 +125,7 @@ function parseCode(blocklyExp,blocklyChart,blockyEvent) {
 	var code = "reInitLab();\n"+blocklyChart+blocklyController+"var set = false;\n"+blockyEvent+blocklyExp;
 	functions = "function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
 	/*var code2 = code;
-	
+
 	var continueSearch = true;
 	while (continueSearch) {
 		console.log(code2);
@@ -145,7 +148,7 @@ function stepCode() {
 	if (!interval) {
 		try {
 			var set = myInterpreter.getValueFromScope('set');
-			
+
 			if((set===undefined)||(set!==true))
 				revisarInicio();
 			var ok = myInterpreter.step();
@@ -177,20 +180,20 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(revisarInicio());
 	};
 	interpreter.setProperty(scope, 'revIni', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for highlighting blocks.
 	var wrapper = function() {
 		return interpreter.createPrimitive(revisarFin());
 	};
 	interpreter.setProperty(scope, 'revFin', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for alert blocks.
 	var wrapper = function(id) {
 		id = id ? id.toString() : '';
 		return interpreter.createPrimitive(alert(id));
 	};
 	interpreter.setProperty(scope, 'alert', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for highlighting blocks.
 	var wrapper = function(id) {
 		id = id ? id.toString() : '';
@@ -198,7 +201,7 @@ function initApi(interpreter, scope) {
 	};
 	interpreter.setProperty(scope, 'highlightBlock', interpreter.createNativeFunction(wrapper));
 
-	
+
 	// Add an API function for the play block.
 	var wrapper = function() {
 		return interpreter.createPrimitive(_model.play());
@@ -216,19 +219,19 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(reset());
 	};
 	interpreter.setProperty(scope, 'reset',	interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for the initialize block.
 	var wrapper = function() {
 		return interpreter.createPrimitive(_model.initialize());
 	};
 	interpreter.setProperty(scope, 'initialize', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for the setTimeStep block.
 	var wrapper = function(number) {
 		return interpreter.createPrimitive(setTimeStep(number));
 	};
 	interpreter.setProperty(scope, 'setTimeStep', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for the addEvent() block.
 	var wrapper = function(cond,statement) {
 		cond = cond ? cond.toString() : '';
@@ -236,7 +239,7 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(addEvent(cond,statement));
 	};
 	interpreter.setProperty(scope, 'addEvent', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for the rec() block.
 	var wrapper = function(bool) {
 		if ((bool.toString().localeCompare("true") == 0)) bool = true;
@@ -244,26 +247,26 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(rec(bool));
 	};
 	interpreter.setProperty(scope, 'rec', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for reInitLab blocks.
 	var wrapper = function() {
 		return interpreter.createPrimitive(reInitLab());
 	};
 	interpreter.setProperty(scope, 'reInitLab',	interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for the addFixedRelation() block.
 	var wrapper = function(number,statement) {
 		statement = statement ? statement.toString() : '';
 		return interpreter.createPrimitive(addFixedRelation(number,statement));
 	};
 	interpreter.setProperty(scope, 'addFixedRelation', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for the createChart() block.
 	var wrapper = function (number) {
 		return interpreter.createPrimitive(createChart(number));
 	};
 	interpreter.setProperty(scope, 'createChart', interpreter.createNativeFunction(wrapper));
-	
+
 	// Add an API function for record_var blocks.
 	var wrapper = function(id,id2) {
 		id = id ? id.toString() : '';
@@ -271,12 +274,12 @@ function initApi(interpreter, scope) {
 		return interpreter.createPrimitive(record_var(id,id2));
 	};
 	interpreter.setProperty(scope, 'record_var', interpreter.createNativeFunction(wrapper));
-	
+
 	var wrapper = function() {
 		return interpreter.createPrimitive(replaceFunction());
 	};
 	interpreter.setProperty(scope, 'replaceFunction', interpreter.createNativeFunction(wrapper));
-	
+
 } // End of initApi
 
 function revisarFin(){
@@ -478,10 +481,10 @@ function evaluarConContexto(code) {
 				values[k] = obj[k];
 			}
 		}
-		
+
 		// CODIGO BLOCKLY A EJECUTAR
 		resultado = eval(code);
-		
+
 		// DEVOLVEMOS VARIABLES
 		var aux = {};
 		for (var k in obj) {
@@ -494,6 +497,6 @@ function evaluarConContexto(code) {
 		}
 		_model._readParameters(aux);
 		_model.resetSolvers();
-	
+
 	return resultado;
 }

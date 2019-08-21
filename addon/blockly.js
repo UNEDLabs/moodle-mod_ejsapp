@@ -118,6 +118,11 @@ function initAux(){
 	controllerOpen=-1;
 	errorInterval=null;
 	chartId = 0;
+	experimentSelected="";
+	eventSelected="";
+	chartSelected="";
+	controllerSelected="";
+
 }
 
 function loadVariables(){
@@ -270,7 +275,7 @@ function createControllerPanel(){
 		controllerEditor = ace.edit("blocklyDivController");
 		controllerEditor.$blockScrolling = Infinity ;
 		controllerEditor.setTheme("ace/theme/xcode");
-		controllerEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);	
+		controllerEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);
 		document.getElementById('blocklyDivController').addEventListener("focusout", focusOutController);
 	}
 	var texto = getInfoFromFunctionName(functionToReplace);
@@ -288,7 +293,7 @@ function createControllerPanel(){
 
 function getCodeFromName(list,name){
 	for( var i = 0; i < list.length; i++){
-		   if ( list[i].name === name) 
+		   if ( list[i].name === name)
 			 return [list[i].code,i];
 	}
 	return null;
@@ -309,7 +314,7 @@ function jsButton(text){
 		result = prompt("New JavaScript code name:", "");
 	else
 		result = prompt(text, "");
-		
+
 	if(result!==null){
 		if(javaScriptsNamesListGeneral.indexOf(result)===-1)
 			addJs(result, "// This is JavaScript named " + result + "\n", jsCodesGeneral, visualJSGeneral,
@@ -333,7 +338,7 @@ function jsButton2(texto){
 		result = prompt("New JavaScript code name:", "");
 	else
 		result = prompt(texto, "");
-		
+
 	if(result!==null){
 		if(javaScriptsNamesListEvents.indexOf(result)===-1)
 			addJs(result, "// This is JavaScript2 named " + result + "\n", jsCodesEvents, visualJSEvents,
@@ -358,7 +363,7 @@ function loadjsb(jsList,jsVisualList,javaScriptsNamesList){
 
 	/*input.onchange = e => {
 	   // getting a hold of the file reference
-	   var file = e.target.files[0]; 
+	   var file = e.target.files[0];
 	   // setting up the reader
 	   var reader = new FileReader();
 	   reader.readAsText(file,'UTF-8');
@@ -485,7 +490,7 @@ function initJSFrame(place){
     editorJS = ace.edit(place);
 	editorJS.$blockScrolling = Infinity ;
     editorJS.setTheme("ace/theme/xcode");
-    editorJS.getSession().setMode("ace/mode/javascript");	
+    editorJS.getSession().setMode("ace/mode/javascript");
 	document.getElementById('_javaScriptFrame').style.fontSize='14px';
 	jsCodesGeneral = [];
 	jsCodesEvents = [];
@@ -529,7 +534,7 @@ dragElement(document.getElementById("ChartBox"));
 
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "header"))  
+  if (document.getElementById(elmnt.id + "header"))
     // if present, the header is where you move the DIV from:
 	document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
 
@@ -547,7 +552,7 @@ function dragElement(elmnt) {
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
   }
-  
+
 
 
   function elementDrag(e) {
@@ -589,24 +594,28 @@ function removeAndCloseScript(id){
 		if(experimentsList[experimentOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			experimentOpen=-1;
+			experimentSelected="";
 		}
 	}
 	else if(chartOpen!==-1) {
 		if(chartsList[chartOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			chartOpen=-1;
+			chartSelected="";
 		}
 	}
 	else if(eventOpen!==-1) {
 		if(eventsList[eventOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			eventOpen=-1;
+			eventSelected="";
 		}
 	}
 	else if(controllerOpen!==-1) {
 		if(controllersList[controllerOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			controllerOpen=-1;
+			controllerSelected="";
 		}
 	}
 	removeScript(id);
@@ -614,35 +623,45 @@ function removeAndCloseScript(id){
 
 function removeScript(id){
 	document.getElementById(id).remove();
-	document.getElementById(id+"list").remove();
+	//document.getElementById(id+"list").remove();
 	for(var i = 0; i < experimentsList.length; i++){
 	   if ( experimentsList[i].name === id) {
-		 experimentsList.splice(i, 1); 
+		 experimentsList.splice(i, 1);
 		 return;
 	   }
 	}
-	
+
 	for(i = 0; i < chartsList.length; i++){
 	   if ( chartsList[i].name === id) {
-		 chartsList.splice(i, 1); 
+		 chartsList.splice(i, 1);
 		 return;
 	   }
 	}
-	
+
 	for(i = 0; i < eventsList.length; i++){
 	   if ( eventsList[i].name === id) {
-		 eventsList.splice(i, 1); 
+		 eventsList.splice(i, 1);
 		 return;
 	   }
 	}
-	
+
 	for(i = 0; i < controllersList.length; i++){
 	   if ( controllersList[i].name === id) {
-		 controllersList.splice(i, 1); 
+		 controllersList.splice(i, 1);
 		 return;
 	   }
 	}
 }
+
+/*function addLabelToDropDown(id2,name,list,image){
+	var d2 = document.getElementById(id2);
+	if(image){
+		d2.insertAdjacentHTML('beforeend','<option id="new" value="' + name + '">' + name + '</option>');
+	}
+	else{
+		d2.insertAdjacentHTML('beforeend','<option id="' + name + 'list" value="' + name + '">' + name + '</option>');
+	}
+}*/
 
 function addnewScript(num,name,code,id,id2,list){
 	var d1 = document.getElementById(id);
@@ -651,9 +670,52 @@ function addnewScript(num,name,code,id,id2,list){
 		'<i class="fa fa-eye"></i>' + ' ' + name +'</a>' + '<div class="topnav-right">' +
 		'<a onclick="removeAndCloseScript(\'' + name + '\')"><i  class="fa fa-times"></i></a>' + '</div></div>');
 	list.push({"name":name,"code":code});
-	var d2 = document.getElementById(id2);
-	d2.insertAdjacentHTML('beforeend','<option id="' + name + 'list" value="' + name + '">' + name + '</option>');
+	//addLabelToDropDown(id2,name,list,false);
 	showScript(num,name);
+}
+
+function colorSelection(num,name){
+	var elem= document.getElementById(name);
+	if(num===1){
+		if(experimentSelected!==""){
+			var elem2= document.getElementById(experimentSelected);
+			elem2.style.color='Black';
+			elem2.style.fontWeight='normal';
+		}
+		elem.style.color='Green';
+		elem.style.fontWeight='bold';
+		experimentSelected=name;
+	}
+	else if(num===2){
+		if(chartSelected!==""){
+			var elem2= document.getElementById(chartSelected);
+			elem2.style.color='Black';
+			elem2.style.fontWeight='normal';
+		}
+		elem.style.color='Blue';
+		elem.style.fontWeight='bold';
+		chartSelected=name;
+	}
+	else if(num===3){
+		if(eventSelected!==""){
+			var elem2= document.getElementById(eventSelected);
+			elem2.style.color='Black';
+			elem2.style.fontWeight='normal';
+		}
+		elem.style.color='Red';
+		elem.style.fontWeight='bold';
+		eventSelected=name;
+	}
+	else{
+		if(controllerSelected!==""){
+			var elem2= document.getElementById(controllerSelected);
+			elem2.style.color='Black';
+			elem2.style.fontWeight='normal';
+		}
+		elem.style.color='Peru';
+		elem.style.fontWeight='bold';
+		controllerSelected=name;
+	}
 }
 
 function newScript(num){
@@ -726,7 +788,7 @@ function showScript(num,name){
 	chartOpen=-1;
 	eventOpen=-1;
 	controllerOpen=-1;
-	
+
 	dragElement(document.getElementById("ScriptBox"));
 	if(num===1){
 		 var result= getCodeFromName(experimentsList,name);
@@ -782,6 +844,7 @@ function showScript(num,name){
 			controllerEditor.setValue(result[0]);
 		}
 	}
+	colorSelection(num,name);
 }
 
 function minimize(object){

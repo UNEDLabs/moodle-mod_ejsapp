@@ -187,8 +187,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
         $navbar =
             html_writer::start_div("navbar", array('id' => 'blockly_navbar')) .
                 html_writer::start_div("dropdown", array("id" => "experimentsDropdown")) .
-                    html_writer::tag("button", "Experiments", array("class" =>
-                        "btn btn-secondary dropdown-toggle", "type" => "button", "id" => "dropdownMenuButton",
+                    html_writer::tag("button ", "Experiments", array("class" =>
+                        " btn btn-secondary dropdown-toggle green", "type" => "button ", "id" => "dropdownMenuButton",
                         "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "experimentsScripts",
                         "aria-labelledby" => "dropdownMenuButton")) .
@@ -200,7 +200,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "chartsDropdown")) .
-                    html_writer::tag("button", "Data & Charts", array("class" => "btn btn-secondary dropdown-toggle",
+                    html_writer::tag("button", "Data & Charts", array("class" => "btn btn-secondary dropdown-toggle blue",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "chartsScripts", "aria-labelledby" =>
@@ -211,7 +211,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "eventsDropdown")) .
-                    html_writer::tag("button", "Events", array("class" => "btn btn-secondary dropdown-toggle",
+                    html_writer::tag("button", "Events", array("class" => "btn btn-secondary dropdown-toggle red",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "eventsScripts", "aria-labelledby" =>
@@ -222,7 +222,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "controllersDropdown")) .
-                    html_writer::tag("button", "Controllers", array("class" => "btn btn-secondary dropdown-toggle",
+                    html_writer::tag("button", "Controllers", array("class" => "btn btn-secondary dropdown-toggle peru",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "controllersScripts", "aria-labelledby" =>
@@ -232,37 +232,18 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                             "dropdown-item", "onclick" => "newScript(4)")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
-                html_writer::start_div("topnav-right", array("id" => "logs")) .
-                    html_writer::start_tag("a", array("id" => "show_log", "onclick" => "showLog()")) .
-                        html_writer::tag("i", " Logs", array("class" => "fa fa-bug", "aria-hidden" => "true")) .
-                    html_writer::end_tag("a") .
-                html_writer::end_div() .
-            html_writer::end_div();
 
-        $textExecution =
-            html_writer::start_div("d-flex justify-content-center flex-wrap", array("id" => "textExecution")) .
-                html_writer::start_div("d-flex justify-content-center flex-wrap", array("id" => "prepareSelectionsMenu")) .
-                    html_writer::tag("select", html_writer::tag("option", "Select experiment",
-                        array("data-display" => "Experiment")), array("id" => "experimentSelection",
-                        "class" => "textExecutionElement nice-select green")) .
-                    html_writer::tag("select", html_writer::tag("option", "Select chart",
-                        array("data-display" => "Chart")), array("id" => "chartSelection",
-                        "class" => "textExecutionElement nice-select blue")) .
-                    html_writer::tag("select", html_writer::tag("option", "Select event",
-                        array("data-display" => "Event")), array("id" => "eventSelection",
-                        "class" => "textExecutionElement nice-select red")) .
-                    html_writer::tag("select", html_writer::tag("option", "Select controller",
-                        array("data-display" => "Controller")), array("id" => "controllerSelection",
-                        "class" => "textExecutionElement nice-select peru")) .
-                html_writer::end_div() .
-                html_writer::start_div("d-flex justify-content-center") .
+                html_writer::start_div("topnav-right", array("id" => "logs")) .
                     html_writer::tag("button", "Run", array("class" => "play-code textExecutionElement",
                         "onclick" => "playCode(" . $params->blocklyconf[1] . "," . $params->blocklyconf[2] . "," .
                             $params->blocklyconf[3] . "," .  ")")) .
+                    html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "show_log", "onclick" => "showLog()")) .
+                        html_writer::tag("i", " Logs", array("class" => "fa fa-bug", "aria-hidden" => "true")) .
+                    html_writer::end_tag("button") .
                 html_writer::end_div() .
             html_writer::end_div();
 
-        return $navbar . $textExecution;
+        return $navbar ;
     }
 
     /**
