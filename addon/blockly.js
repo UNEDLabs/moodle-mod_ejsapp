@@ -269,7 +269,7 @@ function createControllerPanel(){
 		workspaceControllers.addChangeListener(checkControllersBlocks);
 	}
 	else{
-		controllerEditor = ace.edit("blocklyDivController");
+		controllerEditor = ace.edit("blocklyDivController",{maxLines: 25, minLines: 5});
 		controllerEditor.$blockScrolling = Infinity ;
 		controllerEditor.setTheme("ace/theme/xcode");
 		controllerEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);
@@ -518,28 +518,51 @@ function selectJS(n,text){
 // INTERFACE
 
 // DRAGGABLE ELEMENTS
+function resize(){
+	if(experimentOpen!=-1){Blockly.svgResize(workspace);}
+	if(chartOpen!=-1){Blockly.svgResize(workspaceCharts);}
+	if(eventOpen!=-1){Blockly.svgResize(workspaceEvents);}
+	if(controllerOpen!=-1){
+		if(controllerFunctionLanguage==="blockly"){Blockly.svgResize(workspaceControllers);}
+		else {controllerEditor.resize();}
+	}
+}
+
 
 function returning(id){
 	document.getElementById(id).style.width = "100%";
+
+	document.getElementById(id).style.zIndex = "1";
 	document.getElementById(id).style.position = "";
 	document.getElementById("return_"+id).style.display = "none";
+	if(id==="ScriptBox"){
+		document.getElementById(id).style.height = "";
+		resize();
+	}
 }
 
 // Make the DIV element draggable:
 dragElement(document.getElementById("EJsS"));
 dragElement(document.getElementById("ChartBox"));
+dragElement(document.getElementById("ScriptBox"));
 
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "header"))
+  if (document.getElementById(elmnt.id + "header")){
     // if present, the header is where you move the DIV from:
-	document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+	document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;}
 
   function dragMouseDown(e) {
 	elmnt.style.width = "auto";
+	elmnt.style.zIndex = "1010";
 	elmnt.style.position = "absolute";
-	if(elmnt.id!=="EJsS")	elmnt.style.marginTop = "0em";
+	elmnt.style.background = "White";
 	document.getElementById('return_'+elmnt.id).style.display = "inline-block";
+	  if(elmnt.id==="ScriptBox"){
+		  document.getElementById(elmnt.id).style.height = "450px";
+		  document.getElementById(elmnt.id).style.width = "600px";
+		  resize();
+	  }
     e = e || window.event;
     e.preventDefault();
     // get the mouse cursor position at startup:
@@ -569,7 +592,7 @@ function dragElement(elmnt) {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
-	if(elmnt.id!=="EJsS")	elmnt.style.marginTop = "2em";
+	elmnt.style.background_color = "";
   }
 }
 
@@ -623,6 +646,7 @@ function removeScript(id){
 	//document.getElementById(id+"list").remove();
 	for(var i = 0; i < experimentsList.length; i++){
 	   if ( experimentsList[i].name === id) {
+	   	if(experimentSelected===id) {experimentSelected="";}
 		 experimentsList.splice(i, 1);
 		 return;
 	   }
@@ -630,6 +654,7 @@ function removeScript(id){
 
 	for(i = 0; i < chartsList.length; i++){
 	   if ( chartsList[i].name === id) {
+		   if(chartSelected===id) {chartSelected="";}
 		 chartsList.splice(i, 1);
 		 return;
 	   }
@@ -637,6 +662,7 @@ function removeScript(id){
 
 	for(i = 0; i < eventsList.length; i++){
 	   if ( eventsList[i].name === id) {
+		   if(eventSelected===id) {eventSelected="";}
 		 eventsList.splice(i, 1);
 		 return;
 	   }
@@ -644,6 +670,7 @@ function removeScript(id){
 
 	for(i = 0; i < controllersList.length; i++){
 	   if ( controllersList[i].name === id) {
+		   if(controllerSelected===id) {controllerSelected="";}
 		 controllersList.splice(i, 1);
 		 return;
 	   }
@@ -678,6 +705,10 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(experimentSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
+			if(experimentSelected===name){
+				experimentSelected="";
+				return;
+			}
 		}
 		elem.style.color='Green';
 		elem.style.fontWeight='bold';
@@ -688,6 +719,10 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(chartSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
+			if(chartSelected===name){
+				chartSelected="";
+				return;
+			}
 		}
 		elem.style.color='Blue';
 		elem.style.fontWeight='bold';
@@ -698,6 +733,10 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(eventSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
+			if(eventSelected===name){
+				eventSelected="";
+				return;
+			}
 		}
 		elem.style.color='Red';
 		elem.style.fontWeight='bold';
@@ -708,6 +747,10 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(controllerSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
+			if(controllerSelected===name){
+				controllerSelected="";
+				return;
+			}
 		}
 		elem.style.color='Peru';
 		elem.style.fontWeight='bold';
@@ -786,7 +829,6 @@ function showScript(num,name){
 	eventOpen=-1;
 	controllerOpen=-1;
 
-	dragElement(document.getElementById("ScriptBox"));
 	if(num===1){
 		 var result= getCodeFromName(experimentsList,name);
 		 code=Blockly.Xml.textToDom(result[0]);
@@ -839,6 +881,7 @@ function showScript(num,name){
 			document.getElementById("blocklyDivController").style.display="inline-block";
 			controllerOpen=result[1];
 			controllerEditor.setValue(result[0]);
+			controllerEditor.resize();
 		}
 	}
 	colorSelection(num,name);
