@@ -133,11 +133,11 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     public function render_ejsapp_lab() {
         $code =
             html_writer::start_div("", array("id" => "EJsS")) .
-                html_writer::start_div("topnav-right float-right") .
-                    html_writer::tag("i", "", array("id" => "EJsSheader", "class" => "fa fa-arrows-alt fa-2x cursor-move", "aria-hidden" => "true")) .
-                    html_writer::tag("i", "", array("id" => "return_EJsS", "class" => "fa fa-window-restore fa-2x display-none margin-left", "aria-hidden" => "true","onclick"=>"returning('EJsS');")) .
+                html_writer::start_div("topnav-right", array("style" => "float:right")) .
+                    html_writer::tag("i", "", array("id" => "EJsSheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move;")) .
+                    html_writer::tag("i", "", array("id" => "return_EJsS", "class" => "fa fa-window-restore fa-2x", "aria-hidden" => "true", "style"=>"display:none; margin-left:1rem","onclick"=>"returning('EJsS');")) .
                 html_writer::end_div() .
-                html_writer::div("", "text-align-center", array("id" => "_topFrame")) .
+                html_writer::div("", "", array("id" => "_topFrame", "style" => "text-align:center;")) .
             html_writer::end_div();
 
         return $code;
@@ -151,7 +151,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
         global $CFG;
 
         $chartsdiv =
-            html_writer::start_div("display-none", array("id" => "ChartBox")) .
+            html_writer::start_div("", array("id" => "ChartBox", "style" => "display:none;")) .
 
                html_writer::start_div("topnav-right align-self-end") .
                     /*html_writer::tag("i", "", array("id" => "minslideshow", "onclick" => "minimize('ChartBox')",
@@ -165,18 +165,22 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         "saveCSV(0)", "class" => "fa fa-file-text-o fa-2x")) .
                     html_writer::tag("i", "", array("id" => "full_screen_chart", "class" =>
                         "fa fa-expand fa-2x", "aria-hidden" => "true")) .
-                    html_writer::tag("i", "", array("id" => "ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x cursor-move margin-left", "aria-hidden" => "true")) .
-                    html_writer::tag("i", "", array("id" => "return_ChartBox", "class" => "fa fa-window-restore fa-2x display-none margin-left", "aria-hidden" => "true", "onclick"=>"returning('ChartBox');")) .
+                    /*html_writer::tag("i", "", array("id" => "ChartBoxHeader", "class" => "fa fa-arrows-alt",
+                        "aria-hidden" => "true")) .
+                    html_writer::tag("i", "", array("id" => "return_ChartBox", "style" => "display:none;",
+                        "onclick" => "returning('ChartBox')", "class" => "fa fa-window-restore", "aria-hidden" => "true")) .*/
+                    html_writer::tag("i", "", array("id" => "ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem")) .
+                    html_writer::tag("i", "", array("id" => "return_ChartBox", "class" => "fa fa-window-restore fa-2x", "aria-hidden" => "true", "style"=>"display:none; margin-left:1rem","onclick"=>"returning('ChartBox');")) .
 
             html_writer::end_div() .
                 html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
                     html_writer::start_div("d-flex justify-content-center", array("id" => "control_chart")) .
                         html_writer::tag("i", "", array("id" => "prev_chart", "onclick" => "prevChart()",
-                            "class" => "fa fa-angle-double-left fa-2x display-none")) .
+                            "class" => "fa fa-angle-double-left fa-2x", "style" => "display:none;")) .
                         html_writer::tag("i", "", array("id" => "clean_chart", "onclick" => "cleanCharts()",
-                            "class" => "fa fa-times fa-2x display-none")) .
+                            "class" => "fa fa-times fa-2x", "style" => "display:none;")) .
                         html_writer::tag("i", "", array("id" => "next_chart", "onclick" => "nextChart()",
-                            "class" => "fa fa-angle-double-right fa-2x display-none")) .
+                            "class" => "fa fa-angle-double-right fa-2x", "style" => "display:none;")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
             html_writer::end_div();
@@ -259,7 +263,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     public function render_ejsapp_blockly() {
         $blocklydiv =
             html_writer::start_div("blockly", array('id' => 'blocklyDiv')) .
-                html_writer::start_div("box", array("id" => "ScriptBox display-none")) .
+                html_writer::start_div("box", array("id" => "ScriptBox", "style" => "display:none;")) .
 
 
             html_writer::start_div("d-flex justify-content-between") .
@@ -267,16 +271,20 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::start_div("topnav-right") .
                             html_writer::tag("i", "", array("class" => "fa fa-expand fa-2x", "id" =>
                                 "full_screen_blockly", "aria-hidden" => "true")) .
-                            html_writer::tag("i", "", array("id" => "ScriptBoxheader", "class" => "fa fa-arrows-alt fa-2x cursor-move margin-left", "aria-hidden" => "true")) .
-                            html_writer::tag("i", "", array("id" => "return_ScriptBox", "class" => "fa fa-window-restore fa-2x display-none margin-left", "aria-hidden" => "true","onclick"=>"returning('ScriptBox');")) .
+                            html_writer::tag("i", "", array("id" => "ScriptBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem")) .
+                            html_writer::tag("i", "", array("id" => "return_ScriptBox", "class" => "fa fa-window-restore fa-2x", "aria-hidden" => "true", "style"=>"display:none; margin-left:1rem","onclick"=>"returning('ScriptBox');")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                     html_writer::start_div("", array("id" => "whereScriptsAre")) .
-                        html_writer::div("", "display-none", array("id" => "blocklyDivExperiments")) .
-                        html_writer::div("", "display-none", array("id" => "blocklyDivCharts")) .
-                        html_writer::div("", "display-none", array("id" => "blocklyDivEvents")) .
+                        html_writer::div("", "", array("id" => "blocklyDivExperiments",
+                            "style" => "display:none;")) .
+                        html_writer::div("", "", array("id" => "blocklyDivCharts",
+                            "style" => "display:none;")) .
+                        html_writer::div("", "", array("id" => "blocklyDivEvents",
+                            "style" => "display:none;")) .
                         html_writer::start_div("", array("id" => "ControllerDiv")) .
-                            html_writer::div("", "display-none", array("id" => "blocklyDivController")) .
+                            html_writer::div("", "", array("id" => "blocklyDivController",
+                                "style" => "display:none;")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                 html_writer::end_div() .
@@ -300,8 +308,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      */
     public function render_ejsapp_log() {
         $logdiv =
-            html_writer::start_div("display-none", array("id" => "footer")) .
-                html_writer::start_div("display-none", array("id" => "executionLogGen")) .
+            html_writer::start_div("", array("id" => "footer", "style" => "display:none;")) .
+                html_writer::start_div("", array("id" => "executionLogGen", "style" => "display:none")) .
                     html_writer::tag("hr", "") .
                     html_writer::tag("h5", "Previous executions:") .
                     html_writer::div("", "", array("id" => "executionLog")) .

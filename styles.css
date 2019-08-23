@@ -36,26 +36,6 @@
     display: inline-block;
 }
 
-.path-mod-ejsapp .float-right {
-    float: right;
-}
-
-.path-mod-ejsapp .display-none {
-    display: none;
-}
-
-.path-mod-ejsapp .margin-left {
-    margin-left: 1rem;
-}
-
-.path-mod-ejsapp .text-align-center {
-    text-align: center;
-}
-
-.path-mod-ejsapp .cursor-move {
-    cursor: move;
-}
-
 .path-mod-ejsapp #save_chart_img {
     cursor: pointer;
     margin-right: 0.5rem;
@@ -122,7 +102,7 @@
 }
 
 .path-mod-ejsapp .textExecutionElement {
-    margin: 0 1rem;
+    margin: 0rem 1rem
 }
 
 .path-mod-ejsapp .play-code {
@@ -131,7 +111,7 @@
     background-color: white;
     border-style: ridge;
     border-radius: 5px;
-    color: #111;
+    font-color: #111;
     font-family: 'Helvetica Neue', sans-serif;
     font-size: 20px;
     font-weight: bold;
@@ -229,13 +209,16 @@
     cursor: pointer;
     display: block;
     float: left;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: normal;
     height: 42px;
     line-height: 40px;
     outline: none;
     padding-left: 8px;
     padding-right: 18px;
     position: relative;
-    text-align: left;
+    text-align: left !important;
     -webkit-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
     -webkit-user-select: none;
@@ -248,6 +231,7 @@
     font-size: 18px;
     font-weight: bold;
     letter-spacing: -1px;
+    text-align: left;
 }
 .path-mod-ejsapp .nice-select:hover {
     border-color: #dbdbdb;
@@ -296,14 +280,14 @@
     pointer-events: none;
 }
 .path-mod-ejsapp .nice-select.disabled:after {
-    border-color: #ccc;
+    border-color: #cccccc;
 }
 .path-mod-ejsapp .nice-select.wide {
     width: 100%;
 }
 .path-mod-ejsapp .nice-select.wide .list {
-    left: 0;
-    right: 0;
+    left: 0 !important;
+    right: 0 !important;
 }
 .path-mod-ejsapp .nice-select.right {
     float: right;
@@ -349,7 +333,7 @@
     z-index: 9;
 }
 .path-mod-ejsapp .nice-select .list:hover .option:not(:hover) {
-    background-color: transparent;
+    background-color: transparent !important;
 }
 .path-mod-ejsapp .nice-select .option {
     cursor: pointer;
@@ -364,7 +348,7 @@
     -webkit-transition: all 0.2s;
     transition: all 0.2s;
 }
-.path-mod-ejsapp .nice-select .option:hover .nice-select .option.focus .nice-select .option.selected.focus {
+.path-mod-ejsapp .nice-select .option:hover, .nice-select .option.focus, .nice-select .option.selected.focus {
     background-color: #f6f6f6;
 }
 .path-mod-ejsapp .nice-select .option.selected {
@@ -387,4 +371,3 @@
     width: 100%;
     display: flex;
 }
-
