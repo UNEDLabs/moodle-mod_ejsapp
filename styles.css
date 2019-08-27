@@ -34,6 +34,15 @@
 
 .path-mod-ejsapp .topnav-right {
     display: inline-block;
+    float: right;
+}
+
+.path-mod-ejsapp #EJsSheader {
+    cursor: move;
+}
+
+.path-mod-ejsapp #_topFrame {
+    text-align: center;
 }
 
 .path-mod-ejsapp #save_chart_img {
@@ -144,19 +153,19 @@
 .path-mod-ejsapp #blocklyDivExperiments,
 .path-mod-ejsapp #blocklyDivCharts,
 .path-mod-ejsapp #blocklyDivEvents,
-.path-mod-ejsapp #blocklyDivController {
+.path-mod-ejsapp #ControllerDiv {
     height: 100%;
     width: 100%;
+}
+
+.path-mod-ejsapp #blocklyDivController {
+    width: 100%;
+    height: 88%;
 }
 
 .path-mod-ejsapp #_javaScriptFrame {
     cursor: text;
     height: 100%;
-    width: 100%;
-}
-
-.path-mod-ejsapp #controllerDiv {
-    height: 90%;
     width: 100%;
 }
 

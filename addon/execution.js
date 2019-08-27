@@ -31,24 +31,24 @@ function prepareControllerCode(code){
 
 function playCodeDet(value0,value1,value2,value3) {
 	var blocklyExp="";blockyEvent="";blocklyChart="";blocklyController="";
-	if(value0!=="Select experiment"){
+	if(value0!=="Select experiment" && value0!==""){
 		workspace.clear();
 		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(experimentsList,value0)[0]), workspace);
 		var code = Blockly.JavaScript.workspaceToCode(workspace);
 		if(code!==null)
 			blocklyExp =code;
 	}
-	if(value1!=="Select chart"){
+	if(value1!=="Select chart"  && value1!==""){
 		workspaceCharts.clear();
 		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(chartsList,value1)[0]), workspaceCharts);
 		blocklyChart=Blockly.JavaScript.workspaceToCode(workspaceCharts);
 	}
-	if(value2!=="Select event"){
+	if(value2!=="Select event"  && value2!==""){
 		workspaceEvents.clear();
 		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(eventsList,value2)[0]), workspaceEvents);
 		blockyEvent=Blockly.JavaScript.workspaceToCode(workspaceEvents);
 	}
-	if(value3!=="Select controller"){
+	if(value3!=="Select controller"  && value3!==""){
 		if(controllerBlockly){
 			var semicode="";
 			var code = getCodeFromName(controllersList,value3)[0];

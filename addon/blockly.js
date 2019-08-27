@@ -269,7 +269,8 @@ function createControllerPanel(){
 		workspaceControllers.addChangeListener(checkControllersBlocks);
 	}
 	else{
-		controllerEditor = ace.edit("blocklyDivController",{maxLines: 25, minLines: 5});
+		controllerEditor = ace.edit("blocklyDivController");
+		controllerEditor.resize();
 		controllerEditor.$blockScrolling = Infinity ;
 		controllerEditor.setTheme("ace/theme/xcode");
 		controllerEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);
@@ -278,12 +279,12 @@ function createControllerPanel(){
 	var texto = getInfoFromFunctionName(functionToReplace);
 	if(texto[1]!=='')
 		document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-			'<h4 style="margin-top:0em; text-align=center">You are going to overwrite the function called  ' +
+			'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">You are going to overwrite the function called  ' +
 			'<span style="color: green">' + functionToReplace +'</span> which has <span style="color: red"><br>' +
 			texto[0] + '</span> as input parameters and returns <span style="color: blue">'+texto[1]+'</span>.</h4>');
 	else
 		document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-			'<h4 style="margin-top:0em; text-align=center">You are going to overwrite the function called  ' +
+			'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">You are going to overwrite the function called  ' +
 			'<span style="color: green">' + functionToReplace +'</span> which has <span style="color: red"><br>' +
 			texto[0] + '</span> as input parameters and returns nothing.</h4>');
 }
@@ -727,7 +728,7 @@ function addnewScript(num,name,code,id,id2,list){
 	var d1 = document.getElementById(id);
 	d1.insertAdjacentHTML('beforeend', '<div id="' + name + '" style="display:flex;cursor:pointer;' +
 		'justify-content:space-between">' +
-		'<i style="margin-left: .5rem" class="fa fa-play" onclick="colorSelection(' + num + ',\'' + name + '\',true)"></i>' +
+		'<a onclick="colorSelection(' + num + ',\'' + name + '\',true)"><i class="fa fa-play" style="margin-left: .5rem"></i></a>' +
 		'<a onclick="showScript(' + num + ',\'' + name + '\');">' +' ' + name +'</a>' + '<div class="topnav-right">' +
 		'<a onclick="removeAndCloseScript(\'' + name + '\')"><i  class="fa fa-times" style="margin-right: .5rem"></i></a>' + '</div></div>');
 	list.push({"name":name,"code":code});
@@ -860,7 +861,6 @@ function showScript(num,name){
 	document.getElementById("blocklyDivCharts").style.display="none";
 	document.getElementById("blocklyDivEvents").style.display="none";
 	document.getElementById("ControllerDiv").style.display="none";
-	document.getElementById("blocklyDivController").style.display="none";
 	if((experimentOpen!==-1)&&(num===1)){if( experimentsList[experimentOpen].name === name) { experimentOpen=-1; return;}}
 	if((chartOpen!==-1)&&(num===2)){if( chartsList[chartOpen].name === name) { chartOpen=-1; return;}}
 	if((eventOpen!==-1)&&(num===3)){if( eventsList[eventOpen].name === name) { eventOpen=-1; return;}}
@@ -907,23 +907,17 @@ function showScript(num,name){
 		 }
 	}
 	else if	(num===4){
+		var result = getCodeFromName(controllersList,name);
+		document.getElementById("ControllerDiv").style.display="inline-block";
+		controllerOpen=result[1];
 		if(controllerUseBlockly){
-			var result= getCodeFromName(controllersList,name);
 			code=Blockly.Xml.textToDom(result[0]);
-			document.getElementById("ControllerDiv").style.display="inline-block";
-			document.getElementById("blocklyDivController").style.display="inline-block";
 			Blockly.svgResize(workspaceControllers);
-			controllerOpen=result[1];
 			workspaceControllers.clear();
 			if(code!=='<xml></xml>'){
 				Blockly.Xml.domToWorkspace(code, workspaceControllers);
 			}
-		}
-		else{
-			var result= getCodeFromName(controllersList,name);
-			document.getElementById("ControllerDiv").style.display="inline-block";
-			document.getElementById("blocklyDivController").style.display="inline-block";
-			controllerOpen=result[1];
+		} else{
 			controllerEditor.setValue(result[0]);
 			controllerEditor.resize();
 		}
@@ -1134,11 +1128,17 @@ function saveCSV(num){
 }
 
 function saveImg(moodle_upload_file) {
-	var canvas = document.getElementById('myChart1');
-	var data_url = canvas.toDataURL();
-	EJSS_INTERFACE.BoxPanel.showInputDialog("Choose a name for the file", function(name) {
-		sendSnapshot(data_url, name, moodle_upload_file);
-	});
+	for(var i = 0; i<chartArray.length; i++) {
+		if (document.getElementById(chartArray[i].fragment).style.display !== "none") {
+			console.log('myChart' + i);
+			var canvas = document.getElementById('myChart' + i);
+			var data_url = canvas.toDataURL();
+			EJSS_INTERFACE.BoxPanel.showInputDialog("Choose a name for the file", function (name) {
+				sendSnapshot(data_url, name, moodle_upload_file);
+			});
+			break;
+		}
+	}
 }
 
 function sendSnapshot(data_url, user_file, moodle_upload_file) {

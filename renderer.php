@@ -131,13 +131,15 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
 
     public function render_ejsapp_lab() {
-        $code = html_writer::start_div("", array("id" => "prevDrag")) .
+        $code =
+            html_writer::start_div("", array("id" => "prevDrag")) .
             html_writer::end_div() .
             html_writer::start_div("", array("id" => "EJsS")) .
-                html_writer::start_div("topnav-right", array("style" => "float:right")) .
-                    html_writer::tag("i", "", array("id" => "#EJsSheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move;", "onmousedown"=>"copyToDragDiv('#EJsS');")) .
+                html_writer::start_div("topnav-right") .
+                    html_writer::tag("i", "", array("id" => "#EJsSheader", "class" => "fa fa-arrows-alt fa-2x",
+                        "aria-hidden" => "true", "onmousedown"=>"copyToDragDiv('#EJsS');")) .
                     html_writer::end_div() .
-                html_writer::div("", "", array("id" => "_topFrame", "style" => "text-align:center;")) .
+                html_writer::div("", "", array("id" => "_topFrame")) .
             html_writer::end_div();
 
         return $code;
@@ -152,12 +154,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
         $chartsdiv =
             html_writer::start_div("", array("id" => "ChartBox", "style" => "display:none;")) .
-
                html_writer::start_div("topnav-right align-self-end") .
-                    /*html_writer::tag("i", "", array("id" => "minslideshow", "onclick" => "minimize('ChartBox')",
-                        "class" => "fa fa-window-minimize", "aria-hidden" => "true")) .
-                    html_writer::tag("i", "", array("id" => "maxslideshow", "onclick" => "maximize('ChartBox')",
-                        "class" => "fa fa-window-maximize", "aria-hidden" => "true")) .*/
                     html_writer::tag("i", "", array("id" => "save_chart_img", "onclick" =>
                         "saveImg('" . $CFG->wwwroot . "/mod/ejsapp/upload_file.php" . "')",
                         "class" => "fa fa-area-chart fa-2x")) .
@@ -165,13 +162,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         "saveCSV(0)", "class" => "fa fa-file-text-o fa-2x")) .
                     html_writer::tag("i", "", array("id" => "full_screen_chart", "class" =>
                         "fa fa-expand fa-2x", "aria-hidden" => "true")) .
-                    /*html_writer::tag("i", "", array("id" => "ChartBoxHeader", "class" => "fa fa-arrows-alt",
-                        "aria-hidden" => "true")) .
-                    html_writer::tag("i", "", array("id" => "return_ChartBox", "style" => "display:none;",
-                        "onclick" => "returning('ChartBox')", "class" => "fa fa-window-restore", "aria-hidden" => "true")) .*/
-                    html_writer::tag("i", "", array("id" => "#ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ChartBox');")) .
-
-            html_writer::end_div() .
+                    html_writer::tag("i", "", array("id" => "#ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x",
+                        "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ChartBox');")) .
+                html_writer::end_div() .
                 html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
                     html_writer::start_div("d-flex justify-content-center", array("id" => "control_chart")) .
                         html_writer::tag("i", "", array("id" => "prev_chart", "onclick" => "prevChart()",
@@ -241,10 +234,10 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                             "dropdown-item", "onclick" => "newScript(4)")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
-
                 html_writer::start_div("topnav-right", array("id" => "logs")) .
                     html_writer::tag("button", "Run", array("class" => "play-code textExecutionElement",
-                        "onclick" => "playCodeFromOutside()" )) .
+                        "onclick" => "playCode(" . $params->blocklyconf[1] . "," . $params->blocklyconf[2] . "," .
+                            $params->blocklyconf[3] . "," .  ")")) .
                     html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "show_log", "onclick" => "showLog()")) .
                         html_writer::tag("i", " Logs", array("class" => "fa fa-bug", "aria-hidden" => "true")) .
                     html_writer::end_tag("button") .
@@ -262,14 +255,14 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
         $blocklydiv =
             html_writer::start_div("blockly", array('id' => 'blocklyDiv')) .
                 html_writer::start_div("box", array("id" => "ScriptBox", "style" => "display:none;")) .
-
-
-            html_writer::start_div("d-flex justify-content-between") .
+                    html_writer::start_div("d-flex justify-content-between") .
                         html_writer::tag("h3", "", array("id" => "titleScriptBox")) .
                         html_writer::start_div("topnav-right") .
                             html_writer::tag("i", "", array("class" => "fa fa-expand fa-2x", "id" =>
                                 "full_screen_blockly", "aria-hidden" => "true")) .
-                            html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ScriptBox');")) .
+                            html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" =>
+                                "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem",
+                                "onmousedown"=>"copyToDragDiv('#ScriptBox');")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                     html_writer::start_div("", array("id" => "whereScriptsAre")) .
@@ -280,8 +273,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::div("", "", array("id" => "blocklyDivEvents",
                             "style" => "display:none;")) .
                         html_writer::start_div("", array("id" => "ControllerDiv")) .
-                            html_writer::div("", "", array("id" => "blocklyDivController",
-                                "style" => "display:none;")) .
+                            html_writer::div("", "", array("id" => "blocklyDivController")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                 html_writer::end_div() .

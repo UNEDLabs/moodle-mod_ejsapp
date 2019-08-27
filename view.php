@@ -33,7 +33,6 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('locallib.php');
 
 global $USER, $DB, $CFG, $PAGE, $OUTPUT;
-$CFG->cachejs = false;
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
 $colsessionid = optional_param('colsession', null, PARAM_INT);
 $statefile = optional_param('state_file', null, PARAM_TEXT);
