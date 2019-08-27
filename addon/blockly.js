@@ -530,11 +530,17 @@ function resize(){
 
 
 function returning(id){
-	document.getElementById(id).style.width = "100%";
+	/*document.getElementById(id).style.width = "100%";
 
 	document.getElementById(id).style.zIndex = "1";
 	document.getElementById(id).style.position = "";
-	document.getElementById("return_"+id).style.display = "none";
+	document.getElementById("return_"+id).style.display = "none";*/
+	if (document.getElementById('#'+id + "header")){
+		document.getElementById('#'+id + "header").style.display = "";
+	}
+	document.getElementById( 'drag_#'+id).style.display = "none";
+	$('#'+id).append($("#dragContent"+id).contents()); //move element into wrapper
+	document.getElementById( "dragheader").style.display = "none";
 	if(id==="ScriptBox"){
 		document.getElementById(id).style.height = "";
 		resize();
@@ -542,27 +548,58 @@ function returning(id){
 }
 
 // Make the DIV element draggable:
-dragElement(document.getElementById("EJsS"));
-dragElement(document.getElementById("ChartBox"));
-dragElement(document.getElementById("ScriptBox"));
+function copyToDragDiv(id){
+	// PREPARAR DRAG
+	var iDiv = document.createElement('div');
+	iDiv.id = 'drag_'+id;
+	var subid = id.substr(1);
+	iDiv.innerHTML = '<div class="topnav-right align-self-end" style="float:right">' +
+		'<i id="dragheader" class="fa fa-arrows-alt fa-2x" aria-hidden = "true" style="cursor:move;"></i>' +
+		'<i id="return_drag" class="fa fa-window-restore fa-2x" aria-hidden = "true" style="display:none;margin-left:1rem;" onclick="returning(\''+subid+'\');"></i>' +
+		'</div>' +
+		'<div id="dragContent'+subid+'"></div>';
+	var container = document.getElementById('prevDrag');
+	container.insertBefore(iDiv, container.firstChild);
+	//document.getElementsByTagName('body')[0].appendChild(iDiv);
+	dragElement(document.getElementById('drag_'+id));
+
+
+
+	if (document.getElementById(id + "header")){
+		document.getElementById(id + "header").style.display = "none";
+	}
+	document.getElementById( 'drag_'+id).style.display = "";
+	var content = $(id).contents(); //find element
+	var wrapper =$("#dragContent"+subid); //create wrapper element
+	wrapper.append(content); //move element into wrapper
+	document.getElementById( "dragheader").style.display = "";
+	if(id==="#ScriptBox"){
+		document.getElementById("dragContentScriptBox").style.height = "450px";
+		document.getElementById("dragContentScriptBox").style.width = "600px";
+		resize();
+	}
+}
+
+
+//dragElement(document.getElementById("EJsS"));
+//dragElement(document.getElementById("ChartBox"));
+//dragElement(document.getElementById("ScriptBox"));
 
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "header")){
+	document.getElementById( elmnt.id).style.display = "none";
+  if (document.getElementById("dragheader")){
     // if present, the header is where you move the DIV from:
-	document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;}
+	document.getElementById("dragheader").onmousedown = dragMouseDown;
+	document.getElementById("dragheader").style.display = "none";
+  }
+  elmnt.style.width = "auto";
+  elmnt.style.zIndex = "9999";
+  elmnt.style.position = "absolute";
+  elmnt.style.background = "White";
+  document.getElementById('return_drag').style.display = "";
 
   function dragMouseDown(e) {
-	elmnt.style.width = "auto";
-	elmnt.style.zIndex = "1010";
-	elmnt.style.position = "absolute";
-	elmnt.style.background = "White";
-	document.getElementById('return_'+elmnt.id).style.display = "inline-block";
-	  if(elmnt.id==="ScriptBox"){
-		  document.getElementById(elmnt.id).style.height = "450px";
-		  document.getElementById(elmnt.id).style.width = "600px";
-		  resize();
-	  }
     e = e || window.event;
     e.preventDefault();
     // get the mouse cursor position at startup:
@@ -614,28 +651,26 @@ function removeAndCloseScript(id){
 		if(experimentsList[experimentOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			experimentOpen=-1;
-			experimentSelected="";
 		}
 	}
 	else if(chartOpen!==-1) {
 		if(chartsList[chartOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			chartOpen=-1;
-			chartSelected="";
 		}
 	}
 	else if(eventOpen!==-1) {
 		if(eventsList[eventOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			eventOpen=-1;
-			eventSelected="";
+			//eventSelected="";
 		}
 	}
 	else if(controllerOpen!==-1) {
 		if(controllersList[controllerOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			controllerOpen=-1;
-			controllerSelected="";
+			//controllerSelected="";
 		}
 	}
 	removeScript(id);
@@ -648,6 +683,7 @@ function removeScript(id){
 	   if ( experimentsList[i].name === id) {
 	   	if(experimentSelected===id) {experimentSelected="";}
 		 experimentsList.splice(i, 1);
+		   experimentSelected="";
 		 return;
 	   }
 	}
@@ -690,22 +726,23 @@ function removeScript(id){
 function addnewScript(num,name,code,id,id2,list){
 	var d1 = document.getElementById(id);
 	d1.insertAdjacentHTML('beforeend', '<div id="' + name + '" style="display:flex;cursor:pointer;' +
-		'justify-content:space-between">' +	'<a onclick="showScript(' + num + ',\'' + name + '\');">' +
-		'<i class="fa fa-eye"></i>' + ' ' + name +'</a>' + '<div class="topnav-right">' +
-		'<a onclick="removeAndCloseScript(\'' + name + '\')"><i  class="fa fa-times"></i></a>' + '</div></div>');
+		'justify-content:space-between">' +
+		'<i style="margin-left: .5rem" class="fa fa-play" onclick="colorSelection(' + num + ',\'' + name + '\',true)"></i>' +
+		'<a onclick="showScript(' + num + ',\'' + name + '\');">' +' ' + name +'</a>' + '<div class="topnav-right">' +
+		'<a onclick="removeAndCloseScript(\'' + name + '\')"><i  class="fa fa-times" style="margin-right: .5rem"></i></a>' + '</div></div>');
 	list.push({"name":name,"code":code});
 	//addLabelToDropDown(id2,name,list,false);
 	showScript(num,name);
 }
 
-function colorSelection(num,name){
+function colorSelection(num,name,borrar){
 	var elem= document.getElementById(name);
 	if(num===1){
 		if(experimentSelected!==""){
 			var elem2= document.getElementById(experimentSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
-			if(experimentSelected===name){
+			if(borrar && (experimentSelected===name)){
 				experimentSelected="";
 				return;
 			}
@@ -719,7 +756,7 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(chartSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
-			if(chartSelected===name){
+			if(borrar && (chartSelected===name)){
 				chartSelected="";
 				return;
 			}
@@ -733,7 +770,7 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(eventSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
-			if(eventSelected===name){
+			if(borrar && (eventSelected===name)){
 				eventSelected="";
 				return;
 			}
@@ -747,7 +784,7 @@ function colorSelection(num,name){
 			var elem2= document.getElementById(controllerSelected);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
-			if(controllerSelected===name){
+			if(borrar && (controllerSelected===name)){
 				controllerSelected="";
 				return;
 			}
@@ -817,17 +854,24 @@ function newScript(num){
 }
 
 function showScript(num,name){
-	document.getElementById("titleScriptBox").innerHTML = name;
-	document.getElementById("ScriptBox").style.display = "block";
+
+	document.getElementById("ScriptBox").style.display = "none";
 	document.getElementById("blocklyDivExperiments").style.display="none";
 	document.getElementById("blocklyDivCharts").style.display="none";
 	document.getElementById("blocklyDivEvents").style.display="none";
 	document.getElementById("ControllerDiv").style.display="none";
 	document.getElementById("blocklyDivController").style.display="none";
+	if((experimentOpen!==-1)&&(num===1)){if( experimentsList[experimentOpen].name === name) { experimentOpen=-1; return;}}
+	if((chartOpen!==-1)&&(num===2)){if( chartsList[chartOpen].name === name) { chartOpen=-1; return;}}
+	if((eventOpen!==-1)&&(num===3)){if( eventsList[eventOpen].name === name) { eventOpen=-1; return;}}
+	if((controllerOpen!==-1)&&(num===4)){if( controllersList[controllerOpen].name === name) { controllerOpen=-1; return;}}
+	if((controllerOpen!==-1)&&(num===4)){if( controllersList[controllerOpen].name === name) { controllerOpen=-1; return;}}
 	experimentOpen=-1;
 	chartOpen=-1;
 	eventOpen=-1;
 	controllerOpen=-1;
+	document.getElementById("titleScriptBox").innerHTML = name;
+	document.getElementById("ScriptBox").style.display = "block";
 
 	if(num===1){
 		 var result= getCodeFromName(experimentsList,name);
@@ -884,7 +928,7 @@ function showScript(num,name){
 			controllerEditor.resize();
 		}
 	}
-	colorSelection(num,name);
+	colorSelection(num,name,false);
 }
 
 function minimize(object){

@@ -30,8 +30,6 @@ function prepareControllerCode(code){
 }
 
 function playCodeDet(value0,value1,value2,value3) {
-
-	console.log(value0);
 	var blocklyExp="";blockyEvent="";blocklyChart="";blocklyController="";
 	if(value0!=="Select experiment"){
 		workspace.clear();
@@ -72,6 +70,10 @@ function playCodeDet(value0,value1,value2,value3) {
 		return ["","","",""];
 	//CONTROLLER NOT YET Blockly.Xml.domToWorkspace(getCodeFromName(experimentsList,$('select')[3].value), workspaceEvents);
 	return [blocklyExp,blocklyChart,blockyEvent,blocklyController];
+}
+
+function playCodeFromOutside(){
+	playCode(chartsBlockly, eventsBlockly, controllerBlockly);
 }
 
 function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {

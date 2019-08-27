@@ -131,12 +131,12 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
 
     public function render_ejsapp_lab() {
-        $code =
+        $code = html_writer::start_div("", array("id" => "prevDrag")) .
+            html_writer::end_div() .
             html_writer::start_div("", array("id" => "EJsS")) .
                 html_writer::start_div("topnav-right", array("style" => "float:right")) .
-                    html_writer::tag("i", "", array("id" => "EJsSheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move;")) .
-                    html_writer::tag("i", "", array("id" => "return_EJsS", "class" => "fa fa-window-restore fa-2x", "aria-hidden" => "true", "style"=>"display:none; margin-left:1rem","onclick"=>"returning('EJsS');")) .
-                html_writer::end_div() .
+                    html_writer::tag("i", "", array("id" => "#EJsSheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move;", "onmousedown"=>"copyToDragDiv('#EJsS');")) .
+                    html_writer::end_div() .
                 html_writer::div("", "", array("id" => "_topFrame", "style" => "text-align:center;")) .
             html_writer::end_div();
 
@@ -169,8 +169,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         "aria-hidden" => "true")) .
                     html_writer::tag("i", "", array("id" => "return_ChartBox", "style" => "display:none;",
                         "onclick" => "returning('ChartBox')", "class" => "fa fa-window-restore", "aria-hidden" => "true")) .*/
-                    html_writer::tag("i", "", array("id" => "ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem")) .
-                    html_writer::tag("i", "", array("id" => "return_ChartBox", "class" => "fa fa-window-restore fa-2x", "aria-hidden" => "true", "style"=>"display:none; margin-left:1rem","onclick"=>"returning('ChartBox');")) .
+                    html_writer::tag("i", "", array("id" => "#ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ChartBox');")) .
 
             html_writer::end_div() .
                 html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
@@ -245,8 +244,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
                 html_writer::start_div("topnav-right", array("id" => "logs")) .
                     html_writer::tag("button", "Run", array("class" => "play-code textExecutionElement",
-                        "onclick" => "playCode(" . $params->blocklyconf[1] . "," . $params->blocklyconf[2] . "," .
-                            $params->blocklyconf[3] . "," .  ")")) .
+                        "onclick" => "playCodeFromOutside()" )) .
                     html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "show_log", "onclick" => "showLog()")) .
                         html_writer::tag("i", " Logs", array("class" => "fa fa-bug", "aria-hidden" => "true")) .
                     html_writer::end_tag("button") .
@@ -271,8 +269,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::start_div("topnav-right") .
                             html_writer::tag("i", "", array("class" => "fa fa-expand fa-2x", "id" =>
                                 "full_screen_blockly", "aria-hidden" => "true")) .
-                            html_writer::tag("i", "", array("id" => "ScriptBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem")) .
-                            html_writer::tag("i", "", array("id" => "return_ScriptBox", "class" => "fa fa-window-restore fa-2x", "aria-hidden" => "true", "style"=>"display:none; margin-left:1rem","onclick"=>"returning('ScriptBox');")) .
+                            html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" => "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ScriptBox');")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                     html_writer::start_div("", array("id" => "whereScriptsAre")) .
