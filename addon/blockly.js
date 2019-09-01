@@ -119,7 +119,6 @@ function initAux(){
 	eventSelected="";
 	chartSelected="";
 	controllerSelected="";
-
 }
 
 function loadVariables(){
@@ -1130,8 +1129,8 @@ function saveCSV(num){
 function saveImg(moodle_upload_file) {
 	for(var i = 0; i<chartArray.length; i++) {
 		if (document.getElementById(chartArray[i].fragment).style.display !== "none") {
-			console.log('myChart' + i);
-			var canvas = document.getElementById('myChart' + i);
+			console.log('myChart' + chartArray[i].fragment.slice(-1));
+			var canvas = document.getElementById('myChart' + chartArray[i].fragment.slice(-1));
 			var data_url = canvas.toDataURL();
 			EJSS_INTERFACE.BoxPanel.showInputDialog("Choose a name for the file", function (name) {
 				sendSnapshot(data_url, name, moodle_upload_file);

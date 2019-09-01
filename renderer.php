@@ -136,9 +136,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
             html_writer::end_div() .
             html_writer::start_div("", array("id" => "EJsS")) .
                 html_writer::start_div("topnav-right") .
-                    html_writer::tag("i", "", array("id" => "#EJsSheader", "class" => "fa fa-arrows-alt fa-2x",
-                        "aria-hidden" => "true", "onmousedown"=>"copyToDragDiv('#EJsS');")) .
-                    html_writer::end_div() .
+                    /*html_writer::tag("i", "", array("id" => "#EJsSheader", "class" => "fa fa-arrows-alt fa-2x",
+                        "aria-hidden" => "true", "onmousedown"=>"copyToDragDiv('#EJsS');")) .*/
+                html_writer::end_div() .
                 html_writer::div("", "", array("id" => "_topFrame")) .
             html_writer::end_div();
 
@@ -162,8 +162,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         "saveCSV(0)", "class" => "fa fa-file-text-o fa-2x")) .
                     html_writer::tag("i", "", array("id" => "full_screen_chart", "class" =>
                         "fa fa-expand fa-2x", "aria-hidden" => "true")) .
-                    html_writer::tag("i", "", array("id" => "#ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x",
-                        "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ChartBox');")) .
+                    /*html_writer::tag("i", "", array("id" => "#ChartBoxheader", "class" => "fa fa-arrows-alt fa-2x",
+                        "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem", "onmousedown"=>"copyToDragDiv('#ChartBox');")) .*/
                 html_writer::end_div() .
                 html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
                     html_writer::start_div("d-flex justify-content-center", array("id" => "control_chart")) .
@@ -260,9 +260,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::start_div("topnav-right") .
                             html_writer::tag("i", "", array("class" => "fa fa-expand fa-2x", "id" =>
                                 "full_screen_blockly", "aria-hidden" => "true")) .
-                            html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" =>
+                            /*html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" =>
                                 "fa fa-arrows-alt fa-2x", "aria-hidden" => "true", "style"=>"cursor:move; margin-left:1rem",
-                                "onmousedown"=>"copyToDragDiv('#ScriptBox');")) .
+                                "onmousedown"=>"copyToDragDiv('#ScriptBox');")) .*/
                         html_writer::end_div() .
                     html_writer::end_div() .
                     html_writer::start_div("", array("id" => "whereScriptsAre")) .
