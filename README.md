@@ -32,24 +32,7 @@ This module enhances its functionality when used along with the ejsappbooking mo
 the ejsapp_collab_session blocks and the osp repository plugin. You can find and download them at
 https://moodle.org/plugins/browse.php?list=set&id=27, in the plugins section in the Moodle.org webpage or at
 https://github.com/UNEDLabs.
-
-------------------------------------------------------------------------------------------------
- IMPORTANT: For Unix Moodle servers (e.g., Linux and Mac systems), if you have a trust certificate and you want to use
- the option to automatically sign the Java applets, you must give the apache user permissions over the jarsigner (Java
- installation folder) file.
-                                                                                                
- The following points describe how to do it:                                                    
-                                                                                                
- 1) Install jarsigner alternative
- $ alternatives --install /usr/bin/jarsigner jarsigner /usr/java/jdk1.7.0_51/bin/jarsigner 20000
- $ alternatives --set jarsigner /usr/java/jdk1.7.0_51/bin/jarsigner                                                                                    
-                                                                                                
- 2) Change the owner of the jarsigner file to apache.                                             
- For instance,                                                                                  
- 2.a) in Linux CentOS, you should write                         
- $ chown apache /usr/java/jdk1.7.0_51/bin/jarsigner                                                                     
- 2.b) in Linux OpenSuse,you should write                       
- $ chown wwwrun /usr/java/jdk1.7.0_51/bin/jarsigner                                                                                                                                  
+                                                                                                                                
 ------------------------------------------------------------------------------------------------
 
 ## 4. Configuration
