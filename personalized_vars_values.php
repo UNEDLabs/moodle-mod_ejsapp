@@ -33,6 +33,7 @@ require_once('../../config.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->dirroot . '/filter/multilang/filter.php');
+require_once('locallib.php');
 
 define('USER_SMALL_CLASS', 20);   // Below this is considered small.
 define('USER_LARGE_CLASS', 200);  // Above this is considered large.
@@ -695,9 +696,6 @@ if ($personalized) { // If there is at least one ejsapp activity with personaliz
     $table->finish_output();
 
     if (!$table->is_downloading($download, $exportfilename)) {
-        $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
-        $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
-
         if (has_capability('moodle/site:viewparticipants', $context) && $totalcount > ($perpage * 3)) {
             echo '<form action="collaborative_index.php" class="searchform"><div><input type="hidden" name="id" value="' .
                 $course->id . '" />' . get_string('search') . ':&nbsp;' . "\n";
