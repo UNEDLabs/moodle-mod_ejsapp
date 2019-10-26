@@ -78,23 +78,23 @@ if ($id) {
 } else if (isset($n)) {
     $ejsapp = $DB->get_record('ejsapp', array('id' => $n), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $ejsapp->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('ejsapp', $ejsapp->id, $course->id, false,
-        MUST_EXIST);
+    $cm = get_coursemodule_from_instance('ejsapp', $ejsapp->id, $course->id, false, MUST_EXIST);
 } else {
     print_error('You must specify a course_module ID or an instance ID');
 }
 
-require_login($course, true, $cm);
-
+$PAGE->set_cm($cm, $course, $ejsapp); // Set's up global $COURSE.
 $modulecontext = context_module::instance($cm->id);
+$PAGE->set_context($modulecontext);
+
+require_login($course, true, $cm);
+require_capability('mod/ejsapp:view', $modulecontext);
 
 // Completion on view.
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 // Print the page header.
-$PAGE->set_cm($cm, $course, $ejsapp);
-$PAGE->set_context($modulecontext);
 $PAGE->set_url('/mod/ejsapp/view.php', array('id' => $cm->id));
 $PAGE->set_title($ejsapp->name);
 $PAGE->set_title($ejsapp->name);
@@ -135,7 +135,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
         if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
             if ($sarlabinstance !== false) {
-                // Check if there is a booking done by this user and obtain the needed information for Sarlab in case it is used.
+                // Check if there is a booking from this user and obtain the information for Sarlab in case it is used.
                 $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $sarlabinstance,
                     $remlabaccess->labmanager, $maxusetime);
                 if (is_null($remlabinfo)) {

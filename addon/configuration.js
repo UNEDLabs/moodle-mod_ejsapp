@@ -285,8 +285,7 @@ var toolboxEvents = '<xml>' +
 '</xml>';
   
   
-var toolboxCharts = '<xml>' +   
-
+var toolboxCharts = '<xml>' +
 '	<category name="Data and charts" colour="200">' +
 '      <block type="createChart"></block>' +
 '      <block type="record_var"></block>' +
@@ -383,7 +382,7 @@ var toolboxCharts = '<xml>' +
 '</xml>';
   
   
-  var toolboxControllers = '<xml>' +   
+var toolboxControllers = '<xml>' +
 '  <category name="Logic" colour="210">' +
 '      <block type="controls_if"></block>' +
 '      <block type="logic_compare"></block>' +
