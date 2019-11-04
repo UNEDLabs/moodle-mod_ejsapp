@@ -20,7 +20,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Websocket service for connecting to Sarlab experiences.
+ * Websocket service for connecting to ENLARGE experiences.
  *
  * @package    mod_ejsapp
  * @copyright  2016 Luis de la Torre and Ruben Heradio
@@ -36,18 +36,18 @@ define(['jquery'], function() {
                 // Websocket is connected, send data using send().
                 ws.send("Message to send \r\n");
                 ws.connectExperience(command, IP, port, idExp, expTime, user, password, jarPath);
-                console.log("Connected to Sarlab experience: " + idExp);
+                console.log("Connected to ENLARGE experience: " + idExp);
             };
 
             ws.onmessage = function (evt) {
-                console.log("Message from Sarlab server: " + evt.data);
+                console.log("Message from myFrontier server: " + evt.data);
             };
 
             ws.onerror = function() {
                 if (ws.readyState === 1 || ws.readyState === 2) {
                     ws.send("exit");
                 }
-                alert("You need to download, install and/or run the Sarlab service.");
+                alert("You need to download, install and/or run the ENLARGE service.");
                 var a = document.createElement("a");
                 a.download = "myDiscovery_win64.exe";
                 a.href = "http://enlargeirs.dia.uned.es/assets/install_myDiscovery_win64.exe";
