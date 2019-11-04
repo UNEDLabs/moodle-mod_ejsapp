@@ -22,7 +22,7 @@
 // (UNED), Madrid, Spain.
 
 /**
- * Authentication and privileges verification between Moodle and Sarlab for remote lab applications
+ * Authentication and privileges verification between Moodle and myFrontier for remote lab applications
  *
  * @package    mod_ejsapp
  * @copyright  2012 Luis de la Torre and Ruben Heradio

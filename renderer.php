@@ -52,9 +52,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      *
      * @param stdClass $ejsapp record from table ejsapp
      * @param stdClass|null $remlabinfo
-     *                                  $remlabinfo->instance: false|int sarlab id,
+     *                                  $remlabinfo->instance: false|int myFrontier id,
      *                                  $remlabinfo->practice: int practice id,
-     *                                  $remlabinfo->collab: int collab whether sarlab offers collab access to this remote
+     *                                  $remlabinfo->collab: int collab whether myFrontier offers collab access to this remote
      *                                      lab (1) or not (0),
      *                                  $remlabinfo->labmanager: int laboratory manager (1) or student (0)
      *                                  $remlabinfo->max_use_time: int maximum time the remote lab can be connected (in seconds)

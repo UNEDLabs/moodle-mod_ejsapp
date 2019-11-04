@@ -212,8 +212,8 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             if ($practiceintro) {
                 $i = 0;
                 $selectedpracticeindex = $i;
-                foreach ($showableexperiences as $sarlabexp) {
-                    if ($practiceintro == $sarlabexp) {
+                foreach ($showableexperiences as $myFrontierexp) {
+                    if ($practiceintro == $myFrontierexp) {
                         $selectedpracticeindex = $i;
                         break;
                     }

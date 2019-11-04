@@ -377,22 +377,22 @@ function modifications_for_javascript($context, $ejsapp, $file) {
 }
 
 /**
- * Checks if a remote lab equipment is alive or not, either directly when it has a public IP or by asking Sarlab.
+ * Checks if a remote lab equipment is alive or not, either directly when it has a public IP or by asking myFrontier.
  *
  * @param string $host
  * @param int $port
- * @param boolean|string|int $sarlabinstance
+ * @param boolean|string|int $myFrontierinstance
  * @param string $expid
  * @param int $timeout
  * @return int 0, not alive; 1, alive; 2, not checkable
  *
  */
-function ping($host, $port, $sarlabinstance, $expid=null, $timeout=3) {
+function ping($host, $port, $myFrontierinstance, $expid=null, $timeout=3) {
     global $devicesinfo;
 
     $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
     $notcheckable = false;
-    if ($alive && $sarlabinstance !== false) {
+    if ($alive && $myFrontierinstance !== false) {
         $uri = 'http://' . $host . '/SARLABV8.0/';
         $headers = @get_headers($uri);
         if (substr($headers[0], 9, 3) == 200) { // Valid url.
@@ -453,35 +453,44 @@ function ping($host, $port, $sarlabinstance, $expid=null, $timeout=3) {
 }
 
 /**
- * Creates the list of all Sarlab experiences. If a username is provided, it only returns those practices accessible by
- * this particular user.
+ * Creates the list of all experiences in linked myFrontier systems. If a username is provided, it only returns those
+ * practices accessible by this particular user.
  *
- * @param array $sarlabips
+ * @param array $myFrontierips
  * @param string $username
  * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
  * @return string $listexperiences
  * @throws
  *
  */
-function get_experiences_sarlab($sarlabips, $username = "", $ejsappcontext = 0) {
+function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappcontext = 0) {
     global $USER;
     $listexperiences = '';
 
     $context = context_system::instance();
-    if ($username != "" && !has_capability('ltisource/sarlab:editexp', $context, $USER->id, false)){
+    if ($username != "" && !has_capability('ltisource/enlarge:editexp', $context, $USER->id, false)) {
         return $listexperiences;
     }
 
-    foreach ($sarlabips as $sarlabip) {
-        $lastquotemark = strrpos($sarlabip, "'");
+    if ($ejsappcontext == 0) {
+        $cap = get_capability_info('ltisource/enlarge:editexp');
+    } else {
+        $cap = get_capability_info('ltisource/enlarge:useexp');
+    }
+    if (!$cap) {
+        return $listexperiences;
+    }
+
+    foreach ($myFrontierips as $myFrontierip) {
+        $lastquotemark = strrpos($myFrontierip, "'");
         if ($lastquotemark != 0) {
             $lastquotemark++;
         }
-        $ip = substr($sarlabip, $lastquotemark);
-        $firstquotemark = strpos($sarlabip, "'");
+        $ip = substr($myFrontierip, $lastquotemark);
+        $firstquotemark = strpos($myFrontierip, "'");
         if ($firstquotemark !== false) {
             $firstquotemark++;
-            $name = substr($sarlabip, $firstquotemark, $lastquotemark - 1 - $firstquotemark);
+            $name = substr($myFrontierip, $firstquotemark, $lastquotemark - 1 - $firstquotemark);
         } else {
             $name = $ip;
         }
@@ -493,38 +502,32 @@ function get_experiences_sarlab($sarlabips, $username = "", $ejsappcontext = 0) 
                 if (substr($headers[0], 9, 3) == 200) { // Valid file.
                     if ($xml = simplexml_load_file($uri)) {
                         $map = $xml->MapExperience;
-                        $listsarlabexperiences = $map->Experience; // Get list of experiences.
-                        foreach ($listsarlabexperiences as $experience) {
+                        $listmyFrontierexperiences = $map->Experience; // Get list of experiences.
+                        foreach ($listmyFrontierexperiences as $experience) {
                             $experimentsettings = $experience->ExperimentSettings;
                             // Get list of Moodle servers and users who can access the experience.
                             $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
                             // Get list of users in this Moodle server who can access the experience
                             $moodleservers = $listownermoodleusers->ServerMoodle;
-                            if ($moodleservers != null) {
-                                foreach ($moodleservers as $moodleserver) {
-                                    // Check whether this Moodle server is registered in the experience.
-                                    if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
-                                        if ($username != "") {
-                                            // If username is provided, check users permissions both in Moodle and Sarlab.
-                                            $ownerusers = $moodleserver->Owner;
-                                            if ($ejsappcontext == 0) {
-                                                $cap = get_capability_info('ltisource/sarlab:editexp');
-                                            } else {
-                                                $cap = get_capability_info('ltisource/sarlab:useexp');
+                            if ($moodleservers == null) {
+                                break;
+                            }
+                            foreach ($moodleservers as $moodleserver) {
+                                // Check whether this Moodle server is registered in the experience.
+                                if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
+                                    if ($username != "") {
+                                        // If username is provided, check users permissions both in Moodle and myFrontier.
+                                        $ownerusers = $moodleserver->Owner;
+                                        foreach ($ownerusers as $owneruser) {
+                                            // Check whether the required user has access to the experience.
+                                            if (strcasecmp($username, $owneruser) == 0) {
+                                                $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
+                                                break;
                                             }
-                                            if ($cap) {
-                                                foreach ($ownerusers as $owneruser) {
-                                                    // Check whether the required user has access to the experience.
-                                                    if (strcasecmp($username, $owneruser) == 0) {
-                                                        $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            // If not, the whole list of Sarlab experiences must be returned, so add it.
-                                            $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                         }
+                                    } else {
+                                        // If not, the whole list of myFrontier experiences must be returned, so add it.
+                                        $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                     }
                                 }
                             }
@@ -541,15 +544,107 @@ function get_experiences_sarlab($sarlabips, $username = "", $ejsappcontext = 0) 
 }
 
 /**
- * Gets the local experiences (defined without sarlab) and combines them with those in Sarlab in a unique, ordered list.
+ * Creates the list of all myGateway experiences. If a username is provided, it only returns those practices accessible
+ * by this particular user.
  *
- * @param array $usersarlabexperiences
- * @param array $allsarlabexperiences
+ * @param string $username
+ * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
+ * @return string $listexperiences
+ * @throws
+ *
+ */
+function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
+    global $USER;
+    $listexperiences = '';
+
+    $context = context_system::instance();
+    if ($username != "" && !has_capability('ltisource/enlarge:editexp', $context, $USER->id, false)) {
+        return $listexperiences;
+    }
+
+    if ($ejsappcontext == 0) {
+        $cap = get_capability_info('ltisource/enlarge:editexp');
+    } else {
+        $cap = get_capability_info('ltisource/enlarge:useexp');
+    }
+    if (!$cap) {
+        return $listexperiences;
+    }
+
+    // Ask ENLARGE IRS about the myVirtualFrontier servers linked to this Moodle and the myGateway devices linked to each
+    // of these myVirtualFrontier servers
+    $enlargeIP = 'enlargeirs.dia.uned.es';
+    if ($fp = fsockopen($enlargeIP, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+        fclose($fp);
+        $uri = 'http://' . $enlargeIP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
+        $headers = get_headers($uri);
+        $myGatewayDevices = [];
+        if (substr($headers[0], 9, 3) == 200) { // Valid file.
+            if ($xml = simplexml_load_file($uri)) {
+                $myGatewayDevices = $xml->item;
+            }
+        }
+    }
+
+    // Connect to each of the myGateway devices to ask them about the defined experiences
+    foreach ($myGatewayDevices as $myGatewayDevice) {
+        if ($fp = fsockopen($myGatewayDevice->address, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+            fclose($fp);
+            $uri = 'http://' . $myGatewayDevice->address . '/' . $myGatewayDevice->name;
+            $headers = get_headers($uri);
+            if (substr($headers[0], 9, 3) == 200) { // Valid file.
+                if ($xml = simplexml_load_file($uri)) {
+                    $map = $xml->MapExperience;
+                    $listmyFrontierexperiences = $map->Experience; // Get list of experiences.
+                    foreach ($listmyFrontierexperiences as $experience) {
+                        $experimentsettings = $experience->ExperimentSettings;
+                        // Get list of Moodle servers and users who can access the experience.
+                        $listownermoodleusers = $experimentsettings->listOfOwnersExperience;
+                        // Get list of users in this Moodle server who can access the experience
+                        $moodleservers = $listownermoodleusers->ServerMoodle;
+                        if ($moodleservers == null) {
+                            break;
+                        }
+                        foreach ($moodleservers as $moodleserver) {
+                            // Check whether this Moodle server is registered in the experience.
+                            if ($moodleserver['IdMoodle'] == get_config('mod_ejsapp', 'server_id')) {
+                                if ($username != "") {
+                                    // If username is provided, check users permissions both in Moodle and myFrontier.
+                                    $ownerusers = $moodleserver->Owner;
+                                    foreach ($ownerusers as $owneruser) {
+                                        // Check whether the required user has access to the experience.
+                                        if (strcasecmp($username, $owneruser) == 0) {
+                                            $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    // If not, the whole list of myFrontier experiences must be returned, so add it.
+                                    $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $listexperiences = substr($listexperiences, 0, -1);
+
+    return $listexperiences;
+}
+
+/**
+ * Gets the local experiences (defined without ENLARGE) and combines them with those in myFrontier in a unique, ordered list.
+ *
+ * @param array $usermyFrontierexperiences
+ * @param array $allmyFrontierexperiences
  * @return array $combinedexperiences
  * @throws
  *
  */
-function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
+function combine_experiences($usermyFrontierexperiences, $allmyFrontierexperiences) {
     global $DB;
     $remlabmanager = $DB->get_records('block', array('name' => 'remlab_manager'));
     $remlabmanager = !empty($remlabmanager);
@@ -557,16 +652,16 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
     if ($remlabmanager) {
         $localexperiences = $DB->get_records('block_remlab_manager_conf');
         $combinedexperiences = array();
-        if ($usersarlabexperiences[0] != '') {
-            $combinedexperiences = $usersarlabexperiences;
+        if ($usermyFrontierexperiences[0] != '') {
+            $combinedexperiences = $usermyFrontierexperiences;
         }
         foreach ($localexperiences as $localexperience) {
-            if (!in_array($localexperience->practiceintro, $allsarlabexperiences)) {
+            if (!in_array($localexperience->practiceintro, $allmyFrontierexperiences)) {
                 $combinedexperiences[] = $localexperience->practiceintro;
             }
         }
     } else {
-        $combinedexperiences = $usersarlabexperiences;
+        $combinedexperiences = $usermyFrontierexperiences;
     }
 
     // Order the list alphabetically.
@@ -576,7 +671,7 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
 }
 
 /**
- * Gets the experiences defined without sarlab and combines them with those in Sarlab in a unique, ordered list.
+ * Gets the experiences defined without ENLARGE and combines them with those in myFrontier in a unique, ordered list.
  *
  * @param string $username
  * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
@@ -585,17 +680,18 @@ function combine_experiences($usersarlabexperiences, $allsarlabexperiences) {
  *
  */
 function get_showable_experiences($username = "", $ejsappcontext = 0) {
-    $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-    if (empty($sarlabips)) {
-        $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+    $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP'));
+    if (empty($myFrontierips)) {
+        $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
     }
-    // Get experiences from Sarlab.
-    $userlistexperiences = ($username != "") ? get_experiences_sarlab($sarlabips, $username, $ejsappcontext) : "";
-    $alllistexperiences = get_experiences_sarlab($sarlabips, "");
-    $usersarlabexperiences = ($username != "") ? explode(";", $userlistexperiences) : array("");
-    $allsarlabexperiences = explode(";", $alllistexperiences);
-    // Also get experiences NOT in Sarlab and add them to the list.
-    $showableexperiences = combine_experiences($usersarlabexperiences, $allsarlabexperiences);
+    // Get experiences from myFrontier.
+    $userlistexperiences = ($username != "") ? get_experiences_myfrontier($myFrontierips, $username, $ejsappcontext) : "";
+    $userlistexperiences .= ($username != "") ? get_experiences_mygateway($username, $ejsappcontext) : "";
+    $alllistexperiences = get_experiences_myfrontier($myFrontierips, "") . get_experiences_mygateway("");
+    $usermyFrontierexperiences = ($username != "") ? explode(";", $userlistexperiences) : array("");
+    $allmyFrontierexperiences = explode(";", $alllistexperiences);
+    // Also get experiences NOT in myFrontier and add them to the list.
+    $showableexperiences = combine_experiences($usermyFrontierexperiences, $allmyFrontierexperiences);
 
     return $showableexperiences;
 }
@@ -610,25 +706,25 @@ function get_showable_experiences($username = "", $ejsappcontext = 0) {
  *
  */
 function default_rem_lab_conf($practice, $username = "") {
-    // Get experiences from Sarlab and check whether this practice is in a Sarlab server or not.
-    $sarlabinstance = is_practice_in_sarlab($practice, $username, 1);
+    // Get experiences from myFrontier and check whether this practice is in a myFrontier server or not.
+    $myFrontierinstance = is_practice_in_enlarge($practice, $username, 1);
     $defaultconf = new stdClass();
-    if ($sarlabinstance !== false) { // Practice is defined in a Sarlab server
-        $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-        if (empty($sarlabips)) {
-            $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+    if ($myFrontierinstance !== false) { // Practice is defined in a myFrontier server
+        $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP'));
+        if (empty($myFrontierips)) {
+            $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
         }
-        $sarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
-        if (empty($sarlabports)) {
-            $sarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+        $myFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_port'));
+        if (empty($myFrontierports)) {
+            $myFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
         }
-        $initchar = strrpos($sarlabips[intval($sarlabinstance)], "'");
+        $initchar = strrpos($myFrontierips[intval($myFrontierinstance)], "'");
         if ($initchar != 0) {
             $initchar++;
         }
-        $ip = substr($sarlabips[intval($sarlabinstance)], $initchar);
+        $ip = substr($myFrontierips[intval($myFrontierinstance)], $initchar);
         $defaultconf->ip = $ip;
-        $defaultconf->port = $sarlabports[intval($sarlabinstance)];
+        $defaultconf->port = $myFrontierports[intval($myFrontierinstance)];
     } else {
         $arr = explode("@", $practice, 2);
         $practice = $arr[0];
@@ -648,34 +744,34 @@ function default_rem_lab_conf($practice, $username = "") {
 }
 
 /**
- * Checks whether a user-accessible practice is defined in an operative Sarlab server and returns the Sarlab instance if
- * it is, or false if it is not.
+ * Checks whether a user-accessible practice is defined in an operative myFrontier server and returns the myFrontier
+ * instance if it is, or false if it is not.
  *
  * @param string $practice
  * @param string $username
  * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
- * @return false|int $sarlabinstance
+ * @return false|int $myFrontierinstance
  * @throws
  *
  */
-function is_practice_in_sarlab($practice, $username = "", $ejsappcontext = 0) {
-    $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-    if (empty($sarlabips)) {
-        $sarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+function is_practice_in_enlarge($practice, $username = "", $ejsappcontext = 0) {
+    $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP'));
+    if (empty($myFrontierips)) {
+        $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
     }
-    $sarlabinstance = false;
+    $myFrontierinstance = false;
     $instance = 0;
-    foreach ($sarlabips as $sarlabip) {
-        $sarlabiparray = array($sarlabip);
-        $listexperiences = get_experiences_sarlab($sarlabiparray, $username, $ejsappcontext);
-        $sarlabexperiences = explode(";", $listexperiences);
-        if (in_array($practice, $sarlabexperiences)) {
-            $sarlabinstance = $instance;
+    foreach ($myFrontierips as $myFrontierip) {
+        $myFrontieriparray = array($myFrontierip);
+        $listexperiences = get_experiences_myfrontier($myFrontieriparray, $username, $ejsappcontext);
+        $myFrontierexperiences = explode(";", $listexperiences);
+        if (in_array($practice, $myFrontierexperiences)) {
+            $myFrontierinstance = $instance;
             break;
         }
         $instance++;
     }
-    return $sarlabinstance;
+    return $myFrontierinstance;
 }
 
 /**
@@ -753,20 +849,21 @@ function check_booking_system($ejsapp) {
 }
 
 /**
- * Checks if there is an active booking made by the current user for the remote lab and gets information needed by sarlab
+ * Checks if there is an active booking made by the current user for the remote lab and gets information needed by
+ * myFrontier
  *
  * @param object $DB
  * @param object $USER
  * @param stdClass $ejsapp
  * @param string $currenttime
- * @param boolean|string|int $sarlabinstance
+ * @param boolean|string|int $myFrontierinstance
  * @param int $labmanager
  * @param int $maxusetime
  * param int $maxusetime
  * @return stdClass $remlabinfo
  *
  */
-function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance, $labmanager, $maxusetime) {
+function check_users_booking($DB, $USER, $ejsapp, $currenttime, $myFrontierinstance, $labmanager, $maxusetime) {
     $remlabinfo = null;
 
     if ($DB->record_exists('ejsappbooking_remlab_access', array('username' => $USER->username, 'ejsappid' => $ejsapp->id,
@@ -780,7 +877,7 @@ function check_users_booking($DB, $USER, $ejsapp, $currenttime, $sarlabinstance,
                 $expsyst2pract = $DB->get_record('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id,
                     'practiceid' => $booking->practiceid));
                 $practice = $expsyst2pract->practiceintro;
-                $remlabinfo = define_remlab($sarlabinstance, 0, $practice, $labmanager, $maxusetime);
+                $remlabinfo = define_remlab($myFrontierinstance, 0, $practice, $labmanager, $maxusetime);
                 break;
             }
         }
@@ -1081,7 +1178,7 @@ function check_active_booking($repeatedlabs, $courseid = null) {
 /**
  * Returns some info about or related to the access conditions to the remote lab: required idle time, whether the user
  * is a manager of that lab or not, whether the lab is available or not, whether the user can access the lab freely or
- * not and whether the lab uses sarlab or not.
+ * not and whether the lab uses ENLARGE or not.
  *
  * @param stdClass $ejsapp
  * @param stdClass $course
@@ -1132,9 +1229,9 @@ function remote_lab_access_info($ejsapp, $course) {
 /**
  * Defines a new remlab object with all the needed information
  *
- * @param false|int $instance sarlab instance
+ * @param false|int $instance myFrontier instance
  * @param boolean $collab false if not a collab session, true if collaborative
- * @param string $practice the practice identifier in sarlab
+ * @param string $practice the practice identifier in myFrontier
  * @param int $labmanager whether the user is a laboratory manager or not
  * @param int $maxusetime maximum time for using the remote lab
  * @return stdClass $remlabinfo

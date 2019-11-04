@@ -49,7 +49,7 @@ class ejsapp_lab implements renderable {
     public function __construct($ejsapp, $remlabinfo, $userdatafiles, $collabinfo, $personalvarsinfo) {
         global $DB, $USER, $CFG, $COURSE;
 
-        // Sarlab is used to access this remote lab or to establish communication between users participating in a
+        // myFrontier is used to access this remote lab or to establish communication between users participating in a
         // collaborative session.
         if ($remlabinfo) {
             if ($remlabinfo->instance !== false || isset($collabinfo->sarlabport)) {
@@ -59,40 +59,40 @@ class ejsapp_lab implements renderable {
                 mt_srand(time());
                 $random = mt_rand(0, 1000000);
                 if ($remlabinfo) {
-                    $sarlabkey = sha1($min . $seg . $remlabinfo->practice . fullname($USER) .
+                    $myFrontierkey = sha1($min . $seg . $remlabinfo->practice . fullname($USER) .
                         $USER->username . $random);
                 } else {
-                    $sarlabkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
+                    $myFrontierkey = sha1($min . $seg . "EjsS Collab" . fullname($USER) . $USER->username . $random);
                 }
 
-                $newsarlabkey = new stdClass();
-                $newsarlabkey->user = $USER->username;
-                $newsarlabkey->sarlabpass = $sarlabkey;
-                $newsarlabkey->labmanager = $remlabinfo->labmanager;
-                $newsarlabkey->creationtime = $time;
-                $newsarlabkey->expirationtime = $time + $remlabinfo->max_use_time;
+                $newmyFrontierkey = new stdClass();
+                $newmyFrontierkey->user = $USER->username;
+                $newmyFrontierkey->sarlabpass = $myFrontierkey;
+                $newmyFrontierkey->labmanager = $remlabinfo->labmanager;
+                $newmyFrontierkey->creationtime = $time;
+                $newmyFrontierkey->expirationtime = $time + $remlabinfo->max_use_time;
 
-                $DB->insert_record('block_remlab_manager_sb_keys', $newsarlabkey);
+                $DB->insert_record('block_remlab_manager_sb_keys', $newmyFrontierkey);
 
                 if ($remlabinfo->instance !== false) {
-                    $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP'));
-                    if (empty($sarlabips)) {
-                        $listsarlabips = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+                    $listmyFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP'));
+                    if (empty($myFrontierips)) {
+                        $listmyFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
                     }
-                    $sarlabip = $listsarlabips[$remlabinfo->instance];
-                    $initpos = strpos($sarlabip, "'");
-                    $endpos = strrpos($sarlabip, "'");
+                    $myFrontierip = $listmyFrontierips[$remlabinfo->instance];
+                    $initpos = strpos($myFrontierip, "'");
+                    $endpos = strrpos($myFrontierip, "'");
                     if (!(($initpos === false) || ($initpos === $endpos))) {
-                        $sarlabip = substr($sarlabip, $endpos + 1);
+                        $myFrontierip = substr($myFrontierip, $endpos + 1);
                     }
-                    $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_port'));
-                    if (empty($listsarlabports)) {
-                        $listsarlabports = explode(";", get_config('block_remlab_manager', 'sarlab_IP') . ';');
+                    $listmyFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_port'));
+                    if (empty($listmyFrontierports)) {
+                        $listmyFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
                     }
-                    $sarlabport = $listsarlabports[$remlabinfo->instance];
+                    $myFrontierport = $listmyFrontierports[$remlabinfo->instance];
                 } else {
-                    $sarlabip = $collabinfo->ip;
-                    $sarlabport = $collabinfo->sarlabport;
+                    $myFrontierip = $collabinfo->ip;
+                    $myFrontierport = $collabinfo->myFrontierport;
                 }
             }
         }
@@ -206,13 +206,13 @@ class ejsapp_lab implements renderable {
             // For remote labs and collaborative sessions only
             if (($ejsapp->is_rem_lab || $collabinfo) && $remlabinfo) {
                 if ($remlabinfo->instance !== false) {
-                    // For remote labs accessed through Sarlab, pass authentication params to the app.
+                    // For remote labs accessed through myFrontier, pass authentication params to the app.
                     $practice = explode("@", $remlabinfo->practice, 2);
                     // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabCredentials',
-                        array($USER->username . "@" . $CFG->wwwroot, $sarlabkey));
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'sarlabRun',
-                        array($sarlabport == 443, $sarlabip, 'SARLABV8.0', $sarlabport, $practice[0], $CFG->wwwroot .
+                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierCredentials',
+                        array($USER->username . "@" . $CFG->wwwroot, $myFrontierkey));
+                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
+                        array($myFrontierport == 443, $myFrontierip, 'SARLABV8.0', $myFrontierport, $practice[0], $CFG->wwwroot .
                             '/course/view.php?id=' . $COURSE->id));
                 }
                 // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
@@ -255,10 +255,10 @@ class ejsapp_lab implements renderable {
                 $filepath = $file->get_filepath() . $file->get_filename();
                 $practice = explode("@", $remlabinfo->practice, 2);
 
-                $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'SarlabWebSocket',
-                    array('execjar', $sarlabip, 443, $practice, $remlabinfo->max_use_time / 60,
-                        $USER->username . "@" . $CFG->wwwroot, $sarlabkey, $filepath));
-                $PAGE->requires->js_call_amd('mod_ejsapp/sarlab_websocket', 'stopExperienceOnLeave');
+                $PAGE->requires->js_call_amd('mod_ejsapp/myFrontier_websocket', 'myFrontierWebSocket',
+                    array('execjar', $myFrontierip, 443, $practice, $remlabinfo->max_use_time / 60,
+                        $USER->username . "@" . $CFG->wwwroot, $myFrontierkey, $filepath));
+                $PAGE->requires->js_call_amd('mod_ejsapp/myFrontier_websocket', 'stopExperienceOnLeave');
             }
         }
     }

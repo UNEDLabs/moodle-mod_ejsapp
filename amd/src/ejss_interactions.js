@@ -125,7 +125,7 @@ define(['jquery'], function($) {
             }, 200);
         },
 
-        sarlabCredentials: function(username, password) {
+        myFrontierCredentials: function(username, password) {
             var doit = setInterval(function() {
                 if (typeof _model._sarlab !== "undefined") {
                     _model._sarlab.setSarlabCredentials({"username": username, "password": password});
@@ -134,10 +134,10 @@ define(['jquery'], function($) {
             }, 200);
         },
 
-        sarlabRun: function(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen) {
+        myFrontierRun: function(secure, myFrontierIP, myFrontierPath, myFrontierPort, myFrontierExperience, closeScreen) {
             var doit = setInterval(function() {
                 if (typeof _model._sarlab !== "undefined") {
-                    _model._sarlab.setSarlabInfo(secure, sarlabIP, sarlabPath, sarlabPort, sarlabExperience, closeScreen);
+                    _model._sarlab.setSarlabInfo(secure, myFrontierIP, myFrontierPath, myFrontierPort, myFrontierExperience, closeScreen);
                     if (typeof _model._rip !== "undefined") {
                         _model._sarlab.connect(function() {
                             _model._rip.connect();
