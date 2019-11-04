@@ -47,9 +47,9 @@ if ($version < 8) {
 $time = strtotime(date('Y-m-d H:i:s')) + 120; // At least two minutes margin for working with the lab.
 
 if ($record = $DB->get_records_select('block_remlab_manager_sb_keys',
-    'sarlabpass = ? AND expirationtime > ?', array($key, $time))) {
+    'enlargepass = ? AND expirationtime > ?', array($key, $time))) {
     // Delete the key so it can't be used later again.
-    $DB->delete_records('block_remlab_manager_sb_keys', array('sarlabpass' => $key));
+    $DB->delete_records('block_remlab_manager_sb_keys', array('enlargepass' => $key));
     // Check permissions, expiration time, and grant access.
     $permissions = "false";
     if (reset($record)->labmanager == 1) {

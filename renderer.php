@@ -73,7 +73,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      *                                  $collabinfo->session: int collaborative session id,
      *                                  $collabinfo->ip: string collaborative session ip,
      *                                  $collabinfo->localport: int collaborative session local port,
-     *                                  $collabinfo->sarlabport: int|null ENLARGE port,
+     *                                  $collabinfo->enlargeport: int|null ENLARGE port,
      *                                  $collabinfo->director: int|null id of the collaborative session master user, `
      *                                  Null if generate_embedding_code is not called from block ejsapp_collab_session
      * @param stdClass|null $personalvarsinfo

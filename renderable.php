@@ -52,7 +52,7 @@ class ejsapp_lab implements renderable {
         // myFrontier is used to access this remote lab or to establish communication between users participating in a
         // collaborative session.
         if ($remlabinfo) {
-            if ($remlabinfo->instance !== false || isset($collabinfo->sarlabport)) {
+            if ($remlabinfo->instance !== false || isset($collabinfo->enlargeport)) {
                 $time = time();
                 $min = date("i", $time);
                 $seg = date("s", $time);
@@ -67,7 +67,7 @@ class ejsapp_lab implements renderable {
 
                 $newmyFrontierkey = new stdClass();
                 $newmyFrontierkey->user = $USER->username;
-                $newmyFrontierkey->sarlabpass = $myFrontierkey;
+                $newmyFrontierkey->enlargepass = $myFrontierkey;
                 $newmyFrontierkey->labmanager = $remlabinfo->labmanager;
                 $newmyFrontierkey->creationtime = $time;
                 $newmyFrontierkey->expirationtime = $time + $remlabinfo->max_use_time;
@@ -255,10 +255,10 @@ class ejsapp_lab implements renderable {
                 $filepath = $file->get_filepath() . $file->get_filename();
                 $practice = explode("@", $remlabinfo->practice, 2);
 
-                $PAGE->requires->js_call_amd('mod_ejsapp/myFrontier_websocket', 'myFrontierWebSocket',
+                $PAGE->requires->js_call_amd('mod_ejsapp/enlarge_websocket', 'enlargeWebSocket',
                     array('execjar', $myFrontierip, 443, $practice, $remlabinfo->max_use_time / 60,
                         $USER->username . "@" . $CFG->wwwroot, $myFrontierkey, $filepath));
-                $PAGE->requires->js_call_amd('mod_ejsapp/myFrontier_websocket', 'stopExperienceOnLeave');
+                $PAGE->requires->js_call_amd('mod_ejsapp/enlarge_websocket', 'stopExperienceOnLeave');
             }
         }
     }

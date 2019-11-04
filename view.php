@@ -52,8 +52,8 @@ if (!is_null($colsessionid)) {
         $collabinfo->session = $colsessionid;
         $collabinfo->ip = $collabsession->ip;
         $collabinfo->localport = $collabsession->localport;
-        if ($collabsession->sarlabport != 0) {
-            $collabinfo->sarlabport = $collabsession->sarlabport;
+        if ($collabsession->enlargeport != 0) {
+            $collabinfo->enlargeport = $collabsession->enlargeport;
         }
         if (am_i_master_user()) {
             $collabinfo->director = $collabsession->id;
