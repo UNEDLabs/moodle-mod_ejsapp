@@ -4,7 +4,7 @@
 
 ## 1. Content
 
-This plugin lets you add any Java applet or Javascript application created with Easy Java Simulations (EJS) to your
+This plugin lets you add any Java applet or Javascript application created with Easy Java/Javascript Simulations (EjsS) to your
 Moodle course.
 
 The Java applets should have been compiled with version 4.37 (build 20120715 or later) of EJS while the Javascript
