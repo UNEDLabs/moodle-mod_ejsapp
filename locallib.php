@@ -573,7 +573,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
 
     // Ask ENLARGE IRS about the myVirtualFrontier servers linked to this Moodle and the myGateway devices linked to each
     // of these myVirtualFrontier servers
-    $enlargeIP = 'enlargeirs.dia.uned.es';
+    $enlargeIP = 'irs.nebsyst.com';
     if ($fp = fsockopen($enlargeIP, '80', $errorcode, $errorstring, 3)) { // IP is alive.
         fclose($fp);
         $uri = 'http://' . $enlargeIP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
