@@ -313,29 +313,38 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
     }
 
     // Include the three required javascript files for EjsS.
-    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-        'itemid' => $ejsapp->id, 'filename' => 'ejsS.v1.min.js'), 'filesize DESC');
-    $filerecord = reset($filerecords);
-    $file = $fs->get_file_by_id($filerecord->id);
-    $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-        $file->get_itemid() . "/_ejs_library/" . $file->get_filename();
-    $PAGE->requires->js(new moodle_url($pathfile));
+    try {
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => 'ejsS.v1.min.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+            $file->get_itemid() . "/_ejs_library/" . $file->get_filename();
+        $PAGE->requires->js(new moodle_url($pathfile));
+    } catch (dml_exception $e) {
+    }
 
-    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-        'itemid' => $ejsapp->id, 'filename' => 'textresizedetector.js'), 'filesize DESC');
-    $filerecord = reset($filerecords);
-    $file = $fs->get_file_by_id($filerecord->id);
-    $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-        $file->get_itemid() . "/_ejs_library/scripts/" . $file->get_filename();
-    $PAGE->requires->js(new moodle_url($pathfile));
+    try {
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => 'textresizedetector.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+            $file->get_itemid() . "/_ejs_library/scripts/" . $file->get_filename();
+        $PAGE->requires->js(new moodle_url($pathfile));
+    } catch (dml_exception $e) {
+    }
 
-    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-        'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.js'), 'filesize DESC');
-    $filerecord = reset($filerecords);
-    $file = $fs->get_file_by_id($filerecord->id);
-    $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-        $file->get_itemid() . "/" . $file->get_filename();
-    $PAGE->requires->js(new moodle_url($pathfile));
+    try {
+        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+            'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.js'), 'filesize DESC');
+        $filerecord = reset($filerecords);
+        $file = $fs->get_file_by_id($filerecord->id);
+        $pathfile = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
+            $file->get_itemid() . "/" . $file->get_filename();
+        $PAGE->requires->js(new moodle_url($pathfile));
+    } catch (dml_exception $e) {
+    }
 
     // Check if there are variables configured to be personalized in this EJSApp.
     $personalvarsinfo = personalize_vars($ejsapp, $USER, false);

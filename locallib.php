@@ -510,7 +510,7 @@ function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappconte
                             // Get list of users in this Moodle server who can access the experience
                             $moodleservers = $listownermoodleusers->ServerMoodle;
                             if ($moodleservers == null) {
-                                break;
+                                continue;
                             }
                             foreach ($moodleservers as $moodleserver) {
                                 // Check whether this Moodle server is registered in the experience.
