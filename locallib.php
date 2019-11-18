@@ -67,7 +67,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
             $ejsapp->id, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1));
     }
 
-    // Creating the recording file in dataroot and updating the files table in the database.
+    // Creating the blockly file in dataroot and updating the files table in the database.
     if ($ejsapp->use_blockly == 1) {
         if ($ejsapp->blocklyfile) {
             file_save_draft_area_files($ejsapp->blocklyfile, $context->id, 'mod_ejsapp', 'blkfiles',
@@ -349,20 +349,37 @@ function modifications_for_javascript($context, $ejsapp, $file) {
             $pathfiles = new moodle_url("/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() .
                 "/content/" . $file->get_itemid());
             $ejsslibpathfiles = $pathfiles . "/_ejs_library/";
-            $newfilecontent = str_replace("(\"_topFrame\",\"_ejs_library/\",null);",
+            $replacedfilecontent = str_replace("(\"_topFrame\",\"_ejs_library/\",null);",
                 "(\"_topFrame\",\"$ejsslibpathfiles\",\"$pathfiles\");",
                 $originalfilecontent);
             $originalfile->delete();
-            if ($mainfile == "xhtml") {
-                // Extract javascript code from the .xhtml file into a new .js file
-                $newfilecontent = strstr($newfilecontent, 'function ' .
-                    strstr($ejsapp->main_file, '_Simulation', true));
-                $newfilecontent1 = strstr($newfilecontent, '//--><!]]></script>', true);
-                $newfilecontent2 = strstr($newfilecontent, 'var _model;');
-                $newfilecontent2 = strstr($newfilecontent2, '//--><!]]></script>', true);
-                $newfilecontent = $newfilecontent1 . $newfilecontent2;
-                $filerecord->filename = $ejsapp->main_file . '.js';
+            // Extract needed javascript code from the .xhtml file's header into the new .js file
+            $doc = new DOMDocument();
+            if ($mainfile == "javascript") { // If javascript, the xhtml can be used as it is
+                $xhtmlfilerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+                    'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file . '.xhtml'), 'filesize DESC');
+                $xhtmlfilerecord = reset($xhtmlfilerecords);
+                $originalfile = $fs->get_file_by_id($xhtmlfilerecord->id);
+                $originalfilecontent = $originalfile->get_content();
+                $originalfile->delete();
+                $doc->loadHTML($originalfilecontent);
+            } else { //If xhtml, the replaced content is needed
+                $doc->loadHTML($replacedfilecontent);
             }
+            $xpath = new DOMXpath($doc);
+            $n = 1;
+            $newfilecontent = "";
+            foreach ($xpath->query('/html/head/script[string-length(text()) > 1]') as $queryResult) {
+                $newfilecontent .= $xpath->evaluate('string(/html/head/script[string-length(text()) > 1][' . $n . '])');
+                $n++;
+            }
+            // If main file is xhtml, we also need the javascript code in the body
+            if ($mainfile == "xhtml") {
+                $newfilecontent .= $xpath->evaluate('string(/html/body/script[string-length(text()) > 1][1])');
+            } else { // if not, we need to merge the replaced contents from the .js file with the contents from the .xhtml file
+                $newfilecontent = $replacedfilecontent . $newfilecontent;
+            }
+            $filerecord->filename = $ejsapp->main_file . '.js';
             $fs->create_file_from_string($filerecord, $newfilecontent);
             $ejsok = true;
         }
