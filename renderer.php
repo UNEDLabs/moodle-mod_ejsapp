@@ -123,13 +123,10 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     /**
      * Returns the code that embeds an EjsS application into Moodle
      *
-     * @param ejsapp_lab $params
      * @return string Html code that embeds an EjsS application in Moodle
      * @throws
      *
      */
-
-
     public function render_ejsapp_lab() {
         $code =
             html_writer::start_div("", array("id" => "prevDrag")) .

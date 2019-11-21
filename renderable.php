@@ -204,16 +204,18 @@ class ejsapp_lab implements renderable {
             }
 
             // For remote labs and collaborative sessions only
-            if (($ejsapp->is_rem_lab || $collabinfo) && $remlabinfo) {
-                if ($remlabinfo->instance !== false) {
-                    // For remote labs accessed through myFrontier, pass authentication params to the app.
-                    $practice = explode("@", $remlabinfo->practice, 2);
-                    // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierCredentials',
-                        array($USER->username . "@" . $CFG->wwwroot, $myFrontierkey));
-                    $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
-                        array($myFrontierport == 443, $myFrontierip, 'SARLABV8.0', $myFrontierport, $practice[0], $CFG->wwwroot .
-                            '/course/view.php?id=' . $COURSE->id));
+            if (($ejsapp->is_rem_lab || $collabinfo) || $remlabinfo) {
+                if ($remlabinfo) {
+                    if ($remlabinfo->instance !== false) {
+                        // For remote labs accessed through myFrontier, pass authentication params to the app.
+                        $practice = explode("@", $remlabinfo->practice, 2);
+                        // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
+                        $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierCredentials',
+                            array($USER->username . "@" . $CFG->wwwroot, $myFrontierkey));
+                        $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
+                            array($myFrontierport == 443, $myFrontierip, 'SARLABV8.0', $myFrontierport, $practice[0], $CFG->wwwroot .
+                                '/course/view.php?id=' . $COURSE->id));
+                    }
                 }
                 // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.
                 $sseuri = '';
