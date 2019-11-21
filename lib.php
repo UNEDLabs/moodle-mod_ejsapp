@@ -153,8 +153,8 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
                 }
             }
         }
-        // Purge cache so that users will get the updated version
-        rebuild_course_cache($ejsapp->course);
+        // Purge js cache so that users will get the updated version
+        purge_caches(['js']);
     }
 
     return $ejsapp->id;
