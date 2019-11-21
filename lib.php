@@ -135,8 +135,6 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
     $ejsok = update_ejsapp_files_and_tables($ejsapp, $context);
     if ($ejsok) {
         ejsapp_grade_item_update($ejsapp);
-        $bookinginstalled = $DB->get_records('modules', array('name' => 'ejsappbooking'));
-        $bookinginstalled = !empty($bookinginstalled);
         if ($ejsapp->is_rem_lab == 1) { // Remote lab.
             if ($ejsapp->remlab_manager) {
                 $practiceslist = explode(';', $ejsapp->list_practices);
@@ -148,7 +146,8 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
             if ($ejsapp->remlab_manager) {
                 $DB->delete_records('block_remlab_manager_exp2prc', array('ejsappid' => $ejsapp->id));
             }
-            if ($bookinginstalled) {
+            $bookinginstalled = $DB->get_records('modules', array('name' => 'ejsappbooking'));
+            if (!empty($bookinginstalled)) {
                 if ($DB->record_exists('ejsappbooking', array('course' => $ejsapp->course))) {
                     $DB->delete_records('ejsappbooking_remlab_access', array('ejsappid' => $ejsapp->id));
                 }
