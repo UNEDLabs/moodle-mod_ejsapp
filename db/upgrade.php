@@ -368,7 +368,7 @@ function xmldb_ejsapp_upgrade($oldversion) {
     }
 
     if ($oldversion < '2019080500') {
-        // Drop mainframe and codebase fields from ejsapp table.
+        // Drop is_collaborative field from ejsapp table.
         $dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp');
         $field = new xmldb_field('is_collaborative');
@@ -376,7 +376,7 @@ function xmldb_ejsapp_upgrade($oldversion) {
     }
 
     if ($oldversion < '2019081103') {
-        // Drop mainframe and codebase fields from ejsapp table.
+        // Rename class_file field in ejsapp table.
         $dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp');
         $field = new xmldb_field('applet_name', XMLDB_TYPE_TEXT, '64', null, null,
@@ -384,6 +384,11 @@ function xmldb_ejsapp_upgrade($oldversion) {
         $dbman->rename_field($table, $field, 'main_file');
         $field = new xmldb_field('class_file');
         $dbman->drop_field($table, $field);
+    }
+
+    if ($oldversion < '2019081200') {
+        // Upgrade from previous versions are not supported - Stop them
+        return false;
     }
 
     return true;
