@@ -154,6 +154,9 @@ function ejsapp_update_instance($ejsapp, $mform=null) {
             }
         }
     }
+    // Purge cache so that users will get the updated version
+    purge_caches(['js']);
+    rebuild_course_cache($ejsapp->course);
 
     return $ejsapp->id;
 }
@@ -607,7 +610,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
         return false;
     }
 
-    return send_stored_file($file, 604800, 0, $forcedownload, $options);
+    return send_stored_file($file, 86400, 0, $forcedownload, $options);
 }
 
 
