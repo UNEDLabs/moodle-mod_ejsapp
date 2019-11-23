@@ -186,51 +186,58 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
         $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
 
-        // Adding elements to configure the remote lab, if that's the case.
-        $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
+        $experiencelist = '';
+        if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
+            // Elements to configure the remote lab, if that's the case (only if remlab_manager block is installed).
+            $mform->addElement('header', 'rem_lab', get_string('rem_lab_conf', 'ejsapp'));
 
-        $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
-        $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');
-        $remlabmanagerinstalled = $DB->get_records('block', array('name' => 'remlab_manager'));
-        $remlabmanagerinstalled = !empty($remlabmanagerinstalled);
-        $mform->setDefault('remlab_manager', $remlabmanagerinstalled ? 1 : 0);
-        $mform->setDefault('is_rem_lab', 0);
-        $mform->disabledIf('is_rem_lab', 'remlab_manager', 'eq', 0);
+            $mform->addElement('selectyesno', 'is_rem_lab', get_string('is_rem_lab', 'ejsapp'));
+            $mform->addHelpButton('is_rem_lab', 'is_rem_lab', 'ejsapp');
+            $remlabmanagerinstalled = $DB->get_records('block', array('name' => 'remlab_manager'));
+            $remlabmanagerinstalled = !empty($remlabmanagerinstalled);
+            $mform->setDefault('remlab_manager', $remlabmanagerinstalled ? 1 : 0);
+            $mform->setDefault('is_rem_lab', 0);
+            $mform->disabledIf('is_rem_lab', 'remlab_manager', 'eq', 0);
 
-        if ($remlabmanagerinstalled) {
-            $showableexperiences = get_showable_experiences($USER->username, 1);
-        } else {
-            $showableexperiences = array();
-        }
-        $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'),
-            $showableexperiences);
-        $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
-        $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
-        if ($this->current->instance && $remlabmanagerinstalled) {
-            $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
-                array('ejsappid' => $this->current->instance));
-            if ($practiceintro) {
-                $i = 0;
-                $selectedpracticeindex = $i;
-                foreach ($showableexperiences as $myFrontierexp) {
-                    if ($practiceintro == $myFrontierexp) {
-                        $selectedpracticeindex = $i;
-                        break;
-                    }
-                    $i++;
-                }
-                $mform->setDefault('practiceintro', $selectedpracticeindex);
+            if ($remlabmanagerinstalled) {
+                $showableexperiences = get_showable_experiences($USER->username, 1);
             } else {
-                $mform->setDefault('practiceintro', '');
+                $showableexperiences = array();
             }
+            $mform->addElement('select', 'practiceintro', get_string('practiceintro', 'ejsapp'),
+                $showableexperiences);
+            $mform->addHelpButton('practiceintro', 'practiceintro', 'ejsapp');
+            $mform->disabledIf('practiceintro', 'is_rem_lab', 'eq', 0);
+            if ($this->current->instance && $remlabmanagerinstalled) {
+                $practiceintro = $DB->get_field('block_remlab_manager_exp2prc', 'practiceintro',
+                    array('ejsappid' => $this->current->instance));
+                if ($practiceintro) {
+                    $i = 0;
+                    $selectedpracticeindex = $i;
+                    foreach ($showableexperiences as $myFrontierexp) {
+                        if ($practiceintro == $myFrontierexp) {
+                            $selectedpracticeindex = $i;
+                            break;
+                        }
+                        $i++;
+                    }
+                    $mform->setDefault('practiceintro', $selectedpracticeindex);
+                } else {
+                    $mform->setDefault('practiceintro', '');
+                }
+            }
+            foreach ($showableexperiences as $experience) {
+                $experiencelist .= $experience . ';';
+            }
+        } else {
+            $mform->addElement('hidden', 'is_rem_lab');
+            $mform->setType('is_rem_lab', PARAM_INT);
+            $mform->setDefault('is_rem_lab', 0);
         }
         $mform->addElement('hidden', 'list_practices', null);
         $mform->setType('list_practices', PARAM_TEXT);
-        $experiencelist = '';
-        foreach ($showableexperiences as $experience) {
-            $experiencelist .= $experience . ';';
-        }
         $mform->setDefault('list_practices', $experiencelist);
+
 
         // Select the users interaction recording options.
         $mform->addElement('header', 'record_interactions_title', get_string('record_interactions', 'ejsapp'));
