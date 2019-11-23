@@ -359,34 +359,28 @@ function xmldb_ejsapp_upgrade($oldversion) {
 
     if ($oldversion < '2019080400') {
         // Drop mainframe and codebase fields from ejsapp table.
-        $dbman = $DB->get_manager();
+        /*$dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp');
         $field = new xmldb_field('mainframe');
         $dbman->drop_field($table, $field);
         $field = new xmldb_field('codebase');
-        $dbman->drop_field($table, $field);
-    }
+        $dbman->drop_field($table, $field);*/
 
-    if ($oldversion < '2019080500') {
         // Drop is_collaborative field from ejsapp table.
-        $dbman = $DB->get_manager();
+        /*$dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp');
         $field = new xmldb_field('is_collaborative');
-        $dbman->drop_field($table, $field);
-    }
+        $dbman->drop_field($table, $field);*/
 
-    if ($oldversion < '2019081103') {
         // Rename class_file field in ejsapp table.
-        $dbman = $DB->get_manager();
+        /*$dbman = $DB->get_manager();
         $table = new xmldb_table('ejsapp');
         $field = new xmldb_field('applet_name', XMLDB_TYPE_TEXT, '64', null, null,
             null, null, 'timemodified', 'class_file');
         $dbman->rename_field($table, $field, 'main_file');
         $field = new xmldb_field('class_file');
-        $dbman->drop_field($table, $field);
-    }
+        $dbman->drop_field($table, $field);*/
 
-    if ($oldversion < '2019081200') {
         // Upgrade from previous versions are not supported - Stop them
         return false;
     }
