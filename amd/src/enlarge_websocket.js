@@ -28,11 +28,27 @@
  */
 
 define(['jquery'], function() {
-    var ws;
-    var t = {
-        enlargeWebSocket: function(command, IP, port, idExp, expTime, user, password, jarPath) {
-            ws = new WebSocket("ws://127.0.0.1:8887");
-            ws.onopen = function() {
+    const t = {
+        enlargeWebSocket: function (command, IP, port, idExp, expTime, user, password, jarPath) {
+            const ws = new WebSocket("ws://127.0.0.1:8887");
+
+            ws.connectExperience = function (command, IP, port, idExp, expTime, user, password, jarPath) {
+                var obj = '{'
+                    + '"command":"' + command + '",'
+                    + '"ip_server":"' + IP + '",'
+                    + '"port_server":"' + port + '",'
+                    + '"id_exp":"' + idExp + '",'
+                    + '"expiration_time":"' + expTime + '",'
+                    + '"user":"' + user + '",'
+                    + '"password":"' + password + '"';
+                if (command === 'execjar') {
+                    obj += ',' + '"jar_file":"' + jarPath + '"';
+                }
+                obj += '}';
+                ws.send(obj);
+            };
+
+            ws.onopen = function () {
                 // Websocket is connected, send data using send().
                 ws.send("Message to send \r\n");
                 ws.connectExperience(command, IP, port, idExp, expTime, user, password, jarPath);
@@ -43,7 +59,7 @@ define(['jquery'], function() {
                 console.log("Message from myFrontier server: " + evt.data);
             };
 
-            ws.onerror = function() {
+            ws.onerror = function () {
                 if (ws.readyState === 1 || ws.readyState === 2) {
                     ws.send("exit");
                 }
@@ -57,41 +73,23 @@ define(['jquery'], function() {
                 document.body.removeChild(a);
             };
 
-            ws.onclose = function() {
+            ws.onclose = function () {
                 // Websocket is closed.
                 console.log("Connection has been closed.");
             };
-        },
 
-        connectExperience: function(command, IP, port, idExp, expTime, user, password, jarPath) {
-            var obj = '{'
-                +'"command":"' + command + '",'
-                +'"ip_server":"' + IP + '",'
-                +'"port_server":"' + port + '",'
-                +'"id_exp":"' + idExp + '",'
-                +'"expiration_time":"' + expTime + '",'
-                +'"user":"' + user + '",'
-                +'"password":"' + password + '"';
-            if (command === 'execjar') {
-                obj += ',' + '"jar_file":"' + jarPath + '"';
-            }
-            obj += '}';
-            ws.send(obj);
-        },
+            ws.resetExperience = function () {
+                ws.send('{"command":"reset"}');
+            };
 
-        stopExperience: function() {
-            ws.send('{"command":"exit"}');
-        },
+            ws.stopExperience = function () {
+                ws.send('{"command":"exit"}');
+            };
 
-        stopExperienceOnLeave: function() {
-            window.onbeforeunload = function() {
+            window.onbeforeunload = function () {
                 ws.resetExperience();
                 ws.stopExperience();
             };
-        },
-
-        resetExperience: function() {
-            ws.send('{"command":"reset"}');
         }
     };
     return t;

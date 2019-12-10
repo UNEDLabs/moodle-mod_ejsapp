@@ -582,8 +582,8 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     require_login($course, true, $cm);
 
-    if ($filearea !== 'private' && $filearea !== 'content' && $filearea !== 'xmlfiles' &&
-        $filearea !== 'recfiles' && $filearea !== 'blkfiles') {
+    if ($filearea !== 'private' && $filearea !== 'content' && $filearea !== 'compressed' &&
+        $filearea !== 'xmlfiles' && $filearea !== 'recfiles' && $filearea !== 'blkfiles') {
         return false;
     }
 
@@ -607,7 +607,7 @@ function ejsapp_pluginfile($course, $cm, $context, $filearea, array $args, $forc
         return false;
     }
 
-    if ($fileare = 'content') {
+    if ($filearea = 'content' || $filearea = 'compressed') {
         $lifetime = 0;
     } else {
         $lifetime = 604800;

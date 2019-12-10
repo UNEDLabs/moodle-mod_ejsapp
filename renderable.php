@@ -249,18 +249,18 @@ class ejsapp_lab implements renderable {
         } else if (isset($remlabinfo)) { // EjsS Java.
             if ($remlabinfo->instance !== false) {
                 global $PAGE;
+                $practice = explode("@", $remlabinfo->practice, 2);
                 $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'compressed',
                     'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file), 'filesize DESC');
                 $filerecord = reset($filerecords);
                 $fs = get_file_storage();
                 $file = $fs->get_file_by_id($filerecord->id);
-                $filepath = $file->get_filepath() . $file->get_filename();
-                $practice = explode("@", $remlabinfo->practice, 2);
+                $pathfile = $CFG->wwwroot . "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/" . $file->get_filearea() .
+                    "/" . $file->get_itemid() . "/" . $file->get_filename();
 
                 $PAGE->requires->js_call_amd('mod_ejsapp/enlarge_websocket', 'enlargeWebSocket',
                     array('execjar', $myFrontierip, 443, $practice, $remlabinfo->max_use_time / 60,
-                        $USER->username . "@" . $CFG->wwwroot, $myFrontierkey, $filepath));
-                $PAGE->requires->js_call_amd('mod_ejsapp/enlarge_websocket', 'stopExperienceOnLeave');
+                        $USER->username . "@" . $CFG->wwwroot, $myFrontierkey, $pathfile));
             }
         }
     }
