@@ -30,7 +30,7 @@
 define(['jquery'], function() {
     var ws;
     var t = {
-        EnlargeWebSocket: function(command, IP, port, idExp, expTime, user, password, jarPath) {
+        enlargeWebSocket: function(command, IP, port, idExp, expTime, user, password, jarPath) {
             ws = new WebSocket("ws://127.0.0.1:8887");
             ws.onopen = function() {
                 // Websocket is connected, send data using send().

@@ -249,7 +249,7 @@ class ejsapp_lab implements renderable {
         } else if (isset($remlabinfo)) { // EjsS Java.
             if ($remlabinfo->instance !== false) {
                 global $PAGE;
-                $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
+                $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'compressed',
                     'itemid' => $ejsapp->id, 'filename' => $ejsapp->main_file), 'filesize DESC');
                 $filerecord = reset($filerecords);
                 $fs = get_file_storage();

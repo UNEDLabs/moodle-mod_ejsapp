@@ -238,68 +238,27 @@ function users_personalized_vars($ejsapp) {
  *
  */
 function modifications_for_java($context, $ejsapp, $file, $alert) {
-    global $DB, $CFG;
-
-    $ejsok = false;
-    $packer = get_file_packer('application/zip');
-    set_time_limit(180); // Extracting files from a large .jar files may take quite a while
-    if ($file->extract_to_storage($packer, $context->id, 'mod_ejsapp', 'content', $ejsapp->id, '/')) {
-        $ejsapp->main_file = $file->get_filename();
-
-        // Extract the manifest.mf file from the .jar.
-        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => 'MANIFEST.MF'), 'filesize DESC');
-        $filerecord = reset($filerecords);
-        $fs = get_file_storage();
-        $manifest = $fs->get_file_by_id($filerecord->id);
-        $manifest = $manifest->get_content();
-        // Check whether the EjsS version to build this applet is supported.
-        $pattern = '/Applet-Height\s*:\s*(\w+)/';
-        preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-        if (count($matches) == 0) {
-            // If this field doesn't exist in the manifest, then the EjsS version used to compile the jar does not support Moodle.
-            if ($alert) {
-                $message = get_string('EJS_version', 'ejsapp');
-                echo html_writer::tag("script","window.alert(\"$message\")",
-                    array("type" => "text/javascript"));
-            }
-        } else {
-            $ejsok = true;
-        }
-        $fs->delete_area_files($filerecord->contextid, 'mod_ejsapp', 'content');
-
-        // Sign the applet.
-        // Check whether a certificate is installed and in use.
-        if (file_exists(get_config('mod_ejsapp', 'certificate_path')) &&
-            get_config('mod_ejsapp', 'certificate_password') != '' &&
-            get_config('mod_ejsapp', 'certificate_alias') != '') {
-            // Check whether the applet has the codebase parameter in manifest.mf set to $CFG->wwwroot.
-            $pattern = '/\s*\nCodebase\s*:\s*(.+)\s*/';
-            preg_match($pattern, $manifest, $matches, PREG_OFFSET_CAPTURE);
-            $host = explode("://", $CFG->wwwroot);
-            if (substr($matches[1][0], 0, -1) == $host[1]) {
-                if (is_null($file->get_referencefileid())) { // Linked files won't get signed.
-                    // Sign the applet.
-                    shell_exec("jarsigner -storetype pkcs12 -keystore " . get_config('mod_ejsapp',
-                            'certificate_path') . " -storepass " .
-                        get_config('mod_ejsapp', 'certificate_password') .
-                        " -tsa http://timestamp.comodoca.com/rfc3161 " .
-                        $file . " " . get_config('mod_ejsapp', 'certificate_alias'));
-                    // We replace the file stored in Moodle's filesystem and its table with the signed version.
-                    /*$file->delete();
-                    $fs = get_file_storage();
-                    $fs->create_file_from_pathname($filerecord, $filepath);*/
-                }
-            } else if ($alert) { // Files without the codebase parameter set to the Moodle server direction are not signed.
-                $message = get_string('EJS_codebase', 'ejsapp');
-                echo html_writer::tag("script","window.alert(\"$message\")",
-                    array("type" => "text/javascript"));
-            }
+    $ejsapp->main_file = $file->get_filename();
+    // Sign the applet.
+    // Check whether a certificate is installed and in use.
+    if (file_exists(get_config('mod_ejsapp', 'certificate_path')) &&
+        get_config('mod_ejsapp', 'certificate_password') != '' &&
+        get_config('mod_ejsapp', 'certificate_alias') != '') {
+        if (is_null($file->get_referencefileid())) { // Linked files won't get signed.
+            // Sign the applet.
+            shell_exec("jarsigner -storetype pkcs12 -keystore " . get_config('mod_ejsapp',
+                    'certificate_path') . " -storepass " .
+                get_config('mod_ejsapp', 'certificate_password') .
+                " -tsa http://timestamp.comodoca.com/rfc3161 " .
+                $file . " " . get_config('mod_ejsapp', 'certificate_alias'));
+            // We replace the file stored in Moodle's filesystem and its table with the signed version.
+            /*$file->delete();
+            $fs = get_file_storage();
+            $fs->create_file_from_pathname($filerecord, $filepath);*/
         }
     }
-    set_time_limit(ini_get('max_execution_time')); // Return to default time limit
 
-    return $ejsok;
+    return true;
 }
 
 /**
