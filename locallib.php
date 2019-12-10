@@ -242,6 +242,7 @@ function modifications_for_java($context, $ejsapp, $file, $alert) {
 
     $ejsok = false;
     $packer = get_file_packer('application/zip');
+    set_time_limit(180); // Extracting files from a large .jar files may take quite a while
     if ($file->extract_to_storage($packer, $context->id, 'mod_ejsapp', 'content', $ejsapp->id, '/')) {
         $ejsapp->main_file = $file->get_filename();
 
@@ -296,6 +297,7 @@ function modifications_for_java($context, $ejsapp, $file, $alert) {
             }
         }
     }
+    set_time_limit(ini_get('max_execution_time')); // Return to default time limit
 
     return $ejsok;
 }
