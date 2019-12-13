@@ -140,6 +140,7 @@ $string['collab_access'] = 'Esta es una sesi&oacute;n colaborativa.';
 $string['check_bookings'] = 'Consulte sus reservas activas con el sistema de reservas.';
 $string['lab_in_use'] = 'El laboratorio est&aacute; ocupado o reiniciandose en este instante. Pruebe de nuevo m&aacute;s adelante.';
 $string['booked_lab'] = 'Este laboratorio ha sido reservado para esta hora en un curso distinto. Pruebe de nuevo m&aacute;s adelante.';
+$string['forbid_lti'] = 'No tienes permisos para acceder a este laboratorio.';
 
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
 

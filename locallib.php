@@ -551,10 +551,10 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
 
     // Ask ENLARGE IRS about the myVirtualFrontier servers linked to this Moodle and the myGateway devices linked to each
     // of these myVirtualFrontier servers
-    $enlargeIP = 'irs.nebsyst.com';
-    if ($fp = fsockopen($enlargeIP, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+    $enlargeIRS_IP = 'irs.nebsyst.com';
+    if ($fp = fsockopen($enlargeIRS_IP, '80', $errorcode, $errorstring, 3)) { // IP is alive.
         fclose($fp);
-        $uri = 'http://' . $enlargeIP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
+        $uri = 'http://' . $enlargeIRS_IP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
         $headers = get_headers($uri);
         $myGatewayDevices = [];
         if (substr($headers[0], 9, 3) == 200) { // Valid file.
@@ -568,7 +568,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
     foreach ($myGatewayDevices as $myGatewayDevice) {
         if ($fp = fsockopen($myGatewayDevice->address, '80', $errorcode, $errorstring, 3)) { // IP is alive.
             fclose($fp);
-            $uri = 'http://' . $myGatewayDevice->address . '/' . $myGatewayDevice->name;
+            $uri = 'https://' . $myGatewayDevice->address . '/' . $myGatewayDevice->name . '/gexlab';
             $headers = get_headers($uri);
             if (substr($headers[0], 9, 3) == 200) { // Valid file.
                 if ($xml = simplexml_load_file($uri)) {
@@ -722,8 +722,8 @@ function default_rem_lab_conf($practice, $username = "") {
 }
 
 /**
- * Checks whether a user-accessible practice is defined in an operative myFrontier server and returns the myFrontier
- * instance if it is, or false if it is not.
+ * Checks whether a user-accessible practice is defined in an operative myFrontier server or myGateway device and
+ * returns the myFrontier/myVirtualFrontier instance if it is, or false if it is not.
  *
  * @param string $practice
  * @param string $username
@@ -742,8 +742,9 @@ function is_practice_in_enlarge($practice, $username = "", $ejsappcontext = 0) {
     foreach ($myFrontierips as $myFrontierip) {
         $myFrontieriparray = array($myFrontierip);
         $listexperiences = get_experiences_myfrontier($myFrontieriparray, $username, $ejsappcontext);
-        $myFrontierexperiences = explode(";", $listexperiences);
-        if (in_array($practice, $myFrontierexperiences)) {
+        $listexperiences .= get_experiences_mygateway($username, $ejsappcontext);
+        $enlargeExperiences = explode(";", $listexperiences);
+        if (in_array($practice, $enlargeExperiences)) {
             $myFrontierinstance = $instance;
             break;
         }

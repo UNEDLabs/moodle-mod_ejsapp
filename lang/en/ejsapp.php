@@ -140,6 +140,7 @@ $string['collab_access'] = 'This is a collaborative session.';
 $string['check_bookings'] = 'Check your active bookings with the booking system.';
 $string['lab_in_use'] = 'The lab is currently being used or rebooted. Try again later.';
 $string['booked_lab'] = 'This lab has been booked for this hour in a different course. Try again later.';
+$string['forbid_lti'] = 'You don\'t have the rights to access this lab.';
 
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
 

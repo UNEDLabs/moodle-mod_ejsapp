@@ -170,45 +170,50 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             $message1 = $OUTPUT->box(get_string('inactive_lab', 'ejsapp'));
             $action = 'inactive_lab';
         } else {    // Students trying to access a remote lab with restricted access.
-            if ($remlabaccess->booking_info['active_booking']) {
-                // Remote lab freely accessible from the current course but with an active booking made by someone in a different course.
-                $message1 = $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
-                $action = 'booked_lab';
-            } else { // Other cases.
-                // Getting the maximum time the user is allowed to use the remote lab.
-                $bookingendtime = check_last_valid_booking($DB, $USER->username, $ejsapp->id);
-                $bookingendtimeunix = strtotime($bookingendtime);
-                $maxusetime = $bookingendtimeunix - time(); // In seconds.
-                // Check if there is a booking done by this user and obtain the needed information for myFrontier in case it is used.
-                $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $myFrontierinstance,
-                    $remlabaccess->labmanager, $maxusetime);
-                if (!is_null($remlabinfo)) { // The user has an active booking -> he can access the lab.
-                    $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
-                    $maxusetime = $remlabtime->max_use_time;
-                    // Get the lab use status.
-                    $labstatus = $remlabconf->usestate;
-                    // Determine the waiting time.
-                    $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
-                        $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
-                    if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
-                        $accessed = true;
-                    } else {
-                        $message = $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
-                        $action = 'need_to_wait';
-                    }
-                } else { // No active booking.
-                    $message1 = $OUTPUT->box(get_string('no_booking', 'ejsapp'));
-                    if (false) { // TODO: Check if the lab and course support collaborative access.
-                        // Students can still access in collaborative mode.
-                        $message2 = $OUTPUT->box(get_string('collab_access', 'ejsapp'));
-                        $remlabinfo = define_remlab($myFrontierinstance, true, 'NULL',
-                            $remlabaccess->labmanager, $maxusetime);
-                        $action = 'collab_view';
-                    } else { // No access.
-                        $message2 = $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
-                        $action = 'need_to_book';
+            if (!substr($USER->username, 0, 20) === "enrol_lti_enrol_lti_") { // Prevent double-LTI access!
+                if ($remlabaccess->booking_info['active_booking']) {
+                    // Remote lab freely accessible from the current course but with an active booking made by someone in a different course.
+                    $message1 = $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
+                    $action = 'booked_lab';
+                } else { // Other cases.
+                    // Getting the maximum time the user is allowed to use the remote lab.
+                    $bookingendtime = check_last_valid_booking($DB, $USER->username, $ejsapp->id);
+                    $bookingendtimeunix = strtotime($bookingendtime);
+                    $maxusetime = $bookingendtimeunix - time(); // In seconds.
+                    // Check if there is a booking done by this user and obtain the needed information for myFrontier in case it is used.
+                    $remlabinfo = check_users_booking($DB, $USER, $ejsapp, date('Y-m-d H:i:s'), $myFrontierinstance,
+                        $remlabaccess->labmanager, $maxusetime);
+                    if (!is_null($remlabinfo)) { // The user has an active booking -> he can access the lab.
+                        $remlabtime = remote_lab_use_time_info($repeatedlabs, $ejsapp);
+                        $maxusetime = $remlabtime->max_use_time;
+                        // Get the lab use status.
+                        $labstatus = $remlabconf->usestate;
+                        // Determine the waiting time.
+                        $waittime = get_wait_time($remlabconf, $remlabtime->time_first_access, $remlabtime->time_last_access,
+                            $remlabtime->max_use_time, $remlabtime->reboottime, $checkactivity);
+                        if ($labstatus == 'available' || ($labstatus == 'rebooting' && $waittime <= 0)) { // Lab is available.
+                            $accessed = true;
+                        } else {
+                            $message = $OUTPUT->box(get_string('lab_in_use', 'ejsapp'));
+                            $action = 'need_to_wait';
+                        }
+                    } else { // No active booking.
+                        $message1 = $OUTPUT->box(get_string('no_booking', 'ejsapp'));
+                        if (false) { // TODO: Check if the lab and course support collaborative access.
+                            // Students can still access in collaborative mode.
+                            $message2 = $OUTPUT->box(get_string('collab_access', 'ejsapp'));
+                            $remlabinfo = define_remlab($myFrontierinstance, true, 'NULL',
+                                $remlabaccess->labmanager, $maxusetime);
+                            $action = 'collab_view';
+                        } else { // No access.
+                            $message2 = $OUTPUT->box(get_string('check_bookings', 'ejsapp'));
+                            $action = 'need_to_book';
+                        }
                     }
                 }
+            } else {
+                $message2 = $OUTPUT->box(get_string('forbid_lti', 'ejsapp'));
+                $action = 'need_to_book'; //TODO: Replace with event for double-lti access
             }
         }
     }
