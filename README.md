@@ -1,6 +1,6 @@
 [Zenodo](https://zenodo.org/badge/latestdoi/18948/UNEDLabs/moodle-mod_ejsapp)
 
-[DOI](10.5281/zenodo.33845)
+DOI: 10.5281/zenodo.3549877
 
 ## 1. Content
 
