@@ -175,8 +175,8 @@ Blockly.Blocks['jsUpDown'] = {
 	this.setPreviousStatement(true, null);
 	this.setNextStatement(true, null);
 	this.setColour(183);
- this.setTooltip("");
- this.setHelpUrl("");
+ 	this.setTooltip("");
+ 	this.setHelpUrl("");
   }
 };
 
@@ -187,8 +187,8 @@ Blockly.Blocks['jsLeftRight'] = {
 		.appendField(new Blockly.FieldDropdown(visualJSGeneral), "jsOption");
 	this.setOutput(true, null);
 	this.setColour(183);
- this.setTooltip("");
- this.setHelpUrl("");
+ 	this.setTooltip("");
+ 	this.setHelpUrl("");
   }
 };
 
@@ -200,8 +200,8 @@ Blockly.Blocks['jsUpDown2'] = {
 	this.setPreviousStatement(true, null);
 	this.setNextStatement(true, null);
 	this.setColour(183);
- this.setTooltip("");
- this.setHelpUrl("");
+ 	this.setTooltip("");
+ 	this.setHelpUrl("");
   }
 };
 
@@ -212,8 +212,8 @@ Blockly.Blocks['jsLeftRight2'] = {
 		.appendField(new Blockly.FieldDropdown(visualJSEvents), "jsOption");
 	this.setOutput(true, null);
 	this.setColour(183);
- this.setTooltip("");
- this.setHelpUrl("");
+ 	this.setTooltip("");
+ 	this.setHelpUrl("");
   }
 };
 
@@ -221,7 +221,7 @@ Blockly.Blocks['jsLeftRight2'] = {
 Blockly.Blocks.start_rec = {
 	init: function() {
 		this.appendDummyInput()
-		.appendField(Blockly.Msg.ExpSTARTRECORD);
+			.appendField(Blockly.Msg.ExpSTARTRECORD);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(33);
@@ -232,7 +232,7 @@ Blockly.Blocks.start_rec = {
 Blockly.Blocks.stop_rec = {
 	init: function() {
 		this.appendDummyInput()
-		.appendField(Blockly.Msg.ExpSTOPRECORD);
+			.appendField(Blockly.Msg.ExpSTOPRECORD);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(33);

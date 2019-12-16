@@ -108,7 +108,7 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     $ext = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table.
     if ($ext == 'jar') { // Java.
-        $ejsok = modifications_for_java($context, $ejsapp, $file, false);
+        $ejsok = modifications_for_java($ejsapp, $file);
     } else { // Javascript.
         $ejsok = modifications_for_javascript($context, $ejsapp, $file);
     }
@@ -229,15 +229,13 @@ function users_personalized_vars($ejsapp) {
 /**
  * For EjsS java applications.
  *
- * @param stdClass $context
  * @param stdClass $ejsapp
  * @param stored_file $file
- * @param boolean $alert
  * @return boolean $ejsok
  * @throws
  *
  */
-function modifications_for_java($context, $ejsapp, $file, $alert) {
+function modifications_for_java($ejsapp, $file) {
     $ejsapp->main_file = $file->get_filename();
     // Sign the applet.
     // Check whether a certificate is installed and in use.
@@ -527,11 +525,12 @@ function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappconte
  *
  * @param string $username
  * @param int $ejsappcontext 0 if block remlab_manager, 1 if mod ejsapp
+ * @param boolean $returnaddress true to return mygateway addresses too
  * @return string $listexperiences
  * @throws
  *
  */
-function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
+function get_experiences_mygateway($username = "", $ejsappcontext = 0, $returnaddress = false) {
     global $USER;
     $listexperiences = '';
 
@@ -552,7 +551,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
     // Ask ENLARGE IRS about the myVirtualFrontier servers linked to this Moodle and the myGateway devices linked to each
     // of these myVirtualFrontier servers
     $enlargeIRS_IP = 'irs.nebsyst.com';
-    if ($fp = fsockopen($enlargeIRS_IP, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+    if ($fp = fsockopen($enlargeIRS_IP, '443', $errorcode, $errorstring, 3)) { // IP is alive.
         fclose($fp);
         $uri = 'http://' . $enlargeIRS_IP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
         $headers = get_headers($uri);
@@ -566,7 +565,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
 
     // Connect to each of the myGateway devices to ask them about the defined experiences
     foreach ($myGatewayDevices as $myGatewayDevice) {
-        if ($fp = fsockopen($myGatewayDevice->address, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+        if ($fp = fsockopen($myGatewayDevice->address, '443', $errorcode, $errorstring, 3)) { // IP is alive.
             fclose($fp);
             $uri = 'https://' . $myGatewayDevice->address . '/' . $myGatewayDevice->name . '/gexlab';
             $headers = get_headers($uri);
@@ -592,12 +591,14 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0) {
                                     foreach ($ownerusers as $owneruser) {
                                         // Check whether the required user has access to the experience.
                                         if (strcasecmp($username, $owneruser) == 0) {
+                                            if ($returnaddress) $listexperiences .= $myGatewayDevice->address . ':';
                                             $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
                                             break;
                                         }
                                     }
                                 } else {
                                     // If not, the whole list of myFrontier experiences must be returned, so add it.
+                                    if ($returnaddress) $listexperiences .= $myGatewayDevice->address . ':';
                                     $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
                                 }
                             }

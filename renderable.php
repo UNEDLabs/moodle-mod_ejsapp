@@ -212,9 +212,20 @@ class ejsapp_lab implements renderable {
                         // TODO: Replace $CFG->wwwroot by get_config('mod_ejsapp', 'server_id')?
                         $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierCredentials',
                             array($USER->username . "@" . $CFG->wwwroot, $myFrontierkey));
-                        $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
-                            array($myFrontierport == 443, $myFrontierip, 'SARLABV8.0', $myFrontierport, $practice[0], $CFG->wwwroot .
-                                '/course/view.php?id=' . $COURSE->id));
+                        $myGatewayExperiences = get_experiences_mygateway("", 0, true);
+                        $pos = strpos($myGatewayExperiences, $remlabinfo->practice);
+                        if ($pos !== false) { // myGateway experience
+                            $end = substr($myGatewayExperiences, 0, $pos-1);
+                            $length = $pos - strrpos($end, ';') -2;
+                            $myGatewayip = substr($end, -$length);
+                            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
+                                array($myFrontierport == 443, $myGatewayip, $practice[1], $myFrontierport, $practice[0],
+                                    $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
+                        } else { // myFrontier experience
+                            $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
+                                array($myFrontierport == 443, $myFrontierip, 'SARLABV8.0', $myFrontierport, $practice[0],
+                                    $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
+                        }
                     }
                 }
                 // Make sure the Javascript application doesn't stop when losing focus and set SSE info for collab.

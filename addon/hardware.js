@@ -30,7 +30,7 @@ EJSS_HARDWARE.orientationTools = function () {
 				userAgent.match( /iPod/i ) ) return 'iOS';
 		if( userAgent.match( /Android/i ) ) return 'Android';
 		return 'unknown';
-	};
+	}
 
 	window.addEventListener("orientationchange", function() {
 		mOrientation  = readOrientation();
@@ -62,7 +62,7 @@ EJSS_HARDWARE.accelerometer = function () {
         data.gamma = rotation.gamma;
         data.millisAgo = 0;
         return data;
-	};
+	}
 	
 	function deviceMotionHandler(eventData) {
 		// Grab the acceleration from the results
@@ -87,7 +87,7 @@ EJSS_HARDWARE.accelerometer = function () {
 		for (var i=0, n=mListeners.length; i<n; i++) {
 			mListeners[i](mData);
 		}
-	};
+	}
 
 	self.isPresent = function() { return (typeof window.DeviceMotionEvent != "undefined"); };
 
@@ -128,7 +128,7 @@ EJSS_HARDWARE.accelerometer = function () {
     	data.y /= n;
     	data.z /= n;
     	return data;
-	};
+	}
 	
 	self.getDeviceData = function() { return (mAverageTime>0) ? averageData() : mData; };
 	

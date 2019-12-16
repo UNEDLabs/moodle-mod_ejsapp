@@ -45,8 +45,8 @@ jss = function (workspace) {
 	var blockText = '<xml>' + '<button text="Create JavaScript..." callbackKey="jsButtonPressed"></button>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
-	var blockText = '<xml>' + '<button text="Load JavaScript..." callbackKey="loadjsButtonPressed"></button>' + '</xml>';
-	var block = Blockly.Xml.textToDom(blockText).firstChild;
+	blockText = '<xml>' + '<button text="Load JavaScript..." callbackKey="loadjsButtonPressed"></button>' + '</xml>';
+	block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	
 	if (jsCodesGeneral.length > 0) {
@@ -65,8 +65,8 @@ jss2 = function (workspace) {
 	var blockText = '<xml>' + '<button text="Create JavaScript..." callbackKey="jsButtonPressed2"></button>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
-	var blockText = '<xml>' + '<button text="Load JavaScript..." callbackKey="loadjsButtonPressed2"></button>' + '</xml>';
-	var block = Blockly.Xml.textToDom(blockText).firstChild;
+	blockText = '<xml>' + '<button text="Load JavaScript..." callbackKey="loadjsButtonPressed2"></button>' + '</xml>';
+	block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	
 	if (jsCodesEvents.length > 0) {
