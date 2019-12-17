@@ -71,8 +71,8 @@ Blockly.JavaScript.jsUpDown = function(block) {
 			return "var set = true;\n"+jsCodesGeneral[i].code + '\nrevFin();\nset=false;\n';
 		}
 	}
-	//code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
-	//code = code.replace(/(\r\n|\n|\r)/gm, "");
+	/*code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
+	code = code.replace(/(\r\n|\n|\r)/gm, "");*/
 	return '\n';
 };
 
@@ -84,8 +84,8 @@ Blockly.JavaScript.jsUpDown2 = function(block) {
 			return "var set = true;\n"+jsCodesEvents[i].code + '\nrevFin();\nset=false;\n';
 		}
 	}
-	//code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
-	//code = code.replace(/(\r\n|\n|\r)/gm, "");
+	/*code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
+	code = code.replace(/(\r\n|\n|\r)/gm, "");*/
 	return '\n';
 };
 
@@ -98,8 +98,8 @@ Blockly.JavaScript.jsLeftRight = function(block) {
 				break;
 			}
 		}
-		//code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
-		//code = code.replace(/(\r\n|\n|\r)/gm, "");
+		/*code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
+		code = code.replace(/(\r\n|\n|\r)/gm, "");*/
 		return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -112,8 +112,8 @@ Blockly.JavaScript.jsLeftRight2 = function(block) {
 				break;
 			}
 		}
-		//code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
-		//code = code.replace(/(\r\n|\n|\r)/gm, "");
+		/*code = code.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
+		code = code.replace(/(\r\n|\n|\r)/gm, "");*/
 		return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -132,7 +132,7 @@ Blockly.JavaScript.event = function(block) {
 	var statements_name2 = Blockly.JavaScript.statementToCode(block, 'NAME2');
 	statements_name2 = statements_name2.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
 	statements_name2 = statements_name2.replace(/(\r\n|\n|\r)/gm, "");
-	// TODO: Assemble JavaScript into code variable.
+	/* TODO: Assemble JavaScript into code variable. */
 	var condString = statements_name1 + " - " + dropdown_d;
 	code = 'addEvent("' + condString+'", "'+statements_name2 + '");\n';
 	return code;
@@ -140,7 +140,7 @@ Blockly.JavaScript.event = function(block) {
 
 Blockly.JavaScript.fixedRelation = function(block) {
 	var statements_name1 = Blockly.JavaScript.statementToCode(block, 'NAME');
-	
+
 	statements_name1 = statements_name1.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
 	statements_name1 = statements_name1.replace(/(\r\n|\n|\r)/gm, "");
 	code = 'addFixedRelation('+ conditionFixed.length+', "'+ statements_name1 + '");\n';

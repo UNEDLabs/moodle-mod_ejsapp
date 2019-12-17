@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function(){
-	// When the user clicks on <span> (x), close the modal
+	/* When the user clicks on <span> (x), close the modal */
 	document.getElementsByClassName("close")[0].onclick = function() {
 		if(jsOpenType===0)
 			jsCodesGeneral[jsOpenedGeneral].code = editorJS.getValue();
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		document.getElementById('myModal').style.display = "none";
 	};
 
-	// When the user clicks anywhere outside of the modal, close it
+	/* When the user clicks anywhere outside of the modal, close it */
 	window.onclick = function(event) {
 		if (event.target == document.getElementById('myModal')) {
 			if(jsOpenType===0)
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function(){
 			workspace.registerButtonCallback("createVariablePressed", createVariable,"");
 			workspace.registerToolboxCategoryCallback('generalVars', generalVars);
 			workspace.registerToolboxCategoryCallback('jss', jss);
-			//workspace.registerButtonCallback('jsButtonPressed', jsButton);
-			//workspace.registerButtonCallback('loadjsButtonPressed', loadjsButton);
+			/*workspace.registerButtonCallback('jsButtonPressed', jsButton);
+			workspace.registerButtonCallback('loadjsButtonPressed', loadjsButton);*/
 			workspace.addChangeListener(myUpdateFunction);
 			clearInterval(start);
 		}
@@ -149,7 +149,7 @@ function loadVariables(){
 					break;
 			}
 		}
-	} else if (typeof _model._inputAndPublicParameters !== "undefined") { // NEW IMPLEMENTATION
+	} else if (typeof _model._inputAndPublicParameters !== "undefined") { /* NEW IMPLEMENTATION */
 		newImplement = true;
 		var inputAux = _model._inputAndPublicParameters;
 		var outputAux = _model._outputAndPublicParameters;
@@ -220,8 +220,8 @@ function preparePage(){
 		workspaceEvents.registerButtonCallback("createVariablePressed", createVariable,"");
 		workspaceEvents.registerToolboxCategoryCallback('controls', controls);
 		workspaceEvents.registerToolboxCategoryCallback('jss2', jss2);
-		//workspaceEvents.registerButtonCallback('jsButtonPressed2', jsButton2);
-		//workspaceEvents.registerButtonCallback('loadjsButtonPressed2', loadjsButton2);
+		/*workspaceEvents.registerButtonCallback('jsButtonPressed2', jsButton2);
+		workspaceEvents.registerButtonCallback('loadjsButtonPressed2', loadjsButton2);*/
 		workspaceEvents.registerToolboxCategoryCallback('generalVars', generalVars);
 		workspaceEvents.addChangeListener(checkEventsBlocks);
 	}
@@ -303,7 +303,7 @@ function variableExists(name){
 	return false;
 }
 
-// CALLBACKS
+/* CALLBACKS */
 
 function jsButton(text){
 	var result;
@@ -479,9 +479,9 @@ function focusOutController(){
 	controllersList[controllerOpen].code=controllerEditor.getValue();
 }
 
-////////////////////////////////////
+/*
 // ACE EDITOR FOR JAVASCRIPT CODE //
-////////////////////////////////////
+								  */
 
 function initJSFrame(place){
     editorJS = ace.edit(place);
@@ -515,9 +515,9 @@ function selectJS(n,text){
 	}
 }
 
-// INTERFACE
+/* INTERFACE */
 
-// DRAGGABLE ELEMENTS
+/* DRAGGABLE ELEMENTS */
 function resize(){
 	if(experimentOpen!=-1){Blockly.svgResize(workspace);}
 	if(chartOpen!=-1){Blockly.svgResize(workspaceCharts);}
@@ -547,9 +547,8 @@ function returning(id){
 	}
 }
 
-// Make the DIV element draggable:
+/* Make the DIV element draggable: */
 function copyToDragDiv(id){
-	// PREPARAR DRAG
 	var iDiv = document.createElement('div');
 	iDiv.id = 'drag_'+id;
 	var subid = id.substr(1);
@@ -560,7 +559,7 @@ function copyToDragDiv(id){
 		'<div id="dragContent'+subid+'"></div>';
 	var container = document.getElementById('prevDrag');
 	container.insertBefore(iDiv, container.firstChild);
-	//document.getElementsByTagName('body')[0].appendChild(iDiv);
+	/*document.getElementsByTagName('body')[0].appendChild(iDiv);*/
 	dragElement(document.getElementById('drag_'+id));
 
 
@@ -581,15 +580,15 @@ function copyToDragDiv(id){
 }
 
 
-//dragElement(document.getElementById("EJsS"));
-//dragElement(document.getElementById("ChartBox"));
-//dragElement(document.getElementById("ScriptBox"));
+/*dragElement(document.getElementById("EJsS"));
+dragElement(document.getElementById("ChartBox"));
+dragElement(document.getElementById("ScriptBox"));*/
 
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 	document.getElementById( elmnt.id).style.display = "none";
   if (document.getElementById("dragheader")){
-    // if present, the header is where you move the DIV from:
+    /* if present, the header is where you move the DIV from: */
 	document.getElementById("dragheader").onmousedown = dragMouseDown;
 	document.getElementById("dragheader").style.display = "none";
   }
@@ -602,11 +601,11 @@ function dragElement(elmnt) {
   function dragMouseDown(e) {
     e = e || window.event;
     e.preventDefault();
-    // get the mouse cursor position at startup:
+    /* get the mouse cursor position at startup: */
     pos3 = e.clientX;
     pos4 = e.clientY;
     document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
+    /* call a function whenever the cursor moves: */
     document.onmousemove = elementDrag;
   }
 
@@ -615,25 +614,25 @@ function dragElement(elmnt) {
   function elementDrag(e) {
     e = e || window.event;
     e.preventDefault();
-    // calculate the new cursor position:
+    /* calculate the new cursor position: */
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    // set the element's new position:
+    /* set the element's new position: */
     elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
   }
 
   function closeDragElement() {
-    // stop moving when mouse button is released:
+    /* stop moving when mouse button is released: */
     document.onmouseup = null;
     document.onmousemove = null;
 	elmnt.style.background_color = "";
   }
 }
 
-////////////////////////
+
 Element.prototype.remove = function() {
     this.parentElement.removeChild(this);
 };
@@ -663,14 +662,12 @@ function removeAndCloseScript(id){
 		if(eventsList[eventOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			eventOpen=-1;
-			//eventSelected="";
 		}
 	}
 	else if(controllerOpen!==-1) {
 		if(controllersList[controllerOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
 			controllerOpen=-1;
-			//controllerSelected="";
 		}
 	}
 	removeScript(id);
@@ -854,7 +851,6 @@ function newScript(num){
 }
 
 function showScript(num,name){
-
 	document.getElementById("ScriptBox").style.display = "none";
 	document.getElementById("blocklyDivExperiments").style.display="none";
 	document.getElementById("blocklyDivCharts").style.display="none";
@@ -964,7 +960,7 @@ function showLog(){
 		document.getElementById('footer').style.display = "none";
 }
 
-/////////////
+
 
 function printError(textError){
 	if (typeof errorInterval !== 'undefined') {
@@ -979,13 +975,12 @@ function printError(textError){
 	errorInterval = setInterval(changeError, 2000);
 }
 
-
 function changeError() {
 	if(document.getElementById('footer').style.display!=="none") showLog();
 	clearInterval(errorInterval);
 }
 
-/////////// <SAVE & LOAD FILES>
+/* <SAVE & LOAD FILES> */
 
 function saveCode() {
 	json = JSON.stringify(codeToSave());
@@ -1063,34 +1058,34 @@ function setLoadedWorkspace(json){
 
 		var saveExp=JSON.parse(json).experiments;
 		for(i=0;i<saveExp.length;i++){
-			//var code = (new DOMParser()).parseFromString(saveExp[i].code, "text/xml");
-			//experimentsList.push({"name":saveExp[i].name,"code":code});
+			/*var code = (new DOMParser()).parseFromString(saveExp[i].code, "text/xml");
+			experimentsList.push({"name":saveExp[i].name,"code":code});*/
 			addnewScript(1,saveExp[i].name,saveExp[i].code,'experimentsScripts','experimentSelection',experimentsList);
 		}
 		var saveCharts=JSON.parse(json).charts;
 		for(i=0;i<saveCharts.length;i++){
-			//var code = (new DOMParser()).parseFromString(saveCharts[i].code, "text/xml");
-			//chartsList.push({"name":saveCharts[i].name,"code":code});
+			/*var code = (new DOMParser()).parseFromString(saveCharts[i].code, "text/xml");
+			chartsList.push({"name":saveCharts[i].name,"code":code});*/
 			addnewScript(2,saveCharts[i].name,saveCharts[i].code,'chartsScripts','chartSelection',chartsList);
 		}
 		var saveEvents=JSON.parse(json).events;
 		for(i=0;i<saveEvents.length;i++){
-			//var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
-			//eventsList.push({"name":saveExp[i].name,"code":code});
+			/*var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
+			eventsList.push({"name":saveExp[i].name,"code":code});*/
 			addnewScript(3,saveEvents[i].name,saveEvents[i].code,'eventsScripts','eventSelection',eventsList);
 		}
 		var saveControllers=JSON.parse(json).controllers;
 		for(i=0;i<saveControllers.length;i++){
-			//var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
-			//eventsList.push({"name":saveExp[i].name,"code":code});
+			/*var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
+			eventsList.push({"name":saveExp[i].name,"code":code});*/
 			addnewScript(4,saveControllers[i].name,saveControllers[i].code,'controllersScripts','controllerSelection',controllersList);
 		}
 
-		//addnewScript(num,name,null,'ControllerScripts','controllerSelection',controllersList);
+		/*addnewScript(num,name,null,'ControllerScripts','controllerSelection',controllersList);
 
-		//Blockly.Xml.domToWorkspace(xmlDom1, workspace);
-		//Blockly.Xml.domToWorkspace(xmlDom2, workspaceEvents);
-		//Blockly.Xml.domToWorkspace(xmlDom3, workspaceCharts);
+		Blockly.Xml.domToWorkspace(xmlDom1, workspace);
+		Blockly.Xml.domToWorkspace(xmlDom2, workspaceEvents);
+		Blockly.Xml.domToWorkspace(xmlDom3, workspaceCharts);*/
 		document.getElementById("_javaScriptFrame").style.visibility = "hidden";
 	}
 }
@@ -1112,7 +1107,7 @@ function saveCSV(num){
 				break;
 			}
 		}
-	} else if (num === 1){ // Data
+	} else if (num === 1){ /* Data */
 		if(recordedVariables.names.length<0)
 			return;
 		for(var r in recordedVariables.names){
@@ -1146,13 +1141,13 @@ function sendSnapshot(data_url, user_file, moodle_upload_file) {
 		"&user_id="+_model.getUserID()+"&ejsapp_id="+_model.getActivityID();
 	http.open("POST", moodle_upload_file, true);
 
-	//Send the proper header information along with the request
+	/* Send the proper header information along with the request */
 	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
 	http.send(params);
 }
 
-/////////// </SAVE & LOAD FILES>
+/* </SAVE & LOAD FILES> */
 
 function removeVariablesFromBlockly(){
 	for(var v in blocklyVariablesList){
@@ -1190,7 +1185,7 @@ function getValueModel(p1) {
 	return '';
 }
 
-/// CONTROLLER
+/* CONTROLLER */
 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 var ARGUMENT_NAMES = /([^\s,]+)/g;
 function getInfoFromFunctionName(func) {
@@ -1198,13 +1193,13 @@ function getInfoFromFunctionName(func) {
 	var fnStr = func.toString().replace(STRIP_COMMENTS, '');
 	var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
 	var parm=[];
-	//result = result.toString().replace(/,/g, ' , ');
+	/*result = result.toString().replace(/,/g, ' , ');*/
 	if(result === null) result = [];
 	else{
 		parm = result;
 		result = result.toString().replace(/,/g, ' , ');
 	}
-	var dondeReturn = fnStr.indexOf('return')
+	var dondeReturn = fnStr.indexOf('return');
 	if(dondeReturn===-1)
 		return [result,'',parm];
 	else

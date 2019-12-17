@@ -1,5 +1,3 @@
-// This file was automatically generated.  Do not modify.
-
 'use strict';
 
 goog.provide('Blockly.Msg.en');
@@ -390,7 +388,7 @@ Blockly.Msg.TEXT_CREATE_JOIN_ITEM_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAM
 Blockly.Msg.LISTS_INDEX_OF_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.PROCEDURES_DEFRETURN_COMMENT = Blockly.Msg.PROCEDURES_DEFNORETURN_COMMENT;
 
-// EXPERIMENTS
+/* EXPERIMENTS */
 Blockly.Msg.ExpSTART = "start the lab";
 Blockly.Msg.ExpSTARTFOR = "play the lab for";
 Blockly.Msg.ExpSECONDS = "real seconds";

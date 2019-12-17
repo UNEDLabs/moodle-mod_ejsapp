@@ -13,10 +13,9 @@ function prepareControllerCode(code){
 	}
 
 	control = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
-	//u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
-	//(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
-	//control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );
-
+	/*u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
+	(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
+	control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );*/
 
 	/*statem.push(statements_code.toString());
 	var res = getInfoFromFunctionName(functionToReplace);
@@ -68,7 +67,7 @@ function playCodeDet(value0,value1,value2,value3) {
 
 	if((code===null) || (blocklyExp==="") )
 		return ["","","",""];
-	//CONTROLLER NOT YET Blockly.Xml.domToWorkspace(getCodeFromName(experimentsList,$('select')[3].value), workspaceEvents);
+	/* CONTROLLER NOT YET Blockly.Xml.domToWorkspace(getCodeFromName(experimentsList,$('select')[3].value), workspaceEvents); */
 	return [blocklyExp,blocklyChart,blockyEvent,blocklyController];
 }
 
@@ -140,7 +139,6 @@ function parseCode(blocklyExp,blocklyChart,blockyEvent) {
 			code2 = code2.slice(pos2 + 1, code2.length);
 		}
 	}*/
-	//console.log(code);
 	myInterpreter = new Interpreter(code, initApi);
 	highlightPause = false;
 	workspace.highlightBlock(null);
@@ -160,43 +158,43 @@ function stepCode() {
 		}
 		finally {
 			if (!ok) {
-				// Program complete, no more code to execute.
+				/* Program complete, no more code to execute. */
 				workspace.highlightBlock(null);
 				clearInterval(inter);
 				return;
 			}
 		}
 		if (highlightPause) {
-			// A block has been highlighted.  Pause execution here.
+			/* A block has been highlighted.  Pause execution here. */
 			highlightPause = false;
 		} else {
-			// Keep executing until a highlight statement is reached.
+			/* Keep executing until a highlight statement is reached. */
 			stepCode();
 		}
 	}
 }
 
 function initApi(interpreter, scope) {
-	// Add an API function for highlighting blocks.
+	/* Add an API function for highlighting blocks. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(revisarInicio());
 	};
 	interpreter.setProperty(scope, 'revIni', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for highlighting blocks.
+	/* Add an API function for highlighting blocks. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(revisarFin());
 	};
 	interpreter.setProperty(scope, 'revFin', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for alert blocks.
+	/* Add an API function for alert blocks. */
 	var wrapper = function(id) {
 		id = id ? id.toString() : '';
 		return interpreter.createPrimitive(alert(id));
 	};
 	interpreter.setProperty(scope, 'alert', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for highlighting blocks.
+	/* Add an API function for highlighting blocks. */
 	var wrapper = function(id) {
 		id = id ? id.toString() : '';
 		return interpreter.createPrimitive(highlightBlock(id));
@@ -204,37 +202,37 @@ function initApi(interpreter, scope) {
 	interpreter.setProperty(scope, 'highlightBlock', interpreter.createNativeFunction(wrapper));
 
 
-	// Add an API function for the play block.
+	/* Add an API function for the play block. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(_model.play());
 	};
 	interpreter.setProperty(scope, 'play', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the pause block.
+	/* Add an API function for the pause block. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(_model.pause());
 	};
 	interpreter.setProperty(scope, 'pause',interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the reset block.
+	/* Add an API function for the reset block. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(reset());
 	};
 	interpreter.setProperty(scope, 'reset',	interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the initialize block.
+	/* Add an API function for the initialize block. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(_model.initialize());
 	};
 	interpreter.setProperty(scope, 'initialize', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the setTimeStep block.
+	/* Add an API function for the setTimeStep block. */
 	var wrapper = function(number) {
 		return interpreter.createPrimitive(setTimeStep(number));
 	};
 	interpreter.setProperty(scope, 'setTimeStep', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the addEvent() block.
+	/* Add an API function for the addEvent() block. */
 	var wrapper = function(cond,statement) {
 		cond = cond ? cond.toString() : '';
 		statement = statement ? statement.toString() : '';
@@ -242,7 +240,7 @@ function initApi(interpreter, scope) {
 	};
 	interpreter.setProperty(scope, 'addEvent', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the rec() block.
+	/* Add an API function for the rec() block. */
 	var wrapper = function(bool) {
 		if ((bool.toString().localeCompare("true") == 0)) bool = true;
 		else if ((bool.toString().localeCompare("false") == 0))	bool = false;
@@ -250,26 +248,26 @@ function initApi(interpreter, scope) {
 	};
 	interpreter.setProperty(scope, 'rec', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for reInitLab blocks.
+	/* Add an API function for reInitLab blocks. */
 	var wrapper = function() {
 		return interpreter.createPrimitive(reInitLab());
 	};
 	interpreter.setProperty(scope, 'reInitLab',	interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the addFixedRelation() block.
+	/* Add an API function for the addFixedRelation() block. */
 	var wrapper = function(number,statement) {
 		statement = statement ? statement.toString() : '';
 		return interpreter.createPrimitive(addFixedRelation(number,statement));
 	};
 	interpreter.setProperty(scope, 'addFixedRelation', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for the createChart() block.
+	/* Add an API function for the createChart() block. */
 	var wrapper = function (number) {
 		return interpreter.createPrimitive(createChart(number));
 	};
 	interpreter.setProperty(scope, 'createChart', interpreter.createNativeFunction(wrapper));
 
-	// Add an API function for record_var blocks.
+	/* Add an API function for record_var blocks. */
 	var wrapper = function(id,id2) {
 		id = id ? id.toString() : '';
 		id2 = id2 ? id2.toString() : '';
@@ -282,10 +280,10 @@ function initApi(interpreter, scope) {
 	};
 	interpreter.setProperty(scope, 'replaceFunction', interpreter.createNativeFunction(wrapper));
 
-} // End of initApi
+} /* End of initApi */
 
 function revisarFin(){
-	// DEVOLVEMOS VARIABLES
+	/* Return variables */
 	var aux = {};
 	var obj = _model._userSerialize();
 	for (var k in obj) {
@@ -310,7 +308,7 @@ function revisarInicio(){
 }
 
 function revisarFin2(){
-	// DEVOLVEMOS VARIABLES
+	/* Return variables */
 	var aux = {};
 	var obj = _model._userSerialize();
 	for (var k in obj) {
@@ -326,7 +324,6 @@ function revisarFin2(){
 
 function revisarInicio2(){
 	var obj = _model._userSerialize();
-	var values = [];
 	for (var k in obj) {
 		intrp.setValueToScope(k,obj[k]);
 	}
@@ -454,26 +451,26 @@ function setValueModel(p1, p2) {
 
 function cleanFromComments(textblock) {
 	var lines = textblock.split('\n');
-	// Remove one line, starting at the first position
+	/* Remove one line, starting at the first position */
 	for (var i = lines.length - 1; i >= 0; i--) {
 		if (lines[i].indexOf('//') >= 0) {
 			lines.splice(i, 1);
 		}
 	}
-	// Join the array back into a single string
+	/* Join the array back into a single string */
 	return lines.join('\n');
 }
 
 function evaluarConContexto(code) {
 	var resultado = -1000;
-		// VARIABLES FROM BLOCKLY
+		/* VARIABLES FROM BLOCKLY */
 		var context = {};
 		for (var i = 0; i < blocklyVariablesList.length; i++) {
 			var val = myInterpreter.getValue(blocklyVariablesList[i]);
 			if(val!==undefined)
 				window[blocklyVariablesList[i]] = myInterpreter.getValueFromScope(blocklyVariablesList[i]);
 		}
-		// VARIABLES FROM EJSS
+		/* VARIABLES FROM EJSS */
 		var obj = _model._userSerialize();
 		var values = [];
 		for (var k in obj) {
@@ -484,10 +481,10 @@ function evaluarConContexto(code) {
 			}
 		}
 
-		// CODIGO BLOCKLY A EJECUTAR
+		/* CODIGO BLOCKLY A EJECUTAR */
 		resultado = eval(code);
 
-		// DEVOLVEMOS VARIABLES
+		/* DEVOLVEMOS VARIABLES */
 		var aux = {};
 		for (var k in obj) {
 			if(params.indexOf(k)===-1){

@@ -181,10 +181,10 @@ function initChart(number, place, textName, time,idNumber) {
 
 var getData = function(chart, info, dataSetNumber) {
 		if (record) {
-			var x = calculaExpresion(info[0].value);//Number(eval(info[0].value));
+			var x = calculaExpresion(info[0].value); /*Number(eval(info[0].value));*/
 			for (var i = 1; i < info.length; i++) {
 				var val = info[i];
-				var y = calculaExpresion(val.value);//Number(eval(val.value));
+				var y = calculaExpresion(val.value); /*Number(eval(val.value));*/
 				chart.chart.data.datasets[i - 1 + dataSetNumber].data[chart.chart.data.datasets[i - 1 + dataSetNumber].data.length] = {
 					x: x,
 					y: y
@@ -195,7 +195,7 @@ var getData = function(chart, info, dataSetNumber) {
 					}
 					if (info[0].number < 0) {
 						chart.chart.data.datasets[i - 1 + dataSetNumber].data.splice(0, 1);
-					} // Remove first data point
+					} /* Remove first data point */
 				}
 			}
 			chart.chart.update();
@@ -297,5 +297,5 @@ function clearChartByNumber(number) {
 
 function cleanCharts() {
     clearChartByNumber(actual_chart);
-	//removeFragment(actual_chart);
+	/*removeFragment(actual_chart);*/
 }

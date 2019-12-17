@@ -5,17 +5,17 @@ EJSS_HARDWARE.orientationTools = function () {
 	var mIOSkind = (getMobileOperatingSystem()!=="Android");
 	var mOrientation = 0;
 
-	self.getOrientation = function() { return mOrientation; }
+	self.getOrientation = function() { return mOrientation; };
 	
 	function readOrientation() {
 		var orientation;
-		if (mIOSkind) { // Android does it otherwise
+		if (mIOSkind) { /* Android does it otherwise */
 			if (window.orientation=="90") orientation = 90;
 			else if (window.orientation=="0") orientation = 0;
 			else if (window.orientation=="-90") orientation = -90;
 			else orientation = 180;
 		}
-		else { // iOS behaviour
+		else { /* iOS behaviour */
 			if (window.orientation=="90") orientation = -90;
 			else if (window.orientation=="0") orientation = 180;
 			else if (window.orientation=="-90") orientation = 90;
@@ -38,7 +38,7 @@ EJSS_HARDWARE.orientationTools = function () {
 
 	mOrientation = readOrientation();
 
-	//alert ("is IOSKind = "+mIOSkind+"\n orientation = "+mOrientation);
+	/*alert ("is IOSKind = "+mIOSkind+"\n orientation = "+mOrientation);*/
 	
 	return self;
 };
@@ -51,7 +51,7 @@ EJSS_HARDWARE.accelerometer = function () {
 	var mIsRunning = false;
 
 	var mData = { x : 0, y:0, z:0, interval:0 , alpha: 0, beta: 0, gamma: 0};
-	var mHistory = []; // Stores data taken, most recent data goes to [0] 
+	var mHistory = []; /* Stores data taken, most recent data goes to [0] */
 
 	function copyData(acceleration,rotation,data) {
 		data.x = acceleration.x;
@@ -65,8 +65,8 @@ EJSS_HARDWARE.accelerometer = function () {
 	}
 	
 	function deviceMotionHandler(eventData) {
-		// Grab the acceleration from the results
-		//var acceleration = eventData.acceleration;
+		/* Grab the acceleration from the results
+		var acceleration = eventData.acceleration;*/
 		var acceleration = eventData.accelerationIncludingGravity;
 	    var rotation = eventData.rotationRate;
 		var interval = eventData.interval;
@@ -150,7 +150,6 @@ EJSS_HARDWARE.accelerometer = function () {
 	};
 
 	return self;
-
 };
 
 EJSS_HARDWARE.SensorTag = {
@@ -197,7 +196,6 @@ EJSS_HARDWARE.sensorTag = function () {
 	};
 
 	return self;
-
 };
 
 EJSS_HARDWARE.linearAccelerometer = function () {
@@ -221,7 +219,6 @@ EJSS_HARDWARE.linearAccelerometer = function () {
 	};
 
 	return self;
-
 };
 
 EJSS_HARDWARE.gyroscope = function () {
@@ -245,5 +242,4 @@ EJSS_HARDWARE.gyroscope = function () {
 	};
 
 	return self;
-
 };

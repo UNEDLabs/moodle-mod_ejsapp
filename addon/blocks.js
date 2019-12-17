@@ -1,4 +1,3 @@
-	
 Blockly.Blocks.get_model_variable_boolean = {
 	init: function() {
 		var addition;
@@ -32,8 +31,6 @@ Blockly.Blocks.set_model_variable_boolean = {
 		this.setTooltip('');
 	}
 };
-
-
 
 Blockly.Blocks.get_model_variable_number = {
 	init: function() {
@@ -71,7 +68,7 @@ Blockly.Blocks.set_model_variable_number = {
 
 
 
-/// EVENTS
+/* EVENTS */
 Blockly.Blocks.set_model_variable_boolean2 = {
 	init: function() {
 		var addition;
@@ -109,7 +106,6 @@ Blockly.Blocks.set_model_variable_number2 = {
 		this.setTooltip('');
 	}
 };
-///
 
 
 
@@ -358,13 +354,13 @@ Blockly.Blocks.createChart = {
 	 */
 	compose: function(containerBlock) {
 		var itemBlock = containerBlock.getInputTargetBlock('STACK');
-		// Count number of inputs.
+		/* Count number of inputs. */
 		var connections = [];
 		while (itemBlock) {
 			connections.push(itemBlock.valueConnection_);
 			itemBlock = itemBlock.nextConnection &&	itemBlock.nextConnection.targetBlock();
 		}
-		// Disconnect any children that don't belong.
+		/* Disconnect any children that don't belong. */
 		for (var i = 0; i < this.itemCount_; i++) {
 			var connection = this.getInput('ADD' + i).connection.targetConnection;
 			if (connection && connections.indexOf(connection) === -1) {
@@ -373,7 +369,7 @@ Blockly.Blocks.createChart = {
 		}
 		this.itemCount_ = connections.length;
 		this.updateShape_();
-		// Reconnect any child blocks.
+		/* Reconnect any child blocks. */
 		for (var i = 0; i < this.itemCount_; i++) {
 			Blockly.Mutator.reconnect(connections[i], this, 'ADD' + i);
 		}
@@ -403,7 +399,7 @@ Blockly.Blocks.createChart = {
 		if (this.itemCount_ && this.getInput('EMPTY')) {
 			this.removeInput('EMPTY');
 		}
-		// Add new inputs.
+		/* Add new inputs. */
 		for (var i = 0; i < this.itemCount_; i++) {
 			if (!this.getInput('ADD' + i)) {
 				var input = this.appendValueInput('ADD' + i);
@@ -412,7 +408,7 @@ Blockly.Blocks.createChart = {
 				input.setAlign(Blockly.ALIGN_RIGHT);
 			}
 		}
-		// Remove deleted inputs.
+		/* Remove deleted inputs. */
 		while (this.getInput('ADD' + i)) {
 			this.removeInput('ADD' + i);
 			i++;
@@ -441,5 +437,3 @@ Blockly.Blocks.record_var = {
 		this.setTooltip('');
 	}
 };
-
-
