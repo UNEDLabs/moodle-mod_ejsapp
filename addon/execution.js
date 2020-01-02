@@ -54,14 +54,19 @@ function playCodeDet(value0,value1,value2,value3) {
 			if(controllerUseBlockly)
 			{
 				workspaceControllers.clear();
-				Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(code, workspaceControllers));
+				Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(controllersList,value3)[0]), workspaceControllers);
 				semicode=Blockly.JavaScript.workspaceToCode(workspaceControllers);
 
 			}
 			else{
 				semicode=code;
 			}
-			blocklyController=prepareControllerCode(semicode);
+			if(remoteController){
+				_model.sendToRemoteController(semicode);
+				blocklyController="";
+			} else {
+				blocklyController = prepareControllerCode(semicode);
+			}
 		}
 	}
 
