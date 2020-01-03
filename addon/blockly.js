@@ -275,17 +275,24 @@ function createControllerPanel(){
 		controllerEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);
 		document.getElementById('blocklyDivController').addEventListener("focusout", focusOutController);
 	}
-	var texto = getInfoFromFunctionName(functionToReplace);
-	if(texto[1]!=='')
+
+	if(remoteController){
 		document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-			'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">You are going to overwrite the function called  ' +
-			'<span style="color: green">' + functionToReplace +'</span> which has <span style="color: red"><br>' +
-			texto[0] + '</span> as input parameters and returns <span style="color: blue">'+texto[1]+'</span>.</h4>');
-	else
-		document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-			'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">You are going to overwrite the function called  ' +
-			'<span style="color: green">' + functionToReplace +'</span> which has <span style="color: red"><br>' +
-			texto[0] + '</span> as input parameters and returns nothing.</h4>');
+			'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerRemote+'</h4>');
+	}
+	else {
+		var texto = getInfoFromFunctionName(functionToReplace);
+		if (texto[1] !== '')
+			document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
+				'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerTextInitial +
+				'<span style="color: green">' + functionToReplace + '</span>'+Blockly.ControllerTextSecond +'<span style="color: red"><br>' +
+				texto[0] + '</span>'+Blockly.ControllerTextThird +'<span style="color: blue">' + texto[1] + '</span>.</h4>');
+		else
+			document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
+				'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerTextInitial +
+				'<span style="color: green">' + functionToReplace + '</span>'+Blockly.ControllerTextSecond +'<span style="color: red"><br>' +
+				texto[0] + '</span>'+Blockly.ControllerTextThird +Blockly.ControllerTextForth+'</h4>');
+	}
 }
 
 function getCodeFromName(list,name){
