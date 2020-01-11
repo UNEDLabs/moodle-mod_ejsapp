@@ -433,3 +433,12 @@ Blockly.Msg["TEXTS_HUE"] = "160";
 Blockly.Msg["PROCEDURES_HUE"] = "290";
 Blockly.Msg["COLOUR_HUE"] = "20";
 Blockly.Msg["VARIABLES_DYNAMIC_HUE"] = "310";
+
+Blockly.NameLogic = "Lógica";
+Blockly.NameLoops = "Bucles";
+Blockly.NameMath = "Matemáticas";
+Blockly.NameFunctions = "Funciones";
+Blockly.NameExecution = "Ejecución";
+Blockly.NameData = "Datos para las gráficas";
+Blockly.NameEvents = "Eventos";
+Blockly.NameCharts = "Datos y gráficas";

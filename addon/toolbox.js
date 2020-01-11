@@ -5,10 +5,10 @@ generalVars = function(worksp) {
 		extra = "2";
 	
 	var xmlList = [];
-	xmlList.push(Blockly.Xml.textToDom('<xml><button text="Create variable..." callbackKey="createVariablePressed"></button></xml>').firstChild);
+	xmlList.push(Blockly.Xml.textToDom('<xml><button text="'+Blockly.Msg.CreateVar+'" callbackKey="createVariablePressed"></button></xml>').firstChild);
 	if (((!newImplement)&&(keys_boolean.length === 0))||((newImplement)&&(keys_boolean_input.length === 0)&&(keys_boolean_output.length === 0))) {}
 	else
-		xmlList.push(Blockly.Xml.textToDom('<xml><label text="Boolean:" ></label></xml>').firstChild);
+		xmlList.push(Blockly.Xml.textToDom('<xml><label text="'+Blockly.Msg.VarBoolean+'" ></label></xml>').firstChild);
 	if (!newImplement) {
 		if (keys_boolean.length > 0) {
 			xmlList.push(Blockly.Xml.textToDom('<xml><block type="set_model_variable_boolean'+extra+'"></block></xml>').firstChild);
@@ -22,7 +22,7 @@ generalVars = function(worksp) {
 	}
 	if (((!newImplement)&&(keys_number.length === 0))||((newImplement)&&(keys_number_input.length === 0)&&(keys_number_output.length === 0))) {}
 	else
-		xmlList.push(Blockly.Xml.textToDom('<xml><label text="Number:" ></label></xml>').firstChild);
+		xmlList.push(Blockly.Xml.textToDom('<xml><label text="'+Blockly.Msg.VarNumber+'" ></label></xml>').firstChild);
 	if (!newImplement) {
 		if (keys_number.length > 0) {
 			xmlList.push(Blockly.Xml.textToDom('<xml><block type="set_model_variable_number'+extra+'"></block></xml>').firstChild);
@@ -42,10 +42,10 @@ generalVars = function(worksp) {
 
 jss = function (workspace) {
 	var xmlList = [];
-	var blockText = '<xml>' + '<button text="Create JavaScript..." callbackKey="jsButtonPressed"></button>' + '</xml>';
+	var blockText = '<xml>' + '<button text="'+Blockly.Msg.CreateJavaScript+'" callbackKey="jsButtonPressed"></button>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
-	blockText = '<xml>' + '<button text="Load JavaScript..." callbackKey="loadjsButtonPressed"></button>' + '</xml>';
+	blockText = '<xml>' + '<button text="'+Blockly.Msg.LoadJavaScript+'" callbackKey="loadjsButtonPressed"></button>' + '</xml>';
 	block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	
@@ -62,10 +62,10 @@ jss = function (workspace) {
 
 jss2 = function (workspace) {
 	var xmlList = [];
-	var blockText = '<xml>' + '<button text="Create JavaScript..." callbackKey="jsButtonPressed2"></button>' + '</xml>';
+	var blockText = '<xml>' + '<button text="'+Blockly.Msg.CreateJavaScript+'" callbackKey="jsButtonPressed2"></button>' + '</xml>';
 	var block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
-	blockText = '<xml>' + '<button text="Load JavaScript..." callbackKey="loadjsButtonPressed2"></button>' + '</xml>';
+	blockText = '<xml>' + '<button text="'+Blockly.Msg.LoadJavaScript+'" callbackKey="loadjsButtonPressed2"></button>' + '</xml>';
 	block = Blockly.Xml.textToDom(blockText).firstChild;
 	xmlList.push(block);
 	

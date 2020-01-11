@@ -84,23 +84,23 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 	var a="Select chart";
 	var b="Select event";
 	var c="Select controller";
-	var replaytext = ' I want to use <span style="color:green">'+experimentSelected+'</span>';
+	var replaytext = Blockly.Msg.Log1 +' <span style="color:green">'+experimentSelected+'</span>';
 	if(chartsBlockly) {
 		if(chartSelected!==""){
 			a = chartSelected;
-			replaytext += ', viewing <span style="color:blue">'+ a +'</span>';
+			replaytext += Blockly.Msg.Log2+'<span style="color:blue">'+ a +'</span>';
 		}
 	}
 	if(eventsBlockly) {
 		if(eventSelected!==""){
 			b = eventSelected;
-			replaytext += ', with the events defined in <span style="color:red">'+ b +'</span>';
+			replaytext += Blockly.Msg.Log3+'<span style="color:red">'+ b +'</span>';
 		}
 	}
 	if(controllerBlockly) {
 		if(controllerSelected!==""){
 			c = controllerSelected;
-			replaytext += ', using <span style="color:peru">'+ c +'</span>';
+			replaytext += Blockly.Msg.Log4+'<span style="color:peru">'+ c +'</span>';
 		}
 	}
 	var result= playCodeDet(experimentSelected,a,b,c);
@@ -113,7 +113,7 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 		inter = setInterval(stepCode, time_step);
 	}
 	else{
-		printError("No experiment to be executed.");
+		printError(Blockly.Msg.ExpError);
 	}
 }
 

@@ -315,7 +315,7 @@ function variableExists(name){
 function jsButton(text){
 	var result;
 	if(typeof(text)!=='string')
-		result = prompt("New JavaScript code name:", "");
+		result = prompt(Blockly.Msg.NewJavascript, "");
 	else
 		result = prompt(text, "");
 
@@ -324,7 +324,7 @@ function jsButton(text){
 			addJs(result, "// This is JavaScript named " + result + "\n", jsCodesGeneral, visualJSGeneral,
 				workspace, javaScriptsNamesListGeneral);
 		else
-			jsButton("Forbidden name, please choose a new JavaScript name:");
+			jsButton(Blockly.Msg.ForbiddenName);
 	}
 }
 
@@ -339,7 +339,7 @@ function addJs(name,texto,jsCodeList,jsVisual,workspc,javaScriptsNamesList){
 function jsButton2(texto){
 	var result;
 	if(typeof(texto)!=='string')
-		result = prompt("New JavaScript code name:", "");
+		result = prompt(Blockly.Msg.NewJavascript, "");
 	else
 		result = prompt(texto, "");
 
@@ -348,7 +348,7 @@ function jsButton2(texto){
 			addJs(result, "// This is JavaScript2 named " + result + "\n", jsCodesEvents, visualJSEvents,
 				workspaceEvents, javaScriptsNamesListEvents);
 		else
-			jsButton2("Forbidden name, please choose a new JavaScript name:");
+			jsButton2(Blockly.Msg.ForbiddenName);
 	}
 }
 
@@ -395,7 +395,7 @@ function loadjsb(jsList,jsVisualList,javaScriptsNamesList){
 function createVariable(texto){
 	var result;
 	if(typeof(texto)!=='string')
-		result = prompt("New variable name:", "");
+		result = prompt(Blockly.Msg.NewVar, "");
 	else
 		result = prompt(texto, "");
 	if(result!==null){
@@ -403,7 +403,7 @@ function createVariable(texto){
 			addVariable(result);
 		}
 		else{
-			createVariable("Forbidden name, please choose a new variable name:");
+			createVariable(Blockly.Msg.ForbiddenName);
 		}
 	}
 }
@@ -801,12 +801,12 @@ function colorSelection(num,name,borrar){
 
 function newScript(num){
 	if(num===1){
-		var name = prompt("Please enter the experiment script name", "Experiment "+(experimentsList.length+1));
+		var name = prompt(Blockly.Msg.NewExperimentScript, "Experiment "+(experimentsList.length+1));
 		if (name != null) {
 			for( var i = 0; i < experimentsList.length; i++){
 				if ( experimentsList[i].name === name) {
 					newScript(num);
-					printError("Experiment name already used");
+					printError(Blockly.Msg.NewExperimentScriptError);
 					return;
 				}
 			}
@@ -814,12 +814,12 @@ function newScript(num){
 		}
 	}
 	else if(num===2){
-		var name = prompt("Please enter the chart script name", "Chart "+(chartsList.length+1));
+		var name = prompt(Blockly.Msg.NewChartScript, "Chart "+(chartsList.length+1));
 		if (name != null) {
 			for( var i = 0; i < chartsList.length; i++){
 				if ( chartsList[i].name === name) {
 					newScript(num);
-					printError("Chart name already used");
+					printError(Blockly.Msg.NewChartScriptError);
 					return;
 				}
 			}
@@ -827,12 +827,12 @@ function newScript(num){
 		}
 	}
 	else if(num===3){
-		var name = prompt("Please enter the event script name", "Event "+(eventsList.length+1));
+		var name = prompt(Blockly.Msg.NewEventScript, "Event "+(eventsList.length+1));
 		if (name != null) {
 			for( var i = 0; i < eventsList.length; i++){
 				if ( eventsList[i].name === name) {
 					newScript(num);
-					printError("Event name already used");
+					printError(Blockly.Msg.NewEventScriptError);
 					return;
 				}
 			}
@@ -840,12 +840,12 @@ function newScript(num){
 		}
 	}
 	else if(num===4){
-		var name = prompt("Please enter the controller script name", "Controller "+(controllersList.length+1));
+		var name = prompt(Blockly.Msg.NewControllerScript, "Controller "+(controllersList.length+1));
 		if (name != null) {
 			for( var i = 0; i < controllersList.length; i++){
 				if ( controllersList[i].name === name) {
 					newScript(num);
-					printError("Controller name already used");
+					printError(Blockly.Msg.NewControllerScriptError);
 					return;
 				}
 			}

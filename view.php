@@ -282,8 +282,7 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
         $PAGE->requires->js_call_amd('mod_ejsapp/blockly_conf', 'configureBlockly',
-            array($ejsapp->is_rem_lab, $blocklyconf[1], $blocklyconf[2], $blocklyconf[3], $blocklyconf[4],
-                $blocklyconf[5], $blocklyconf[6]));
+            array($ejsapp->is_rem_lab, $blocklyconf[1], $blocklyconf[2], $blocklyconf[3], $blocklyconf[4],  $blocklyconf[5], $blocklyconf[6]));
         // Required libraries for blockly
         $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blockly_compressed.js', true);
         $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blocks_compressed.js', true);
@@ -292,6 +291,11 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
             $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js', true);
         } else {
             $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/en.js', true);
+        }
+        if (file_exists($CFG->dirroot . '/mod/ejsapp/addon/lang/' . current_language() . '.js')) {
+            $PAGE->requires->js('/mod/ejsapp/addon/lang/' . current_language() . '.js');
+        } else {
+            $PAGE->requires->js('/mod/ejsapp/addon/lang/en.js');
         }
         $PAGE->requires->js('/mod/ejsapp/vendor/js-interpreter/acorn.js', true);
         $PAGE->requires->js('/mod/ejsapp/vendor/js-interpreter/interpreter.js', true);
@@ -304,11 +308,7 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $PAGE->requires->js('/mod/ejsapp/addon/javascript.js');
         $PAGE->requires->js('/mod/ejsapp/addon/execution.js');
         $PAGE->requires->js('/mod/ejsapp/addon/toolbox.js');
-        if (file_exists($CFG->dirroot . '/mod/ejsapp/addon/lang/' . current_language() . '.js')) {
-            $PAGE->requires->js('/mod/ejsapp/addon/lang/' . current_language() . '.js');
-        } else {
-            $PAGE->requires->js('/mod/ejsapp/addon/lang/en.js');
-        }
+
         $chartsdiv = $renderer->ejsapp_charts();
         $controldiv = $renderer->ejsapp_controlbar($blocklyconf);
         $blocklydiv = $renderer->ejsapp_blockly();
