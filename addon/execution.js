@@ -61,12 +61,15 @@ function playCodeDet(value0,value1,value2,value3) {
 			else{
 				semicode=code;
 			}
-			if(remoteController){
-				_model.sendToRemoteController(semicode);
-				blocklyController="";
-			} else {
+
+			if(!remoteController){
 				blocklyController = prepareControllerCode(semicode);
 			}
+			else{
+				blocklyController = "";
+				codeForRemoteController = semicode;
+			}
+
 		}
 	}
 
@@ -166,6 +169,11 @@ function stepCode() {
 				/* Program complete, no more code to execute. */
 				workspace.highlightBlock(null);
 				clearInterval(inter);
+				if(remoteController) {
+					_model.sendToRemoteController(codeForRemoteController);
+					codeForRemoteController ="";
+				}
+
 				return;
 			}
 		}

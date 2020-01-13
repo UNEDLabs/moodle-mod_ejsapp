@@ -279,9 +279,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
         $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
 
-
-
-
         // Select the users interaction recording options.
         $mform->addElement('header', 'record_interactions_title', get_string('record_interactions', 'ejsapp'));
         $mform->addElement('selectyesno', 'record', get_string('record_interactions', 'ejsapp'));

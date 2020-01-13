@@ -282,7 +282,8 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
         $PAGE->requires->js_call_amd('mod_ejsapp/blockly_conf', 'configureBlockly',
-            array($ejsapp->is_rem_lab, $blocklyconf[1], $blocklyconf[2], $blocklyconf[3], $blocklyconf[4],  $blocklyconf[5], $blocklyconf[6]));
+            array($ejsapp->is_rem_lab, $blocklyconf[1], $blocklyconf[2], $blocklyconf[3], $blocklyconf[4],
+                $blocklyconf[5], $blocklyconf[6]));
         // Required libraries for blockly
         $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blockly_compressed.js', true);
         $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blocks_compressed.js', true);

@@ -119,6 +119,7 @@ function initAux(){
 	eventSelected="";
 	chartSelected="";
 	controllerSelected="";
+	codeForRemoteController="";
 }
 
 function loadVariables(){
