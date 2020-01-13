@@ -264,13 +264,14 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
             $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
             $mform->setDefault('func_blockly', 'controller');
-        }
-
+        } else {
+            $mform->addElement('hidden', 'func_blockly', null);
+            $mform->setType('func_blockly', PARAM_TEXT);
+            $mform->setDefault('func_blockly', 'controller');
             $mform->addElement('selectyesno', 'remote_blockly', get_string('remote_blockly', 'ejsapp'));
             $mform->disabledIf('remote_blockly', 'controller_blockly', 'eq', 0);
             $mform->setDefault('remote_blockly', 0);
-
-
+        }
 
         // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
