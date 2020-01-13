@@ -237,7 +237,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 
         $available_languages = array(
             "blockly" => "Blockly",
-            "javaScript" => "JavaScript",
+            "javascript" => "JavaScript",
             "c_cpp" => "C and C++",
             "csharp" => "C#",
             "cobol" => "Cobol",
