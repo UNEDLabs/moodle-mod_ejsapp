@@ -309,7 +309,7 @@ function revisarFin(){
 			}
 		}
 	}
-	_model.resetSolvers();
+	if (_model.resetSolvers) _model.resetSolvers();
 }
 
 function revisarInicio(){
@@ -332,7 +332,7 @@ function revisarFin2(){
 			_model._userUnserialize(aux);
 		}
 	}
-	_model.resetSolvers();
+	if (_model.resetSolvers) _model.resetSolvers();
 }
 
 function revisarInicio2(){
@@ -508,7 +508,7 @@ function evaluarConContexto(code) {
 			}
 		}
 		_model._readParameters(aux);
-		_model.resetSolvers();
+		if (_model.resetSolvers) _model.resetSolvers();
 
 	return resultado;
 }
