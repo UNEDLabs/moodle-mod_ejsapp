@@ -112,8 +112,23 @@ $string['use_blockly_help'] = 'Cuando se usa esta opci&oacute;n, la actividad EJ
 $string['charts_blockly'] = 'Mostrar bloques de gr&aacute;ficas';
 $string['events_blockly'] = 'Mostrar bloques de eventos';
 $string['controller_blockly'] = 'Mostrar bloques de controlador';
+$string['remote_blockly'] = 'El controlador se ejecuta en el servidor';
+$string['func_blockly'] = 'Variable que almacena la función del controlador local';
+$string['languageController_blockly'] = 'Lenguaje de programación para el controlador';
 $string['blocklyfile'] = 'Programa inicial';
 $string['blocklyfile_help'] = 'Puedes seleccionar un fichero .blk que especifique que programa blockly debe cargarse inicialmente.';
+$string['experiment_blockly'] = "Experimentos";
+$string['data_blockly'] = "Datos y Gráficas";
+$string['event_blockly'] = "Eventos";
+$string['controller_blockly'] = "Controladores";
+$string['experimentDropdown_blockly'] = " Nuevo código del experimento";
+$string['chartDropdown_blockly'] = " Nuevo código de la gráfica";
+$string['eventDropdown_blockly'] = " Nuevo código del evento";
+$string['controllerDropdown_blockly'] = " Nuevo código del controlador";
+$string['run_blockly'] = " Empezar";
+$string['log_blockly'] = " Registro";
+$string['error_blockly'] = " Errores:";
+$string['previousExecutions_blockly'] = " Ejecuciones previas:";
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 

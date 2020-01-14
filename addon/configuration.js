@@ -1,5 +1,5 @@
 var toolbox = '<xml>' +
-'  <category name="Logic" colour="210">' +
+'  <category name="'+Blockly.NameLogic+'" colour="210">' +
 '      <block type="controls_if"></block>' + 
 '      <block type="logic_compare"></block>' +
 '      <block type="logic_operation"></block>' +
@@ -8,7 +8,7 @@ var toolbox = '<xml>' +
 '      <block type="logic_null"></block>' + 
 '      <block type="logic_ternary"></block>' + 
 '    </category>' + 
-'    <category name="Loops" colour="120">' + 
+'    <category name="'+Blockly.NameLoops+'" colour="120">' +
 '      <block type="controls_repeat_ext">' + 
 '        <value name="TIMES">' + 
 '          <shadow type="math_number">' + 
@@ -37,7 +37,7 @@ var toolbox = '<xml>' +
 '      <block type="controls_forEach"></block>' + 
 '      <block type="controls_flow_statements"></block>' + 
 '    </category>' + 
-'    <category name="Math" colour="230">' + 
+'    <category name="'+Blockly.NameMath+'" colour="230">' +
 '      <block type="math_number"></block>' + 
 '      <block type="math_arithmetic">' + 
 '        <value name="A">' + 
@@ -127,14 +127,14 @@ var toolbox = '<xml>' +
 '    <category name="JavaScript" custom="jss" colour="183"></category>' +
 '    <sep></sep>' +
 '    	<category name="Variables" custom="generalVars" colour="44"></category>' + 
-'    <category name="Functions" colour="290" custom="PROCEDURE"></category>' +
+'    <category name="'+Blockly.NameFunctions+'" colour="290" custom="PROCEDURE"></category>' +
 '    <sep></sep>' + 
-'   		 <category name="Execution" colour = "0">' + 
+'   		 <category name="'+Blockly.NameExecution+'" colour = "0">' +
 '   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>' + 
 '   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>' + 
 '   		 	<block type=\"wait\"></block>' + 
 '   		 </category>' + 
-'		 <category name="Data for charts" colour="33">' + 
+'		 <category name="'+Blockly.NameData+'" colour="33">' +
 '   		 	<block type="start_rec"></block>' + 
 '   		 	<block type="stop_rec"></block>' + 
 '   		 </category>' + 
@@ -142,9 +142,9 @@ var toolbox = '<xml>' +
   
   
 var toolboxEvents = '<xml>' +   
-'  <category name="Events"  custom="controls" colour = "60">  </category>' +
+'  <category name="'+Blockly.NameEvents+'"  custom="controls" colour = "60">  </category>' +
 '    <sep></sep>' +
-'  <category name="Logic" colour="210">' +
+'  <category name="'+Blockly.NameLogic+'" colour="210">' +
 '      <block type="controls_if"></block>' +
 '      <block type="logic_compare"></block>' +
 '      <block type="logic_operation"></block>' +
@@ -153,7 +153,7 @@ var toolboxEvents = '<xml>' +
 '      <block type="logic_null"></block>' +
 '      <block type="logic_ternary"></block>' +
 '    </category>' +
-'    <category name="Loops" colour="120">' +
+'    <category name="'+Blockly.NameLoops+'" colour="120">' +
 '      <block type="controls_repeat_ext">' +
 '        <value name="TIMES">' +
 '          <shadow type="math_number">' +
@@ -182,7 +182,7 @@ var toolboxEvents = '<xml>' +
 '      <block type="controls_forEach"></block>' +
 '      <block type="controls_flow_statements"></block>' +
 '    </category>' +
-'    <category name="Math" colour="230">' +
+'    <category name="'+Blockly.NameMath+'" colour="230">' +
 '      <block type="math_number"></block>' +
 '      <block type="math_arithmetic">' +
 '        <value name="A">' +
@@ -273,12 +273,12 @@ var toolboxEvents = '<xml>' +
 '    <sep></sep>' +
 '    	<category name="Variables" custom="generalVars" colour="44"></category>' +
 '    <sep></sep>' +
-'   		 <category name="Execution" colour = "0">' +
+'   		 <category name="'+Blockly.NameExecution+'" colour = "0">' +
 '   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>' +
 '   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>' +
 '   		 	<block type=\"wait\"></block>' +
 '   		 </category>' +
-'		 <category name="Data for charts" colour="33">' +
+'		 <category name="'+Blockly.NameData+'" colour="33">' +
 '   		 	<block type="start_rec"></block>' +
 '   		 	<block type="stop_rec"></block>' +
 '   		 </category>' +
@@ -286,11 +286,11 @@ var toolboxEvents = '<xml>' +
   
   
 var toolboxCharts = '<xml>' +
-'	<category name="Data and charts" colour="200">' +
+'	<category name="'+Blockly.NameCharts+'" colour="200">' +
 '      <block type="createChart"></block>' +
 '      <block type="record_var"></block>' +
 '   		 </category>' +
-'    <category name="Math" colour="230">' +
+'    <category name="'+Blockly.NameMath+'" colour="230">' +
 '      <block type="math_number"></block>' +
 '      <block type="math_arithmetic">' +
 '        <value name="A">' +
@@ -383,7 +383,7 @@ var toolboxCharts = '<xml>' +
   
   
 var toolboxControllers = '<xml>' +
-'  <category name="Logic" colour="210">' +
+'  <category name="'+Blockly.NameLogic+'" colour="210">' +
 '      <block type="controls_if"></block>' +
 '      <block type="logic_compare"></block>' +
 '      <block type="logic_operation"></block>' +
@@ -392,7 +392,7 @@ var toolboxControllers = '<xml>' +
 '      <block type="logic_null"></block>' +
 '      <block type="logic_ternary"></block>' +
 '    </category>' +
-'    <category name="Loops" colour="120">' +
+'    <category name="'+Blockly.NameLoops+'" colour="120">' +
 '      <block type="controls_repeat_ext">' +
 '        <value name="TIMES">' +
 '          <shadow type="math_number">' +
@@ -421,7 +421,7 @@ var toolboxControllers = '<xml>' +
 '      <block type="controls_forEach"></block>' +
 '      <block type="controls_flow_statements"></block>' +
 '    </category>' +
-'    <category name="Math" colour="230">' +
+'    <category name="'+Blockly.NameMath+'" colour="230">' +
 '      <block type="math_number"></block>' +
 '      <block type="math_arithmetic">' +
 '        <value name="A">' +

@@ -161,31 +161,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $this->repeat_elements($varsarray, $no, $repeateloptions, 'option_repeats',
             'option_add_vars', 2, null, true);
 
-        // Use and configuration of Blockly.
-        $mform->addElement('header', 'blockly_config', get_string('blockly_config', 'ejsapp'));
-
-        $mform->addElement('selectyesno', 'use_blockly', get_string('use_blockly', 'ejsapp'));
-        $mform->addHelpButton('use_blockly', 'use_blockly', 'ejsapp');
-        $mform->setDefault('use_blockly', 0);
-
-        $mform->addElement('selectyesno', 'charts_blockly', get_string('charts_blockly', 'ejsapp'));
-        $mform->disabledIf('charts_blockly', 'use_blockly', 'eq', 0);
-        $mform->setDefault('charts_blockly', 0);
-
-        $mform->addElement('selectyesno', 'events_blockly', get_string('events_blockly', 'ejsapp'));
-        $mform->disabledIf('events_blockly', 'use_blockly', 'eq', 0);
-        $mform->setDefault('events_blockly', 0);
-
-        $mform->addElement('selectyesno', 'controller_blockly', get_string('controller_blockly', 'ejsapp'));
-        $mform->disabledIf('controller_blockly', 'use_blockly', 'eq', 0);
-        $mform->setDefault('controller_blockly', 0);
-
-        // Adding an optional text file with a recording to automatically run it when the lab loads.
-        $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
-            null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
-        $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
-        $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
-
         $experiencelist = '';
         if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
             // Elements to configure the remote lab, if that's the case (only if remlab_manager block is installed).
@@ -229,6 +204,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             foreach ($showableexperiences as $experience) {
                 $experiencelist .= $experience . ';';
             }
+
         } else {
             $mform->addElement('hidden', 'is_rem_lab');
             $mform->setType('is_rem_lab', PARAM_INT);
@@ -238,6 +214,70 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->setType('list_practices', PARAM_TEXT);
         $mform->setDefault('list_practices', $experiencelist);
 
+
+
+        // Use and configuration of Blockly.
+        $mform->addElement('header', 'blockly_config', get_string('blockly_config', 'ejsapp'));
+
+        $mform->addElement('selectyesno', 'use_blockly', get_string('use_blockly', 'ejsapp'));
+        $mform->addHelpButton('use_blockly', 'use_blockly', 'ejsapp');
+        $mform->setDefault('use_blockly', 0);
+
+        $mform->addElement('selectyesno', 'charts_blockly', get_string('charts_blockly', 'ejsapp'));
+        $mform->disabledIf('charts_blockly', 'use_blockly', 'eq', 0);
+        $mform->setDefault('charts_blockly', 0);
+
+        $mform->addElement('selectyesno', 'events_blockly', get_string('events_blockly', 'ejsapp'));
+        $mform->disabledIf('events_blockly', 'use_blockly', 'eq', 0);
+        $mform->setDefault('events_blockly', 0);
+
+        $mform->addElement('selectyesno', 'controller_blockly', get_string('controller_blockly', 'ejsapp'));
+        $mform->disabledIf('controller_blockly', 'use_blockly', 'eq', 0);
+        $mform->setDefault('controller_blockly', 0);
+
+        $available_languages = array(
+            "blockly" => "Blockly",
+            "javascript" => "JavaScript",
+            "c_cpp" => "C and C++",
+            "csharp" => "C#",
+            "cobol" => "Cobol",
+            "haskell" => "Haskell",
+            "java" => "Java",
+            "json" => "Json",
+            "lisp" => "Lisp",
+            "matlab" => "Matlab",
+            "pascal" => "Pascal",
+            "php" => "Php",
+            "prolog" => "Prolog",
+            "python" => "Python",
+            "r" => "R",
+            "ruby" => "Ruby",
+            "rust" => "Rust",
+            "vhdl" => "VHDL",
+            "xml" => "XML"
+        );
+        $mform->addElement('select', 'controller_language', get_string('languageController_blockly', 'ejsapp'), $available_languages);
+        $mform->disabledIf('controller_language', 'controller_blockly', 'eq', 0);
+        $mform->setDefault('controller_language', 'javascript');
+
+        if (!$DB->record_exists('block', array('name' => 'remlab_manager'))) {
+            $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
+            $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
+            $mform->setDefault('func_blockly', 'controller');
+        } else {
+            $mform->addElement('hidden', 'func_blockly', null);
+            $mform->setType('func_blockly', PARAM_TEXT);
+            $mform->setDefault('func_blockly', 'controller');
+            $mform->addElement('selectyesno', 'remote_blockly', get_string('remote_blockly', 'ejsapp'));
+            $mform->disabledIf('remote_blockly', 'controller_blockly', 'eq', 0);
+            $mform->setDefault('remote_blockly', 0);
+        }
+
+        // Adding an optional text file with a recording to automatically run it when the lab loads.
+        $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
+            null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
+        $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
+        $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
 
         // Select the users interaction recording options.
         $mform->addElement('header', 'record_interactions_title', get_string('record_interactions', 'ejsapp'));
@@ -329,6 +369,9 @@ class mod_ejsapp_mod_form extends moodleform_mod {
                 $defaultvalues['charts_blockly'] = $blocklyconf[1];
                 $defaultvalues['events_blockly'] = $blocklyconf[2];
                 $defaultvalues['controller_blockly'] = $blocklyconf[3];
+                $defaultvalues['func_blockly'] = $blocklyconf[4];
+                $defaultvalues['controller_language'] = $blocklyconf[5];
+                $defaultvalues['remote_blockly'] = $blocklyconf[6];
             }
         }
     } // End of funtion data_preprocessing().

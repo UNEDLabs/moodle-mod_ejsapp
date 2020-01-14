@@ -54,14 +54,22 @@ function playCodeDet(value0,value1,value2,value3) {
 			if(controllerUseBlockly)
 			{
 				workspaceControllers.clear();
-				Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(code, workspaceControllers));
+				Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(controllersList,value3)[0]), workspaceControllers);
 				semicode=Blockly.JavaScript.workspaceToCode(workspaceControllers);
 
 			}
 			else{
 				semicode=code;
 			}
-			blocklyController=prepareControllerCode(semicode);
+
+			if(!remoteController){
+				blocklyController = prepareControllerCode(semicode);
+			}
+			else{
+				blocklyController = "";
+				codeForRemoteController = semicode;
+			}
+
 		}
 	}
 
@@ -79,23 +87,23 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 	var a="Select chart";
 	var b="Select event";
 	var c="Select controller";
-	var replaytext = ' I want to use <span style="color:green">'+experimentSelected+'</span>';
+	var replaytext = Blockly.Msg.Log1 +' <span style="color:green">'+experimentSelected+'</span>';
 	if(chartsBlockly) {
 		if(chartSelected!==""){
 			a = chartSelected;
-			replaytext += ', viewing <span style="color:blue">'+ a +'</span>';
+			replaytext += Blockly.Msg.Log2+'<span style="color:blue">'+ a +'</span>';
 		}
 	}
 	if(eventsBlockly) {
 		if(eventSelected!==""){
 			b = eventSelected;
-			replaytext += ', with the events defined in <span style="color:red">'+ b +'</span>';
+			replaytext += Blockly.Msg.Log3+'<span style="color:red">'+ b +'</span>';
 		}
 	}
 	if(controllerBlockly) {
 		if(controllerSelected!==""){
 			c = controllerSelected;
-			replaytext += ', using <span style="color:peru">'+ c +'</span>';
+			replaytext += Blockly.Msg.Log4+'<span style="color:peru">'+ c +'</span>';
 		}
 	}
 	var result= playCodeDet(experimentSelected,a,b,c);
@@ -108,7 +116,7 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 		inter = setInterval(stepCode, time_step);
 	}
 	else{
-		printError("No experiment to be executed.");
+		printError(Blockly.Msg.ExpError);
 	}
 }
 
@@ -161,6 +169,11 @@ function stepCode() {
 				/* Program complete, no more code to execute. */
 				workspace.highlightBlock(null);
 				clearInterval(inter);
+				if(remoteController) {
+					_model.sendToRemoteController(codeForRemoteController);
+					codeForRemoteController ="";
+				}
+
 				return;
 			}
 		}

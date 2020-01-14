@@ -119,6 +119,9 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     array_push($blocklyconf, $ejsapp->charts_blockly);
     array_push($blocklyconf, $ejsapp->events_blockly);
     array_push($blocklyconf, $ejsapp->controller_blockly);
+    array_push($blocklyconf, $ejsapp->func_blockly);
+    array_push($blocklyconf, $ejsapp->controller_language);
+    array_push($blocklyconf, $ejsapp->remote_blockly);
     $ejsapp->blockly_conf = json_encode($blocklyconf);
 
     $DB->update_record('ejsapp', $ejsapp);
