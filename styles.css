@@ -188,23 +188,19 @@
     line-height: 1;
 }
 
-.path-mod-ejsapp .peru {
+.path-mod-ejsapp .mod-ejsapp-peru {
     color: peru;
 }
 
-.path-mod-ejsapp .green {
+.path-mod-ejsapp .mod-ejsapp-green {
     color: green;
 }
 
-.path-mod-ejsapp .blue {
+.path-mod-ejsapp .mod-ejsapp-blue {
     color: blue;
 }
 
-.path-mod-ejsapp .yellow {
-    color: yellow;
-}
-
-.path-mod-ejsapp .red {
+.path-mod-ejsapp .mod-ejsapp-red {
     color: red;
 }
 

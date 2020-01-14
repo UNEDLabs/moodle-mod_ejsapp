@@ -187,7 +187,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
             html_writer::start_div("navbar", array('id' => 'blockly_navbar')) .
                 html_writer::start_div("dropdown", array("id" => "experimentsDropdown")) .
                     html_writer::tag("button ", get_string('experiment_blockly', 'ejsapp'), array("class" =>
-                        " btn btn-secondary dropdown-toggle green", "type" => "button ", "id" => "dropdownMenuButton",
+                        " btn btn-secondary dropdown-toggle mod-ejsapp-green", "type" => "button ", "id" => "dropdownMenuButton",
                         "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "experimentsScripts",
                         "aria-labelledby" => "dropdownMenuButton")) .
@@ -199,7 +199,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "chartsDropdown")) .
-                    html_writer::tag("button", get_string('data_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle blue",
+                    html_writer::tag("button", get_string('data_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-blue",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "chartsScripts", "aria-labelledby" =>
@@ -210,7 +210,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "eventsDropdown")) .
-                    html_writer::tag("button", get_string('event_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle red",
+                    html_writer::tag("button", get_string('event_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsappred",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "eventsScripts", "aria-labelledby" =>
@@ -221,7 +221,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "controllersDropdown")) .
-                    html_writer::tag("button", get_string('controller_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle peru",
+                    html_writer::tag("button", get_string('controller_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "controllersScripts", "aria-labelledby" =>
