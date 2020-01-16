@@ -210,7 +210,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div() .
                 html_writer::end_div() .
                 html_writer::start_div("dropdown", array("id" => "eventsDropdown")) .
-                    html_writer::tag("button", get_string('event_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsappred",
+                    html_writer::tag("button", get_string('event_blockly', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-red",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "eventsScripts", "aria-labelledby" =>

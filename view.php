@@ -227,28 +227,15 @@ $experiments = '';
 if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // Javascript
     $fs = get_file_storage();
     $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-        'itemid' => $ejsapp->id, 'filename' => 'ejss.css'), 'filesize DESC');
+        'itemid' => $ejsapp->id, 'filename' => 'ejsSimulation.css'), 'filesize DESC');
     if (!empty($filerecords)) {
         $filerecord = reset($filerecords);
         $file = $fs->get_file_by_id($filerecord->id);
         if ($file) {
             $originalcss = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
                 $file->get_itemid() . "/_ejs_library/css/" . $file->get_filename();
+            $PAGE->requires->css($originalcss);
         }
-    } else {
-        $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
-            'itemid' => $ejsapp->id, 'filename' => 'ejsSimulation.css'), 'filesize DESC');
-        if (!empty($filerecords)) {
-            $filerecord = reset($filerecords);
-            $file = $fs->get_file_by_id($filerecord->id);
-            if ($file) {
-                $originalcss = "/pluginfile.php/" . $file->get_contextid() . "/" . $file->get_component() . "/content/" .
-                    $file->get_itemid() . "/_ejs_library/css/" . $file->get_filename();
-            }
-        }
-    }
-    if ($file) {
-        $PAGE->requires->css($originalcss);
     }
     $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
         'itemid' => $ejsapp->id, 'filename' => 'ejsapp.css'), 'filesize DESC');
