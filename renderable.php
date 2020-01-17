@@ -219,7 +219,7 @@ class ejsapp_lab implements renderable {
                             $length = $pos - strrpos($end, ';') -2;
                             $myGatewayip = substr($end, -$length);
                             $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
-                                array($myFrontierport == 443, $myGatewayip, $practice[1], $myFrontierport, $practice[0],
+                                array($myFrontierport == 443, $myGatewayip, strtolower($practice[1]), $myFrontierport, $practice[0],
                                     $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
                         } else { // myFrontier experience
                             $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
