@@ -560,9 +560,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0, $returnad
         $headers = get_headers($uri);
         $myGatewayDevices = [];
         if (substr($headers[0], 9, 3) == 200) { // Valid file.
-            if ($xml = simplexml_load_file($uri)) {
-                $myGatewayDevices = $xml->item;
-            }
+            $myGatewayDevices = simplexml_load_file($uri);
         }
     }
 
@@ -570,7 +568,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0, $returnad
     foreach ($myGatewayDevices as $myGatewayDevice) {
         if ($fp = fsockopen($myGatewayDevice->address, '443', $errorcode, $errorstring, 3)) { // IP is alive.
             fclose($fp);
-            $uri = 'https://' . $myGatewayDevice->address . '/' . $myGatewayDevice->name . '/gexlab';
+            $uri = 'https://' . $myGatewayDevice->address . '/' . strtolower($myGatewayDevice->name) . '/gexlab';
             $headers = get_headers($uri);
             if (substr($headers[0], 9, 3) == 200) { // Valid file.
                 if ($xml = simplexml_load_file($uri)) {
