@@ -170,7 +170,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             $message1 = $OUTPUT->box(get_string('inactive_lab', 'ejsapp'));
             $action = 'inactive_lab';
         } else {    // Students trying to access a remote lab with restricted access.
-            if (!substr($USER->username, 0, 20) === "enrol_lti_enrol_lti_") { // Prevent double-LTI access!
+            if (substr($USER->username, 0, 20) != "enrol_lti_enrol_lti_") { // Prevent double-LTI access!
                 if ($remlabaccess->booking_info['active_booking']) {
                     // Remote lab freely accessible from the current course but with an active booking made by someone in a different course.
                     $message1 = $OUTPUT->box(get_string('booked_lab', 'ejsapp'));
