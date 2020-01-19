@@ -190,18 +190,22 @@
 
 .path-mod-ejsapp .mod-ejsapp-peru {
     color: peru;
+    background-color: transparent;
 }
 
 .path-mod-ejsapp .mod-ejsapp-green {
     color: green;
+    background-color: transparent;
 }
 
 .path-mod-ejsapp .mod-ejsapp-blue {
     color: blue;
+    background-color: transparent;
 }
 
 .path-mod-ejsapp .mod-ejsapp-red {
     color: red;
+    background-color: transparent;
 }
 
 .path-mod-ejsapp .nice-select {
