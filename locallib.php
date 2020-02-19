@@ -370,7 +370,6 @@ function ping($host, $port, $myFrontierinstance, $expid=null, $timeout=3) {
     global $devicesinfo;
 
     $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
-    $notcheckable = false;
     if ($alive && $myFrontierinstance !== false) {
         $uri = 'http://' . $host . '/SARLABV8.0/';
         $headers = @get_headers($uri);
@@ -381,54 +380,51 @@ function ping($host, $port, $myFrontierinstance, $expid=null, $timeout=3) {
             }
             $url = $uri . 'webresources/net/isLive?idExp=' . $expid;
             if ($response = file_get_contents($url)) {
-                $alive = ($response === 'true');
+                if ($response === 'true') {
+                    return 1;
+                } else {
+                    // Get list of devices in the experience that are not alive and see which ones are down.
+                    $devices = explode("Ping to ", $response);
+
+                    /**
+                     * Gets a string between an initial and a final string.
+                     *
+                     * @param string $string
+                     * @param string $start
+                     * @param string $end
+                     * @return string
+                     *
+                     */
+                    function get_string_between($string, $start, $end) {
+                        $string = " ".$string;
+                        $ini = strpos($string, $start);
+                        if ($ini == 0) {
+                            return "";
+                        }
+                        $ini += strlen($start);
+                        $len = strpos($string, $end, $ini) - $ini;
+                        return substr($string, $ini, $len);
+                    }
+
+                    foreach ($devices as $device) {
+                        $devicesinfo[]->name = get_string_between($device, ": ", "ping ");
+                        $ip = get_string_between($device, "ping ", "Reply from ");
+                        $devicesinfo[]->ip = $ip;
+                        $url = $uri . 'isAlive?' . $ip;
+                        if ($info = file_get_contents($url)) {
+                            $devicesinfo[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? true : false;
+                        }
+                    }
+                    return 0;
+                }
             } else {
-                $notcheckable = true;
+                return 2;
             }
         } else {
-            $notcheckable = true;
+            return 2;
         }
     }
-    if ($notcheckable) {
-        return 2;
-    }
-    if ($alive) {
-        return 1;
-    } else {
-        // Get list of devices in the experience that are not alive and see which ones are down.
-        //$devices = explode("Ping to ", $response);
-
-        /**
-         * Gets a string between an initial and a final string.
-         *
-         * @param string $string
-         * @param string $start
-         * @param string $end
-         * @return string
-         *
-         */
-        /*function get_string_between($string, $start, $end) {
-            $string = " ".$string;
-            $ini = strpos($string, $start);
-            if ($ini == 0) {
-                return "";
-            }
-            $ini += strlen($start);
-            $len = strpos($string, $end, $ini) - $ini;
-            return substr($string, $ini, $len);
-        }
-
-        foreach ($devices as $device) {
-            $devicesinfo[]->name = get_string_between($device, ": ", "ping ");
-            $ip = get_string_between($device, "ping ", "Reply from ");
-            $devicesinfo[]->ip = $ip;
-            $url = $uri . 'isAlive?' . $ip;
-            if ($info = file_get_contents($url)) {
-                $devicesinfo[]->alive = (mb_strtoupper(trim($info[1])) === mb_strtoupper("true")) ? true : false;
-            }
-        }*/
-        return 0;
-    }
+    return 0;
 }
 
 /**
@@ -476,7 +472,7 @@ function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappconte
         if ($ip != '127.0.0.1' && $ip != '') {
             if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 3)) { // IP is alive.
                 fclose($fp);
-                $uri = 'http://' . $ip . '/SARLABV8.0/gexlab';
+                $uri = 'https://' . $ip . '/SARLABV8.0/gexlab';
                 $headers = get_headers($uri);
                 if (substr($headers[0], 9, 3) == 200) { // Valid file.
                     if ($xml = simplexml_load_file($uri)) {
@@ -499,6 +495,10 @@ function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappconte
                                         $ownerusers = $moodleserver->Owner;
                                         foreach ($ownerusers as $owneruser) {
                                             // Check whether the required user has access to the experience.
+                                            /*if($USER->id == $owneruser){
+                                                $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
+                                                break;
+                                            }*/
                                             if (strcasecmp($username, $owneruser) == 0) {
                                                 $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                                 break;
@@ -556,7 +556,7 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0, $returnad
     $enlargeIRS_IP = 'irs.nebsyst.com';
     if ($fp = fsockopen($enlargeIRS_IP, '443', $errorcode, $errorstring, 3)) { // IP is alive.
         fclose($fp);
-        $uri = 'http://' . $enlargeIRS_IP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
+        $uri = 'https://' . $enlargeIRS_IP . '/moodle/listmygatewaylinks?siteId=' . get_config('mod_ejsapp', 'server_id');
         $headers = get_headers($uri);
         $myGatewayDevices = [];
         if (substr($headers[0], 9, 3) == 200) { // Valid file.
@@ -591,6 +591,11 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0, $returnad
                                     $ownerusers = $moodleserver->Owner;
                                     foreach ($ownerusers as $owneruser) {
                                         // Check whether the required user has access to the experience.
+                                        /*if($USER->id == $owneruser){
+                                              if ($returnaddress) $listexperiences .= $myGatewayDevice->address . ':';
+                                              $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
+                                              break;
+                                        }*/
                                         if (strcasecmp($username, $owneruser) == 0) {
                                             if ($returnaddress) $listexperiences .= $myGatewayDevice->address . ':';
                                             $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
@@ -666,6 +671,7 @@ function get_showable_experiences($username = "", $ejsappcontext = 0) {
     }
     // Get experiences from myFrontier.
     $userlistexperiences = ($username != "") ? get_experiences_myfrontier($myFrontierips, $username, $ejsappcontext) : "";
+    if ($userlistexperiences != '') $userlistexperiences .= ';';
     $userlistexperiences .= ($username != "") ? get_experiences_mygateway($username, $ejsappcontext) : "";
     $alllistexperiences = get_experiences_myfrontier($myFrontierips, "") . get_experiences_mygateway("");
     $usermyFrontierexperiences = ($username != "") ? explode(";", $userlistexperiences) : array("");
@@ -744,6 +750,7 @@ function is_practice_in_enlarge($practice, $username = "", $ejsappcontext = 0) {
     foreach ($myFrontierips as $myFrontierip) {
         $myFrontieriparray = array($myFrontierip);
         $listexperiences = get_experiences_myfrontier($myFrontieriparray, $username, $ejsappcontext);
+        if ($listexperiences != '') $listexperiences .= ';';
         $listexperiences .= get_experiences_mygateway($username, $ejsappcontext);
         $enlargeExperiences = explode(";", $listexperiences);
         if (in_array($practice, $enlargeExperiences)) {
