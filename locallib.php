@@ -102,12 +102,8 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
         }
     }
 
-    // Initialize the mod_form elements.
-    $ejsapp->manifest = 'EJsS';
-
-    $ext = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table.
-    if ($ext == 'jar') { // Java.
+    if (pathinfo($file->get_filename(), PATHINFO_EXTENSION) == 'jar') { // Java.
         $ejsok = modifications_for_java($ejsapp, $file);
     } else { // Javascript.
         $ejsok = modifications_for_javascript($context, $ejsapp, $file);
@@ -495,11 +491,7 @@ function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappconte
                                         $ownerusers = $moodleserver->Owner;
                                         foreach ($ownerusers as $owneruser) {
                                             // Check whether the required user has access to the experience.
-                                            /*if($USER->id == $owneruser){
-                                                $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
-                                                break;
-                                            }*/
-                                            if (strcasecmp($username, $owneruser) == 0) {
+                                            if($USER->id == $owneruser){
                                                 $listexperiences .= $experience['IdExp'] . '@' . $name . ';';
                                                 break;
                                             }
@@ -591,15 +583,10 @@ function get_experiences_mygateway($username = "", $ejsappcontext = 0, $returnad
                                     $ownerusers = $moodleserver->Owner;
                                     foreach ($ownerusers as $owneruser) {
                                         // Check whether the required user has access to the experience.
-                                        /*if($USER->id == $owneruser){
+                                        if($USER->id == $owneruser){
                                               if ($returnaddress) $listexperiences .= $myGatewayDevice->address . ':';
                                               $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
                                               break;
-                                        }*/
-                                        if (strcasecmp($username, $owneruser) == 0) {
-                                            if ($returnaddress) $listexperiences .= $myGatewayDevice->address . ':';
-                                            $listexperiences .= $experience['IdExp'] . '@' . $myGatewayDevice->name . ';';
-                                            break;
                                         }
                                     }
                                 } else {

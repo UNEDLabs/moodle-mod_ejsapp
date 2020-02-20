@@ -147,7 +147,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
             }
             $accessed = true;
         } else { // Lab is in use or rebooting.
-            if (false) { // TODO: Check if the lab and course support collaborative access.
+            if (false) { // TODO: Check if the lab supports collaborative access.
                 // Teachers can still access in collaborative mode.
                 $message1 = $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                 if ($myFrontierinstance !== false) {
@@ -199,7 +199,7 @@ if (($ejsapp->is_rem_lab == 0)) { // Virtual lab.
                         }
                     } else { // No active booking.
                         $message1 = $OUTPUT->box(get_string('no_booking', 'ejsapp'));
-                        if (false) { // TODO: Check if the lab and course support collaborative access.
+                        if (false) { // TODO: Check if the lab supports collaborative access.
                             // Students can still access in collaborative mode.
                             $message2 = $OUTPUT->box(get_string('collab_access', 'ejsapp'));
                             $remlabinfo = define_remlab($myFrontierinstance, true, 'NULL',
