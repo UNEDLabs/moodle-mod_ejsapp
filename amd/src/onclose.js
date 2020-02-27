@@ -37,7 +37,7 @@ define(['jquery'], function($) {
                 $.ajax({
                     url: url,
                     type: "GET",
-                    async: false
+                    async: true
                 });
             });
         }

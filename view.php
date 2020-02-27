@@ -451,9 +451,8 @@ $event->trigger();
 if ($accessed) {
     // Monitoring for how long the user works with the lab and checking she does not exceed the maximum time allowed to
     // work with the remote lab.
-    $ejsappname = urlencode($ejsapp->name);
     $params = '?courseid=' . $course->id . '&activityid=' . $ejsapp->id .
-        '&cmid=' . $cm->id . '&ejsappname=' . urlencode($ejsappname) . '&userid=' . $USER->id;
+        '&cmid=' . $cm->id . '&ejsappname=' . rawurlencode($ejsapp->name) . '&userid=' . $USER->id;
     $urllog = $CFG->wwwroot . '/mod/ejsapp/add_to_log.php' . $params;
     $urlleave = $CFG->wwwroot . '/mod/ejsapp/leave_or_kick_out.php' . $params;
     if ($ejsapp->is_rem_lab == 0) {
