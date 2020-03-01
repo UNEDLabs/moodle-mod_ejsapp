@@ -66,6 +66,7 @@ function initAux(){
 		controllerUseBlockly = true;
 		workspaceControllers = null;
 	}
+	functionsVariableList = [];
 	blocklyVariablesList = [];
 	modelVariablesList = [];
 	workspace = null;
@@ -120,6 +121,7 @@ function initAux(){
 	chartSelected="";
 	controllerSelected="";
 	codeForRemoteController="";
+	functionsFromEvents="";
 }
 
 function loadVariables(){
@@ -410,17 +412,45 @@ function createVariable(texto){
 }
 
 function addVariable(result){
-	blocklyVariablesList.push(result);
+	if((modelVariablesList.indexOf(result)===-1) && (blocklyVariablesList.indexOf(result)===-1)) {
+		blocklyVariablesList.push(result);
+		if (!newImplement) {
+			keys_number.push([result, result]);
+			keys_boolean.push([result, result]);
+		} else {
+			keys_number_input.push([result, result]);
+			keys_number_output.push([result, result]);
+			keys_boolean_input.push([result, result]);
+			keys_boolean_output.push([result, result]);
+		}
+	}
+}
+
+remove = function(ary, elem) {
+	var i = ary.indexOf(elem);
+	if (i >= 0) ary.splice(i, 1);
+	return ary;
+}
+
+function removeVariable(result){
 	if (!newImplement) {
-		keys_number.push([result,result]);
-		keys_boolean.push([result,result]);
+		keys_number=remove(keys_number,result);
+		keys_boolean=remove(keys_boolean,result);
+	} else {
+		keys_number_input=remove(keys_number_input,result);
+		keys_number_output=remove(keys_number_output,result);
+		keys_boolean_input=remove(keys_boolean_input,result);
+		keys_boolean_output=remove(keys_boolean_output,result);
 	}
-	else{
-		keys_number_input.push([result,result]);
-		keys_number_output.push([result,result]);
-		keys_boolean_input.push([result,result]);
-		keys_boolean_output.push([result,result]);
+
+}
+
+function getNamesFromBlocklyVariables(arrayVariables){
+	var names = [];
+	for(var i = 0;i<arrayVariables.length;i++){
+		names.push(arrayVariables[i].name);
 	}
+	return names;
 }
 
 function myUpdateFunction(event){
@@ -429,6 +459,31 @@ function myUpdateFunction(event){
 			var xml = Blockly.Xml.workspaceToDom(workspace);
 			experimentsList[experimentOpen].code=Blockly.Xml.domToText(xml);
 		}
+		// Function parameters to variables
+		if(experimentOpen!==-1){
+
+			for(var i =0;i<workspace.getAllVariables().length;i++){
+				addVariable(workspace.getAllVariables()[i].name);
+				functionsVariableList.push(workspace.getAllVariables()[i].name);
+			}
+			for(var i =0;i<functionsVariableList.length;i++){
+				if((getNamesFromBlocklyVariables(workspaceEvents.getAllVariables()).indexOf(functionsVariableList[i])===-1)&&(getNamesFromBlocklyVariables(workspace.getAllVariables()).indexOf(functionsVariableList[i]))){
+					removeVariable(functionsVariableList[i]);
+				}
+			}
+		}
+		else if(eventOpen!==-1){
+			for(var i =0;i<workspaceEvents.getAllVariables().length;i++){
+				addVariable(workspaceEvents.getAllVariables()[i].name);
+				functionsVariableList.push(workspaceEvents.getAllVariables()[i].name);
+			}
+			for(var i =0;i<functionsVariableList.length;i++){
+				if((getNamesFromBlocklyVariables(workspaceEvents.getAllVariables()).indexOf(functionsVariableList[i])===-1)&&(getNamesFromBlocklyVariables(workspace.getAllVariables()).indexOf(functionsVariableList[i]))){
+					removeVariable(functionsVariableList[i]);
+				}
+			}
+		}
+
 	}
 	if (event.element ==="click"){
 		if((event.blockId!==null && event.blockId!==undefined)&&(workspace.getBlockById(event.blockId)!==null)){
@@ -440,7 +495,7 @@ function myUpdateFunction(event){
 		else{
 			document.getElementById('myModal').style.display = "none";
 		}
-	 }
+	}
 }
 
 function checkEventsBlocks(event){
@@ -1132,7 +1187,6 @@ function saveCSV(num){
 function saveImg(moodle_upload_file) {
 	for(var i = 0; i<chartArray.length; i++) {
 		if (document.getElementById(chartArray[i].fragment).style.display !== "none") {
-			console.log('myChart' + chartArray[i].fragment.slice(-1));
 			var canvas = document.getElementById('myChart' + chartArray[i].fragment.slice(-1));
 			var data_url = canvas.toDataURL();
 			EJSS_INTERFACE.BoxPanel.showInputDialog("Choose a name for the file", function (name) {

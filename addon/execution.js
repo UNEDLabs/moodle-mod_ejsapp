@@ -75,7 +75,23 @@ function playCodeDet(value0,value1,value2,value3) {
 
 	if((code===null) || (blocklyExp==="") )
 		return ["","","",""];
-	/* CONTROLLER NOT YET Blockly.Xml.domToWorkspace(getCodeFromName(experimentsList,$('select')[3].value), workspaceEvents); */
+	// Prepare blocklyEvent for Extra functions:
+
+	var code2 = blockyEvent;
+
+	functionsFromEvents="";
+	var continueSearch = true;
+	while (continueSearch) {
+		var pos = code2.search("function ");
+		if (pos === -1)
+			continueSearch = false;
+		else {
+			var pos2 = code2.search("}\n");
+			functionsFromEvents = functionsFromEvents + "\n" + code2.slice(pos, pos2 + 1);
+			code2 = code2.slice(pos2 + 1, code2.length);
+		}
+	}
+
 	return [blocklyExp,blocklyChart,blockyEvent,blocklyController];
 }
 
@@ -376,7 +392,7 @@ function rec(bool) {
 }
 
 function addEvent(cond,act) {
-	_model.getOdes()[0]._addEvent(cond, act, EJSS_ODE_SOLVERS.EVENT_TYPE.CROSSING_EVENT, EJSS_ODE_SOLVERS.EVENT_METHOD.BISECTION, 10000, 0.00001, true);
+	_model.getOdes()[0]._addEvent(cond, functionsFromEvents+'\n'+act, EJSS_ODE_SOLVERS.EVENT_TYPE.CROSSING_EVENT, EJSS_ODE_SOLVERS.EVENT_METHOD.BISECTION, 10000, 0.00001, true);
 	_model.reset();
 }
 
