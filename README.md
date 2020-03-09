@@ -39,6 +39,10 @@ https://github.com/UNEDLabs.
 
 When installing ejsapp for the first time, you may need to set a few variables (in case you want to use applets):
 
+   check_activity: How often the users' activity in EJSApp is checked (s)
+   
+   server_id: ID used for registering this Moodle site in ENLARGE IRS (https://irs.nebsyst.com). Leave it blank if the site is not registered
+
    certificate_path:	This variable defines the absolute path to the trust certificate file.
 
    certificate_password:This variable must contain the password of the trust certificate.
