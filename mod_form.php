@@ -260,15 +260,13 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('controller_language', 'controller_blockly', 'eq', 0);
         $mform->setDefault('controller_language', 'javascript');
 
-        if (!$DB->record_exists('block', array('name' => 'remlab_manager'))) {
-            $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
-            $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
-            $mform->setDefault('func_blockly', 'controller');
-        } else {
-            $mform->addElement('hidden', 'func_blockly', null);
-            $mform->setType('func_blockly', PARAM_TEXT);
-            $mform->setDefault('func_blockly', 'controller');
+        $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
+        $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
+        $mform->setDefault('func_blockly', 'controller');
+
+        if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
             $mform->addElement('selectyesno', 'remote_blockly', get_string('remote_blockly', 'ejsapp'));
+            $mform->disabledIf('remote_blockly', 'is_rem_lab', 'eq', 0);
             $mform->disabledIf('remote_blockly', 'controller_blockly', 'eq', 0);
             $mform->setDefault('remote_blockly', 0);
         }

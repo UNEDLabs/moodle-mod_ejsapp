@@ -31,8 +31,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020030110;         // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2020030900;         // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2013111800;
 $plugin->component = 'mod_ejsapp';      // To check on upgrade, that module sits in correct place.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.0 (Build: 2020011900)';
+$plugin->release = '4.0 (Build: 2020030900)';
