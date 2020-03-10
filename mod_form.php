@@ -241,33 +241,30 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             "c_cpp" => "C and C++",
             "csharp" => "C#",
             "cobol" => "Cobol",
-            "haskell" => "Haskell",
             "java" => "Java",
-            "json" => "Json",
-            "lisp" => "Lisp",
             "matlab" => "Matlab",
             "pascal" => "Pascal",
             "php" => "Php",
-            "prolog" => "Prolog",
             "python" => "Python",
             "r" => "R",
             "ruby" => "Ruby",
             "rust" => "Rust",
             "vhdl" => "VHDL",
-            "xml" => "XML"
         );
         $mform->addElement('select', 'controller_language', get_string('languageController_blockly', 'ejsapp'), $available_languages);
         $mform->disabledIf('controller_language', 'controller_blockly', 'eq', 0);
         $mform->setDefault('controller_language', 'javascript');
 
         $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
+        $mform->setType('func_blockly', PARAM_TEXT);
         $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
+        $mform->disabledIf('func_blockly', 'is_rem_lab', 'eq', 1);
         $mform->setDefault('func_blockly', 'controller');
 
         if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
             $mform->addElement('selectyesno', 'remote_blockly', get_string('remote_blockly', 'ejsapp'));
-            $mform->disabledIf('remote_blockly', 'is_rem_lab', 'eq', 0);
             $mform->disabledIf('remote_blockly', 'controller_blockly', 'eq', 0);
+            $mform->disabledIf('remote_blockly', 'is_rem_lab', 'eq', 0);
             $mform->setDefault('remote_blockly', 0);
         }
 
