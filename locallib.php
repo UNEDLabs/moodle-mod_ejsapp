@@ -82,25 +82,9 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
                 'context' => $context, 'noclean' => 1, 'trusttext' => 0), $ejsapp->appwording);
     }
 
-    // Obtain the uploaded .zip or .jar file from moodledata using the information in the files table.
-    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'compressed',
-        'itemid' => $ejsapp->id), 'filesize DESC');
-    $filerecord = reset($filerecords);
-    $fs = get_file_storage();
-    $file = $fs->get_file_by_id($filerecord->id);
-
-    // In case it is an alias to an external repository.
-    if (class_exists('repository_filesystem')) {
-        if (!is_null($file->get_referencefileid())) {
-            $repositoryid = $file->get_repository_id();
-            $repositorytypeid = $DB->get_field('repository_instances', 'typeid',
-                array('id' => $repositoryid));
-            if ($DB->get_field('repository', 'type', array('id' => $repositorytypeid)) == 'filesystem') {
-                $repository = repository_filesystem::get_instance($repositoryid);
-                $repository->sync_reference($file);
-            }
-        }
-    }
+    // Get EjsS file regardless it is stored in Moodle filesystem or an alias to a file in a repository
+    $syncfileinfo = get_sync_file($ejsapp->id);
+    $file = $syncfileinfo[0];
 
     // Get params and set their corresponding values in the mod_form elements and update the ejsapp table.
     if (pathinfo($file->get_filename(), PATHINFO_EXTENSION) == 'jar') { // Java.
@@ -156,6 +140,39 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
 
     return $ejsok;
 } // End of function update_ejsapp_files_and_tables.
+
+/**
+ * Get EjsS file regardless it is stored in Moodle filesystem or an alias to a file in a repository
+ *
+ * @param int $ejsappid
+ * @return array[stdclass|bool bool] [$file $modified]
+ * @throws
+ *
+ */
+function get_sync_file($ejsappid) {
+    global $DB;
+
+    // Obtain the uploaded .zip or .jar file from moodledata using the information in the files table.
+    $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'compressed',
+        'itemid' => $ejsappid), 'filesize DESC');
+    $filerecord = reset($filerecords);
+    $fs = get_file_storage();
+    $file = $fs->get_file_by_id($filerecord->id);
+    $modified = false;
+
+    // In case it is an alias to an external repository.
+    if (!is_null($filerecord->referencefileid)) {
+        $contenthash = $DB->get_field('files_reference', 'referencehash',
+            array('id' => $filerecord->referencefileid));
+        if ($filerecord->contenthash != $contenthash) {
+            $modified = true;
+            $filerecord->contenthash = $contenthash;
+            $DB->update_record('files', $filerecord);
+        }
+    }
+
+    return [$file, $modified];
+}
 
 /**
  * Generates the values of the personalized variables in a particular EJS application for a given user.

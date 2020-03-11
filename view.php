@@ -307,6 +307,13 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $experiments = $controldiv . $blocklydiv . $logdiv;
     }
 
+    // Check if file is an alias to a file in a repository and update it if necessary
+    $syncfileinfo = get_sync_file($ejsapp->id);
+    if ($syncfileinfo[1]) {
+        modifications_for_javascript($context, $ejsapp, $syncfileinfo[0]);
+        $DB->update_record('ejsapp', $ejsapp);
+    }
+
     // Include the three required javascript files for EjsS.
     try {
         $filerecords = $DB->get_records('files', array('component' => 'mod_ejsapp', 'filearea' => 'content',
