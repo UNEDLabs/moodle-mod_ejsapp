@@ -162,6 +162,7 @@ function get_sync_file($ejsappid) {
 
     // In case it is an alias to an external repository.
     if (!is_null($filerecord->referencefileid)) {
+        $file->sync_external_file();
         $contenthash = $DB->get_field('files_reference', 'referencehash',
             array('id' => $filerecord->referencefileid));
         if ($filerecord->contenthash != $contenthash) {
