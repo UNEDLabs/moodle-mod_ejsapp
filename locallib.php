@@ -646,7 +646,8 @@ function combine_experiences($usermyFrontierexperiences, $allmyFrontierexperienc
             $combinedexperiences = $usermyFrontierexperiences;
         }
         foreach ($localexperiences as $localexperience) {
-            if (!in_array($localexperience->practiceintro, $allmyFrontierexperiences)) {
+            if (!in_array($localexperience->practiceintro, $allmyFrontierexperiences) &&
+                !in_array($localexperience->practiceintro, $combinedexperiences)) {
                 $combinedexperiences[] = $localexperience->practiceintro;
             }
         }
@@ -779,19 +780,14 @@ function is_practice_in_enlarge($practice, $username = "", $ejsappcontext = 0) {
 function check_create_remlab_conf($practice) {
     global $DB;
 
-    if (!$practice) {
-        $remlab_conf = default_rem_lab_conf($practice);
-        $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
+    if ($DB->record_exists('block_remlab_manager_conf', array('practiceintro' => $practice))) {
+        $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
     } else {
-        if ($DB->record_exists('block_remlab_manager_conf', array('practiceintro' => $practice))) {
-            $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
+        if ($practice != '') {
+            $remlab_conf = default_rem_lab_conf($practice);
+            $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
         } else {
-            if ($practice != '') {
-                $remlab_conf = default_rem_lab_conf($practice);
-                $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
-            } else {
-                $remlab_conf = null;
-            }
+            $remlab_conf = null;
         }
     }
 
