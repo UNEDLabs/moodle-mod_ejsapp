@@ -779,14 +779,19 @@ function is_practice_in_enlarge($practice, $username = "", $ejsappcontext = 0) {
 function check_create_remlab_conf($practice) {
     global $DB;
 
-    if ($DB->record_exists('block_remlab_manager_conf', array('practiceintro' => $practice))) {
-        $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
+    if (!$practice) {
+        $remlab_conf = default_rem_lab_conf($practice);
+        $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
     } else {
-        if ($practice != '') {
-            $remlab_conf = default_rem_lab_conf($practice);
-            $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
+        if ($DB->record_exists('block_remlab_manager_conf', array('practiceintro' => $practice))) {
+            $remlab_conf = $DB->get_record('block_remlab_manager_conf', array('practiceintro' => $practice));
         } else {
-            $remlab_conf = null;
+            if ($practice != '') {
+                $remlab_conf = default_rem_lab_conf($practice);
+                $DB->insert_record('block_remlab_manager_conf', $remlab_conf);
+            } else {
+                $remlab_conf = null;
+            }
         }
     }
 
