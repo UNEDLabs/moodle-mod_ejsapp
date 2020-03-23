@@ -2,14 +2,11 @@
 
 'use strict';
 
-goog.provide('Blockly.Msg.is');
-
-goog.require('Blockly.Msg');
-
 Blockly.Msg["ADD_COMMENT"] = "Skrifa skýringu";
 Blockly.Msg["CANNOT_DELETE_VARIABLE_PROCEDURE"] = "Can't delete the variable '%1' because it's part of the definition of the function '%2'";  // untranslated
 Blockly.Msg["CHANGE_VALUE_TITLE"] = "Breyta gildi:";
 Blockly.Msg["CLEAN_UP"] = "Hreinsa kubba";
+Blockly.Msg["COLLAPSED_WARNINGS_WARNING"] = "Collapsed blocks contain warnings.";  // untranslated
 Blockly.Msg["COLLAPSE_ALL"] = "Loka kubbum";
 Blockly.Msg["COLLAPSE_BLOCK"] = "Loka kubbi";
 Blockly.Msg["COLOUR_BLEND_COLOUR1"] = "litur 1";
@@ -68,7 +65,7 @@ Blockly.Msg["DELETE_VARIABLE_CONFIRMATION"] = "Delete %1 uses of the '%2' variab
 Blockly.Msg["DELETE_X_BLOCKS"] = "Eyða %1 kubbum";
 Blockly.Msg["DISABLE_BLOCK"] = "Óvirkja kubb";
 Blockly.Msg["DUPLICATE_BLOCK"] = "Afrita";
-Blockly.Msg["DUPLICATE_COMMENT"] = "Duplicate Comment";  // untranslated
+Blockly.Msg["DUPLICATE_COMMENT"] = "Tvítaka athugasemd";
 Blockly.Msg["ENABLE_BLOCK"] = "Virkja kubb";
 Blockly.Msg["EXPAND_ALL"] = "Opna kubba";
 Blockly.Msg["EXPAND_BLOCK"] = "Opna kubb";
@@ -392,6 +389,7 @@ Blockly.Msg["TEXT_TRIM_OPERATOR_RIGHT"] = "eyða bilum hægra megin við";
 Blockly.Msg["TEXT_TRIM_TOOLTIP"] = "Skila afriti af textanum þar sem möguleg bil við báða enda hafa verið fjarlægð.";
 Blockly.Msg["TODAY"] = "Í dag";
 Blockly.Msg["UNDO"] = "Afturkalla";
+Blockly.Msg["UNNAMED_KEY"] = "unnamed";  // untranslated
 Blockly.Msg["VARIABLES_DEFAULT_NAME"] = "atriði";
 Blockly.Msg["VARIABLES_GET_CREATE_SET"] = "Búa til 'stilla %1'";
 Blockly.Msg["VARIABLES_GET_HELPURL"] = "https://github.com/google/blockly/wiki/Variables#get";
@@ -402,7 +400,8 @@ Blockly.Msg["VARIABLES_SET_HELPURL"] = "https://github.com/google/blockly/wiki/V
 Blockly.Msg["VARIABLES_SET_TOOLTIP"] = "Stillir þessa breytu á innihald inntaksins.";
 Blockly.Msg["VARIABLE_ALREADY_EXISTS"] = "Breyta með heitinu '%1' er þegar til staðar.";
 Blockly.Msg["VARIABLE_ALREADY_EXISTS_FOR_ANOTHER_TYPE"] = "A variable named '%1' already exists for another type: '%2'.";  // untranslated
-Blockly.Msg["WORKSPACE_COMMENT_DEFAULT_TEXT"] = "Say something...";  // untranslated
+Blockly.Msg["WORKSPACE_ARIA_LABEL"] = "Blockly Workspace";  // untranslated
+Blockly.Msg["WORKSPACE_COMMENT_DEFAULT_TEXT"] = "Segðu eitthvað...";
 Blockly.Msg["CONTROLS_FOREACH_INPUT_DO"] = Blockly.Msg["CONTROLS_REPEAT_INPUT_DO"];
 Blockly.Msg["CONTROLS_FOR_INPUT_DO"] = Blockly.Msg["CONTROLS_REPEAT_INPUT_DO"];
 Blockly.Msg["CONTROLS_IF_ELSEIF_TITLE_ELSEIF"] = Blockly.Msg["CONTROLS_IF_MSG_ELSEIF"];

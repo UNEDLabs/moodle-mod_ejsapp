@@ -2,14 +2,11 @@
 
 'use strict';
 
-goog.provide('Blockly.Msg.sr.latn');
-
-goog.require('Blockly.Msg');
-
 Blockly.Msg["ADD_COMMENT"] = "Dodaj komentar";
 Blockly.Msg["CANNOT_DELETE_VARIABLE_PROCEDURE"] = "Ne mogu da obrišem varijablu ’%1’ jer je deo definicije funkcije ’%2’";
 Blockly.Msg["CHANGE_VALUE_TITLE"] = "Promeni vrednost:";
 Blockly.Msg["CLEAN_UP"] = "Ukloni blokove";
+Blockly.Msg["COLLAPSED_WARNINGS_WARNING"] = "Collapsed blocks contain warnings.";  // untranslated
 Blockly.Msg["COLLAPSE_ALL"] = "Skupi blokove";
 Blockly.Msg["COLLAPSE_BLOCK"] = "Skupi blok";
 Blockly.Msg["COLOUR_BLEND_COLOUR1"] = "boja 1";
@@ -392,6 +389,7 @@ Blockly.Msg["TEXT_TRIM_OPERATOR_RIGHT"] = "skratiti prostor sa desne strane";
 Blockly.Msg["TEXT_TRIM_TOOLTIP"] = "Vraća kopiju teksta sa uklonjenim prostorom sa jednog od dva kraja.";
 Blockly.Msg["TODAY"] = "Danas";
 Blockly.Msg["UNDO"] = "Opozovi";
+Blockly.Msg["UNNAMED_KEY"] = "unnamed";  // untranslated
 Blockly.Msg["VARIABLES_DEFAULT_NAME"] = "stavka";
 Blockly.Msg["VARIABLES_GET_CREATE_SET"] = "Napravi „postavi %1“";
 Blockly.Msg["VARIABLES_GET_HELPURL"] = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -402,6 +400,7 @@ Blockly.Msg["VARIABLES_SET_HELPURL"] = "https://github.com/google/blockly/wiki/V
 Blockly.Msg["VARIABLES_SET_TOOLTIP"] = "Postavlja promenljivu tako da bude jednaka ulazu.";
 Blockly.Msg["VARIABLE_ALREADY_EXISTS"] = "Promenljiva pod imenom '%1' već postoji.";
 Blockly.Msg["VARIABLE_ALREADY_EXISTS_FOR_ANOTHER_TYPE"] = "Varijabla po imenu '%1' već postoji za drugu varijablu tipa '%2'.";
+Blockly.Msg["WORKSPACE_ARIA_LABEL"] = "Blockly Workspace";  // untranslated
 Blockly.Msg["WORKSPACE_COMMENT_DEFAULT_TEXT"] = "Say something...";  // untranslated
 Blockly.Msg["CONTROLS_FOREACH_INPUT_DO"] = Blockly.Msg["CONTROLS_REPEAT_INPUT_DO"];
 Blockly.Msg["CONTROLS_FOR_INPUT_DO"] = Blockly.Msg["CONTROLS_REPEAT_INPUT_DO"];
