@@ -127,8 +127,9 @@ var toolbox = '<xml>' +
 '    <category name="JavaScript" custom="jss" colour="183"></category>' +
 '    <sep></sep>' +
 '    	<category name="Variables" custom="generalVars" colour="44"></category>' + 
-'    <category name="'+Blockly.NameFunctions+'" colour="290" custom="PROCEDURE"></category>' +
-'    <sep></sep>' + 
+'       <category name="'+Blockly.NameFunctions+'" colour="290" custom="PROCEDURE"></category>' +
+    '   <category name="'+Blockly.Msg["EJSSFunctions"]+'" colour="290" custom="ejssFunctions" ></category>' +
+    '    <sep></sep>' +
 '   		 <category name="'+Blockly.NameExecution+'" colour = "0">' +
 '   		 	<block type=\"play_lab\"></block><block type=\"pause_lab\"></block>' + 
 '   		 	<block type=\"initialize_lab\"></block><block type=\"reset_lab\"></block>' + 

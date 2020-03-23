@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function(){
 			}
 			initAux();
 			loadVariables();
+			prepareBlocks();
+			prepareJavaScript();
 			preparePage();
 			initJSFrame("_javaScriptFrame");
 
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			});
 			workspace.registerButtonCallback("createVariablePressed", createVariable,"");
 			workspace.registerToolboxCategoryCallback('generalVars', generalVars);
+			workspace.registerToolboxCategoryCallback('ejssFunctions', ejssFunctions);
 			workspace.registerToolboxCategoryCallback('jss', jss);
 			/*workspace.registerButtonCallback('jsButtonPressed', jsButton);
 			workspace.registerButtonCallback('loadjsButtonPressed', loadjsButton);*/
@@ -59,7 +62,12 @@ document.addEventListener('DOMContentLoaded', function(){
 	}, 200);
 }, false);
 
+//function_from_ejss = [{'name':'funcion_prueba','params':['x','y','z'],'code':'console.log("Aleluya "+x+" "+y+" "+z);'}]; // PRUEBA
+//function_from_ejss_with_return = [{'name':'funcion_prueba2','params':['x','y'],'code':'console.log("Aleluya "+x+" "+y+" "+z);'}]; // PRUEBA
+
 function initAux(){
+	function_from_ejss = [];
+	function_from_ejss_with_return = [];
 	controllerUseBlockly = false;
 	if(controllerFunctionLanguage==='blockly')
 	{
@@ -124,6 +132,17 @@ function initAux(){
 	functionsFromEvents="";
 }
 
+var STRIP_COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n])*')|("(?:\\"|[^"\r\n])*"))|(\s*=[^,\)]*))/mg;
+var ARGUMENT_NAMES = /([^\s,]+)/g;
+function getParamNames(func) {
+	var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+	var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+	if(result === null)
+		result = [];
+	return result;
+}
+
+
 function loadVariables(){
 	var _vars = "";
 	if (typeof _model.getOdes() !== "undefined")
@@ -146,6 +165,15 @@ function loadVariables(){
 					break;
 				case 'boolean':
 					keys_boolean.push(dupla);
+					break;
+
+				case 'function':
+					if(functionToReplace!==k) {
+						if((obj[k].toString().includes('return ')))
+							function_from_ejss_with_return.push({'name': k, 'params': getParamNames(obj[k])})
+						else
+							function_from_ejss.push({'name': k, 'params': getParamNames(obj[k])})
+					}
 					break;
 				default:
 					keys_others.push(dupla);
@@ -170,6 +198,14 @@ function loadVariables(){
 				case 'boolean':
 					keys_boolean_input.push(dupla);
 					break;
+				case 'function':
+					if(functionToReplace!==inputAux[k]) {
+						if((obj[k].toString().includes('return ')))
+							function_from_ejss_with_return.push({'name': k, 'params': getParamNames(obj[k])})
+						else
+							function_from_ejss.push({'name': inputAux[k], 'params': getParamNames(obj[inputAux[k]])})
+					}
+					break;
 				default:
 					keys_others_input.push(dupla);
 					break;
@@ -190,6 +226,8 @@ function loadVariables(){
 					keys_boolean_output.push(dupla);
 					break;
 				default:
+					console.log('Output');
+					console.log(obj[outputAux[k]]+' '+typeof obj[outputAux[k]]);
 					keys_others_output.push(dupla);
 					break;
 			}
@@ -318,7 +356,7 @@ function variableExists(name){
 function jsButton(text){
 	var result;
 	if(typeof(text)!=='string')
-		result = prompt(Blockly.Msg.NewJavascript, "");
+		result = prompt(Blockly.Msg["NewJavascript"], "");
 	else
 		result = prompt(text, "");
 
@@ -327,7 +365,7 @@ function jsButton(text){
 			addJs(result, "// This is JavaScript named " + result + "\n", jsCodesGeneral, visualJSGeneral,
 				workspace, javaScriptsNamesListGeneral);
 		else
-			jsButton(Blockly.Msg.ForbiddenName);
+			jsButton(Blockly.Msg["ForbiddenName"]);
 	}
 }
 
@@ -342,7 +380,7 @@ function addJs(name,texto,jsCodeList,jsVisual,workspc,javaScriptsNamesList){
 function jsButton2(texto){
 	var result;
 	if(typeof(texto)!=='string')
-		result = prompt(Blockly.Msg.NewJavascript, "");
+		result = prompt(Blockly.Msg["NewJavascript"], "");
 	else
 		result = prompt(texto, "");
 
@@ -351,7 +389,7 @@ function jsButton2(texto){
 			addJs(result, "// This is JavaScript2 named " + result + "\n", jsCodesEvents, visualJSEvents,
 				workspaceEvents, javaScriptsNamesListEvents);
 		else
-			jsButton2(Blockly.Msg.ForbiddenName);
+			jsButton2(Blockly.Msg["ForbiddenName"]);
 	}
 }
 
@@ -398,7 +436,7 @@ function loadjsb(jsList,jsVisualList,javaScriptsNamesList){
 function createVariable(texto){
 	var result;
 	if(typeof(texto)!=='string')
-		result = prompt(Blockly.Msg.NewVar, "");
+		result = prompt(Blockly.Msg["NewVar"], "");
 	else
 		result = prompt(texto, "");
 	if(result!==null){
@@ -406,7 +444,7 @@ function createVariable(texto){
 			addVariable(result);
 		}
 		else{
-			createVariable(Blockly.Msg.ForbiddenName);
+			createVariable(Blockly.Msg["ForbiddenName"]);
 		}
 	}
 }
@@ -857,12 +895,12 @@ function colorSelection(num,name,borrar){
 
 function newScript(num){
 	if(num===1){
-		var name = prompt(Blockly.Msg.NewExperimentScript, "Experiment "+(experimentsList.length+1));
+		var name = prompt(Blockly.Msg["NewExperimentScript"], "Experiment "+(experimentsList.length+1));
 		if (name != null) {
 			for( var i = 0; i < experimentsList.length; i++){
 				if ( experimentsList[i].name === name) {
 					newScript(num);
-					printError(Blockly.Msg.NewExperimentScriptError);
+					printError(Blockly.Msg["NewExperimentScriptError"]);
 					return;
 				}
 			}
@@ -870,12 +908,12 @@ function newScript(num){
 		}
 	}
 	else if(num===2){
-		var name = prompt(Blockly.Msg.NewChartScript, "Chart "+(chartsList.length+1));
+		var name = prompt(Blockly.Msg["NewChartScript"], "Chart "+(chartsList.length+1));
 		if (name != null) {
 			for( var i = 0; i < chartsList.length; i++){
 				if ( chartsList[i].name === name) {
 					newScript(num);
-					printError(Blockly.Msg.NewChartScriptError);
+					printError(Blockly.Msg["NewChartScriptError"]);
 					return;
 				}
 			}
@@ -883,12 +921,12 @@ function newScript(num){
 		}
 	}
 	else if(num===3){
-		var name = prompt(Blockly.Msg.NewEventScript, "Event "+(eventsList.length+1));
+		var name = prompt(Blockly.Msg["NewEventScript"], "Event "+(eventsList.length+1));
 		if (name != null) {
 			for( var i = 0; i < eventsList.length; i++){
 				if ( eventsList[i].name === name) {
 					newScript(num);
-					printError(Blockly.Msg.NewEventScriptError);
+					printError(Blockly.Msg["NewEventScriptError"]);
 					return;
 				}
 			}
@@ -896,12 +934,12 @@ function newScript(num){
 		}
 	}
 	else if(num===4){
-		var name = prompt(Blockly.Msg.NewControllerScript, "Controller "+(controllersList.length+1));
+		var name = prompt(Blockly.Msg["NewControllerScript"], "Controller "+(controllersList.length+1));
 		if (name != null) {
 			for( var i = 0; i < controllersList.length; i++){
 				if ( controllersList[i].name === name) {
 					newScript(num);
-					printError(Blockly.Msg.NewControllerScriptError);
+					printError(Blockly.Msg["NewControllerScriptError"]);
 					return;
 				}
 			}

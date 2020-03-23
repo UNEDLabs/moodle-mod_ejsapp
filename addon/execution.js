@@ -1,4 +1,5 @@
 function prepareControllerCode(code){
+	console.log('code ' + code);
 	statements_code = cleanFromComments(code);
 	statements_code = statements_code.replace(/(\r\n|\n|\r)/gm, "");
 	var res = getInfoFromFunctionName(functionToReplace);
@@ -13,6 +14,7 @@ function prepareControllerCode(code){
 	}
 
 	control = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
+	console.log('control ' + control);
 	/*u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
 	(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
 	control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );*/
@@ -103,23 +105,23 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 	var a="Select chart";
 	var b="Select event";
 	var c="Select controller";
-	var replaytext = Blockly.Msg.Log1 +' <span style="color:green">'+experimentSelected+'</span>';
+	var replaytext = Blockly.Msg["Log1"] +' <span style="color:green">'+experimentSelected+'</span>';
 	if(chartsBlockly) {
 		if(chartSelected!==""){
 			a = chartSelected;
-			replaytext += Blockly.Msg.Log2+'<span style="color:blue">'+ a +'</span>';
+			replaytext += Blockly.Msg["Log2"]+'<span style="color:blue">'+ a +'</span>';
 		}
 	}
 	if(eventsBlockly) {
 		if(eventSelected!==""){
 			b = eventSelected;
-			replaytext += Blockly.Msg.Log3+'<span style="color:red">'+ b +'</span>';
+			replaytext += Blockly.Msg["Log3"]+'<span style="color:red">'+ b +'</span>';
 		}
 	}
 	if(controllerBlockly) {
 		if(controllerSelected!==""){
 			c = controllerSelected;
-			replaytext += Blockly.Msg.Log4+'<span style="color:peru">'+ c +'</span>';
+			replaytext += Blockly.Msg["Log4"]+'<span style="color:peru">'+ c +'</span>';
 		}
 	}
 	var result= playCodeDet(experimentSelected,a,b,c);
@@ -132,7 +134,7 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 		inter = setInterval(stepCode, time_step);
 	}
 	else{
-		printError(Blockly.Msg.ExpError);
+		printError(Blockly.Msg["ExpError"]);
 	}
 }
 
@@ -309,7 +311,18 @@ function initApi(interpreter, scope) {
 	};
 	interpreter.setProperty(scope, 'replaceFunction', interpreter.createNativeFunction(wrapper));
 
+	var wrapper = function(id,id2) {
+		id = id ? id.toString() : '';
+		id2 = JSON.parse("[" + id2.toString() + "]");
+		return interpreter.createPrimitive(callFunction(id,id2));
+	};
+	interpreter.setProperty(scope, 'callFunction', interpreter.createNativeFunction(wrapper));
+
 } /* End of initApi */
+
+function callFunction(name,params){
+	return (getValueModel(name)).apply(null,params);
+}
 
 function revisarFin(){
 	/* Return variables */
