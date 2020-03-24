@@ -170,9 +170,9 @@ function loadVariables(){
 				case 'function':
 					if(functionToReplace!==k) {
 						if((obj[k].toString().includes('return ')))
-							function_from_ejss_with_return.push({'name': k, 'params': getParamNames(obj[k])})
+							function_from_ejss_with_return.push({'name': k, 'params': getParamNames(obj[k])});
 						else
-							function_from_ejss.push({'name': k, 'params': getParamNames(obj[k])})
+							function_from_ejss.push({'name': k, 'params': getParamNames(obj[k])});
 					}
 					break;
 				default:
@@ -200,10 +200,10 @@ function loadVariables(){
 					break;
 				case 'function':
 					if(functionToReplace!==inputAux[k]) {
-						if((obj[k].toString().includes('return ')))
-							function_from_ejss_with_return.push({'name': k, 'params': getParamNames(obj[k])})
+						if((inputAux[k].toString().includes('return ')))
+							function_from_ejss_with_return.push({'name': inputAux[k], 'params': getParamNames(obj[inputAux[k]])});
 						else
-							function_from_ejss.push({'name': inputAux[k], 'params': getParamNames(obj[inputAux[k]])})
+							function_from_ejss.push({'name': inputAux[k], 'params': getParamNames(obj[inputAux[k]])});
 					}
 					break;
 				default:
