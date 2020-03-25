@@ -109,12 +109,12 @@ $string['blockly_config'] = 'Configure use of Blockly';
 
 $string['use_blockly'] = 'Enable using Blockly';
 $string['use_blockly_help'] = 'When using this option, the EJSApp activity will display a space for programming in Blockly. The programs created with Blockly will be able to interact with the virtual or remote lab.';
-$string['charts_blockly'] = 'Mostrar bloques de gr&aacute;ficas';
-$string['events_blockly'] = 'Mostrar bloques de eventos';
-$string['controller_blockly'] = 'Mostrar bloques de controlador';
+$string['charts_blockly'] = 'Enable chart blocks';
+$string['events_blockly'] = 'Enable event blocks';
+$string['controller_blockly'] = 'Enable controller blocks';
 $string['remote_blockly'] = 'The server executes the controller';
-$string['func_blockly'] = 'Variable that stores the local controller function';
-$string['languageController_blockly'] = 'Programming language for the controller';
+$string['func_blockly'] = 'Variable that stores the controller function';
+$string['languageController_blockly'] = 'Programming language for writing functions';
 $string['blocklyfile'] = 'Initial program';
 $string['blocklyfile_help'] = 'You can select a .blk file that specifies which blockly programs should be initially loaded.';
 $string['experiment_blockly'] = "Experiments";

@@ -258,7 +258,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
         $mform->setType('func_blockly', PARAM_TEXT);
         $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
-        $mform->disabledIf('func_blockly', 'is_rem_lab', 'eq', 1);
         $mform->setDefault('func_blockly', 'controller');
 
         if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
@@ -267,6 +266,8 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             $mform->disabledIf('remote_blockly', 'is_rem_lab', 'eq', 0);
             $mform->setDefault('remote_blockly', 0);
         }
+
+
 
         // Adding an optional text file with a recording to automatically run it when the lab loads.
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),

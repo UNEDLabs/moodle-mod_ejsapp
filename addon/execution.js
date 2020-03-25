@@ -1,5 +1,4 @@
 function prepareControllerCode(code){
-	console.log('code ' + code);
 	statements_code = cleanFromComments(code);
 	statements_code = statements_code.replace(/(\r\n|\n|\r)/gm, "");
 	var res = getInfoFromFunctionName(functionToReplace);
@@ -14,7 +13,6 @@ function prepareControllerCode(code){
 	}
 
 	control = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
-	console.log('control ' + control);
 	/*u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
 	(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
 	control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );*/
@@ -188,7 +186,10 @@ function stepCode() {
 				workspace.highlightBlock(null);
 				clearInterval(inter);
 				if(remoteController) {
-					_model.sendToRemoteController(codeForRemoteController);
+					//_model.sendToRemoteController(codeForRemoteController);
+					var params=[];
+					params.push(codeForRemoteController);
+					callFunction(functionToReplace,params);
 					codeForRemoteController ="";
 				}
 
