@@ -134,10 +134,10 @@ define(['jquery'], function($) {
             }, 200);
         },
 
-        myFrontierRun: function(secure, myFrontierIP, myFrontierPath, myFrontierPort, myFrontierExperience, closeScreen) {
+        myFrontierRun: function(myFrontierIP, myFrontierPath, myFrontierExperience, closeScreen) {
             var doit = setInterval(function() {
                 if (typeof _model._sarlab !== "undefined") {
-                    _model._sarlab.setSarlabInfo(secure, myFrontierIP, myFrontierPath, myFrontierPort, myFrontierExperience, closeScreen);
+                    _model._sarlab.setSarlabInfo(true, myFrontierIP, myFrontierPath, 443, myFrontierExperience, closeScreen);
                     if (typeof _model._rip !== "undefined") {
                         _model._sarlab.connect(function() {
                             _model._rip.connect();

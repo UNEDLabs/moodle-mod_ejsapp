@@ -385,7 +385,8 @@ function ping($host, $port, $myFrontierinstance, $expid=null, $timeout=3) {
 
     $alive = fsockopen($host, $port, $errno, $errstr, $timeout);
     if ($alive && $myFrontierinstance !== false) {
-        $uri = 'http://' . $host . '/SARLABV8.0/';
+        ($port == 443) ? $protocol = 'https://' : $protocol = 'http://';
+        $uri = $protocol . $host . '/SARLABV8.0/';
         $headers = @get_headers($uri);
         if (substr($headers[0], 9, 3) == 200) { // Valid url.
             if ($expid != null) {
@@ -484,7 +485,7 @@ function get_experiences_myfrontier($myFrontierips, $username = "", $ejsappconte
             $name = $ip;
         }
         if ($ip != '127.0.0.1' && $ip != '') {
-            if ($fp = fsockopen($ip, '80', $errorcode, $errorstring, 3)) { // IP is alive.
+            if ($fp = fsockopen($ip, '443', $errorcode, $errorstring, 3)) { // IP is alive.
                 fclose($fp);
                 $uri = 'https://' . $ip . '/SARLABV8.0/gexlab';
                 $headers = get_headers($uri);
@@ -706,23 +707,18 @@ function default_rem_lab_conf($practice, $username = "") {
         if (empty($myFrontierips)) {
             $myFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
         }
-        $myFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_port'));
-        if (empty($myFrontierports)) {
-            $myFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
-        }
         $initchar = strrpos($myFrontierips[intval($myFrontierinstance)], "'");
         if ($initchar != 0) {
             $initchar++;
         }
         $ip = substr($myFrontierips[intval($myFrontierinstance)], $initchar);
         $defaultconf->ip = $ip;
-        $defaultconf->port = $myFrontierports[intval($myFrontierinstance)];
     } else {
         $arr = explode("@", $practice, 2);
         $practice = $arr[0];
         $defaultconf->ip = '127.0.0.1';
-        $defaultconf->port = 443;
     }
+    $defaultconf->port = 443;
     $defaultconf->practiceintro = $practice;
     $defaultconf->slotsduration = 1;
     $defaultconf->totalslots = 18;

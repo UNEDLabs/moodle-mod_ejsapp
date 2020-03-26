@@ -85,14 +85,11 @@ class ejsapp_lab implements renderable {
                     if (!(($initpos === false) || ($initpos === $endpos))) {
                         $myFrontierip = substr($myFrontierip, $endpos + 1);
                     }
-                    $listmyFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_port'));
                     if (empty($listmyFrontierports)) {
                         $listmyFrontierports = explode(";", get_config('block_remlab_manager', 'myFrontier_IP') . ';');
                     }
-                    $myFrontierport = $listmyFrontierports[$remlabinfo->instance];
                 } else {
                     $myFrontierip = $collabinfo->ip;
-                    $myFrontierport = $collabinfo->myFrontierport;
                 }
             }
         }
@@ -219,11 +216,11 @@ class ejsapp_lab implements renderable {
                             $length = $pos - strrpos($end, ';') -2;
                             $myGatewayip = substr($end, -$length);
                             $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
-                                array($myFrontierport == 443, $myGatewayip, strtolower($practice[1]), $myFrontierport, $practice[0],
+                                array($myGatewayip, strtolower($practice[1]), $practice[0],
                                     $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
                         } else { // myFrontier experience
                             $PAGE->requires->js_call_amd('mod_ejsapp/ejss_interactions', 'myFrontierRun',
-                                array($myFrontierport == 443, $myFrontierip, 'SARLABV8.0', $myFrontierport, $practice[0],
+                                array($myFrontierip, 'SARLABV8.0', $practice[0],
                                     $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id));
                         }
                     }
