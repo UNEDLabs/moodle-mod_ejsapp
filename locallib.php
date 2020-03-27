@@ -94,14 +94,19 @@ function update_ejsapp_files_and_tables($ejsapp, $context) {
     }
 
     // Configuration of blockly.
+    $functions = array();
+    $func_names = $ejsapp->func_name;
+    $remote = $ejsapp->remote_function;
+    for ($i = 0; $i < count($func_names); $i++) {
+        array_push($functions, [$func_names[$i], $remote[$i]]);
+    }
     $blocklyconf = array();
     array_push($blocklyconf, $ejsapp->use_blockly);
     array_push($blocklyconf, $ejsapp->charts_blockly);
     array_push($blocklyconf, $ejsapp->events_blockly);
-    array_push($blocklyconf, $ejsapp->controller_blockly);
-    array_push($blocklyconf, $ejsapp->func_blockly);
-    array_push($blocklyconf, $ejsapp->controller_language);
-    array_push($blocklyconf, $ejsapp->remote_blockly);
+    array_push($blocklyconf, $ejsapp->functions);
+    array_push($blocklyconf, $ejsapp->func_language);
+    array_push($blocklyconf, $functions);
     $ejsapp->blockly_conf = json_encode($blocklyconf);
 
     $DB->update_record('ejsapp', $ejsapp);

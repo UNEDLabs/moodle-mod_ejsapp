@@ -216,8 +216,8 @@ class mod_ejsapp_mod_form extends moodleform_mod {
 
 
 
-        // Use and configuration of Blockly.
-        $mform->addElement('header', 'blockly_config', get_string('blockly_config', 'ejsapp'));
+        // Use and configuration of Blockly and ACE code editor.
+        $mform->addElement('header', 'programming_config', get_string('programming_config', 'ejsapp'));
 
         $mform->addElement('selectyesno', 'use_blockly', get_string('use_blockly', 'ejsapp'));
         $mform->addHelpButton('use_blockly', 'use_blockly', 'ejsapp');
@@ -231,9 +231,9 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $mform->disabledIf('events_blockly', 'use_blockly', 'eq', 0);
         $mform->setDefault('events_blockly', 0);
 
-        $mform->addElement('selectyesno', 'controller_blockly', get_string('controller_blockly', 'ejsapp'));
-        $mform->disabledIf('controller_blockly', 'use_blockly', 'eq', 0);
-        $mform->setDefault('controller_blockly', 0);
+        $mform->addElement('selectyesno', 'functions', get_string('functions', 'ejsapp'));
+        $mform->disabledIf('functions', 'use_blockly', 'eq', 0);
+        $mform->setDefault('functions', 0);
 
         $available_languages = array(
             "blockly" => "Blockly",
@@ -251,29 +251,55 @@ class mod_ejsapp_mod_form extends moodleform_mod {
             "rust" => "Rust",
             "vhdl" => "VHDL",
         );
-        $mform->addElement('select', 'controller_language', get_string('languageController_blockly', 'ejsapp'), $available_languages);
-        $mform->disabledIf('controller_language', 'controller_blockly', 'eq', 0);
-        $mform->setDefault('controller_language', 'javascript');
+        $mform->addElement('select', 'func_language', get_string('func_language', 'ejsapp'), $available_languages);
+        $mform->addHelpButton('func_language', 'func_language', 'ejsapp');
+        $mform->disabledIf('func_language', 'functions', 'eq', 0);
+        $mform->setDefault('func_language', 'javascript');
 
-        $mform->addElement('text', 'func_blockly', get_string('func_blockly', 'ejsapp'));
-        $mform->setType('func_blockly', PARAM_TEXT);
-        $mform->disabledIf('func_blockly', 'controller_blockly', 'eq', 0);
-        $mform->setDefault('func_blockly', 'controller');
-
+        $varsarray = array();
+        $varsarray[] = $mform->createElement('text', 'func_name', get_string('func_name', 'ejsapp'));
         if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
-            $mform->addElement('selectyesno', 'remote_blockly', get_string('remote_blockly', 'ejsapp'));
-            $mform->disabledIf('remote_blockly', 'controller_blockly', 'eq', 0);
-            $mform->disabledIf('remote_blockly', 'is_rem_lab', 'eq', 0);
-            $mform->setDefault('remote_blockly', 0);
+            $varsarray[] = $mform->createElement('selectyesno', 'remote_function', get_string('remote_function', 'ejsapp'));
+        } else {
+            $mform->addElement('hidden', 'remote_function', null);
+            $mform->setType('remote_function', PARAM_INT);
+            $mform->setDefault('remote_function', 0);
         }
 
+        $repeatfuncoptions = array();
+        $repeatfuncoptions['func_name']['disabledif'] = array('functions', 'eq', 0);
+        $repeatfuncoptions['func_name']['type'] = PARAM_TEXT;
+        $repeatfuncoptions['func_name']['helpbutton'] = array('func_name', 'ejsapp');
+        if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
+            $repeatfuncoptions['remote_function']['disabledif'] = array('functions', 'eq', 0);
+            $repeatfuncoptions['remote_function']['disabledif'] = array('is_rem_lab', 'eq', 0);
+        }
 
+        $no = 1;
+        if ($this->current->instance) {
+            if ($blocklyconf = $DB->get_field('ejsapp', 'blockly_conf', array('id' => $this->current->instance))) {
+                $blocklyconf = json_decode($blocklyconf);
+                $functions = $blocklyconf[5];
+                $no = count($functions);
+            }
+        }
 
-        // Adding an optional text file with a recording to automatically run it when the lab loads.
+        $this->repeat_elements($varsarray, $no, $repeatfuncoptions, 'funcoption_repeats',
+            'option_add_funcs', 1, null, true);
+
+        // Adding an optional text file with a blockly program.
         $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
             null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
         $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
         $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0);
+
+        /* TODO: Adding an optional text file with a textual program (if any programming language rather than blockly is selected).
+        $mform->addElement('filemanager', 'blocklyfile', get_string('blocklyfile', 'ejsapp'),
+            null, array('subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => '.blk'));
+        $mform->addHelpButton('blocklyfile', 'blocklyfile', 'ejsapp');
+        $mform->disabledIf('blocklyfile', 'use_blockly', 'eq', 0); */
+
+
 
         // Select the users interaction recording options.
         $mform->addElement('header', 'record_interactions_title', get_string('record_interactions', 'ejsapp'));
@@ -364,10 +390,15 @@ class mod_ejsapp_mod_form extends moodleform_mod {
                 $defaultvalues['use_blockly'] = $blocklyconf[0];
                 $defaultvalues['charts_blockly'] = $blocklyconf[1];
                 $defaultvalues['events_blockly'] = $blocklyconf[2];
-                $defaultvalues['controller_blockly'] = $blocklyconf[3];
-                $defaultvalues['func_blockly'] = $blocklyconf[4];
-                $defaultvalues['controller_language'] = $blocklyconf[5];
-                $defaultvalues['remote_blockly'] = $blocklyconf[6];
+                $defaultvalues['functions'] = $blocklyconf[3];
+                $defaultvalues['func_language'] = $blocklyconf[4];
+                $functions = $blocklyconf[5];
+                $key = 0;
+                foreach ($functions as $function) {
+                    $defaultvalues['func_name['.$key.']'] = $function[0];
+                    $defaultvalues['remote_function['.$key.']'] = $function[1];
+                    $key ++;
+                }
             }
         }
     } // End of funtion data_preprocessing().
@@ -407,15 +438,6 @@ class mod_ejsapp_mod_form extends moodleform_mod {
                 $errors['practiceintro'] = get_string('practiceintro_required', 'ejsapp');
             }
         }
-
-        // TODO: Check whether the uploaded file is a valid EjsS file.
-        /*
-        $draftitemid = $data['appletfile'];
-        $draftitemid = file_get_submitted_draft_itemid('appletfile');
-        $file = $fs->get_file_by_id($draftitemid);
-
-        $manifest = file_get_contents('zip://' . $filepath . '#' . 'META-INF/MANIFEST.MF');
-        */
 
         return $errors;
     } // End of function validation().

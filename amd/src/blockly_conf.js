@@ -29,15 +29,15 @@
 
 define([], function() {
     var t = {
-        configureBlockly: function(remote, charts, events, controller, functionName, language, server) {
+        configureBlockly: function(remote, charts, events, controller, language, functionName, server) {
             remoteLab = remote === "1";
             chartsBlockly = charts === "1";
             eventsBlockly = events === "1";
             controllerBlockly = controller === "1";
             time_step = 1;
-            functionToReplace = functionName;
             controllerFunctionLanguage = language;
-            remoteController = server === "1";
+            functionToReplace = functionName;
+            remoteController = server;
             codeBeforeController = "";
             codeAfterController = "";
         }
