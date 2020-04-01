@@ -108,14 +108,14 @@ $string['vars_incorrect_type'] = 'ATENCI&Oacute;N: El tipo y los valores especif
 $string['programming_config'] = 'Configurar uso de Blockly y editor de c&oacute;digo ACE';
 
 $string['use_blockly'] = 'Habilitar Blockly/ACE';
-$string['use_blockly_help'] = 'Cuando se usa esta opci&oacute;n, la actividad EJSApp mostrar&aacute; un espacio para programar en Blockly. Los programas creados en Blockly podr&aacute;n interactuar con el laboratorio virtual o remoto. Tambi&eacute;n puede usarse un editor de c&oacute;digo para reescribir funciones del laboratorio.';
+$string['use_blockly_help'] = 'Cuando se usa esta opci&oacute;n, la actividad EJSApp mostrar&aacute; un espacio para programar en Blockly. Los programas creados en Blockly podr&aacute;n interactuar con el laboratorio virtual o remoto. Tambi&eacute;n puede usarse un editor de c&oacute;digo para sobrescribir funciones del laboratorio.';
 $string['charts_blockly'] = 'Habilitar gr&aacute;ficas';
 $string['events_blockly'] = 'Habilitar eventos';
 $string['functions'] = 'Habilitar reescribir funciones';
 $string['func_language'] = 'Lenguaje de programaci&oacute;n';
-$string['func_language'] = 'El lenguaje de programaci&oacute;n a usar para reescribir las funciones. Para cualquier elecc&oacute;n distinta de Blockly, aparece el editor de c&oacute;digo ACE.';
+$string['func_language_help'] = 'El lenguaje de programaci&oacute;n a usar para sobrescribir las funciones. Para cualquier elecc&oacute;n distinta de Blockly, aparece el editor de c&oacute;digo ACE.';
 $string['func_name'] = 'Funci&oacute;n para ser reescrita';
-$string['func_name_help'] = 'Nombre de la variable que almacena la funci&oacute;n que quieres permitir que sea reescrita.';
+$string['func_name_help'] = 'Nombre de la variable que almacena la funci&oacute;n que quieres permitir que sea sobrescrita.';
 $string['remote_function'] = 'La funci&oacute;n se ejecuta en el servidor';
 $string['blocklyfile'] = 'Programa blockly inicial';
 $string['blocklyfile_help'] = 'Puedes seleccionar un fichero .blk que especifique que programa blockly debe cargarse inicialmente.';
@@ -162,7 +162,7 @@ $string['forbid_lti'] = 'No tienes permisos para acceder a este laboratorio.';
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
 
 $string['personal_vars_button'] = 'Ver variables personalizadas';
-$string['rewrite_functions_button'] = 'Seleccionar funciones de laboratorio a reemplazar';
+$string['rewrite_functions_button'] = 'Seleccionar funciones de laboratorio a sobreescribir';
 
 // Strings in lib.php.
 $string['deletedlogs'] = 'Borrar todas las entradas del log';
@@ -170,6 +170,9 @@ $string['deletedlegacylogs'] = 'Borrar todas las entradas del log antiguo';
 $string['deletedrecords'] = 'Borrar todas acciones grabadas de usuario en actividades ejsapp';
 $string['deletedpersonalvars'] = 'Borrar todas las variables personalizadas';
 $string['deletedgrades'] = 'Borrar todas las calificaciones de actividades ejsapp';
+
+// Strings in personalized_vars_values.php.
+$string['rewriteFuncs_pageTitle'] = 'Habilitar la reescritura de funciones del laboratorio';
 
 // Strings in personalized_vars_values.php.
 $string['personalVars_pageTitle'] = 'Valores de las variables personalizadas';

@@ -513,7 +513,7 @@ function ejsapp_extend_settings_navigation($settings, $ejsappnode) {
         $node = navigation_node::create(get_string('personal_vars_button', 'ejsapp'),
             $url, navigation_node::TYPE_SETTING, null, 'mod_ejsapp_personal_vars');
         $ejsappnode->add_node($node, $beforekey);
-        $url = new moodle_url('/mod/ejsapp/rewrite_functions',
+        $url = new moodle_url('/mod/ejsapp/rewrite_functions.php',
             array('id' => $PAGE->cm->id, 'courseid' => $PAGE->course->id));
         $node = navigation_node::create(get_string('rewrite_functions_button', 'ejsapp'),
             $url, navigation_node::TYPE_SETTING, null, 'mod_ejsapp_rewrite_functions');

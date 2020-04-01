@@ -108,21 +108,21 @@ $string['vars_incorrect_type'] = 'WARNING: The specified type and values for thi
 $string['programming_config'] = 'Configure use of Blockly & ACE code editor';
 
 $string['use_blockly'] = 'Enable Blockly/ACE';
-$string['use_blockly_help'] = 'When using this option, the EJSApp activity will display a space for programming in Blockly. The programs created with Blockly will be able to interact with the virtual or remote lab. A code editor can also be used to rewrite lab functions.';
+$string['use_blockly_help'] = 'When using this option, the EJSApp activity will display a space for programming in Blockly. The programs created with Blockly will be able to interact with the virtual or remote lab. A code editor can also be used to overwrite lab functions.';
 $string['charts_blockly'] = 'Enable charts';
 $string['events_blockly'] = 'Enable events';
-$string['functions'] = 'Enable rewriting functions';
+$string['functions'] = 'Enable overwriting functions';
 $string['func_language'] = 'Programming language';
-$string['func_language_help'] = 'The programming language to be used for rewriting functions. For any choice different to Blockly, the ACE code editor will appear.';
-$string['func_name'] = 'Function to be rewritten';
-$string['func_name_help'] = 'Name of the variable that stores the function you want to allow to be rewritten.';
+$string['func_language_help'] = 'The programming language to be used for overwriting functions. For any choice different to Blockly, the ACE code editor will appear.';
+$string['func_name'] = 'Function to be overwritten';
+$string['func_name_help'] = 'Name of the variable that stores the function you want to allow to be overwritten.';
 $string['remote_function'] = 'Function runs on the server';
 $string['blocklyfile'] = 'Initial blockly program';
 $string['blocklyfile_help'] = 'You can select a .blk file that specifies which blockly programs should be initially loaded.';
 $string['experiment_blockly'] = "Experiments";
 $string['data_blockly'] = "Data & Charts";
 $string['event_blockly'] = "Events";
-$string['functions'] = "Rewrite Functions";
+$string['functions'] = "Overwrite Functions";
 $string['experimentDropdown_blockly'] = " New experiment script";
 $string['chartDropdown_blockly'] = " New chart script";
 $string['eventDropdown_blockly'] = " New event script";
@@ -162,7 +162,7 @@ $string['forbid_lti'] = 'You don\'t have the rights to access this lab.';
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
 
 $string['personal_vars_button'] = 'View personalized variables';
-$string['rewrite_functions_button'] = 'Select lab functions to be rewritten';
+$string['rewrite_functions_button'] = 'Select lab functions to be overwritten';
 
 // Strings in lib.php.
 $string['deletedlogs'] = 'Delete all log entries';
@@ -170,6 +170,9 @@ $string['deletedlegacylogs'] = 'Delete all legacy log entries';
 $string['deletedrecords'] = 'Delete all user actions recorded in ejsapp activities';
 $string['deletedpersonalvars'] = 'Delete all user personalized variables';
 $string['deletedgrades'] = 'Delete all grades of ejsapp activities';
+
+// Strings in personalized_vars_values.php.
+$string['rewriteFuncs_pageTitle'] = 'Enable overwriting lab functions';
 
 // Strings in personalized_vars_values.php.
 $string['personalVars_pageTitle'] = 'Values of the personalized variables';
