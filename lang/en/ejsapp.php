@@ -122,10 +122,11 @@ $string['blocklyfile_help'] = 'You can select a .blk file that specifies which b
 $string['experiment_blockly'] = "Experiments";
 $string['data_blockly'] = "Data & Charts";
 $string['event_blockly'] = "Events";
+$string['functions'] = "Rewrite Functions";
 $string['experimentDropdown_blockly'] = " New experiment script";
 $string['chartDropdown_blockly'] = " New chart script";
 $string['eventDropdown_blockly'] = " New event script";
-$string['controllerDropdown_blockly'] = " New controller script";
+$string['functionsDropdown'] = " New function script";
 $string['run_blockly'] = " Run";
 $string['log_blockly'] = " Log";
 $string['error_blockly'] = " Errors:";
@@ -161,6 +162,7 @@ $string['forbid_lti'] = 'You don\'t have the rights to access this lab.';
 $string['ejsapp_error'] = 'The EJSApp activity you are trying to access does not exist.';
 
 $string['personal_vars_button'] = 'View personalized variables';
+$string['rewrite_functions_button'] = 'Select lab functions to be rewritten';
 
 // Strings in lib.php.
 $string['deletedlogs'] = 'Delete all log entries';

@@ -122,10 +122,11 @@ $string['blocklyfile_help'] = 'Puedes seleccionar un fichero .blk que especifiqu
 $string['experiment_blockly'] = "Experimentos";
 $string['data_blockly'] = "Datos y Gráficas";
 $string['event_blockly'] = "Eventos";
+$string['functions'] = "Reescribir Funciones";
 $string['experimentDropdown_blockly'] = " Nuevo código del experimento";
 $string['chartDropdown_blockly'] = " Nuevo código de la gráfica";
 $string['eventDropdown_blockly'] = " Nuevo código del evento";
-$string['controllerDropdown_blockly'] = " Nuevo código del controlador";
+$string['functionsDropdown'] = " Nuevo código de la función";
 $string['run_blockly'] = " Ejecutar";
 $string['log_blockly'] = " Registro";
 $string['error_blockly'] = " Errores:";
@@ -161,6 +162,7 @@ $string['forbid_lti'] = 'No tienes permisos para acceder a este laboratorio.';
 $string['ejsapp_error'] = 'La actividad EJSApp a la que est&aacute; tratando de acceder no existe.';
 
 $string['personal_vars_button'] = 'Ver variables personalizadas';
+$string['rewrite_functions_button'] = 'Seleccionar funciones de laboratorio a reemplazar';
 
 // Strings in lib.php.
 $string['deletedlogs'] = 'Borrar todas las entradas del log';
