@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				document.getElementById('eventsDropdown').style.display = "none";
 			}
 			if(!controllerBlockly) {
-				document.getElementById('controllersDropdown').style.display = "none";
+				document.getElementById('functionsDropdown').style.display = "none";
 			}
 			initAux();
 			loadVariables();
@@ -66,13 +66,14 @@ document.addEventListener('DOMContentLoaded', function(){
 //function_from_ejss_with_return = [{'name':'funcion_prueba2','params':['x','y'],'code':'console.log("Aleluya "+x+" "+y+" "+z);'}]; // PRUEBA
 
 function initAux(){
+	evaluatefuns = [];
 	function_from_ejss = [];
 	function_from_ejss_with_return = [];
-	controllerUseBlockly = false;
+	functionUseBlockly = false;
 	if(controllerFunctionLanguage==='blockly')
 	{
-		controllerUseBlockly = true;
-		workspaceControllers = null;
+		functionUseBlockly = true;
+		workspaceFunctions = null;
 	}
 	functionsVariableList = [];
 	blocklyVariablesList = [];
@@ -110,26 +111,32 @@ function initAux(){
 	recordedVariables={};
 	recordedVariables.names = [];
 	recordedVariables.datas = [];
-	controllerEditor = null;
+	functionEditor = null;
 	experimentsList = [];
 	chartsList = [];
 	eventsList = [];
-	controllersList = [];
+	functionsList = [];
+	functionOpen =[];
+	functionSelected=[];
+	for(var i=0;i<functionToReplace.length;i++){
+		functionsList.push([]);
+		functionOpen[i]=-1;
+		functionSelected[i]="";
+	}
 	codeOfData = [];
 	codeOfEvents = [];
 	codeOfControllers = [];
 	experimentOpen=-1;
 	chartOpen=-1;
 	eventOpen=-1;
-	controllerOpen=-1;
 	errorInterval=null;
 	chartId = 0;
 	experimentSelected="";
 	eventSelected="";
 	chartSelected="";
-	controllerSelected="";
-	codeForRemoteController="";
+	codeForRemoteFunctions=[];
 	functionsFromEvents="";
+	divForFunctions = [];
 }
 
 var STRIP_COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n])*')|("(?:\\"|[^"\r\n])*"))|(\s*=[^,\)]*))/mg;
@@ -142,6 +149,39 @@ function getParamNames(func) {
 	return result;
 }
 
+function loadFunctionsNamesFromModel(_model){
+	var obj = _model._userSerialize();
+	var result = [];
+	if(obj!==null){
+		if (typeof _model._userSerializePublic !== "undefined" && _model._userSerializePublic !== null) {
+			for (var k in obj) {
+				switch (typeof obj[k]) {
+					case 'function':
+						if(functionToReplace!==k) {
+							result.push(k);
+						}
+						break;
+				}
+			}
+
+		} else if (typeof _model._inputAndPublicParameters !== "undefined") {
+			var inputAux = _model._inputAndPublicParameters;
+			for (var k in inputAux) {
+				if(inputAux[k].includes(':')){
+					inputAux[k]= inputAux[k].slice(0, inputAux[k].indexOf(' '));
+					switch (typeof obj[inputAux[k]]) {
+						case 'function':
+							if(functionToReplace!==inputAux[k]) {
+								result.push(inputAux[k]);
+							}
+							break;
+					}
+				}
+			}
+		}
+	}
+	return result;
+}
 
 function loadVariables(){
 	var _vars = "";
@@ -226,8 +266,8 @@ function loadVariables(){
 					keys_boolean_output.push(dupla);
 					break;
 				default:
-					console.log('Output');
-					console.log(obj[outputAux[k]]+' '+typeof obj[outputAux[k]]);
+					//console.log('Output');
+					//console.log(obj[outputAux[k]]+' '+typeof obj[outputAux[k]]);
 					keys_others_output.push(dupla);
 					break;
 			}
@@ -289,9 +329,27 @@ function preparePage(){
 	}
 }
 
+function updateControllerPanelDiv(num){
+	var element = document.getElementById('ControllerHeader');
+	if(remoteController[num]){
+		element.innerHTML = '<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerRemote+'</h4>';
+	}
+	else {
+		var texto = getInfoFromFunctionName(functionToReplace[num]);
+		if (texto[1] !== '')
+			element.innerHTML='<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerTextInitial +
+				'<span style="color: green">' + functionToReplace[num] + '</span>'+Blockly.ControllerTextSecond +'<span style="color: red"><br>' +
+				texto[0] + '</span>'+Blockly.ControllerTextThird +'<span style="color: blue">' + texto[1] + '</span>.</h4>';
+		else
+			element.innerHTML='<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerTextInitial +
+				'<span style="color: green">' + functionToReplace[num] + '</span>'+Blockly.ControllerTextSecond +'<span style="color: red"><br>' +
+				texto[0] + '</span>'+Blockly.ControllerTextThird +Blockly.ControllerTextForth+'</h4>';
+	}
+}
+
 function createControllerPanel(){
 	if(controllerFunctionLanguage==="blockly"){
-		workspaceControllers = Blockly.inject('blocklyDivController', {
+		workspaceFunctions = Blockly.inject('blocklyDivController', {
 		grid:
 			{
 				spacing: 25,
@@ -304,42 +362,36 @@ function createControllerPanel(){
 		collapse: true,
 		zoom: {controls: true}
 		});
-		workspaceControllers.registerButtonCallback("createVariablePressed", createVariable,"");
-		workspaceControllers.registerToolboxCategoryCallback('generalVars', generalVars);
-		workspaceControllers.addChangeListener(checkControllersBlocks);
+		workspaceFunctions.registerButtonCallback("createVariablePressed", createVariable,"");
+		workspaceFunctions.registerToolboxCategoryCallback('generalVars', generalVars);
+		workspaceFunctions.addChangeListener(checkFunctionsBlocks);
 	}
 	else{
-		controllerEditor = ace.edit("blocklyDivController");
-		controllerEditor.resize();
-		controllerEditor.$blockScrolling = Infinity ;
-		controllerEditor.setTheme("ace/theme/xcode");
-		controllerEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);
-		document.getElementById('blocklyDivController').addEventListener("focusout", focusOutController);
+		functionEditor = ace.edit("blocklyDivController");
+		functionEditor.resize();
+		functionEditor.$blockScrolling = Infinity ;
+		functionEditor.setTheme("ace/theme/xcode");
+		functionEditor.getSession().setMode("ace/mode/"+controllerFunctionLanguage);
+		document.getElementById('blocklyDivController').addEventListener("focusout", focusOutFunction);
 	}
-
-	if(remoteController){
-		document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-			'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerRemote+'</h4>');
-	}
-	else {
-		var texto = getInfoFromFunctionName(functionToReplace);
-		if (texto[1] !== '')
-			document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-				'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerTextInitial +
-				'<span style="color: green">' + functionToReplace + '</span>'+Blockly.ControllerTextSecond +'<span style="color: red"><br>' +
-				texto[0] + '</span>'+Blockly.ControllerTextThird +'<span style="color: blue">' + texto[1] + '</span>.</h4>');
-		else
-			document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
-				'<h4 id="ControllerHeader" style="margin-top:0; text-align=center">'+Blockly.ControllerTextInitial +
-				'<span style="color: green">' + functionToReplace + '</span>'+Blockly.ControllerTextSecond +'<span style="color: red"><br>' +
-				texto[0] + '</span>'+Blockly.ControllerTextThird +Blockly.ControllerTextForth+'</h4>');
-	}
+	document.getElementById('ControllerDiv').insertAdjacentHTML('afterbegin',
+		'<h4 id="ControllerHeader"></h4>');
 }
 
 function getCodeFromName(list,name){
 	for( var i = 0; i < list.length; i++){
 		   if ( list[i].name === name)
 			 return [list[i].code,i];
+	}
+	return null;
+}
+
+function getCodeFromNameFunctions(list,name){
+	for( var i = 0; i < list.length; i++){
+		for(var j = 0; j<list[i].length;j++) {
+			if (list[i][j].name === name)
+				return [list[i][j].code, list[i][j].name];
+		}
 	}
 	return null;
 }
@@ -565,19 +617,35 @@ function checkChartsBlocks(event){
 	}
 }
 
-function checkControllersBlocks(event){
+function getFunctionOpen(){
+	for(var i =0; i<functionToReplace.length;i++){
+		if(functionOpen[i]!=-1)
+			return i;
+	}
+	return -1;
+}
+
+function checkFunctionsBlocks(event){
 	if (event.type == Blockly.Events.CHANGE || Blockly.Events.CHANGE){
-		if(controllerOpen!==-1){
-			if(controllerUseBlockly){
-				var xml = Blockly.Xml.workspaceToDom(workspaceControllers);
-				controllersList[controllerOpen].code=Blockly.Xml.domToText(xml);
+		var index = getFunctionOpen();
+		if(index!==-1){
+			if(functionUseBlockly){
+				var xml = Blockly.Xml.workspaceToDom(workspaceFunctions);
+				functionsList[index][functionOpen[index]].code=Blockly.Xml.domToText(xml);
 			}
 		}
 	}
 }
 
-function focusOutController(){
-	controllersList[controllerOpen].code=controllerEditor.getValue();
+function getIndexFunctionOpen(){
+	for(var i = 0; i< functionOpen.length;i++){
+		if(functionOpen[i]!==-1)
+			return i;
+	}
+}
+
+function focusOutFunction(){
+	functionsList[getIndexFunctionOpen()][functionOpen[[getIndexFunctionOpen()]]].code=functionEditor.getValue();
 }
 
 /*
@@ -624,8 +692,8 @@ function resize(){
 	if(chartOpen!=-1){Blockly.svgResize(workspaceCharts);}
 	if(eventOpen!=-1){Blockly.svgResize(workspaceEvents);}
 	if(controllerOpen!=-1){
-		if(controllerFunctionLanguage==="blockly"){Blockly.svgResize(workspaceControllers);}
-		else {controllerEditor.resize();}
+		if(controllerFunctionLanguage==="blockly"){Blockly.svgResize(workspaceFunctions);}
+		else {functionEditor.resize();}
 	}
 }
 
@@ -746,7 +814,7 @@ NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
     }
 };
 
-function removeAndCloseScript(id){
+function removeAndCloseScript(id,funindex){
 	if(experimentOpen!==-1)	{
 		if(experimentsList[experimentOpen].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
@@ -765,16 +833,16 @@ function removeAndCloseScript(id){
 			eventOpen=-1;
 		}
 	}
-	else if(controllerOpen!==-1) {
-		if(controllersList[controllerOpen].name === id) {
+	else if(functionOpen[funindex]!==-1) {
+		if(functionsList[funindex][functionOpen[funindex]].name === id) {
 			document.getElementById("ScriptBox").style.display="none";
-			controllerOpen=-1;
+			functionOpen[funindex]=-1;
 		}
 	}
-	removeScript(id);
+	removeScript(id,funindex);
 }
 
-function removeScript(id){
+function removeScript(id,funindex){
 	document.getElementById(id).remove();
 	//document.getElementById(id+"list").remove();
 	for(var i = 0; i < experimentsList.length; i++){
@@ -782,33 +850,52 @@ function removeScript(id){
 	   	if(experimentSelected===id) {experimentSelected="";}
 		 experimentsList.splice(i, 1);
 		   experimentSelected="";
+		   if(experimentOpen>0) {
+			   if (experimentsList[experimentOpen] == null)
+				   experimentOpen--;
+		   }
 		 return;
 	   }
 	}
 
-	for(i = 0; i < chartsList.length; i++){
+	for(var i = 0; i < chartsList.length; i++){
 	   if ( chartsList[i].name === id) {
 		   if(chartSelected===id) {chartSelected="";}
 		 chartsList.splice(i, 1);
+		   if(chartOpen>0) {
+			   if (chartsList[chartOpen] == null)
+				   chartOpen--;
+		   }
 		 return;
 	   }
 	}
 
-	for(i = 0; i < eventsList.length; i++){
+	for(var i = 0; i < eventsList.length; i++){
 	   if ( eventsList[i].name === id) {
 		   if(eventSelected===id) {eventSelected="";}
 		 eventsList.splice(i, 1);
+		   if(eventOpen>0) {
+			   if (eventsList[eventOpen] == null)
+				   eventOpen--;
+		   }
 		 return;
 	   }
 	}
 
-	for(i = 0; i < controllersList.length; i++){
-	   if ( controllersList[i].name === id) {
-		   if(controllerSelected===id) {controllerSelected="";}
-		 controllersList.splice(i, 1);
-		 return;
-	   }
+	for(var l = 0; l < functionsList[funindex].length; l++) {
+		if (functionsList[funindex][l].name === id) {
+			if (functionSelected[funindex] === id) {
+				functionSelected[funindex] = "";
+			}
+			functionsList[funindex].splice(l, 1);
+			if(functionOpen[funindex]>0) {
+				if (functionsList[funindex][functionOpen[funindex]] == null)
+					functionOpen[funindex]--;
+			}
+			return;
+		}
 	}
+
 }
 
 /*function addLabelToDropDown(id2,name,list,image){
@@ -821,19 +908,30 @@ function removeScript(id){
 	}
 }*/
 
-function addnewScript(num,name,code,id,id2,list){
+function addnewScript(num,name,code,id,id2,list,funindex){
 	var d1 = document.getElementById(id);
-	d1.insertAdjacentHTML('beforeend', '<div id="' + name + '" style="display:flex;cursor:pointer;' +
-		'justify-content:space-between">' +
-		'<a onclick="colorSelection(' + num + ',\'' + name + '\',true)"><i class="fa fa-play" style="margin-left: .5rem"></i></a>' +
-		'<a onclick="showScript(' + num + ',\'' + name + '\');">' +' ' + name +'</a>' + '<div class="topnav-right">' +
-		'<a onclick="removeAndCloseScript(\'' + name + '\')"><i  class="fa fa-times" style="margin-right: .5rem"></i></a>' + '</div></div>');
-	list.push({"name":name,"code":code});
-	//addLabelToDropDown(id2,name,list,false);
-	showScript(num,name);
+	if(num!=4) {
+		d1.insertAdjacentHTML('beforeend', '<div id="' + name + '" style="display:flex;cursor:pointer;' +
+			'justify-content:space-between">' +
+			'<a onclick="colorSelection(' + num + ',\'' + name + '\',true)"><i class="fa fa-play" style="margin-left: .5rem"></i></a>' +
+			'<a onclick="showScript(' + num + ',\'' + name + '\');">' + ' ' + name + '</a>' + '<div class="topnav-right">' +
+			'<a onclick="removeAndCloseScript(\'' + name + '\')"><i  class="fa fa-times" style="margin-right: .5rem"></i></a>' + '</div></div>');
+		list.push({"name": name, "code": code});
+		//addLabelToDropDown(id2,name,list,false);
+		showScript(num, name);
+	}
+	else{
+		d1.insertAdjacentHTML('beforeend', '<div id="' + name + '" style="display:flex;cursor:pointer;' +
+			'justify-content:space-between">' +
+			'<a onclick="colorSelection(' + num + ',\'' + name + '\',true,'+funindex+')"><i class="fa fa-play" style="margin-left: .5rem"></i></a>' +
+			'<a onclick="showScript(' + num + ',\'' + name + '\','+funindex+');">' + ' ' + name + '</a>' + '<div class="topnav-right">' +
+			'<a onclick="removeAndCloseScript(\'' + name + '\','+funindex+')"><i  class="fa fa-times" style="margin-right: .5rem"></i></a>' + '</div></div>');
+		list.push({"name": name, "code": code});
+		showScript(num, name, funindex);
+	}
 }
 
-function colorSelection(num,name,borrar){
+function colorSelection(num,name,borrar,funindex){
 	var elem= document.getElementById(name);
 	if(num===1){
 		if(experimentSelected!==""){
@@ -878,22 +976,22 @@ function colorSelection(num,name,borrar){
 		eventSelected=name;
 	}
 	else{
-		if(controllerSelected!==""){
-			var elem2= document.getElementById(controllerSelected);
+		if(functionSelected[funindex]!==""){
+			var elem2= document.getElementById(functionSelected[funindex]);
 			elem2.style.color='Black';
 			elem2.style.fontWeight='normal';
-			if(borrar && (controllerSelected===name)){
-				controllerSelected="";
+			if(borrar && (functionSelected[funindex]===name)){
+				functionSelected[funindex]="";
 				return;
 			}
 		}
 		elem.style.color='Peru';
 		elem.style.fontWeight='bold';
-		controllerSelected=name;
+		functionSelected[funindex]=name;
 	}
 }
 
-function newScript(num){
+function newScript(num,funindex){
 	if(num===1){
 		var name = prompt(Blockly.Msg["NewExperimentScript"], "Experiment "+(experimentsList.length+1));
 		if (name != null) {
@@ -934,24 +1032,24 @@ function newScript(num){
 		}
 	}
 	else if(num===4){
-		var name = prompt(Blockly.Msg["NewControllerScript"], "Controller "+(controllersList.length+1));
+		var name = prompt(Blockly.Msg["NewControllerScript"], functionToReplace[funindex]+" "+(functionsList[funindex].length+1));
 		if (name != null) {
-			for( var i = 0; i < controllersList.length; i++){
-				if ( controllersList[i].name === name) {
-					newScript(num);
+			for( var i = 0; i < functionsList[funindex].length; i++){
+				if ( functionsList[funindex][i].name === name) {
+					newScript(num,funindex);
 					printError(Blockly.Msg["NewControllerScriptError"]);
 					return;
 				}
 			}
 			var message = "";
-			if(controllerUseBlockly) message = "<xml></xml>";
-			addnewScript(num,name,message,'controllersScripts','controllerSelection',controllersList);
+			if(functionUseBlockly) message = "<xml></xml>";
+			addnewScript(num,name,message,'functionsScripts'+funindex,'controllerSelection',functionsList[funindex],funindex);
 
 		}
 	}
 }
 
-function showScript(num,name){
+function showScript(num,name,funindex){
 	document.getElementById("ScriptBox").style.display = "none";
 	document.getElementById("blocklyDivExperiments").style.display="none";
 	document.getElementById("blocklyDivCharts").style.display="none";
@@ -960,12 +1058,14 @@ function showScript(num,name){
 	if((experimentOpen!==-1)&&(num===1)){if( experimentsList[experimentOpen].name === name) { experimentOpen=-1; return;}}
 	if((chartOpen!==-1)&&(num===2)){if( chartsList[chartOpen].name === name) { chartOpen=-1; return;}}
 	if((eventOpen!==-1)&&(num===3)){if( eventsList[eventOpen].name === name) { eventOpen=-1; return;}}
-	if((controllerOpen!==-1)&&(num===4)){if( controllersList[controllerOpen].name === name) { controllerOpen=-1; return;}}
-	if((controllerOpen!==-1)&&(num===4)){if( controllersList[controllerOpen].name === name) { controllerOpen=-1; return;}}
+	if((functionOpen[funindex]!==-1)&&(num===4)){if( functionsList[funindex][functionOpen[funindex]].name === name) { functionOpen[funindex]=-1; return;}}
+	//if((functionOpen[funindex]!==-1)&&(num===4)){if( functionsList[functionOpen].name === name) { functionOpen[funindex]=-1; return;}}
 	experimentOpen=-1;
 	chartOpen=-1;
 	eventOpen=-1;
-	controllerOpen=-1;
+	for(var i=0;i<functionOpen.length;i++){
+		functionOpen[i]=-1;
+	}
 	document.getElementById("titleScriptBox").innerHTML = name;
 	document.getElementById("ScriptBox").style.display = "block";
 
@@ -1003,22 +1103,24 @@ function showScript(num,name){
 		 }
 	}
 	else if	(num===4){
-		var result = getCodeFromName(controllersList,name);
+		updateControllerPanelDiv(funindex);
+		var result = getCodeFromName(functionsList[funindex],name);
 		document.getElementById("ControllerDiv").style.display="inline-block";
-		controllerOpen=result[1];
-		if(controllerUseBlockly){
+		functionOpen[funindex]=result[1];
+		//console.log("func open "+funindex+" "+result[1]);
+		if(functionUseBlockly){
 			code=Blockly.Xml.textToDom(result[0]);
-			Blockly.svgResize(workspaceControllers);
-			workspaceControllers.clear();
+			Blockly.svgResize(workspaceFunctions);
+			workspaceFunctions.clear();
 			if(code!=='<xml></xml>'){
-				Blockly.Xml.domToWorkspace(code, workspaceControllers);
+				Blockly.Xml.domToWorkspace(code, workspaceFunctions);
 			}
 		} else{
-			controllerEditor.setValue(result[0]);
-			controllerEditor.resize();
+			functionEditor.setValue(result[0]);
+			functionEditor.resize();
 		}
 	}
-	colorSelection(num,name,false);
+	colorSelection(num,name,false,funindex);
 }
 
 function minimize(object){
@@ -1094,18 +1196,21 @@ function codeToSave(){
 		saveExp.push({"name":experimentsList[i].name,"code":experimentsList[i].code});
 	}
 	var saveEvents=[];
-	for(i=0;i<eventsList.length;i++){
+	for(var i=0;i<eventsList.length;i++){
 		saveEvents.push({"name":eventsList[i].name,"code":eventsList[i].code});
 	}
 	var saveCharts=[];
-	for(i=0;i<chartsList.length;i++){
+	for(var i=0;i<chartsList.length;i++){
 		saveCharts.push({"name":chartsList[i].name,"code":chartsList[i].code});
 	}
-	var saveControllers=[];
-	for(i=0;i<controllersList.length;i++){
-		saveControllers.push({"name":controllersList[i].name,"code":controllersList[i].code});
+	var saveFunctions=[];
+	for(var i=0;i<functionsList.length;i++){
+		saveFunctions.push([]);
+		for(var j=0;j<functionsList[i].length;j++){
+			saveFunctions[i].push({"name":functionsList[i][j].name,"code":functionsList[i][j].code});
+		}
 	}
-	return {experiments:saveExp, events:saveEvents, charts:saveCharts, controllers:saveControllers,
+	return {experiments:saveExp, events:saveEvents, charts:saveCharts, functions:saveFunctions,
 		vars:blocklyVariablesList, javaScriptsNamesListGeneral:javaScriptsNamesListGeneral,
 		javaScriptsNamesListEvents:javaScriptsNamesListEvents, jsCodesGeneral:jsCodesGeneral,
 		jsCodesEvents:jsCodesEvents, visualJSGeneral:visualJSGeneral, visualJSEvents:visualJSEvents};
@@ -1127,7 +1232,7 @@ function setLoadedWorkspace(json){
 			workspaceEvents.clear();
 		if(chartsBlockly)
 			workspaceCharts.clear();
-		if(controllerUseBlockly) workspaceControllers.clear();
+		if(functionUseBlockly) workspaceFunctions.clear();
 
 		var vars = JSON.parse(json).vars;
 		removeVariablesFromBlockly();
@@ -1140,46 +1245,53 @@ function setLoadedWorkspace(json){
 		visualJSEvents = JSON.parse(json).visualJSEvents;
 		visualJSGeneral = JSON.parse(json).visualJSGeneral;
 
-		for(i=0;i<experimentsList.length;i++){
+		for(var i=0;i<experimentsList.length;i++){
 			removeScript(experimentsList[i].name);
 		}
 		experimentsList=[];
-		for(i=0;i<chartsList.length;i++){
+		for(var i=0;i<chartsList.length;i++){
 			removeScript(chartsList[i].name);
 		}
 		chartsList=[];
-		for(i=0;i<eventsList.length;i++){
+		for(var i=0;i<eventsList.length;i++){
 			removeScript(eventsList[i].name);
 		}
 		eventsList=[];
-		for(i=0;i<controllersList.length;i++){
-			removeScript(controllersList[i].name);
+		for(var i=0;i<functionsList.length;i++){
+			for(var j=0;j<functionsList[i].length;j++) {
+				removeScript(functionsList[i][j].name);
+			}
 		}
-		controllersList=[];
+		functionsList=[];
+		for(var i=0;i<functionToReplace.length;i++){
+			functionsList.push([]);
+		}
 
 		var saveExp=JSON.parse(json).experiments;
-		for(i=0;i<saveExp.length;i++){
+		for(var i=0;i<saveExp.length;i++){
 			/*var code = (new DOMParser()).parseFromString(saveExp[i].code, "text/xml");
 			experimentsList.push({"name":saveExp[i].name,"code":code});*/
 			addnewScript(1,saveExp[i].name,saveExp[i].code,'experimentsScripts','experimentSelection',experimentsList);
 		}
 		var saveCharts=JSON.parse(json).charts;
-		for(i=0;i<saveCharts.length;i++){
+		for(var i=0;i<saveCharts.length;i++){
 			/*var code = (new DOMParser()).parseFromString(saveCharts[i].code, "text/xml");
 			chartsList.push({"name":saveCharts[i].name,"code":code});*/
 			addnewScript(2,saveCharts[i].name,saveCharts[i].code,'chartsScripts','chartSelection',chartsList);
 		}
 		var saveEvents=JSON.parse(json).events;
-		for(i=0;i<saveEvents.length;i++){
+		for(var i=0;i<saveEvents.length;i++){
 			/*var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
 			eventsList.push({"name":saveExp[i].name,"code":code});*/
 			addnewScript(3,saveEvents[i].name,saveEvents[i].code,'eventsScripts','eventSelection',eventsList);
 		}
-		var saveControllers=JSON.parse(json).controllers;
-		for(i=0;i<saveControllers.length;i++){
-			/*var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
-			eventsList.push({"name":saveExp[i].name,"code":code});*/
-			addnewScript(4,saveControllers[i].name,saveControllers[i].code,'controllersScripts','controllerSelection',controllersList);
+		var saveFunctions=JSON.parse(json).functions;
+		for(var i=0;i<saveFunctions.length;i++){
+			for(var j=0;j<saveFunctions[i].length;j++) {
+				/*var code = (new DOMParser()).parseFromString(saveEvents[i].code, "text/xml");
+                eventsList.push({"name":saveExp[i].name,"code":code});*/
+				addnewScript(4, saveFunctions[i][j].name, saveFunctions[i][j].code, 'functionsScripts'+i, 'controllerSelection', functionsList[i],i);
+			}
 		}
 
 		/*addnewScript(num,name,null,'ControllerScripts','controllerSelection',controllersList);

@@ -131,6 +131,7 @@ $string['run_blockly'] = " Run";
 $string['log_blockly'] = " Log";
 $string['error_blockly'] = " Errors:";
 $string['previousExecutions_blockly'] = " Previous executions:";
+$string['functions_ace'] = "Overwrite functions";
 
 $string['rem_lab_conf'] = 'Remote lab configuration';
 

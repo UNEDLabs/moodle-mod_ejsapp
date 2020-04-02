@@ -183,7 +183,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      * @return string Html code that prints the html for the control bar
      */
     public function render_ejsapp_controlbar($params) {
-        $navbar =
+
+        $navbar1 =
             html_writer::start_div("navbar", array('id' => 'blockly_navbar')) .
                 html_writer::start_div("dropdown", array("id" => "experimentsDropdown")) .
                     html_writer::tag("button ", get_string('experiment_blockly', 'ejsapp'), array("class" =>
@@ -220,17 +221,47 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                             "dropdown-item", "onclick" => "newScript(3)")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
-                html_writer::start_div("dropdown", array("id" => "controllersDropdown")) .
-                    html_writer::tag("button", get_string('functions', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
+                /*html_writer::start_div("dropdown", array("id" => "functionsDropdown")) .
+                    html_writer::tag("button", get_string('functions_ace', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
-                    html_writer::start_div("dropdown-menu", array("id" => "controllersScripts", "aria-labelledby" =>
+                    html_writer::start_div("dropdown-menu", array("id" => "functionsScripts", "aria-labelledby" =>
                         "dropdownMenuButton")) .
                         html_writer::tag("a", html_writer::tag("i", "", array("class" =>
-                                "fa fa-plus", "aria-hidden" => "true")) . get_string('functionsDropdown', 'ejsapp'), array("class" =>
+                                "fa fa-plus", "aria-hidden" => "true")) . get_string('functionDropdown_blockly', 'ejsapp'), array("class" =>
                             "dropdown-item", "onclick" => "newScript(4)")) .
                     html_writer::end_div() .
+                html_writer::end_div() .*/
+                html_writer::start_div("dropdown", array("id" => "allFunctionsDropdown")) .
+                    html_writer::tag("button", get_string('functions_ace', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
+                        "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
+                        "aria-haspopup" => "true", "aria-expanded" => "false")) .
+                    html_writer::start_div("dropdown-menu", array("id" => "functionsScripts", "aria-labelledby" =>
+                        "dropdownMenuButton")) ;
+
+        $functions = $params->blocklyconf[5];
+        $extranavbar = "";
+        $index = 0;
+        foreach ($functions as $function) {
+            $name = $function[0];
+            $extranavbar = $extranavbar .
+                html_writer::start_div("dropdown", array("id" => "functionsDropdown")) .
+                    html_writer::tag("p", $name, array("class" => "mod-ejsapp-peru")).
+                    html_writer::start_div("a", array("id" => "functionsScripts" . $index, "aria-labelledby" =>
+                        "dropdownMenuButton")) .
+                        html_writer::tag("a", html_writer::tag("i", "", array("class" =>
+                                "fa fa-plus")) . get_string('functionDropdown', 'ejsapp'), array("class" =>
+                            "dropdown-item", "onclick" => "newScript(4,".$index.")")) .
+                    html_writer::end_div() .
+                html_writer::end_div() ;
+            $index = $index+1;
+        }
+
+        $navbar2 =
+                    html_writer::end_div() .
                 html_writer::end_div() .
+
+
                 html_writer::start_div("topnav-right", array("id" => "logs")) .
                     html_writer::tag("button", get_string('run_blockly', 'ejsapp'), array("class" => "play-code textExecutionElement",
                         "onclick" => "playCode(" . $params->blocklyconf[1] . "," . $params->blocklyconf[2] . "," .
@@ -241,7 +272,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 html_writer::end_div() .
             html_writer::end_div();
 
-        return $navbar ;
+        return $navbar1 . $extranavbar . $navbar2 ;
     }
 
     /**

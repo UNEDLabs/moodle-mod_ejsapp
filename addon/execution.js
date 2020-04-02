@@ -1,7 +1,8 @@
-function prepareControllerCode(code){
+function prepareControllerCode(code,name){
 	statements_code = cleanFromComments(code);
 	statements_code = statements_code.replace(/(\r\n|\n|\r)/gm, "");
-	var res = getInfoFromFunctionName(functionToReplace);
+	statements_code = statements_code.replace(/"/g, '\\"');
+	var res = getInfoFromFunctionName(name);
 	ret="";
 	if(res[1]!==""){
 		ret = "return "+res[1]+";";
@@ -11,8 +12,8 @@ function prepareControllerCode(code){
 	for(var k = 0;k<params.length;k++){
 		textoparametros+='window["'+params[k]+'"] = '+params[k]+';';
 	}
-
-	control = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
+	var fun = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
+	evaluatefuns.push(fun);
 	/*u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
 	(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
 	control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );*/
@@ -25,11 +26,13 @@ function prepareControllerCode(code){
 	}
 	fun = new Function(res[0], statements_code +ret );
 	console.log(fun);*/
-	return "replaceFunction();\n"
+	//console.log("---name "+name);
+	return "replaceFunction('"+name+"', "+(evaluatefuns.length-1)+");\n"
 }
 
 function playCodeDet(value0,value1,value2,value3) {
 	var blocklyExp="";blockyEvent="";blocklyChart="";blocklyController="";
+	evaluatefuns = [];
 	if(value0!=="Select experiment" && value0!==""){
 		workspace.clear();
 		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(experimentsList,value0)[0]), workspace);
@@ -47,29 +50,45 @@ function playCodeDet(value0,value1,value2,value3) {
 		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(eventsList,value2)[0]), workspaceEvents);
 		blockyEvent=Blockly.JavaScript.workspaceToCode(workspaceEvents);
 	}
-	if(value3!=="Select controller"  && value3!==""){
+	if(value3.length!==0){
 		if(controllerBlockly){
-			var semicode="";
-			var code = getCodeFromName(controllersList,value3)[0];
-			if(controllerUseBlockly)
-			{
-				workspaceControllers.clear();
-				Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(controllersList,value3)[0]), workspaceControllers);
-				semicode=Blockly.JavaScript.workspaceToCode(workspaceControllers);
+			/*for(var i =0;i<value3.length;i++) {
+				var semicode = "";
+				var code = getCodeFromNameFunctions(functionsList, value3[i])[0];
+				if (functionUseBlockly) {
+					workspaceFunctions.clear();
+					Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromNameFunctions(functionsList, value3[i])[0]), workspaceFunctions);
+					semicode = Blockly.JavaScript.workspaceToCode(workspaceFunctions);
 
-			}
-			else{
-				semicode=code;
-			}
+				} else {
+					semicode = code;
+				}
+				console.log("value3 indice "+i+" valor "+value3[i]);
+				if (!remoteController[i]) {
+					blocklyController.push(prepareControllerCode(semicode,value3[i]));
+				} else {
+					blocklyController = [];
+					codeForRemoteController = semicode;
+				}
+			}*/
+			for(var i=0;i<functionSelected.length;i++){
+				if(functionSelected[i]!=="") {
+					var result =  getCodeFromNameFunctions(functionsList, functionSelected[i]);
+					var code = result[0];
+					var name = functionToReplace[i];
+					if (functionUseBlockly) {
+						workspaceFunctions.clear();
+						Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(code), workspaceFunctions);
+						code = Blockly.JavaScript.workspaceToCode(workspaceFunctions);
+					}
+					if (!remoteController[i]) {
+						blocklyController=blocklyController+(prepareControllerCode(code,name));
+					} else {
+						codeForRemoteFunctions.push(code);
+					}
 
-			if(!remoteController){
-				blocklyController = prepareControllerCode(semicode);
+				}
 			}
-			else{
-				blocklyController = "";
-				codeForRemoteController = semicode;
-			}
-
 		}
 	}
 
@@ -99,10 +118,10 @@ function playCodeFromOutside(){
 	playCode(chartsBlockly, eventsBlockly, controllerBlockly);
 }
 
-function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
+function playCode(chartsBlockly, eventsBlockly, functionBlockly) {
 	var a="Select chart";
 	var b="Select event";
-	var c="Select controller";
+	var c=[];
 	var replaytext = Blockly.Msg["Log1"] +' <span style="color:green">'+experimentSelected+'</span>';
 	if(chartsBlockly) {
 		if(chartSelected!==""){
@@ -116,10 +135,12 @@ function playCode(chartsBlockly, eventsBlockly, controllerBlockly) {
 			replaytext += Blockly.Msg["Log3"]+'<span style="color:red">'+ b +'</span>';
 		}
 	}
-	if(controllerBlockly) {
-		if(controllerSelected!==""){
-			c = controllerSelected;
-			replaytext += Blockly.Msg["Log4"]+'<span style="color:peru">'+ c +'</span>';
+	if(functionBlockly) {
+		for(var i=0;i<functionSelected.length;i++) {
+			if (functionSelected[i] !== "") {
+				c.push(functionSelected[i]);
+				replaytext += Blockly.Msg["Log4"] + '<span style="color:peru">' + functionSelected[i] + '</span>';
+			}
 		}
 	}
 	var result= playCodeDet(experimentSelected,a,b,c);
@@ -142,11 +163,12 @@ function replayCode(value0,value1,value2,value3){
 	inter = setInterval(stepCode, time_step);
 }
 
-function parseCode(blocklyExp,blocklyChart,blockyEvent) {
+function parseCode(blocklyExp,blocklyChart,blockyEvent,blocklyController) {
 	Blockly.JavaScript.addReservedWords('LoopTrap');
 	Blockly.JavaScript.STATEMENT_PREFIX = '';
 	Blockly.JavaScript.addReservedWords('highlightBlock');
 	Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+	//console.log(blocklyController);
 	var code = "reInitLab();\n"+blocklyChart+blocklyController+"var set = false;\n"+blockyEvent+blocklyExp;
 	functions = "function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
 	/*var code2 = code;
@@ -185,13 +207,24 @@ function stepCode() {
 				/* Program complete, no more code to execute. */
 				workspace.highlightBlock(null);
 				clearInterval(inter);
-				if(remoteController) {
+				// ATENCIÓN!!!!
+				for(var i =0;i<remoteController.length;i++){
+					var j = 0;
+					if(remoteController[i]){
+						var params=[];
+						params.push(codeForRemoteFunctions[j]);
+						callFunction(functionToReplace[i],params);
+						j++;
+					}
+				}
+				codeForRemoteFunctions=[];
+				/*if(remoteController) {
 					//_model.sendToRemoteController(codeForRemoteController);
 					var params=[];
 					params.push(codeForRemoteController);
 					callFunction(functionToReplace,params);
 					codeForRemoteController ="";
-				}
+				}*/
 
 				return;
 			}
@@ -307,8 +340,9 @@ function initApi(interpreter, scope) {
 	};
 	interpreter.setProperty(scope, 'record_var', interpreter.createNativeFunction(wrapper));
 
-	var wrapper = function() {
-		return interpreter.createPrimitive(replaceFunction());
+	var wrapper = function(id,id2) {
+		id = id ? id.toString() : '';
+		return interpreter.createPrimitive(replaceFunction(id,id2));
 	};
 	interpreter.setProperty(scope, 'replaceFunction', interpreter.createNativeFunction(wrapper));
 
@@ -322,6 +356,8 @@ function initApi(interpreter, scope) {
 } /* End of initApi */
 
 function callFunction(name,params){
+	//console.log("-name "+name);
+	//console.log("-params "+params);
 	return (getValueModel(name)).apply(null,params);
 }
 
@@ -474,7 +510,7 @@ function record_var(id,id2){
 }
 
 
-function replaceFunction() {
+function replaceFunction(name,number) {
 	/*var statements_code = statem[0].toString();
 	console.log("statements_code "+statements_code);
 	statem.splice(0, 1);
@@ -483,7 +519,11 @@ function replaceFunction() {
 		fill = new Function(text_params, statements_code + ' return ' + value_name + ';');
 	setValueModel(dropdown_original, fill);
 	console.log(getValueModel(dropdown_original));*/
-	setValueModel(functionToReplace,control);
+	//console.log("name "+name);
+	//console.log("number "+number);
+	//console.log("evaluatefuns[number] "+evaluatefuns[number]);
+
+	setValueModel(name,evaluatefuns[number]);
 }
 
 function setValueModel(p1, p2) {

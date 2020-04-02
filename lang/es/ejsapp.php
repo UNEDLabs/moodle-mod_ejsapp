@@ -131,6 +131,7 @@ $string['run_blockly'] = " Ejecutar";
 $string['log_blockly'] = " Registro";
 $string['error_blockly'] = " Errores:";
 $string['previousExecutions_blockly'] = " Ejecuciones previas:";
+$string['functions_ace'] = "Funciones reescribibles";
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 
