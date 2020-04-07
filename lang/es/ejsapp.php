@@ -122,16 +122,15 @@ $string['blocklyfile_help'] = 'Puedes seleccionar un fichero .blk que especifiqu
 $string['experiment_blockly'] = "Experimentos";
 $string['data_blockly'] = "Datos y Gráficas";
 $string['event_blockly'] = "Eventos";
-$string['functions'] = "Reescribir Funciones";
-$string['experimentDropdown_blockly'] = " Nuevo código del experimento";
-$string['chartDropdown_blockly'] = " Nuevo código de la gráfica";
-$string['eventDropdown_blockly'] = " Nuevo código del evento";
-$string['functionsDropdown'] = " Nuevo código de la función";
+$string['functions'] = "Funciones";
+$string['experimentDropdown_blockly'] = " Nuevo código de experimento";
+$string['chartDropdown_blockly'] = " Nuevo código de gráfica";
+$string['eventDropdown_blockly'] = " Nuevo código de evento";
+$string['functionDropdown'] = " Reescribir función";
 $string['run_blockly'] = " Ejecutar";
 $string['log_blockly'] = " Registro";
 $string['error_blockly'] = " Errores:";
 $string['previousExecutions_blockly'] = " Ejecuciones previas:";
-$string['functions_ace'] = "Funciones reescribibles";
 
 $string['rem_lab_conf'] = 'Configuraci&oacute;n del laboratorio remoto';
 

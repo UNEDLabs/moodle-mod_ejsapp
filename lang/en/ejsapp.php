@@ -122,16 +122,15 @@ $string['blocklyfile_help'] = 'You can select a .blk file that specifies which b
 $string['experiment_blockly'] = "Experiments";
 $string['data_blockly'] = "Data & Charts";
 $string['event_blockly'] = "Events";
-$string['functions'] = "Overwrite Functions";
+$string['functions'] = "Functions";
 $string['experimentDropdown_blockly'] = " New experiment script";
 $string['chartDropdown_blockly'] = " New chart script";
 $string['eventDropdown_blockly'] = " New event script";
-$string['functionsDropdown'] = " New function script";
+$string['functionDropdown'] = " Overwrite function";
 $string['run_blockly'] = " Run";
 $string['log_blockly'] = " Log";
 $string['error_blockly'] = " Errors:";
 $string['previousExecutions_blockly'] = " Previous executions:";
-$string['functions_ace'] = "Overwrite functions";
 
 $string['rem_lab_conf'] = 'Remote lab configuration';
 

@@ -181,9 +181,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      * Prints ejsapp control bar div
      * @param ejsapp_controlbar $params
      * @return string Html code that prints the html for the control bar
+     * @throws coding_exception
      */
     public function render_ejsapp_controlbar($params) {
-
         $navbar1 =
             html_writer::start_div("navbar", array('id' => 'blockly_navbar')) .
                 html_writer::start_div("dropdown", array("id" => "experimentsDropdown")) .
@@ -221,19 +221,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                             "dropdown-item", "onclick" => "newScript(3)")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
-                /*html_writer::start_div("dropdown", array("id" => "functionsDropdown")) .
-                    html_writer::tag("button", get_string('functions_ace', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
-                        "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
-                        "aria-haspopup" => "true", "aria-expanded" => "false")) .
-                    html_writer::start_div("dropdown-menu", array("id" => "functionsScripts", "aria-labelledby" =>
-                        "dropdownMenuButton")) .
-                        html_writer::tag("a", html_writer::tag("i", "", array("class" =>
-                                "fa fa-plus", "aria-hidden" => "true")) . get_string('functionDropdown_blockly', 'ejsapp'), array("class" =>
-                            "dropdown-item", "onclick" => "newScript(4)")) .
-                    html_writer::end_div() .
-                html_writer::end_div() .*/
                 html_writer::start_div("dropdown", array("id" => "allFunctionsDropdown")) .
-                    html_writer::tag("button", get_string('functions_ace', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
+                    html_writer::tag("button", get_string('functions', 'ejsapp'), array("class" => "btn btn-secondary dropdown-toggle mod-ejsapp-peru",
                         "type" => "button", "id" => "dropdownMenuButton", "data-toggle" => "dropdown",
                         "aria-haspopup" => "true", "aria-expanded" => "false")) .
                     html_writer::start_div("dropdown-menu", array("id" => "functionsScripts", "aria-labelledby" =>
