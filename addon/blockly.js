@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', function(){
 	/* When the user clicks on <span> (x), close the modal */
 	document.getElementsByClassName("close")[0].onclick = function() {
@@ -65,13 +67,56 @@ document.addEventListener('DOMContentLoaded', function(){
 //function_from_ejss = [{'name':'funcion_prueba','params':['x','y','z'],'code':'console.log("Aleluya "+x+" "+y+" "+z);'}]; // PRUEBA
 //function_from_ejss_with_return = [{'name':'funcion_prueba2','params':['x','y'],'code':'console.log("Aleluya "+x+" "+y+" "+z);'}]; // PRUEBA
 
-function initAux(){
+function onDrag(){
+
+	for(var i = 0;i<dragElems.length;i++) {
+		var elem = document.getElementById(dragElems[i]);
+		elem.style.border = "";
+		elem.style.opacity = "1";
+	}
+}
+
+function detectMob() {
+	return ( ( window.innerWidth <= 800 ) && ( window.innerHeight <= 600 ) );
+}
+
+function dragableElements(dragElems,blockly){
+	if(!detectMob()) {
+		require(['mod_ejsapp/Sortable'], function(sortable) {
+			for (var i = 0; i < dragElems.length; i++) {
+				var elem = document.getElementById(dragElems[i]);
+				new sortable.create(elem, {group: 'shared', swap: true, animation: 150});
+				if (blockly == i) {
+					elem.ondragend = function() {
+						onDrag();
+						resize();
+					};
+				} else {
+					elem.ondragend = function() {
+						onDrag();
+					};
+				}
+				elem.ondrag = function() {
+					for (var i = 0; i < dragElems.length; i++) {
+						document.getElementById(dragElems[i]).style.border = "medium solid grey";
+					}
+					this.style.opacity = "0.5";
+				};
+			}
+		});
+	}
+}
+
+function initAux() {
+	// SWAP ELEMENTS
+	dragElems=['dragBlockly_navbar','dragLab','dragBlockly'];
+	dragableElements(dragElems,2);
+	//////
 	evaluatefuns = [];
 	function_from_ejss = [];
 	function_from_ejss_with_return = [];
 	functionUseBlockly = false;
-	if(controllerFunctionLanguage==='blockly')
-	{
+	if (controllerFunctionLanguage === 'blockly') {
 		functionUseBlockly = true;
 		workspaceFunctions = null;
 	}
@@ -104,11 +149,11 @@ function initAux(){
 	jsOpenedEvents = -1;
 	javaScriptsNamesListGeneral = [];
 	javaScriptsNamesListEvents = [];
-	functions ="";
+	functions = "";
 	conditionFixed = [];
 	intrp = null;
 	record = false;
-	recordedVariables={};
+	recordedVariables = {};
 	recordedVariables.names = [];
 	recordedVariables.datas = [];
 	functionEditor = null;
@@ -116,28 +161,29 @@ function initAux(){
 	chartsList = [];
 	eventsList = [];
 	functionsList = [];
-	functionOpen =[];
-	functionSelected=[];
-	for(var i=0;i<functionToReplace.length;i++){
+	functionOpen = [];
+	functionSelected = [];
+	for (var i = 0; i < functionToReplace.length; i++) {
 		functionsList.push([]);
-		functionOpen[i]=-1;
-		functionSelected[i]="";
+		functionOpen[i] = -1;
+		functionSelected[i] = "";
 	}
 	codeOfData = [];
 	codeOfEvents = [];
 	codeOfControllers = [];
-	experimentOpen=-1;
-	chartOpen=-1;
-	eventOpen=-1;
-	errorInterval=null;
+	experimentOpen = -1;
+	chartOpen = -1;
+	eventOpen = -1;
+	errorInterval = null;
 	chartId = 0;
-	experimentSelected="";
-	eventSelected="";
-	chartSelected="";
-	codeForRemoteFunctions=[];
-	functionsFromEvents="";
+	experimentSelected = "";
+	eventSelected = "";
+	chartSelected = "";
+	codeForRemoteFunctions = [];
+	functionsFromEvents = "";
 	divForFunctions = [];
 }
+
 
 var STRIP_COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n])*')|("(?:\\"|[^"\r\n])*"))|(\s*=[^,\)]*))/mg;
 var ARGUMENT_NAMES = /([^\s,]+)/g;
@@ -520,7 +566,7 @@ remove = function(ary, elem) {
 	var i = ary.indexOf(elem);
 	if (i >= 0) ary.splice(i, 1);
 	return ary;
-}
+};
 
 function removeVariable(result){
 	if (!newImplement) {
@@ -689,9 +735,9 @@ function selectJS(n,text){
 /* DRAGGABLE ELEMENTS */
 function resize(){
 	if(experimentOpen!=-1){Blockly.svgResize(workspace);}
-	if(chartOpen!=-1){Blockly.svgResize(workspaceCharts);}
-	if(eventOpen!=-1){Blockly.svgResize(workspaceEvents);}
-	if(controllerOpen!=-1){
+	else if(chartOpen!=-1){Blockly.svgResize(workspaceCharts);}
+	else if(eventOpen!=-1){Blockly.svgResize(workspaceEvents);}
+	else if(getFunctionOpen()!=-1){
 		if(controllerFunctionLanguage==="blockly"){Blockly.svgResize(workspaceFunctions);}
 		else {functionEditor.resize();}
 	}
@@ -747,11 +793,6 @@ function copyToDragDiv(id){
 		resize();
 	}
 }
-
-
-/*dragElement(document.getElementById("EJsS"));
-dragElement(document.getElementById("ChartBox"));
-dragElement(document.getElementById("ScriptBox"));*/
 
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -1417,3 +1458,4 @@ function getInfoFromFunctionName(func) {
 	else
 		return [result,fnStr.substring(dondeReturn+7, fnStr.lastIndexOf(';')),parm];
 }
+

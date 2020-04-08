@@ -380,3 +380,11 @@
     width: 100%;
     display: flex;
 }
+
+.resizable {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #F4F6F6;
+    resize: both;
+    overflow: auto;
+}

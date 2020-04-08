@@ -310,8 +310,12 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $blocklydiv = $renderer->ejsapp_blockly();
         $logdiv = $renderer->ejsapp_log();
 
+        $dragBlockly_navbar =  html_writer::div($controldiv,'',array('id' => 'dragBlockly_navbar'));
+        $dragBlockly =  html_writer::div($blocklydiv . $logdiv,'',array('id' => 'dragBlockly'));
+
         // Join HTML divs for placing blockly related elements in a single one.
-        $experiments = $controldiv . $blocklydiv . $logdiv;
+        //$experiments = $controldiv . $blocklydiv . $logdiv;
+        $experiments = $dragBlockly_navbar . $dragBlockly;
     }
 
     // Check if file is an alias to a file in a repository and update it if necessary
@@ -366,9 +370,9 @@ if ($accessed) {
     if ($ejsapp->intro) {
         echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
     }
-
-    echo html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
+    $lab = html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
+    echo html_writer::div($lab,'',array('id' => 'dragLab'));
     echo $experiments;
 
     if ($ejsapp->appwording) {
