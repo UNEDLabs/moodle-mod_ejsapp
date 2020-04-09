@@ -37,6 +37,10 @@
     float: right;
 }
 
+.path-mod-ejsapp .sortable {
+    cursor: move;
+}
+
 .path-mod-ejsapp #EJsSheader {
     cursor: move;
 }

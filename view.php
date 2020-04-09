@@ -310,8 +310,8 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $blocklydiv = $renderer->ejsapp_blockly();
         $logdiv = $renderer->ejsapp_log();
 
-        $dragBlockly_navbar =  html_writer::div($controldiv,'',array('id' => 'dragBlockly_navbar'));
-        $dragBlockly =  html_writer::div($blocklydiv . $logdiv,'',array('id' => 'dragBlockly'));
+        $dragBlockly_navbar =  html_writer::div($controldiv,'sortable', array('id' => 'dragBlockly_navbar'));
+        $dragBlockly =  html_writer::div($blocklydiv . $logdiv,'sortable', array('id' => 'dragBlockly'));
 
         // Join HTML divs for placing blockly related elements in a single one.
         //$experiments = $controldiv . $blocklydiv . $logdiv;
@@ -370,9 +370,10 @@ if ($accessed) {
     if ($ejsapp->intro) {
         echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
     }
+
     $lab = html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
-    echo html_writer::div($lab,'',array('id' => 'dragLab'));
+    echo html_writer::div($lab,'sortable', array('id' => 'dragLab'));
     echo $experiments;
 
     if ($ejsapp->appwording) {
@@ -475,10 +476,10 @@ if ($accessed) {
     $urlleave = $CFG->wwwroot . '/mod/ejsapp/leave_or_kick_out.php' . $params;
     if ($ejsapp->is_rem_lab == 0) {
         $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'addLog', array($urllog, $urlleave,
-            intval($ejsapp->is_rem_lab), 'EJsS', $checkactivity));
+            intval($ejsapp->is_rem_lab), 'dragLab', $checkactivity));
     } else {
         $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'addLog', array($urllog, $urlleave,
-            intval($ejsapp->is_rem_lab), 'EJsS', $checkactivity, $maxusetime));
+            intval($ejsapp->is_rem_lab), 'dragLab', $checkactivity, $maxusetime));
     }
     $PAGE->requires->js_call_amd('mod_ejsapp/onclose', 'onclose', array($urlleave));
 } else if ($action == 'booked_lab' || $action == 'need_to_wait') {
