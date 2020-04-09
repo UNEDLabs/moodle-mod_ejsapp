@@ -19,6 +19,7 @@
     flex-basis: 50%;
     flex-shrink: 5;
     flex-grow: 2;
+    cursor: default;
 }
 
 .path-mod-ejsapp #ChartBox {
@@ -152,6 +153,7 @@
 .path-mod-ejsapp #whereScriptsAre {
     text-align: center;
     height: 90%;
+    cursor: default;
 }
 
 .path-mod-ejsapp #blocklyDivExperiments,
