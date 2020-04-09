@@ -267,6 +267,7 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
     // Full screen features
     $PAGE->requires->js_call_amd('mod_ejsapp/activity_interactions', 'fullScreen');
 
+    $sortableclass = '';
     $blocklyconf = json_decode($ejsapp->blockly_conf);
     if ($blocklyconf[0] == 1) {
         $functions = $blocklyconf[5];
@@ -310,8 +311,9 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $blocklydiv = $renderer->ejsapp_blockly();
         $logdiv = $renderer->ejsapp_log();
 
-        $dragBlockly_navbar =  html_writer::div($controldiv,'sortable', array('id' => 'dragBlockly_navbar'));
-        $dragBlockly =  html_writer::div($blocklydiv . $logdiv,'sortable', array('id' => 'dragBlockly'));
+        $sortableclass = 'sortable';
+        $dragBlockly_navbar =  html_writer::div($controldiv,$sortableclass, array('id' => 'dragBlockly_navbar'));
+        $dragBlockly =  html_writer::div($blocklydiv . $logdiv,$sortableclass, array('id' => 'dragBlockly'));
 
         // Join HTML divs for placing blockly related elements in a single one.
         //$experiments = $controldiv . $blocklydiv . $logdiv;
@@ -373,7 +375,7 @@ if ($accessed) {
 
     $lab = html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
-    echo html_writer::div($lab,'sortable', array('id' => 'dragLab'));
+    echo html_writer::div($lab,$sortableclass, array('id' => 'dragLab'));
     echo $experiments;
 
     if ($ejsapp->appwording) {
