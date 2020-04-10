@@ -691,6 +691,10 @@ function get_showable_experiences($username = "", $ejsappcontext = 0) {
     // Also get experiences NOT in myFrontier and add them to the list.
     $showableexperiences = combine_experiences($usermyFrontierexperiences, $allmyFrontierexperiences);
 
+    if (empty($showableexperiences[0])) {
+        array_shift($showableexperiences);
+    }
+
     return $showableexperiences;
 }
 
