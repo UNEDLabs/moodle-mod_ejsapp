@@ -17,7 +17,6 @@
 *.RTF	 diff=astextplain
 
 #Vendored software
-blockly/media/* linguist-vendored
-blockly/blockly_compressed.js linguist-vendored
-blockly/blocks_compressed.js linguist-vendored
-blockly/javascript_compressed.js linguist-vendored
+vendor/ace/* linguist-vendored
+vendor/blockly/* linguist-vendored
+vendor/js-interpreter/* linguist-vendored
