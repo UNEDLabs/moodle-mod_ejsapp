@@ -312,8 +312,8 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $logdiv = $renderer->ejsapp_log();
 
         $sortableclass = 'sortable';
-        $dragBlockly_navbar =  html_writer::div($controldiv,$sortableclass, array('id' => 'dragBlockly_navbar'));
-        $dragBlockly =  html_writer::div($blocklydiv . $logdiv,$sortableclass, array('id' => 'dragBlockly'));
+        $dragBlockly_navbar =  html_writer::div($controldiv, $sortableclass, array('id' => 'dragBlockly_navbar'));
+        $dragBlockly =  html_writer::div($blocklydiv . $logdiv, $sortableclass, array('id' => 'dragBlockly'));
 
         // Join HTML divs for placing blockly related elements in a single one.
         //$experiments = $controldiv . $blocklydiv . $logdiv;
@@ -375,7 +375,7 @@ if ($accessed) {
 
     $lab = html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
         $chartsdiv, 'labchart');
-    echo html_writer::div($lab,$sortableclass, array('id' => 'dragLab'));
+    echo html_writer::div($lab, $sortableclass, array('id' => 'dragLab'));
     echo $experiments;
 
     if ($ejsapp->appwording) {

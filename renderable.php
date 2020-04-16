@@ -72,7 +72,7 @@ class ejsapp_lab implements renderable {
                 $newmyFrontierkey->creationtime = $time;
                 $newmyFrontierkey->expirationtime = $time + $remlabinfo->max_use_time;
 
-                $DB->insert_record('block_remlab_manager_sb_keys', $newmyFrontierkey);
+                $DB->insert_record('block_remlab_manager_eg_keys', $newmyFrontierkey);
 
                 if ($remlabinfo->instance !== false) {
                     $listmyFrontierips = explode(";", get_config('block_remlab_manager', 'myFrontier_IP'));
