@@ -133,8 +133,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                 html_writer::start_tag("ul") .
                     html_writer::start_div("", array("id" => "EJsS")) .
                         html_writer::start_div("topnav-right") .
-                            html_writer::tag("i", "", array("id" => "#LabBoxheader", "class" =>
-                                "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+                            html_writer::tag("i", "", array("id" => "LabBoxheader", "class" =>
+                                "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
                         html_writer::end_div() .
                         html_writer::div("", "", array("id" => "_topFrame")) .
                     html_writer::end_div().
@@ -160,9 +160,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::tag("i", "", array("id" => "save_chart_data", "onclick" =>
                             "saveCSV(0)", "class" => "fa fa-file-text-o fa-2x")) .
                         html_writer::tag("i", "", array("id" => "full_screen_chart", "class" =>
-                            "fa fa-expand fa-2x", "aria-hidden" => "true")) .
+                            "fa fa-expand fa-2x")) .
                         html_writer::tag("i", "", array("class" =>
-                            "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+                            "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
                     html_writer::end_div() .
                     html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
                         html_writer::start_div("d-flex justify-content-center", array("id" => "control_chart")) .
@@ -198,7 +198,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::start_tag("a", array("class" => "dropdown-item",
                             "onclick" => "newScript(1)")) .
                             html_writer::tag("i", "", array("class" => "fa fa-plus",
-                                "aria-hidden" => "true")) . get_string('experimentDropdown_blockly', 'ejsapp') .
+                                )) . get_string('experimentDropdown_blockly', 'ejsapp') .
                         html_writer::end_tag("a") .
                     html_writer::end_div() .
                 html_writer::end_div() .
@@ -209,7 +209,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::start_div("dropdown-menu", array("id" => "chartsScripts", "aria-labelledby" =>
                         "dropdownMenuButton")) .
                         html_writer::tag("a", html_writer::tag("i", "", array("class" =>
-                                "fa fa-plus", "aria-hidden" => "true")) . get_string('chartDropdown_blockly', 'ejsapp'), array("class" =>
+                                "fa fa-plus", )) . get_string('chartDropdown_blockly', 'ejsapp'), array("class" =>
                             "dropdown-item", "onclick" => "newScript(2)")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
@@ -220,7 +220,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::start_div("dropdown-menu", array("id" => "eventsScripts", "aria-labelledby" =>
                         "dropdownMenuButton")) .
                         html_writer::tag("a", html_writer::tag("i", "", array("class" =>
-                                "fa fa-plus", "aria-hidden" => "true")) . get_string('eventDropdown_blockly', 'ejsapp'), array("class" =>
+                                "fa fa-plus", )) . get_string('eventDropdown_blockly', 'ejsapp'), array("class" =>
                             "dropdown-item", "onclick" => "newScript(3)")) .
                     html_writer::end_div() .
                 html_writer::end_div() .
@@ -259,13 +259,13 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         "onclick" => "playCode(" . $params->blocklyconf[1] . "," . $params->blocklyconf[2] . "," .
                             $params->blocklyconf[3] . "," .  ")")) .
                     html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "show_log", "onclick" => "showLog()")) .
-                        html_writer::tag("i", get_string('log_blockly', 'ejsapp'), array("class" => "fa fa-bug", "aria-hidden" => "true")) .
+                        html_writer::tag("i", get_string('log_blockly', 'ejsapp'), array("class" => "fa fa-bug", )) .
                     html_writer::end_tag("button") .
                     html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "enable_drag", "onclick" => "enableDrag()")) .
-                        html_writer::tag("i","" ,array("class" => "fa fa-arrows", "aria-hidden" => "true")) .
+                        html_writer::tag("i","" ,array("class" => "fa fa-arrows", )) .
                     html_writer::end_tag("button") .
-                    html_writer::tag("i", "", array("id" => "#Menuheader", "class" =>
-                        "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+                    html_writer::tag("i", "", array("id" => "Menuheader", "class" =>
+                        "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
                 html_writer::end_div() .
             html_writer::end_div();
 
@@ -284,9 +284,9 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::tag("h3", "", array("id" => "titleScriptBox")) .
                         html_writer::start_div("topnav-right") .
                             html_writer::tag("i", "", array("class" => "fa fa-expand fa-2x", "id" =>
-                                "full_screen_blockly", "aria-hidden" => "true")) .
-                            html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" =>
-                                "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+                                "full_screen_blockly", )) .
+                            html_writer::tag("i", "", array("id" => "ScriptBoxheader", "class" =>
+                                "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                     html_writer::start_div("", array("id" => "whereScriptsAre")) .

@@ -377,7 +377,7 @@ if ($accessed) {
 
     $topnavLab = html_writer::start_tag("ul") . html_writer::start_div("topnav-right") .
     html_writer::tag("i", "", array("id" => "#topNavLabBoxheader", "class" =>
-        "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+        "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
     html_writer::end_div() ;
 
     echo html_writer::div($topnavLab . $lab,$sortableclass,array('id' => 'dragLab'));

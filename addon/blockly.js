@@ -894,7 +894,7 @@
 			}
 		}
 		removeScript(id,funindex);
-	}
+	};
 
 	removeScript = function (id,funindex){
 		document.getElementById(id).remove();
@@ -1250,11 +1250,11 @@
 	});
 
 	function enableDrag(){
-		enableDragItems=!enableDragItems;
-		if(enableDragItems){
+		var elements = document.getElementsByClassName('my_handle');
+		enableDragItems = !enableDragItems;
+		if(enableDragItems) {
 			document.getElementById('enable_drag').style.background = 'lightgrey';
-			var elements = document.getElementsByClassName('my_handle');
-			for(var i=0;i<elements.length;i++){
+			for (var i=0; i < elements.length; i++){
 				elements[i].style.display = '';
 			}
 			for (var i = 0; i < dragElems.length; i++) {
@@ -1267,10 +1267,9 @@
 				document.getElementById(dragElems2[i]).style.outline = '2px dashed lightblue';
 			}
 		}
-		else{
+		else {
 			document.getElementById('enable_drag').style.background = 'white';
-			var elements = document.getElementsByClassName('my_handle');
-			for(var i=0;i<elements.length;i++){
+			for (var i=0; i < elements.length; i++) {
 				elements[i].style.display = 'none';
 			}
 			for (var i = 0; i < dragElems.length; i++) {

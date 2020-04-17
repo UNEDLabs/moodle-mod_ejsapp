@@ -17,6 +17,6 @@
 *.RTF	 diff=astextplain
 
 #Vendored software
-vendor/ace/* linguist-vendored
-vendor/blockly/* linguist-vendored
-vendor/js-interpreter/* linguist-vendored
+vendor/* linguist-vendored
+amd/src/vendor/* linguist-vendored
+amd/build/vendor/* linguist-vendored

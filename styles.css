@@ -13,8 +13,13 @@
     width: 100%;
 }
 
+.path-mod-ejsapp #UpperEJsS {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .path-mod-ejsapp #EJsS {
-    min-width: 700px;
     max-width: 100%;
     flex-basis: 50%;
     flex-shrink: 5;
@@ -34,16 +39,13 @@
 }
 
 .path-mod-ejsapp .topnav-right {
-    display: inline-block;
-    float: right;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.path-mod-ejsapp .sortable {
-    cursor: move;
-}
-
-.path-mod-ejsapp #EJsSheader {
-    cursor: move;
+.path-mod-ejsapp .topnav-right {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .path-mod-ejsapp #_topFrame {
@@ -74,11 +76,6 @@
     margin: 0 30px;
 }
 
-.path-mod-ejsapp #prev_chart,
-.path-mod-ejsapp #next_chart {
-    cursor: pointer;
-}
-
 .path-mod-ejsapp #slideshow-wrapper {
     width: 100%;
 }
@@ -98,8 +95,18 @@
     padding-bottom: 0;
 }
 
+.path-mod-ejsapp #Menuheader {
+    align-self: center;
+}
+
+.path-mod-ejsapp .my_handle {
+    cursor: move;
+}
+
 .path-mod-ejsapp .dropdown-item,
-.path-mod-ejsapp #show_log {
+.path-mod-ejsapp #show_log,
+.path-mod-ejsapp #prev_chart,
+.path-mod-ejsapp #next_chart {
     cursor: pointer;
 }
 
@@ -158,6 +165,10 @@
     text-align: center;
     height: 90%;
     cursor: default;
+}
+
+.path-mod-ejsapp .blocklySvg {
+    width: 100%;
 }
 
 .path-mod-ejsapp #blocklyDivExperiments,
