@@ -119,6 +119,10 @@
     margin: 0rem 1rem
 }
 
+.path-mod-ejsapp .ghost {
+    opacity: 0.4;
+}
+
 .path-mod-ejsapp .play-code {
     height: 2em;
     cursor: pointer;

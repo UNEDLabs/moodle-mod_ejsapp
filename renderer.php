@@ -129,14 +129,17 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
      */
     public function render_ejsapp_lab() {
         $code =
-            html_writer::start_div("", array("id" => "prevDrag")) .
-            html_writer::end_div() .
-            html_writer::start_div("", array("id" => "EJsS")) .
-                html_writer::start_div("topnav-right") .
-                html_writer::end_div() .
-                html_writer::div("", "", array("id" => "_topFrame")) .
-            html_writer::end_div();
-
+            html_writer::start_div("", array("id" => "UpperEJsS")) .
+                html_writer::start_tag("ul") .
+                    html_writer::start_div("", array("id" => "EJsS")) .
+                        html_writer::start_div("topnav-right") .
+                            html_writer::tag("i", "", array("id" => "#LabBoxheader", "class" =>
+                                "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+                        html_writer::end_div() .
+                        html_writer::div("", "", array("id" => "_topFrame")) .
+                    html_writer::end_div().
+                html_writer::end_tag("ul").
+            html_writer::end_div() ;
         return $code;
     }
 
@@ -149,25 +152,29 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
 
         $chartsdiv =
             html_writer::start_div("", array("id" => "ChartBox", "style" => "display:none;")) .
-               html_writer::start_div("topnav-right align-self-end") .
-                    html_writer::tag("i", "", array("id" => "save_chart_img", "onclick" =>
-                        "saveImg('" . $CFG->wwwroot . "/mod/ejsapp/upload_file.php" . "')",
-                        "class" => "fa fa-area-chart fa-2x")) .
-                    html_writer::tag("i", "", array("id" => "save_chart_data", "onclick" =>
-                        "saveCSV(0)", "class" => "fa fa-file-text-o fa-2x")) .
-                    html_writer::tag("i", "", array("id" => "full_screen_chart", "class" =>
-                        "fa fa-expand fa-2x", "aria-hidden" => "true")) .
-                html_writer::end_div() .
-                html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
-                    html_writer::start_div("d-flex justify-content-center", array("id" => "control_chart")) .
-                        html_writer::tag("i", "", array("id" => "prev_chart", "onclick" => "prevChart()",
-                            "class" => "fa fa-angle-double-left fa-2x", "style" => "display:none;")) .
-                        html_writer::tag("i", "", array("id" => "clean_chart", "onclick" => "cleanCharts()",
-                            "class" => "fa fa-times fa-2x", "style" => "display:none;")) .
-                        html_writer::tag("i", "", array("id" => "next_chart", "onclick" => "nextChart()",
-                            "class" => "fa fa-angle-double-right fa-2x", "style" => "display:none;")) .
+                html_writer::start_tag("ul") .
+                   html_writer::start_div("topnav-right align-self-end") .
+                        html_writer::tag("i", "", array("id" => "save_chart_img", "onclick" =>
+                            "saveImg('" . $CFG->wwwroot . "/mod/ejsapp/upload_file.php" . "')",
+                            "class" => "fa fa-area-chart fa-2x")) .
+                        html_writer::tag("i", "", array("id" => "save_chart_data", "onclick" =>
+                            "saveCSV(0)", "class" => "fa fa-file-text-o fa-2x")) .
+                        html_writer::tag("i", "", array("id" => "full_screen_chart", "class" =>
+                            "fa fa-expand fa-2x", "aria-hidden" => "true")) .
+                        html_writer::tag("i", "", array("class" =>
+                            "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
                     html_writer::end_div() .
-                html_writer::end_div() .
+                    html_writer::start_div("d-flex flex-column", array("id" => "slideshow-wrapper")) .
+                        html_writer::start_div("d-flex justify-content-center", array("id" => "control_chart")) .
+                            html_writer::tag("i", "", array("id" => "prev_chart", "onclick" => "prevChart()",
+                                "class" => "fa fa-angle-double-left fa-2x", "style" => "display:none;")) .
+                            html_writer::tag("i", "", array("id" => "clean_chart", "onclick" => "cleanCharts()",
+                                "class" => "fa fa-times fa-2x", "style" => "display:none;")) .
+                            html_writer::tag("i", "", array("id" => "next_chart", "onclick" => "nextChart()",
+                                "class" => "fa fa-angle-double-right fa-2x", "style" => "display:none;")) .
+                        html_writer::end_div() .
+                    html_writer::end_div() .
+                html_writer::end_tag("ul") .
             html_writer::end_div();
 
         return $chartsdiv;
@@ -254,6 +261,11 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "show_log", "onclick" => "showLog()")) .
                         html_writer::tag("i", get_string('log_blockly', 'ejsapp'), array("class" => "fa fa-bug", "aria-hidden" => "true")) .
                     html_writer::end_tag("button") .
+                    html_writer::start_tag("button", array("class" => "play-code textExecutionElement", "id" => "enable_drag", "onclick" => "enableDrag()")) .
+                        html_writer::tag("i","" ,array("class" => "fa fa-arrows", "aria-hidden" => "true")) .
+                    html_writer::end_tag("button") .
+                    html_writer::tag("i", "", array("id" => "#Menuheader", "class" =>
+                        "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
                 html_writer::end_div() .
             html_writer::end_div();
 
@@ -273,6 +285,8 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                         html_writer::start_div("topnav-right") .
                             html_writer::tag("i", "", array("class" => "fa fa-expand fa-2x", "id" =>
                                 "full_screen_blockly", "aria-hidden" => "true")) .
+                            html_writer::tag("i", "", array("id" => "#ScriptBoxheader", "class" =>
+                                "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
                         html_writer::end_div() .
                     html_writer::end_div() .
                     html_writer::start_div("", array("id" => "whereScriptsAre")) .

@@ -14,230 +14,220 @@ function prepareControllerCode(code,name){
 	}
 	var fun = new Function(res[0], textoparametros+'evaluarConContexto("'+statements_code+ret+'");' );
 	evaluatefuns.push(fun);
-	/*u=4.0*(beta-betaRef) - 35.0*alpha + 1.5*dbeta - 3.0*dalpha;
-	(4 * ((beta) - (betaRef)) - (35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha))))
-	control = new Function(res[0], textoparametros+'evaluarConContexto("u=(4 * ((beta) - (betaRef)) - 35 * (alpha) + (1.5 * (dbeta) - 3 * (dalpha)))");' );*/
-
-	/*statem.push(statements_code.toString());
-	var res = getInfoFromFunctionName(functionToReplace);
-	var ret="";
-	if(res[1]!==""){
-		ret = "return "+res[1]+";";
-	}
-	fun = new Function(res[0], statements_code +ret );
-	console.log(fun);*/
-	//console.log("---name "+name);
 	return "replaceFunction('"+name+"', "+(evaluatefuns.length-1)+");\n"
 }
+require(['mod_ejsapp/blockly_compressed','mod_ejsapp/javascript_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyJS,BlocklyConf) {
+	playCodeDet = function(value0, value1, value2, value3) {
+		var blocklyExp = "";
+		blockyEvent = "";
+		blocklyChart = "";
+		blocklyController = "";
+		evaluatefuns = [];
+		var code ="";
+		if (value0 !== "Select experiment" && value0 !== "") {
+			workspace.clear();
 
-function playCodeDet(value0,value1,value2,value3) {
-	var blocklyExp="";blockyEvent="";blocklyChart="";blocklyController="";
-	evaluatefuns = [];
-	if(value0!=="Select experiment" && value0!==""){
-		workspace.clear();
-		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(experimentsList,value0)[0]), workspace);
-		var code = Blockly.JavaScript.workspaceToCode(workspace);
-		if(code!==null)
-			blocklyExp =code;
-	}
-	if(value1!=="Select chart"  && value1!==""){
-		workspaceCharts.clear();
-		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(chartsList,value1)[0]), workspaceCharts);
-		blocklyChart=Blockly.JavaScript.workspaceToCode(workspaceCharts);
-	}
-	if(value2!=="Select event"  && value2!==""){
-		workspaceEvents.clear();
-		Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(eventsList,value2)[0]), workspaceEvents);
-		blockyEvent=Blockly.JavaScript.workspaceToCode(workspaceEvents);
-	}
-	if(value3.length!==0){
-		if(controllerBlockly){
-			/*for(var i =0;i<value3.length;i++) {
-				var semicode = "";
-				var code = getCodeFromNameFunctions(functionsList, value3[i])[0];
-				if (functionUseBlockly) {
-					workspaceFunctions.clear();
-					Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromNameFunctions(functionsList, value3[i])[0]), workspaceFunctions);
-					semicode = Blockly.JavaScript.workspaceToCode(workspaceFunctions);
+			Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(experimentsList, value0)[0]), workspace);
+			code = BlocklyJS.workspaceToCode(workspace);
 
-				} else {
-					semicode = code;
-				}
-				console.log("value3 indice "+i+" valor "+value3[i]);
-				if (!remoteController[i]) {
-					blocklyController.push(prepareControllerCode(semicode,value3[i]));
-				} else {
-					blocklyController = [];
-					codeForRemoteController = semicode;
-				}
-			}*/
-			for(var i=0;i<functionSelected.length;i++){
-				if(functionSelected[i]!=="") {
-					var result =  getCodeFromNameFunctions(functionsList, functionSelected[i]);
-					var code = result[0];
-					var name = functionToReplace[i];
-					if (functionUseBlockly) {
-						workspaceFunctions.clear();
-						Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(code), workspaceFunctions);
-						code = Blockly.JavaScript.workspaceToCode(workspaceFunctions);
+			if (code !== null)
+				blocklyExp = code;
+		}
+		if (value1 !== "Select chart" && value1 !== "") {
+			workspaceCharts.clear();
+			Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(chartsList, value1)[0]), workspaceCharts);
+			blocklyChart = BlocklyJS.workspaceToCode(workspaceCharts);
+		}
+		if (value2 !== "Select event" && value2 !== "") {
+			workspaceEvents.clear();
+			Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(getCodeFromName(eventsList, value2)[0]), workspaceEvents);
+			blockyEvent = BlocklyJS.workspaceToCode(workspaceEvents);
+		}
+		if (value3.length !== 0) {
+			if (BlocklyConf.returnControllerBlockly()) {
+				for (var i = 0; i < functionSelected.length; i++) {
+					if (functionSelected[i] !== "") {
+						var result = getCodeFromNameFunctions(functionsList, functionSelected[i]);
+						code = result[0];
+						var name = BlocklyConf.returnFunctionToReplace()[i];
+						if (functionUseBlockly) {
+							workspaceFunctions.clear();
+							Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(code), workspaceFunctions);
+							code = BlocklyJS.workspaceToCode(workspaceFunctions);
+						}
+						else{
+							if(Object.keys(errorFunctionsList[i]).length>0){ //Errors
+								var error = 'FUN: '+functionSelected[i]+'\n';
+								for (var anno in errorFunctionsList[i]) {
+									// anno.row, anno.column, anno.text, anno.type
+									error = error +errorFunctionsList[i][anno].type+': '+errorFunctionsList[i][anno].text+' ('+errorFunctionsList[i][anno].row+', '+errorFunctionsList[i][anno].column+')\n';
+								}
+								printError(error);
+								return ["-1", "", "", ""];
+							}
+						}
+						if (!BlocklyConf.returnRemoteController()[i]) {
+							blocklyController = blocklyController + (prepareControllerCode(code, name));
+						} else {
+							codeForRemoteFunctions.push(code);
+						}
+
 					}
-					if (!remoteController[i]) {
-						blocklyController=blocklyController+(prepareControllerCode(code,name));
-					} else {
-						codeForRemoteFunctions.push(code);
-					}
-
 				}
 			}
 		}
-	}
 
-	if((code===null) || (blocklyExp==="") )
-		return ["","","",""];
-	// Prepare blocklyEvent for Extra functions:
+		if ((code === null) || (blocklyExp === ""))
+			return ["", "", "", ""];
+		// Prepare blocklyEvent for Extra functions:
 
-	var code2 = blockyEvent;
+		var code2 = blockyEvent;
 
-	functionsFromEvents="";
-	var continueSearch = true;
-	while (continueSearch) {
-		var pos = code2.search("function ");
-		if (pos === -1)
-			continueSearch = false;
-		else {
-			var pos2 = code2.search("}\n");
-			functionsFromEvents = functionsFromEvents + "\n" + code2.slice(pos, pos2 + 1);
-			code2 = code2.slice(pos2 + 1, code2.length);
-		}
-	}
-
-	return [blocklyExp,blocklyChart,blockyEvent,blocklyController];
-}
-
-function playCodeFromOutside(){
-	playCode(chartsBlockly, eventsBlockly, controllerBlockly);
-}
-
-function playCode(chartsBlockly, eventsBlockly, functionBlockly) {
-	var a="Select chart";
-	var b="Select event";
-	var c=[];
-	var replaytext = Blockly.Msg["Log1"] +' <span style="color:green">'+experimentSelected+'</span>';
-	if(chartsBlockly) {
-		if(chartSelected!==""){
-			a = chartSelected;
-			replaytext += Blockly.Msg["Log2"]+'<span style="color:blue">'+ a +'</span>';
-		}
-	}
-	if(eventsBlockly) {
-		if(eventSelected!==""){
-			b = eventSelected;
-			replaytext += Blockly.Msg["Log3"]+'<span style="color:red">'+ b +'</span>';
-		}
-	}
-	if(functionBlockly) {
-		for(var i=0;i<functionSelected.length;i++) {
-			if (functionSelected[i] !== "") {
-				c.push(functionSelected[i]);
-				replaytext += Blockly.Msg["Log4"] + '<span style="color:peru">' + functionSelected[i] + '</span>';
+		functionsFromEvents = "";
+		var continueSearch = true;
+		while (continueSearch) {
+			var pos = code2.search("function ");
+			if (pos === -1)
+				continueSearch = false;
+			else {
+				var pos2 = code2.search("}\n");
+				functionsFromEvents = functionsFromEvents + "\n" + code2.slice(pos, pos2 + 1);
+				code2 = code2.slice(pos2 + 1, code2.length);
 			}
 		}
+
+		return [blocklyExp, blocklyChart, blockyEvent, blocklyController];
 	}
-	var result= playCodeDet(experimentSelected,a,b,c);
-	if(result[0]!==""){
-		document.getElementById('executionLogGen').style.display="block";
-		document.getElementById('executionLog').insertAdjacentHTML('beforeend', '<div class="textsmall">' +
-			'<i onclick=" var result=replayCode(\''+$('select')[0].value+'\',\''+a+'\',\''+b+'\',\''+c+'\');" ' +
-			'class="fa fa-repeat"></i>'+replaytext+'</div>');
-		parseCode(result[0],result[1],result[2],result[3]);
-		inter = setInterval(stepCode, time_step);
+});
+
+require(['mod_ejsapp/blockly_conf'], function (BlocklyConf) {
+	function playCodeFromOutside() {
+		playCode(BlocklyConf.returnChartsBlockly(), BlocklyConf.returnEventsBlockly(), BlocklyConf.returnControllerBlockly());
 	}
-	else{
-		printError(Blockly.Msg["ExpError"]);
-	}
+});
+
+function checkErrorsInFunctions(code,name,funindex){
+
+	showScript(4,name,funindex);
+	var errorsAndWarnings = functionEditor.getSession().getAnnotations();
+	if(antcode!==null)
+		functionEditor.setValue(antcode);
+	return errorsAndWarnings;
 }
 
-function replayCode(value0,value1,value2,value3){
-	var result=playCodeDet(value0,value1,value2,value3);
-	parseCode(result[0],result[1],result[2],result[3]);
-	inter = setInterval(stepCode, time_step);
-}
+require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
+	playCode = function (chartsBlockly, eventsBlockly, functionBlockly) {
+		var a = "Select chart";
+		var b = "Select event";
+		var c = [];
+		var replaytext;
 
-function parseCode(blocklyExp,blocklyChart,blockyEvent,blocklyController) {
-	Blockly.JavaScript.addReservedWords('LoopTrap');
-	Blockly.JavaScript.STATEMENT_PREFIX = '';
-	Blockly.JavaScript.addReservedWords('highlightBlock');
-	Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
-	//console.log(blocklyController);
-	var code = "reInitLab();\n"+blocklyChart+blocklyController+"var set = false;\n"+blockyEvent+blocklyExp;
-	functions = "function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
-	/*var code2 = code;
+			replaytext = Blockly.Msg["Log1"] + ' <span style="color:green">' + experimentSelected + '</span>';
 
-	var continueSearch = true;
-	while (continueSearch) {
-		console.log(code2);
-		var pos = code2.search("function ");
-		if (pos === -1)
-			continueSearch = false;
-		else {
-			var pos2 = code2.search("}\n");
-			functions = functions + "\n" + code2.slice(pos, pos2 + 1);
-			code2 = code2.slice(pos2 + 1, code2.length);
+			if (chartsBlockly) {
+			if (chartSelected !== "") {
+				a = chartSelected;
+					replaytext += Blockly.Msg["Log2"] + '<span style="color:blue">' + a + '</span>';
+
+			}
 		}
-	}*/
-	myInterpreter = new Interpreter(code, initApi);
-	highlightPause = false;
-	workspace.highlightBlock(null);
-}
-
-function stepCode() {
-	if (!interval) {
-		try {
-			var set = myInterpreter.getValueFromScope('set');
-
-			if((set===undefined)||(set!==true))
-				revisarInicio();
-			var ok = myInterpreter.step();
+		if (eventsBlockly) {
+			if (eventSelected !== "") {
+				b = eventSelected;
+					replaytext += Blockly.Msg["Log3"] + '<span style="color:red">' + b + '</span>';
+			}
 		}
-		catch(error) {
-			printError(error);
-		}
-		finally {
-			if (!ok) {
-				/* Program complete, no more code to execute. */
-				workspace.highlightBlock(null);
-				clearInterval(inter);
-				// ATENCIÓN!!!!
-				for(var i =0;i<remoteController.length;i++){
-					var j = 0;
-					if(remoteController[i]){
-						var params=[];
-						params.push(codeForRemoteFunctions[j]);
-						callFunction(functionToReplace[i],params);
-						j++;
-					}
+		if (functionBlockly) {
+			for (var i = 0; i < functionSelected.length; i++) {
+				if (functionSelected[i] !== "") {
+					c.push(functionSelected[i]);
+					replaytext += Blockly.Msg["Log4"] + '<span style="color:peru">' + functionSelected[i] + '</span>';
 				}
-				codeForRemoteFunctions=[];
-				/*if(remoteController) {
-					//_model.sendToRemoteController(codeForRemoteController);
-					var params=[];
-					params.push(codeForRemoteController);
-					callFunction(functionToReplace,params);
-					codeForRemoteController ="";
-				}*/
+			}
+		}
 
+		var result = playCodeDet(experimentSelected, a, b, c);
+		if (result[0] !== "") {
+			if(result[0] === "-1"){
 				return;
 			}
+			document.getElementById('executionLogGen').style.display = "block";
+			document.getElementById('executionLog').insertAdjacentHTML('beforeend', '<div class="textsmall">' +
+				'<i onclick=" var result=replayCode(\'' + $('select')[0].value + '\',\'' + a + '\',\'' + b + '\',\'' + c + '\');" ' +
+				'class="fa fa-repeat"></i>' + replaytext + '</div>');
+			parseCode(result[0], result[1], result[2], result[3]);
+			inter = setInterval(stepCode, BlocklyConf.returnTime_step());
 		}
-		if (highlightPause) {
-			/* A block has been highlighted.  Pause execution here. */
-			highlightPause = false;
-		} else {
-			/* Keep executing until a highlight statement is reached. */
-			stepCode();
+		else {
+			printError(Blockly.Msg["ExpError"]);
+		}
+
+	};
+});
+
+require(['mod_ejsapp/blockly_conf'], function (BlocklyConf) {
+	replayCode = function (value0, value1, value2, value3) {
+		var result = playCodeDet(value0, value1, value2, value3);
+		parseCode(result[0], result[1], result[2], result[3]);
+		inter = setInterval(stepCode, BlocklyConf.returnTime_step());
+	}
+});
+
+require(['mod_ejsapp/javascript_compressed'], function (BlocklyJS) {
+	parseCode = function (blocklyExp, blocklyChart, blockyEvent, blocklyController) {
+		BlocklyJS.addReservedWords('LoopTrap');
+		BlocklyJS.STATEMENT_PREFIX = '';
+		BlocklyJS.addReservedWords('highlightBlock');
+		BlocklyJS.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+
+		var code = "reInitLab();\n" + blocklyChart + blocklyController + "var set = false;\n" + blockyEvent + blocklyExp;
+		functions = "function pause(){_model.pause();} function reset(){_model.reset();} function initialize(){_model.initialize();} function play(){_model.play();}\n";
+		myInterpreter = new Interpreter(code, initApi);
+		highlightPause = false;
+		workspace.highlightBlock(null);
+	}
+});
+
+require(['mod_ejsapp/blockly_conf'], function (BlocklyConf) {
+	stepCode = function () {
+		if (!interval) {
+			try {
+				var set = myInterpreter.getValueFromScope('set');
+
+				if ((set === undefined) || (set !== true))
+					revisarInicio();
+				var ok = myInterpreter.step();
+			} catch (error) {
+				printError(error);
+			} finally {
+				if (!ok) {
+					/* Program complete, no more code to execute. */
+					workspace.highlightBlock(null);
+					clearInterval(inter);
+					// ATENCIÓN!!!!
+					for (var i = 0; i < BlocklyConf.returnRemoteController().length; i++) {
+						var j = 0;
+						if (BlocklyConf.returnRemoteController()[i]) {
+							var params = [];
+							params.push(codeForRemoteFunctions[j]);
+							callFunction(BlocklyConf.returnFunctionToReplace()[i], params);
+							j++;
+						}
+					}
+					codeForRemoteFunctions = [];
+					return;
+				}
+			}
+			if (highlightPause) {
+				/* A block has been highlighted.  Pause execution here. */
+				highlightPause = false;
+			} else {
+				/* Keep executing until a highlight statement is reached. */
+				stepCode();
+			}
 		}
 	}
-}
+});
 
 function initApi(interpreter, scope) {
 	/* Add an API function for highlighting blocks. */
@@ -368,11 +358,9 @@ function revisarFin(){
 	for (var k in obj) {
 		var value = myInterpreter.getValueFromScope(k);
 		if (value !== undefined) {
-			if(k!==functionToReplace){
 				aux = {};
 				aux[k] = value;
 				_model._userUnserialize(aux);
-			}
 		}
 	}
 	if (_model.resetSolvers) _model.resetSolvers();

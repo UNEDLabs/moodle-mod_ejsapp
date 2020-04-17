@@ -281,14 +281,14 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
             array($ejsapp->is_rem_lab, $blocklyconf[1], $blocklyconf[2], $blocklyconf[3], $blocklyconf[4],
                 $funcnames, $remote));
         // Required libraries for blockly
-        $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blockly_compressed.js', true);
-        $PAGE->requires->js('/mod/ejsapp/vendor/blockly/blocks_compressed.js', true);
-        $PAGE->requires->js('/mod/ejsapp/vendor/blockly/javascript_compressed.js', true);
-        if (file_exists($CFG->dirroot . '/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js')) {
+        //$PAGE->requires->js('/mod/ejsapp/vendor/blockly/blockly_compressed.js', true);
+        //$PAGE->requires->js('/mod/ejsapp/vendor/blockly/blocks_compressed.js', true);
+        //$PAGE->requires->js('/mod/ejsapp/vendor/blockly/javascript_compressed.js', true);
+        /*if (file_exists($CFG->dirroot . '/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js')) {
             $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/' . current_language() . '.js', true);
         } else {
             $PAGE->requires->js('/mod/ejsapp/vendor/blockly/msg/js/en.js', true);
-        }
+        }*/
         if (file_exists($CFG->dirroot . '/mod/ejsapp/addon/lang/' . current_language() . '.js')) {
             $PAGE->requires->js('/mod/ejsapp/addon/lang/' . current_language() . '.js');
         } else {
@@ -372,10 +372,15 @@ if ($accessed) {
     if ($ejsapp->intro) {
         echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
     }
-
     $lab = html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
-        $chartsdiv, 'labchart');
-    echo html_writer::div($lab, $sortableclass, array('id' => 'dragLab'));
+        $chartsdiv, 'labchart'). html_writer::end_tag("ul");
+
+    $topnavLab = html_writer::start_tag("ul") . html_writer::start_div("topnav-right") .
+    html_writer::tag("i", "", array("id" => "#topNavLabBoxheader", "class" =>
+        "fa fa-arrows-alt fa-2x my_handle", "aria-hidden" => "true", "style"=>"display:none;margin-left:1rem")) .
+    html_writer::end_div() ;
+
+    echo html_writer::div($topnavLab . $lab,$sortableclass,array('id' => 'dragLab'));
     echo $experiments;
 
     if ($ejsapp->appwording) {

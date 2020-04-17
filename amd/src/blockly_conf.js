@@ -28,6 +28,16 @@
  */
 
 define([], function() {
+    var remoteLab;
+    var chartsBlockly;
+    var eventsBlockly;
+    var controllerBlockly;
+    var time_step;
+    var controllerFunctionLanguage;
+    var functionToReplace;
+    var remoteController;
+    var codeBeforeController;
+    var codeAfterController;
     var t = {
         configureBlockly: function(remote, charts, events, controller, language, functionName, server) {
             remoteLab = remote === "1";
@@ -40,7 +50,17 @@ define([], function() {
             remoteController = server;
             codeBeforeController = "";
             codeAfterController = "";
-        }
+        },
+        returnRemoteLab:function(){return remoteLab},
+        returnChartsBlockly:function(){return chartsBlockly},
+        returnEventsBlockly:function(){return eventsBlockly},
+        returnControllerBlockly:function(){return controllerBlockly},
+        returnTime_step:function(){return time_step},
+        returnControllerFunctionLanguage:function(){return controllerFunctionLanguage},
+        returnFunctionToReplace:function(){return functionToReplace},
+        returnRemoteController:function(){return remoteController},
+        returnCodeBeforeController:function(){return codeBeforeController},
+        returnCodeAfterController:function(){return codeAfterController}
     };
     return t;
 });
