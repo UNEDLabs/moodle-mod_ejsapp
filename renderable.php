@@ -288,6 +288,24 @@ class ejsapp_charts implements renderable {
 }
 
 /**
+ * Auxiliary class to print the labchart div
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class ejsapp_labchart implements renderable {
+    /**
+     * __construct
+     * @param string $labdiv
+     * @param string $chartdiv
+     */
+    public function __construct($labdiv, $chartdiv, $sortableclass) {
+        $this->labdiv = $labdiv;
+        $this->chartdiv = $chartdiv;
+        $this->sortableclass = $sortableclass;
+    }
+}
+
+/**
  * Auxiliary class to print the controlbar div
  * @copyright  2012 Luis de la Torre and Ruben Heradio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -325,5 +343,22 @@ class ejsapp_log implements renderable {
      * __construct
      */
     public function __construct() {
+    }
+}
+
+/**
+ * Auxiliary class to print the experiment div
+ * @copyright  2012 Luis de la Torre and Ruben Heradio
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class ejsapp_experiment implements renderable {
+    /**
+     * __construct
+     */
+    public function __construct($controldiv, $blocklydiv, $logdiv, $sortableclass) {
+        $this->controldiv = $controldiv;
+        $this->blocklydiv = $blocklydiv;
+        $this->logdiv = $logdiv;
+        $this->sortableclass = $sortableclass;
     }
 }

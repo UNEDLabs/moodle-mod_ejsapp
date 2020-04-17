@@ -96,6 +96,17 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Prints ejsapp labchart div
+     * @param string $labdiv
+     * @param string $chartdiv
+     * @param string $sortableclass
+     * @return string Html code that prints the labchart div
+     */
+    public function ejsapp_labchart($labdiv, $chartdiv, $sortableclass) {
+        return $this->render(new ejsapp_labchart($labdiv, $chartdiv, $sortableclass));
+    }
+
+    /**
      * Prints ejsapp controlbar div
      * @param array $blocklyconf
      * @return string Html code that prints the control bar div
@@ -121,6 +132,14 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Combines controlba and blockly divs and prints ejsapp experiment div
+     * @return string Html code that prints the experiment div
+     */
+    public function ejsapp_experiment($controldiv, $blocklydiv, $logdiv, $sortableclass) {
+        return $this->render(new ejsapp_experiment($controldiv, $blocklydiv, $logdiv, $sortableclass));
+    }
+
+    /**
      * Returns the code that embeds an EjsS application into Moodle
      *
      * @return string Html code that embeds an EjsS application in Moodle
@@ -140,6 +159,7 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::end_div().
                 html_writer::end_tag("ul").
             html_writer::end_div() ;
+
         return $code;
     }
 
@@ -178,6 +198,29 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
             html_writer::end_div();
 
         return $chartsdiv;
+    }
+
+    /**
+     * Returns the code that combines the lab and the chart divs
+     *
+     * @param ejsapp_labchart $params
+     * @return string Html code that embeds the lab and chart elements
+     * @throws
+     *
+     */
+    public function render_ejsapp_labchart($params) {
+        $code =
+            html_writer::start_div($params->sortableclass, array('id' => 'dragLab')) .
+                html_writer::start_tag("ul") .
+                    html_writer::start_div("topnav-right") .
+                        html_writer::tag("i", "", array("id" => "topNavLabBoxheader", "class" =>
+                            "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
+                    html_writer::end_div() .
+                    html_writer::div($params->labdiv . $params->chartdiv, 'labchart').
+                html_writer::end_tag("ul");
+            html_writer::end_div();
+
+        return $code;
     }
 
     /**
@@ -329,9 +372,23 @@ class mod_ejsapp_renderer extends plugin_renderer_base {
                     html_writer::div("", "", array("id" => "executionLog")) .
                 html_writer::end_div() .
                 html_writer::tag("hr", "") .
-                html_writer::tag("textarea", get_string('error_blockly', 'ejsapp'), array("id" => "errorArea", "readonly" => "true")) .
+                html_writer::tag("textarea", get_string('error_blockly', 'ejsapp'),
+                    array("id" => "errorArea", "readonly" => "true")) .
             html_writer::end_div();
 
         return $logdiv;
+    }
+
+    /**
+     * Combines controlbar and blockly divs and prints ejsapp experiment div
+     * @return string Html code that prints the experiment div
+     * @throws coding_exception
+     */
+    public function render_ejsapp_experiment($params) {
+        $dragBlockly_navbar = html_writer::div($params->controldiv, $params->sortableclass,
+            array('id' => 'dragBlockly_navbar'));
+        $dragBlockly = html_writer::div($params->blocklydiv . $params->logdiv, $params->sortableclass,
+            array('id' => 'dragBlockly'));
+        return $dragBlockly_navbar . $dragBlockly;
     }
 }

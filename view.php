@@ -311,13 +311,9 @@ if (pathinfo($ejsapp->main_file,PATHINFO_EXTENSION) != 'jar' && $accessed) { // 
         $blocklydiv = $renderer->ejsapp_blockly();
         $logdiv = $renderer->ejsapp_log();
 
-        $sortableclass = 'sortable';
-        $dragBlockly_navbar =  html_writer::div($controldiv, $sortableclass, array('id' => 'dragBlockly_navbar'));
-        $dragBlockly =  html_writer::div($blocklydiv . $logdiv, $sortableclass, array('id' => 'dragBlockly'));
-
         // Join HTML divs for placing blockly related elements in a single one.
-        //$experiments = $controldiv . $blocklydiv . $logdiv;
-        $experiments = $dragBlockly_navbar . $dragBlockly;
+        $sortableclass = 'sortable';
+        $experiments = $renderer->ejsapp_experiment($controldiv, $blocklydiv, $logdiv, $sortableclass);
     }
 
     // Check if file is an alias to a file in a repository and update it if necessary
@@ -372,15 +368,11 @@ if ($accessed) {
     if ($ejsapp->intro) {
         echo $OUTPUT->box(format_module_intro('ejsapp', $ejsapp, $cm->id), 'generalbox mod_introbox', 'ejsappintro');
     }
-    $lab = html_writer::div($renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo) .
-        $chartsdiv, 'labchart'). html_writer::end_tag("ul");
 
-    $topnavLab = html_writer::start_tag("ul") . html_writer::start_div("topnav-right") .
-    html_writer::tag("i", "", array("id" => "#topNavLabBoxheader", "class" =>
-        "fa fa-arrows-alt fa-2x my_handle", "style"=>"display:none;margin-left:1rem")) .
-    html_writer::end_div() ;
+    $labdiv = $renderer->ejsapp_lab($ejsapp, $remlabinfo, $datafiles, $collabinfo, $personalvarsinfo);
+    $labchart = $renderer->ejsapp_labchart($labdiv, $chartsdiv, $sortableclass);
 
-    echo html_writer::div($topnavLab . $lab,$sortableclass,array('id' => 'dragLab'));
+    echo $labchart;
     echo $experiments;
 
     if ($ejsapp->appwording) {
