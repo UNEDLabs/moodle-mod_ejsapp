@@ -260,6 +260,7 @@ class mod_ejsapp_mod_form extends moodleform_mod {
         $varsarray[] = $mform->createElement('text', 'func_name', get_string('func_name', 'ejsapp'));
         if ($DB->record_exists('block', array('name' => 'remlab_manager'))) {
             $varsarray[] = $mform->createElement('selectyesno', 'remote_function', get_string('remote_function', 'ejsapp'));
+            $mform->disabledIf('remote_function', 'functions', 'eq', 0);
         } else {
             $mform->addElement('hidden', 'remote_function', null);
             $mform->setType('remote_function', PARAM_INT);
