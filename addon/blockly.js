@@ -1222,7 +1222,7 @@
 
 
 
-	require(['mod_ejsapp/Sortable'], function(sortable) {
+	require(['mod_ejsapp/vendor/sortable'], function(sortable) {
 		dragableElements = function (dragElems,dragElems2,blockly){
 			if(!detectMob()) {
 				for (var i = 0; i < dragElems2.length; i++) {
