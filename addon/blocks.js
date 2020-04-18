@@ -1,5 +1,5 @@
 function prepareBlocks(newImplement,keys_boolean,keys_boolean_output,keys_boolean_input,keys_number,keys_number_output,keys_number_input,visualJSGeneral,visualJSEvents,events_vars,function_from_ejss,function_from_ejss_with_return) {
-	require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blocks_compressed'], function (Blockly,Blocks) {
+	require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/vendor/blockly/blocks_compressed'], function (Blockly,Blocks) {
 		Blocks.get_model_variable_boolean = {
 			init: function() {
 				var addition;

@@ -42,7 +42,7 @@
 					preparePage();
 					initJSFrame("_javaScriptFrame");
 
-					require(['mod_ejsapp/blockly_compressed'], function(Blockly) {
+					require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function(Blockly) {
 
 						workspace = Blockly.inject('blocklyDivExperiments', {
 							grid:
@@ -320,7 +320,7 @@
 		if(detectMob()){
 			document.getElementById("enable_drag").style.display=none;
 		}
-		require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
+		require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
 			if (BlocklyConf.returnEventsBlockly()) {
 				workspaceEvents = Blockly.inject('blocklyDivEvents', {
 					grid:
@@ -368,7 +368,7 @@
 		});
 	}
 
-	require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
+	require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
 		updateControllerPanelDiv = function(num) {
 			var element = document.getElementById('ControllerHeader');
 			if (BlocklyConf.returnRemoteController()[num]) {
@@ -390,7 +390,7 @@
 	require(['mod_ejsapp/blockly_conf'], function (BlocklyConf) {
 		createControllerPanel = function() {
 			if (BlocklyConf.returnControllerFunctionLanguage() === "blockly") {
-				require(['mod_ejsapp/blockly_compressed'], function(Blockly) {
+				require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function(Blockly) {
 					workspaceFunctions = Blockly.inject('blocklyDivController', {
 						grid:
 							{
@@ -587,7 +587,7 @@
 	}
 
 	function myUpdateFunction(event){
-		require(['mod_ejsapp/blockly_compressed'], function (Blockly) {
+		require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function (Blockly) {
 			if (event.type == Blockly.Events.CHANGE || Blockly.Events.CHANGE) {
 				if (experimentOpen !== -1) {
 					var xml = Blockly.Xml.workspaceToDom(workspace);
@@ -643,7 +643,7 @@
 				document.getElementById('myModal').style.display = "none";
 			}
 		}
-		require(['mod_ejsapp/blockly_compressed'], function (Blockly) {
+		require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function (Blockly) {
 			if (event.type == Blockly.Events.CHANGE || Blockly.Events.CHANGE) {
 				if (eventOpen !== -1) {
 					var xml = Blockly.Xml.workspaceToDom(workspaceEvents);
@@ -654,7 +654,7 @@
 	}
 
 	function checkChartsBlocks(event){
-		require(['mod_ejsapp/blockly_compressed'], function (Blockly) {
+		require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function (Blockly) {
 			if (event.type == Blockly.Events.CHANGE || Blockly.Events.CHANGE) {
 				if (chartOpen !== -1) {
 					var xml = Blockly.Xml.workspaceToDom(workspaceCharts);
@@ -674,7 +674,7 @@
 	});
 
 	function checkFunctionsBlocks(event){
-		require(['mod_ejsapp/blockly_compressed'], function (Blockly) {
+		require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function (Blockly) {
 			if (event.type == Blockly.Events.CHANGE || Blockly.Events.CHANGE) {
 				var index = getFunctionOpen();
 				if (index !== -1) {
@@ -739,7 +739,7 @@
 
 	/* DRAGGABLE ELEMENTS */
 	function resize(){
-		require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
+		require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
 			if (experimentOpen != -1) {
 				Blockly.svgResize(workspace);
 			} else if (chartOpen != -1) {
@@ -1101,7 +1101,7 @@
 		}
 	});
 
-	require(['mod_ejsapp/blockly_compressed'], function (Blockly) {
+	require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function (Blockly) {
 	showScript = function (num,name,funindex){
 		document.getElementById("ScriptBox").style.display = "none";
 		document.getElementById("blocklyDivExperiments").style.display="none";

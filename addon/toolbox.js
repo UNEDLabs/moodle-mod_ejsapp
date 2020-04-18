@@ -1,6 +1,6 @@
 // TOOLBOX CONFIGURATION
 
-require(['mod_ejsapp/blockly_compressed'], function (Blockly) {
+require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function (Blockly) {
 	generalVars = function(worksp) {
 		var extra = "";
 		if (worksp.id !== workspace.id)

@@ -16,7 +16,7 @@ function prepareControllerCode(code,name){
 	evaluatefuns.push(fun);
 	return "replaceFunction('"+name+"', "+(evaluatefuns.length-1)+");\n"
 }
-require(['mod_ejsapp/blockly_compressed','mod_ejsapp/javascript_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyJS,BlocklyConf) {
+require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/vendor/blockly/javascript_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyJS,BlocklyConf) {
 	playCodeDet = function(value0, value1, value2, value3) {
 		var blocklyExp = "";
 		blockyEvent = "";
@@ -115,7 +115,7 @@ function checkErrorsInFunctions(code,name,funindex){
 	return errorsAndWarnings;
 }
 
-require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
+require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/blockly_conf'], function (Blockly,BlocklyConf) {
 	playCode = function (chartsBlockly, eventsBlockly, functionBlockly) {
 		var a = "Select chart";
 		var b = "Select event";
@@ -173,7 +173,7 @@ require(['mod_ejsapp/blockly_conf'], function (BlocklyConf) {
 	}
 });
 
-require(['mod_ejsapp/javascript_compressed'], function (BlocklyJS) {
+require(['mod_ejsapp/vendor/blockly/javascript_compressed'], function (BlocklyJS) {
 	parseCode = function (blocklyExp, blocklyChart, blockyEvent, blocklyController) {
 		BlocklyJS.addReservedWords('LoopTrap');
 		BlocklyJS.STATEMENT_PREFIX = '';

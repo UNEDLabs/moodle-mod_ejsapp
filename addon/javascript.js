@@ -1,5 +1,5 @@
 function prepareJavaScript(jsCodesGeneral,jsCodesEvents,conditionFixed,chartId,chartInfo,function_from_ejss,function_from_ejss_with_return) {
-	require(['mod_ejsapp/javascript_compressed'], function (BlocklyJS) {
+	require(['mod_ejsapp/vendor/blockly/javascript_compressed'], function (BlocklyJS) {
 		BlocklyJS.get_model_variable_boolean = function(block) {
 			return getJS(block, "modelvariables1");
 		};

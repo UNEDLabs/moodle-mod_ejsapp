@@ -1,5 +1,5 @@
 function prepareToolBox() {
-    require(['mod_ejsapp/blockly_compressed','mod_ejsapp/blockly_compressed'], function(Blockly) {
+    require(['mod_ejsapp/vendor/blockly/blockly_compressed','mod_ejsapp/vendor/blockly/blockly_compressed'], function(Blockly) {
        toolbox = '<xml>' +
             '  <category name="' + Blockly.NameLogic + '" colour="210">' +
             '      <block type="controls_if"></block>' +
