@@ -467,7 +467,7 @@ require(['mod_ejsapp/vendor/blockly/blockly_compressed'], function(Blockly) {
     Blockly.Msg["ExpINPUT"] = "input parameters";
     Blockly.Msg["ExpNEWVAR"] = "new variables";
     Blockly.Msg["ExpCODE"] = "code";
-    Blockly.Msg["ExpINITIALIZE "] = "initialize the lab";
+    Blockly.Msg["ExpINITIALIZE"] = "initialize the lab";
     Blockly.Msg["ExpCHARTRENEW"] = "refresh with every experiment";
     Blockly.ControllerTextInitial = "You are going to overwrite the function called ";
     Blockly.ControllerTextSecond = " which has ";
