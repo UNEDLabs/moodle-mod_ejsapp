@@ -10,6 +10,8 @@ Moodle course.
 The Java applets should have been compiled with version 4.37 (build 20120715 or later) of EJS while the Javascript
 applications should have been created with version 5.1 (build 20150613 or later) to work properly.
 
+This plugin will not receive further updates other than (maybe) some form of a basic version of the automatic generation of lab interfaces. For more updated versions, contact the authors and/or Nebulous Systems at https://www.nebsyst.com, https://irs.nebsyst.com or contact@nebsyst.com.
+
 ## 2. License
 
 EJSApp is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
